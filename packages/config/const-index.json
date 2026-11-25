@@ -2526,12 +2526,6 @@
         "scope": "config",
         "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/icon.ts"
-      },
-      {
-        "ref": "HUE_SLIDER_TRACK.PALETTE",
-        "scope": "app:platform",
-        "from": "@platform/constants/hue-slider",
-        "file": "apps/platform/src/constants/hue-slider.ts"
       }
     ],
     "QUOTE": [
@@ -8354,14 +8348,6 @@
         "file": "apps/platform/src/constants/growth-layer.ts"
       }
     ],
-    "RAINBOW": [
-      {
-        "ref": "HUE_SLIDER_TRACK.RAINBOW",
-        "scope": "app:platform",
-        "from": "@platform/constants/hue-slider",
-        "file": "apps/platform/src/constants/hue-slider.ts"
-      }
-    ],
     "XXXS": [
       {
         "ref": "ICON_SIZE.XXXS",
@@ -8824,6 +8810,14 @@
         "file": "apps/platform/src/constants/onboarding.ts"
       }
     ],
+    "ACCENT_HUE_INACCESSIBLE": [
+      {
+        "ref": "ONBOARDING_FIELD_ERROR.ACCENT_HUE_INACCESSIBLE",
+        "scope": "app:platform",
+        "from": "@platform/constants/onboarding",
+        "file": "apps/platform/src/constants/onboarding.ts"
+      }
+    ],
     "REVIEW": [
       {
         "ref": "ONBOARDING_STEP.REVIEW",
@@ -8880,7 +8874,7 @@
         "file": "apps/platform/src/constants/onboarding.ts"
       }
     ],
-    "(width >= 85rem)": [
+    "(width >= 69rem)": [
       {
         "ref": "ONBOARDING_TIER_QUERY.FULL",
         "scope": "app:platform",

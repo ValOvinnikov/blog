@@ -23,6 +23,10 @@ const settle = (page: Page) =>
     document.querySelectorAll('img[loading="lazy"]').forEach((image) => {
       (image as HTMLImageElement).loading = 'eager';
     });
+    // A play function can leave a control focused, which paints its ring into the rest screenshot the ring is measured against.
+    if (document.activeElement instanceof HTMLElement) {
+      document.activeElement.blur();
+    }
     await document.fonts.ready;
     await Promise.all(
       Array.from(document.images).map((image) =>

@@ -18,16 +18,11 @@ import type { TStarterCopy } from './copy/starter-copy';
 import type { TStarterDocumentUnion, TStarterPage } from './starter-document';
 import { STARTER_DOCUMENT_IDS } from './starter-document-ids';
 import type { TStarterTemplate } from './starter-document-shape';
-import {
-  moduleSlot,
-  pageHeadingBlock,
-  paragraphs,
-  reference,
-  seo,
-} from './starter-fields';
+import { moduleSlot, paragraphs, reference } from './starter-fields';
 import { internalLink } from './starter-links';
 import { INTRODUCTION_MODULE_TITLE } from './starter-module-titles';
 import { buildContentModule } from './starter-modules';
+import { pageFields, starterTemplate } from './starter-pages';
 
 const COOKIE_STATEMENT_LINK_MARK_KEY = 'cookieStatementLink';
 
@@ -65,22 +60,19 @@ export function buildLegalPages(
 ): TStarterDocumentUnion[] {
   return [
     buildCookieStatementDocument(locale, cookieStatement),
-    {
-      _id: STARTER_DOCUMENT_IDS.PRIVACY_INDEX_TEMPLATE,
-      _type: 'template_privacyIndex',
-      title: 'Privacy Index Template',
-    } satisfies TStarterTemplate<Template_privacyIndex>,
+    starterTemplate(
+      STARTER_DOCUMENT_IDS.PRIVACY_INDEX_TEMPLATE,
+      'template_privacyIndex',
+      'Privacy Index Template',
+    ) satisfies TStarterTemplate<Template_privacyIndex>,
     {
       _id: STARTER_DOCUMENT_IDS.PRIVACY_INDEX,
       _type: 'page_privacyIndex',
-      language: locale,
-      title: privacyIndex.title,
-      headingBlock: pageHeadingBlock(
-        privacyIndex.heading,
-        privacyIndex.supportingText,
+      ...pageFields(
+        locale,
+        STARTER_DOCUMENT_IDS.PRIVACY_INDEX_TEMPLATE,
+        privacyIndex,
       ),
-      template: reference(STARTER_DOCUMENT_IDS.PRIVACY_INDEX_TEMPLATE),
-      seo: seo(privacyIndex.metaTitle, privacyIndex.metaDescription),
     } satisfies TStarterPage<Page_privacyIndex>,
     internalLink(
       STARTER_DOCUMENT_IDS.COOKIE_STATEMENT_LINK,
@@ -95,9 +87,11 @@ export function buildLegalPages(
       body: legalIndexIntro(legalIndex.intro, cookieStatement.title),
     }),
     {
-      _id: STARTER_DOCUMENT_IDS.LEGAL_INDEX_TEMPLATE,
-      _type: 'template_legalIndex',
-      title: 'Legal Index Template',
+      ...starterTemplate(
+        STARTER_DOCUMENT_IDS.LEGAL_INDEX_TEMPLATE,
+        'template_legalIndex',
+        'Legal Index Template',
+      ),
       modules: [
         moduleSlot(STARTER_DOCUMENT_IDS.LEGAL_INDEX_INTRO, 'module_content'),
       ],
@@ -105,14 +99,11 @@ export function buildLegalPages(
     {
       _id: STARTER_DOCUMENT_IDS.LEGAL_INDEX,
       _type: 'page_legalIndex',
-      language: locale,
-      title: legalIndex.title,
-      headingBlock: pageHeadingBlock(
-        legalIndex.heading,
-        legalIndex.supportingText,
+      ...pageFields(
+        locale,
+        STARTER_DOCUMENT_IDS.LEGAL_INDEX_TEMPLATE,
+        legalIndex,
       ),
-      template: reference(STARTER_DOCUMENT_IDS.LEGAL_INDEX_TEMPLATE),
-      seo: seo(legalIndex.metaTitle, legalIndex.metaDescription),
     } satisfies TStarterPage<Page_legalIndex>,
   ];
 }

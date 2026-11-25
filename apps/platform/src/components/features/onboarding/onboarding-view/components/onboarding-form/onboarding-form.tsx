@@ -40,7 +40,6 @@ export const OnboardingForm = ({
     isContinueDisabled,
     panelRef,
     addressVerdict,
-    addressError,
     siteAddress,
     previewAddress,
     railSteps,
@@ -83,8 +82,6 @@ export const OnboardingForm = ({
 
   const footer = (
     <OnboardingFooter
-      step={step}
-      addressVerdict={addressVerdict}
       failure={failure}
       isFirstStep={isFirstStep}
       isLastStep={isLastStep}
@@ -120,7 +117,7 @@ export const OnboardingForm = ({
                     step={step}
                     values={values}
                     fieldErrors={fieldErrors}
-                    addressError={addressError}
+                    addressVerdict={addressVerdict}
                     siteAddress={siteAddress}
                     changeField={changeField}
                     changeSiteType={changeSiteType}

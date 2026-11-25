@@ -1,27 +1,14 @@
-import { LookField } from '@platform/components/features/look/look-form/components/look-field';
+import { LookChoiceField } from '@platform/components/features/look/look-form/components/look-choice-field';
 import { toLookGlyphOptions } from '@platform/components/features/look/look-form/components/look-option-glyph';
-import { useLookFieldLock } from '@platform/components/features/look/look-form/use-look-field-lock';
-import { useLookForm } from '@platform/components/features/look/look-form-provider';
-import { SegmentedControl } from '@platform/components/shared/segmented-control';
 import {
   ACCOUNT_BUTTON_STYLE,
   ACCOUNT_PANEL_STYLE,
   ACCOUNT_PHONE_PLACEMENT,
-  type TAccountButtonStyle,
-  type TAccountPanelStyle,
-  type TAccountPhonePlacement,
 } from '@shinefold/config';
 import { useTranslations } from 'next-intl';
 
 export const AccountFields = () => {
-  const {
-    values: { accountButtonStyle, accountPanelStyle, accountPhonePlacement },
-    updateField,
-  } = useLookForm();
   const t = useTranslations('lookForm');
-  const buttonLock = useLookFieldLock('accountButtonStyle');
-  const panelLock = useLookFieldLock('accountPanelStyle');
-  const placementLock = useLookFieldLock('accountPhonePlacement');
 
   const buttonOptions = toLookGlyphOptions(
     'accountButtonStyle',
@@ -41,55 +28,26 @@ export const AccountFields = () => {
 
   return (
     <>
-      <LookField
+      <LookChoiceField
         field="accountButtonStyle"
         label={t('accountButtonStyleLabel')}
         hint={t('accountButtonStyleDescription')}
-        isGroup={true}
-        lock={buttonLock}
-      >
-        <SegmentedControl<TAccountButtonStyle>
-          aria={buttonLock.aria}
-          options={buttonOptions}
-          value={accountButtonStyle}
-          onChange={(style) => updateField('accountButtonStyle', style)}
-          lock={buttonLock}
-        />
-      </LookField>
+        options={buttonOptions}
+      />
 
-      <LookField
+      <LookChoiceField
         field="accountPanelStyle"
         label={t('accountPanelStyleLabel')}
         hint={t('accountPanelStyleDescription')}
-        isGroup={true}
-        lock={panelLock}
-      >
-        <SegmentedControl<TAccountPanelStyle>
-          aria={panelLock.aria}
-          options={panelOptions}
-          value={accountPanelStyle}
-          onChange={(style) => updateField('accountPanelStyle', style)}
-          lock={panelLock}
-        />
-      </LookField>
+        options={panelOptions}
+      />
 
-      <LookField
+      <LookChoiceField
         field="accountPhonePlacement"
         label={t('accountPhonePlacementLabel')}
         hint={t('accountPhonePlacementDescription')}
-        isGroup={true}
-        lock={placementLock}
-      >
-        <SegmentedControl<TAccountPhonePlacement>
-          aria={placementLock.aria}
-          options={placementOptions}
-          value={accountPhonePlacement}
-          onChange={(placement) =>
-            updateField('accountPhonePlacement', placement)
-          }
-          lock={placementLock}
-        />
-      </LookField>
+        options={placementOptions}
+      />
     </>
   );
 };

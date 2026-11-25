@@ -8,43 +8,10 @@ import {
   type TSiteAddressStatus,
 } from '@platform/constants/onboarding';
 import type { TCreateSiteFieldError } from '@platform/server/onboarding/create-site-input';
-import { tv } from '@platform/utils/tv/tv';
 import { ICONS, SIZE, type TMaybeUndefined } from '@shinefold/config';
 import { useTranslations } from 'next-intl';
 
-const addressVerdictVariants = tv({
-  slots: {
-    root: ['flex min-w-0'],
-    chip: [
-      'inline-flex max-w-full items-start gap-2',
-      'rounded-platform border py-[7px] pr-3 pl-[9px]',
-    ],
-    glyph: ['flex h-[19px] shrink-0 items-center'],
-    message: ['min-w-0 text-platform-13-5 leading-platform-19 font-semibold'],
-    announcement: ['sr-only'],
-  },
-  variants: {
-    status: {
-      [SITE_ADDRESS_STATUS.IDLE]: {},
-      [SITE_ADDRESS_STATUS.CHECKING]: {
-        chip: ['border-platform-line bg-platform-surface'],
-        glyph: ['text-platform-muted'],
-        message: ['text-platform-text'],
-      },
-      [SITE_ADDRESS_STATUS.AVAILABLE]: {
-        chip: ['border-platform-ok/30 bg-platform-ok-weak'],
-        glyph: ['text-platform-ok'],
-        message: ['text-platform-ok'],
-      },
-      [SITE_ADDRESS_STATUS.UNAVAILABLE]: {},
-      [SITE_ADDRESS_STATUS.UNVERIFIED]: {
-        chip: ['border-platform-warn/30 bg-platform-warn-weak'],
-        glyph: ['text-platform-warn'],
-        message: ['font-medium text-platform-text'],
-      },
-    },
-  },
-});
+import { addressVerdictVariants } from './address-verdict-variants';
 
 const VERDICT_ICON = {
   [SITE_ADDRESS_STATUS.AVAILABLE]: ICONS.CHECK,
@@ -66,9 +33,8 @@ export const AddressVerdict = ({
 }: TAddressVerdictProps) => {
   const t = useTranslations('onboardingForm');
   const toErrorText = useFieldErrorText();
-  const { root, chip, glyph, message, announcement } = addressVerdictVariants({
-    status,
-  });
+  const { root, chip, glyph, message, detail, host, announcement } =
+    addressVerdictVariants({ status });
 
   if (status === SITE_ADDRESS_STATUS.IDLE) {
     return <div role="status" className={root()} />;
@@ -84,8 +50,10 @@ export const AddressVerdict = ({
 
   const messages = {
     [SITE_ADDRESS_STATUS.CHECKING]: t('siteAddressChecking'),
-    [SITE_ADDRESS_STATUS.AVAILABLE]: t('siteAddressAvailable', {
+    [SITE_ADDRESS_STATUS.AVAILABLE]: t.rich('siteAddressAvailable', {
       address: siteAddress,
+      detail: (chunks) => <span className={detail()}>{chunks}</span>,
+      host: (chunks) => <span className={host()}>{chunks}</span>,
     }),
     [SITE_ADDRESS_STATUS.UNVERIFIED]: t('siteAddressUnverified'),
   };

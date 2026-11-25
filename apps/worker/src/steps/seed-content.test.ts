@@ -17,6 +17,10 @@ import {
 } from '@worker/testing/outage/fixtures';
 import { MOCK_PROVISION_ENV } from '@worker/testing/provision-env/fake-provision-env';
 import {
+  mockSanityClient,
+  type TMockSanityClient,
+} from '@worker/testing/sanity-client/mock-sanity-client';
+import {
   MOCK_INSUFFICIENT_PERMISSIONS_MESSAGE,
   MOCK_MALFORMED_DOCUMENT_MESSAGE,
 } from '@worker/testing/sanity-client-error/fixtures';
@@ -68,37 +72,13 @@ function starterDocumentsFor(siteType: TStarterSiteType, tenant: TTenant) {
   });
 }
 
-function createClientStub(
-  transaction: {
-    createIfNotExists: ReturnType<typeof vi.fn>;
-    commit: ReturnType<typeof vi.fn>;
-  },
-  options: { fetchResult?: string | null } = {},
-) {
-  const { fetchResult = null } = options;
-  const assetsUpload = vi.fn();
-  const fetch = vi.fn().mockResolvedValue(fetchResult);
-  const client = {
-    assets: { upload: assetsUpload },
-    fetch,
-    transaction: () => transaction,
-  };
-  return {
-    assetsUpload,
-    fetch,
-    createClient: vi
-      .fn()
-      .mockReturnValue(client) as unknown as TSeedContentDeps['createClient'],
-  };
-}
-
 describe(seedTenantContent, () => {
   let tenant: TTenant;
-  let commit: ReturnType<typeof vi.fn>;
-  let createIfNotExists: ReturnType<typeof vi.fn>;
-  let assetsUpload: ReturnType<typeof vi.fn>;
-  let clientFetch: ReturnType<typeof vi.fn>;
-  let createClient: TSeedContentDeps['createClient'];
+  let commit: TMockSanityClient['commit'];
+  let createIfNotExists: TMockSanityClient['createIfNotExists'];
+  let upload: TMockSanityClient['upload'];
+  let clientFetch: TMockSanityClient['fetch'];
+  let createClient: Mock<TSeedContentDeps['createClient']>;
   let mintWriteToken: Mock<TSeedContentDeps['mintWriteToken']>;
   let revokeWriteToken: Mock<TSeedContentDeps['revokeWriteToken']>;
   let sleep: Mock<TSeedContentDeps['sleep']>;
@@ -111,32 +91,38 @@ describe(seedTenantContent, () => {
       afterSeed?: TAfterSeed;
     } = {},
   ) {
-    const { siteType = SITE_TYPE.BLANK, deps } = options;
-    return seedTenantContent(
-      options.tenant ?? tenant,
+    const { siteType = SITE_TYPE.BLANK, deps, afterSeed } = options;
+    return seedTenantContent({
+      tenant: options.tenant ?? tenant,
       siteType,
-      MOCK_PROVISION_ENV.productName,
-      {
+      productName: MOCK_PROVISION_ENV.productName,
+      deps: {
         createClient,
         mintWriteToken,
         revokeWriteToken,
         sleep,
         ...deps,
       },
-      options.afterSeed,
-    );
+      afterSeed,
+    });
   }
 
   beforeEach(() => {
     freezeClock();
     tenant = baseTenant();
-    commit = vi.fn().mockResolvedValue(undefined);
-    createIfNotExists = vi.fn();
+    let client: TMockSanityClient['client'];
     ({
-      assetsUpload,
+      client,
+      upload,
       fetch: clientFetch,
-      createClient,
-    } = createClientStub({ createIfNotExists, commit }));
+      createIfNotExists,
+      commit,
+    } = mockSanityClient());
+    clientFetch.mockResolvedValue(null);
+    commit.mockResolvedValue(undefined);
+    createClient = vi
+      .fn<TSeedContentDeps['createClient']>()
+      .mockReturnValue(client);
     mintWriteToken = vi
       .fn()
       .mockResolvedValue({ id: MOCK_ROBOT_ID, token: MOCK_WRITE_TOKEN });
@@ -170,14 +156,11 @@ describe(seedTenantContent, () => {
   });
 
   it('skips seeding when the dataset already has settings_site', async () => {
-    const existingSiteClient = createClientStub(
-      { createIfNotExists, commit },
-      { fetchResult: MOCK_EXISTING_SETTINGS_SITE_ID },
-    );
+    clientFetch.mockResolvedValue(MOCK_EXISTING_SETTINGS_SITE_ID);
 
-    await seed({ deps: { createClient: existingSiteClient.createClient } });
+    await seed();
 
-    expect(existingSiteClient.fetch).toHaveBeenCalledWith(SITE_SETTINGS_QUERY);
+    expect(clientFetch).toHaveBeenCalledWith(SITE_SETTINGS_QUERY);
     expect(createIfNotExists).not.toHaveBeenCalled();
     expect(commit).not.toHaveBeenCalled();
     expect(setTenantSanityWriteTokenAndSeededAt).not.toHaveBeenCalled();
@@ -218,7 +201,7 @@ describe(seedTenantContent, () => {
     });
 
     it('seeds through a client authenticated with the minted token', () => {
-      const [clientOptions] = vi.mocked(createClient).mock.lastCall ?? [];
+      const [clientOptions] = createClient.mock.lastCall ?? [];
       expect(clientOptions?.projectId).toBe(MOCK_SANITY_PROJECT_ID);
       expect(clientOptions?.dataset).toBe(MOCK_SANITY_DATASET);
       expect(clientOptions?.token).toBe(MOCK_WRITE_TOKEN);
@@ -226,7 +209,7 @@ describe(seedTenantContent, () => {
     });
 
     it('commits every document and the ledger in one transaction, no assets', () => {
-      expect(assetsUpload).not.toHaveBeenCalled();
+      expect(upload).not.toHaveBeenCalled();
       expect(createIfNotExists).toHaveBeenCalledTimes(
         starterDocumentsFor(SITE_TYPE.BLANK, tenant).length + 1,
       );
@@ -324,7 +307,7 @@ describe(seedTenantContent, () => {
       await seed({ afterSeed });
 
       expect(afterSeed).toHaveBeenCalledWith(
-        vi.mocked(createClient).mock.results[0]?.value,
+        createClient.mock.results[0]?.value,
       );
       expect(
         vi.mocked(setTenantSanityWriteTokenAndSeededAt).mock
@@ -333,15 +316,9 @@ describe(seedTenantContent, () => {
     });
 
     it('runs it on an already-seeded dataset, then revokes the transient token', async () => {
-      const existingSiteClient = createClientStub(
-        { createIfNotExists, commit },
-        { fetchResult: MOCK_EXISTING_SETTINGS_SITE_ID },
-      );
+      clientFetch.mockResolvedValue(MOCK_EXISTING_SETTINGS_SITE_ID);
 
-      await seed({
-        afterSeed,
-        deps: { createClient: existingSiteClient.createClient },
-      });
+      await seed({ afterSeed });
 
       expect(afterSeed).toHaveBeenCalledOnce();
       expect(revokeWriteToken).toHaveBeenCalledWith(MOCK_REVOKED_TOKEN);

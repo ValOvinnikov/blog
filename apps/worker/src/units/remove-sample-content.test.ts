@@ -10,6 +10,7 @@ import {
   mockRevision,
   mockSanityDocument,
 } from '@worker/testing/sample-content/fixtures';
+import { mockSanityClient } from '@worker/testing/sanity-client/mock-sanity-client';
 import { MOCK_TENANT_ID } from '@worker/testing/tenant/fixtures';
 import { createTenantWriteClient } from '@worker/utils/tenant-content/tenant-write-client';
 
@@ -20,11 +21,8 @@ vi.mock('@shinefold/db/queries/tenants');
 
 const ids = STARTER_DOCUMENT_IDS;
 
-const fetch = vi.fn();
-const patch = vi.fn();
-const deleteDocument = vi.fn();
-const commit = vi.fn();
-const transaction = vi.fn(() => ({ patch, delete: deleteDocument, commit }));
+const { client, fetch, transaction, patch, deleteDocument, commit } =
+  mockSanityClient();
 
 const MOCK_CTA_REVISION = mockRevision();
 const MOCK_ABOUT_TITLE = 'About';
@@ -71,10 +69,7 @@ describe(removeSampleContent, () => {
       additionalLocales: [],
       plan: TENANT_PLAN.FREE,
     });
-    vi.mocked(createTenantWriteClient).mockResolvedValue({
-      fetch,
-      transaction,
-    } as never);
+    vi.mocked(createTenantWriteClient).mockResolvedValue(client);
   });
 
   it('unlinks and deletes unedited samples in one transaction, listing the kept', async () => {

@@ -77,8 +77,8 @@
     "nameHint": "Staat in de kop van je site en in browsertabbladen.",
     "siteAddressLabel": "Adres van de site",
     "siteAddressHint": "Letters, cijfers en koppeltekens. Met het Starter- of Growth-abonnement kun je je eigen domein koppelen.",
-    "siteAddressChecking": "Adres controleren…",
-    "siteAddressAvailable": "{address} is van jou",
+    "siteAddressChecking": "Controleren…",
+    "siteAddressAvailable": "Beschikbaar<detail> — <host>{address}</host></detail>",
     "siteAddressUnverified": "We konden dit adres nu niet controleren. Je kunt doorgaan – we controleren het opnieuw wanneer je de site aanmaakt.",
     "languageLabel": "Taal",
     "languageHint": "De taal waarmee je site begint. Je kunt later meer talen toevoegen.",
@@ -100,6 +100,7 @@
       "siteAddressInvalid": "Gebruik alleen kleine letters, cijfers en koppeltekens, maximaal 63 tekens, zonder koppelteken aan het begin of eind.",
       "siteAddressReserved": "Dit adres is gereserveerd. Kies een ander.",
       "siteAddressTaken": "Dit adres is al in gebruik. Kies een ander.",
+      "accentHueInaccessible": "Met deze tint blijft lopende tekst op de getinte vlakken niet leesbaar, dus de site zou hem vervangen. Kies een andere tint.",
       "termsNotAccepted": "Accepteer de Servicevoorwaarden en het Privacybeleid om door te gaan."
     },
     "steps": {

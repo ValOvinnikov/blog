@@ -9,7 +9,7 @@ export const onboardingFormVariants = tv({
     form: [
       'flex flex-1 flex-col',
       'md:grid md:min-h-0 md:grid-cols-1 md:grid-rows-[minmax(0,1fr)_auto] md:bg-platform-surface',
-      'min-[85rem]:grid-cols-[minmax(0,1fr)_560px]',
+      'min-[69rem]:grid-cols-[560px_minmax(0,1fr)]',
     ],
     main: [
       'min-w-0 bg-platform-surface px-4 pt-6 pb-7',
@@ -23,7 +23,7 @@ export const onboardingFormVariants = tv({
     fields: ['mt-5 flex flex-col gap-6 md:mt-8 md:gap-7'],
     railPreview: ['mt-8'],
     previewColumn: [
-      'col-start-2 row-span-2 row-start-1 flex min-h-0 flex-col overflow-hidden bg-platform-bg px-7 py-8 shadow-[inset_1px_0_0_var(--platform-preview-column-line)]',
+      'col-start-2 row-span-2 row-start-1 flex min-h-0 flex-col overflow-hidden bg-platform-bg p-6 shadow-[inset_1px_0_0_var(--platform-preview-column-line)]',
     ],
     phonePreview: [
       'flex-1 border-t border-platform-line bg-platform-bg px-3 pt-5 pb-6 md:hidden',

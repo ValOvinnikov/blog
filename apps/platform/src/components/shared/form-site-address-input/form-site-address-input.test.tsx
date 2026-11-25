@@ -11,10 +11,12 @@ faker.seed(5995);
 const MOCK_LABEL = faker.lorem.words(2);
 const MOCK_HINT = faker.lorem.sentence();
 const MOCK_ERROR = faker.lorem.sentence();
+const MOCK_SUFFIX = `.${MOCK_TENANT_ROOT_DOMAIN}`;
+const MOCK_STATUS = faker.lorem.words(3);
+const MOCK_COPY = { label: MOCK_LABEL, hint: MOCK_HINT };
 
 const setup = customRender(FormSiteAddressInput, {
-  label: MOCK_LABEL,
-  hint: MOCK_HINT,
+  copy: MOCK_COPY,
   value: '',
   onChange: vi.fn(),
   rootDomain: MOCK_TENANT_ROOT_DOMAIN,
@@ -33,14 +35,14 @@ describe(`<${FormSiteAddressInput.name}/>`, () => {
     const siteAddress = screen.getByRole('textbox', { name: MOCK_LABEL });
 
     expect(siteAddress).toHaveAccessibleDescription(
-      `.${MOCK_TENANT_ROOT_DOMAIN} ${MOCK_HINT}`,
+      `${MOCK_SUFFIX} ${MOCK_HINT}`,
     );
   });
 
   it('shows no suffix when no root domain is set', () => {
     setup({ rootDomain: undefined });
 
-    const suffix = screen.queryByText(`.${MOCK_TENANT_ROOT_DOMAIN}`);
+    const suffix = screen.queryByText(MOCK_SUFFIX);
     const siteAddress = screen.getByRole('textbox', { name: MOCK_LABEL });
 
     expect(suffix).not.toBeInTheDocument();
@@ -48,23 +50,30 @@ describe(`<${FormSiteAddressInput.name}/>`, () => {
   });
 
   it('describes an invalid input with its suffix, hint and error, in that order', () => {
-    setup({ error: MOCK_ERROR });
+    setup({ copy: { ...MOCK_COPY, error: MOCK_ERROR } });
 
     const siteAddress = screen.getByRole('textbox', { name: MOCK_LABEL });
 
     expect(siteAddress).toBeInvalid();
     expect(siteAddress).toHaveAccessibleDescription(
-      `.${MOCK_TENANT_ROOT_DOMAIN} ${MOCK_HINT} ${MOCK_ERROR}`,
+      `${MOCK_SUFFIX} ${MOCK_HINT} ${MOCK_ERROR}`,
     );
   });
 
-  it('places the hint after the address row in the wizard appearance', () => {
-    setup({ appearance: FIELD_APPEARANCE.WIZARD });
+  it('places the status between the address row and the hint in the wizard appearance', () => {
+    setup({
+      appearance: FIELD_APPEARANCE.WIZARD,
+      status: <span>{MOCK_STATUS}</span>,
+    });
 
-    const suffix = screen.getByText(`.${MOCK_TENANT_ROOT_DOMAIN}`);
+    const suffix = screen.getByText(MOCK_SUFFIX);
+    const status = screen.getByText(MOCK_STATUS);
     const hint = screen.getByText(MOCK_HINT);
 
-    expect(suffix.compareDocumentPosition(hint)).toBe(
+    expect(suffix.compareDocumentPosition(status)).toBe(
+      Node.DOCUMENT_POSITION_FOLLOWING,
+    );
+    expect(status.compareDocumentPosition(hint)).toBe(
       Node.DOCUMENT_POSITION_FOLLOWING,
     );
   });

@@ -44,6 +44,7 @@ The Taxonomy List shows a browsable grid of topics or tags, each card carrying t
 - A term with no archive page in the request language is dropped from the grid.
 - A failed fetch is logged and thrown to the error boundary (a 500), unlike most modules, which render nothing.
 - The view composes `TaxonomyCard` directly rather than the post `MediaCardItem`; `TaxonomyCard.Posts` renders only when latest posts are on and the term has any.
+- Cards in a row stretch to equal height, and each card's post count sits at its foot, so counts line up across a row whatever the description length.
 
 ## Dependencies
 

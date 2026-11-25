@@ -162,10 +162,13 @@ site as a 14-day Growth trial, with no card.
   capped at 640px and left-aligned. The layout has three tiers, read in JS
   with `useMediaQuery` at the same edges the CSS uses, so the preview renders
   once, in its tier's place, and the DOM order is the keyboard order:
-  - **Full** (from 1360px): the 300px rail, the content column and a 560px
-    grey preview column side by side. The page never scrolls; the content
-    column scrolls inside itself above Back / Continue, pinned to its foot.
-  - **Rail** (768–1359px): the 300px rail and the content column, with the
+  - **Full** (from 1104px): the 300px rail, a 560px content column and a
+    grey preview stage filling the rest, one 24px gutter in from the column.
+    The site is scaled to fit the stage's width and height, never above
+    100%, and centred once it reaches 100%. The page never scrolls; the
+    content column scrolls inside itself above Back / Continue, pinned to its
+    foot, while the preview stays in place.
+  - **Rail** (768–1103px): the 300px rail and the content column, with the
     preview inside the column below the fields and above the same pinned
     Back / Continue.
   - **Phone** (below 768px): the rail is a dark top band: the brand row (with
@@ -198,20 +201,31 @@ site as a 14-day Growth trial, with no card.
   2. **Address** — the Site address (only the subdomain, with
      `.<TENANT_ROOT_DOMAIN>` shown beside it, checked live by
      `checkSiteAddressAction` as the user types) and the starting language,
-     each with its hint below it. A taken, reserved or invalid address shows
-     its error under the hint, with the input invalid and described by the
-     suffix, the hint, then the error; the actions' `role="status"` region
-     repeats it as screen-reader-only text so it is announced as it appears.
-     The other verdicts — checking,
-     "<address> is yours" and the orange (`warn`) "couldn't check" note — are a tinted
-     chip in a `role="status"` region in the pinned actions, between Back and
-     Continue (on its own line above the buttons in the phone action bar).
+     each with its hint below it. The address's verdict sits in a
+     `role="status"` region directly under the input, above the hint,
+     through `FormSiteAddressInput`'s `status` slot. Checking ("Checking…"),
+     "Available — <address>" (the address in the suffix's monospace, on one
+     line; "Available" alone where the field is narrower than 24rem, while
+     screen readers still hear the address) and the orange (`warn`)
+     "couldn't check" note are a tinted chip there. A taken, reserved or
+     invalid address shows its error under the hint, with the input invalid
+     and described by the suffix, the hint, then the error, and Continue
+     disabled; the status region repeats the error as screen-reader-only
+     text so it is announced as it appears. The pinned actions hold only
+     Back (left) and Continue (right) on one row; on a phone both are full
+     width, stacked with Continue on top.
   3. **Look** — the preset and accent colour. Each site type starts on its
      own preset and that preset's accent (`STARTER_PRESET_BY_SITE_TYPE`:
      Editorial for Blog, Portfolio and Personal / résumé; Console for Docs,
      Business, Product and Blank), and changing the site type moves the preview with it until the
      owner picks a preset or moves the accent here; from then on their choice
-     stays whatever the site type.
+     stays whatever the site type. The accent slider uses the Look page's
+     palette track, and a hue the accent-hue guard (`isAccentHueAccessible`)
+     refuses shows the Look page's "unreadable" error as the field's error
+     and blocks Continue. A refused hue never reaches Review or Create site:
+     Continue from an earlier step and Create site both return to Look, and
+     `createSiteAction` refuses it as an `accentHue` field error
+     (`ACCENT_HUE_INACCESSIBLE`).
   4. **Review** — every choice in a ruled row (`DetailList` with
      `isBordered`), each with an Edit back to its step: a button styled as a
      text link (`BUTTON_VARIANT.LINK`), since it changes the step rather than
