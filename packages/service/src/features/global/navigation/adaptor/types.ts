@@ -6,6 +6,7 @@ export type TNavigationItem = ILink & {
 
 export type TNavigation = {
   items: TNavigationItem[];
+  headerAction: TMaybeUndefined<ILink>;
   tagline: TMaybeUndefined<string>;
   showLanguageSwitcher?: boolean;
 };
