@@ -32,13 +32,10 @@ import {
   mockProvisionedTenant,
 } from '@worker/testing/tenant/fixtures';
 import { buildAppliedMigrationLedger } from '@worker/utils/migration-ledger/migration-ledger';
+import type { TSeedContentDeps } from '@worker/utils/step-deps/step-deps';
 import type { Mock } from 'vitest';
 
-import {
-  seedTenantContent,
-  type TAfterSeed,
-  type TSeedContentDeps,
-} from './seed-content';
+import { seedTenantContent, type TAfterSeed } from './seed-content';
 
 faker.seed(7007);
 
@@ -205,7 +202,6 @@ describe(seedTenantContent, () => {
       expect(clientOptions?.projectId).toBe(MOCK_SANITY_PROJECT_ID);
       expect(clientOptions?.dataset).toBe(MOCK_SANITY_DATASET);
       expect(clientOptions?.token).toBe(MOCK_WRITE_TOKEN);
-      expect(clientOptions?.useCdn).toBe(false);
     });
 
     it('commits every document and the ledger in one transaction, no assets', () => {

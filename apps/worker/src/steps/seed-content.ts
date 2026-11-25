@@ -1,4 +1,3 @@
-import { createClient } from '@sanity/client';
 import {
   buildStarterDocuments,
   type TMaybeNull,
@@ -7,11 +6,6 @@ import {
 } from '@shinefold/config';
 import { setTenantSanityWriteTokenAndSeededAt } from '@shinefold/db/queries/tenants';
 import type { TTenant } from '@shinefold/db/schema/tenants';
-import {
-  createSanityRobotToken,
-  deleteSanityRobotToken,
-} from '@shinefold/db/utils/sanity-management-client/sanity-robot-tokens';
-import { SANITY_API_VERSION } from '@worker/constants/sanity-api';
 import { grantPropagationRetryOptions } from '@worker/utils/grant-propagation-retry/grant-propagation-retry';
 import {
   buildAppliedMigrationLedger,
@@ -21,39 +15,24 @@ import {
   retryWithBackoff,
   type TRetryWithBackoffOptions,
 } from '@worker/utils/retry-with-backoff/retry-with-backoff';
-import {
-  type TTemporaryWriteTokenDeps,
-  withTemporaryWriteToken,
-} from '@worker/utils/temporary-write-token/temporary-write-token';
+import type { TSeedContentDeps } from '@worker/utils/step-deps/step-deps';
+import { withTemporaryWriteToken } from '@worker/utils/temporary-write-token/temporary-write-token';
+import type { TTenantSanityClient } from '@worker/utils/tenant-sanity-client/tenant-sanity-client';
 
-type TSanityClient = ReturnType<typeof createClient>;
-
-export type TSeedContentDeps = TTemporaryWriteTokenDeps & {
-  createClient: typeof createClient;
-  sleep: (ms: number) => Promise<void>;
-};
-
-const defaultDeps: TSeedContentDeps = {
-  createClient,
-  mintWriteToken: createSanityRobotToken,
-  revokeWriteToken: deleteSanityRobotToken,
-  sleep: (ms) => new Promise((resolve) => setTimeout(resolve, ms)),
-};
-
-export type TAfterSeed = (client: TSanityClient) => Promise<void>;
+export type TAfterSeed = (client: TTenantSanityClient) => Promise<void>;
 
 export type TSeedTenantContentOptions = {
   tenant: TTenant;
   siteType: TStarterSiteType;
   productName: string;
-  deps?: TSeedContentDeps;
+  deps: TSeedContentDeps;
   afterSeed?: TAfterSeed;
 };
 
 const SITE_SETTINGS_EXISTS_QUERY = '*[_type == "settings_site"][0]._id';
 
 async function commitStarterContent(
-  client: TSanityClient,
+  client: TTenantSanityClient,
   tenant: TTenant,
   siteType: TStarterSiteType,
   retryOptions: TRetryWithBackoffOptions,
@@ -82,7 +61,7 @@ export async function seedTenantContent({
   tenant,
   siteType,
   productName,
-  deps = defaultDeps,
+  deps,
   afterSeed,
 }: TSeedTenantContentOptions): Promise<void> {
   const { id: tenantId, sanityProjectId, sanityDataset } = tenant;
@@ -99,8 +78,6 @@ export async function seedTenantContent({
         projectId: sanityProjectId,
         dataset: sanityDataset,
         token,
-        apiVersion: SANITY_API_VERSION,
-        useCdn: false,
       });
       const retryOptions = grantPropagationRetryOptions(deps.sleep);
 

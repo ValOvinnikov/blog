@@ -1,32 +1,37 @@
 import { setTimeout as sleep } from 'node:timers/promises';
 
-import { createClient } from '@sanity/client';
 import { getTenantSanityCredentials } from '@shinefold/db/queries/tenants';
-import { SANITY_API_TIMEOUT_MS } from '@shinefold/db/utils/sanity-management-client/sanity-api-request';
 import {
   createSanityRobotToken,
   deleteSanityRobotToken,
 } from '@shinefold/db/utils/sanity-management-client/sanity-robot-tokens';
 import { listSanityWebhooks } from '@shinefold/db/utils/sanity-management-client/sanity-webhooks-list';
-import { type TSeedContentDeps } from '@worker/steps/seed-content';
-import { type TVerifyTenantSeededContentDeps } from '@worker/steps/verify-seeded-content';
+import type { TTemporaryWriteTokenDeps } from '@worker/utils/temporary-write-token/temporary-write-token';
+import { createTenantSanityClient } from '@worker/utils/tenant-sanity-client/tenant-sanity-client';
 import { listVercelProjectDomains } from '@worker/utils/vercel-client/vercel-client';
 
-export function createClientWithTimeout(
-  config: Parameters<typeof createClient>[0],
-): ReturnType<typeof createClient> {
-  return createClient({ ...config, timeout: SANITY_API_TIMEOUT_MS });
-}
+type TStepSanityDeps = {
+  createClient: typeof createTenantSanityClient;
+  sleep: (ms: number) => Promise<void>;
+};
+
+export type TSeedContentDeps = TTemporaryWriteTokenDeps & TStepSanityDeps;
+
+export type TVerifyTenantSeededContentDeps = TStepSanityDeps & {
+  getCredentials: typeof getTenantSanityCredentials;
+  listWebhooks: typeof listSanityWebhooks;
+  listDomains: typeof listVercelProjectDomains;
+};
 
 export const seedContentDeps: TSeedContentDeps = {
-  createClient: createClientWithTimeout,
+  createClient: createTenantSanityClient,
   mintWriteToken: createSanityRobotToken,
   revokeWriteToken: deleteSanityRobotToken,
   sleep,
 };
 
 export const verifyContentDeps: TVerifyTenantSeededContentDeps = {
-  createClient: createClientWithTimeout,
+  createClient: createTenantSanityClient,
   getCredentials: getTenantSanityCredentials,
   listWebhooks: listSanityWebhooks,
   listDomains: listVercelProjectDomains,

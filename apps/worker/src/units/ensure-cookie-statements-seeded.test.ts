@@ -13,12 +13,12 @@ import {
 } from '@worker/testing/tenant/fixtures';
 import { atStepAttempt } from '@worker/testing/workflow/step-attempt';
 import { logger } from '@worker/utils/logger/logger';
-import { createClientWithTimeout } from '@worker/utils/step-deps/step-deps';
+import { createTenantSanityClient } from '@worker/utils/tenant-sanity-client/tenant-sanity-client';
 
 import { ensureCookieStatementsSeeded } from './ensure-cookie-statements-seeded';
 
 vi.mock('@shinefold/db/queries/tenants');
-vi.mock('@worker/utils/step-deps/step-deps');
+vi.mock('@worker/utils/tenant-sanity-client/tenant-sanity-client');
 vi.mock('workflow');
 
 const MOCK_WRITE_TOKEN = 'sk-write';
@@ -38,18 +38,17 @@ describe(ensureCookieStatementsSeeded, () => {
       provisioningStatus: null,
     });
     commit.mockResolvedValue({});
-    vi.mocked(createClientWithTimeout).mockReturnValue(client);
+    vi.mocked(createTenantSanityClient).mockReturnValue(client);
   });
 
   it('creates the starter cookie statement for each locale in one commit, only where missing', async () => {
     await ensureCookieStatementsSeeded(MOCK_TENANT_ID, MOCK_LOCALES);
 
-    expect(createClientWithTimeout).toHaveBeenCalledWith(
+    expect(createTenantSanityClient).toHaveBeenCalledWith(
       expect.objectContaining({
         projectId: MOCK_SANITY_PROJECT_ID,
         dataset: MOCK_SANITY_DATASET,
         token: MOCK_WRITE_TOKEN,
-        useCdn: false,
       }),
     );
     expect(createIfNotExists.mock.calls).toEqual(
@@ -65,7 +64,7 @@ describe(ensureCookieStatementsSeeded, () => {
       ensureCookieStatementsSeeded(MOCK_TENANT_ID, MOCK_LOCALES),
     ).rejects.toThrow();
 
-    expect(createClientWithTimeout).not.toHaveBeenCalled();
+    expect(createTenantSanityClient).not.toHaveBeenCalled();
     expect(logger.error).toHaveBeenCalledWith(
       COOKIE_STATEMENT_LOG.SEED_FAILED,
       expect.objectContaining({ tenantId: MOCK_TENANT_ID }),
