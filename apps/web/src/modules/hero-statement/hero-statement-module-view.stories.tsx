@@ -72,3 +72,12 @@ export const Banner: TStory = {
     }),
   },
 };
+
+export const WithFootnote: TStory = {
+  args: {
+    module: storyModule({
+      ctaButtons: MOCK_CTA_ACTIONS,
+      footnote: 'No card required · cancel anytime',
+    }),
+  },
+};
