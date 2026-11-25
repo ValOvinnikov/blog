@@ -1,14 +1,19 @@
 import { MEMBERSHIP_ROLE } from '@shinefold/db/constants';
 import { insertTestTenant } from '@shinefold/db/testing/fixtures';
+import { MOCK_NOW } from '@shinefold/db/testing/frozen-clock';
 import {
   deleteSeatRows,
   MOCK_INVITE_CONSUMED_AT,
   mockMembershipInvite,
 } from '@shinefold/db/testing/membership-invites/fixtures';
-import { insertTeam } from '@shinefold/db/testing/memberships/fixtures';
+import {
+  insertTeam,
+  insertTestMember,
+  MOCK_EDITOR_EMAIL,
+} from '@shinefold/db/testing/memberships/fixtures';
 import { useQueryTestDb } from '@shinefold/db/testing/query-test-db';
 
-import { countSeatsInUse } from './count-seats-in-use';
+import { countSeatsInUse, countUnlockedSeatsInUse } from './count-seats-in-use';
 
 vi.mock('@shinefold/db/client');
 
@@ -47,5 +52,29 @@ describe(countSeatsInUse, () => {
     await mockMembershipInvite(db(), otherTenantId);
 
     expect(await countSeatsInUse(tenantId)).toBe(0);
+  });
+});
+
+describe(countUnlockedSeatsInUse, () => {
+  let tenantId: string;
+
+  beforeEach(async () => {
+    ({ id: tenantId } = await insertTestTenant(db()));
+    await insertTeam(db(), tenantId, [MEMBERSHIP_ROLE.OWNER]);
+    await insertTestMember(db(), tenantId, MOCK_EDITOR_EMAIL, {
+      role: MEMBERSHIP_ROLE.EDITOR,
+      lockedAt: MOCK_NOW,
+    });
+    await mockMembershipInvite(db(), tenantId, {
+      role: MEMBERSHIP_ROLE.EDITOR,
+    });
+  });
+
+  it('counts unlocked members and pending invites, but not a locked member', async () => {
+    expect(await countUnlockedSeatsInUse(tenantId)).toBe(2);
+  });
+
+  it('still counts the locked member in every seat in use', async () => {
+    expect(await countSeatsInUse(tenantId)).toBe(3);
   });
 });

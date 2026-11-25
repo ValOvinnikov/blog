@@ -30,3 +30,7 @@ function pendingInvitesCount(tenantId: SQLWrapper | string): SQL<number> {
 export function seatsInUse(tenantId: SQLWrapper | string): SQL<number> {
   return sql<number>`(${membershipsCount(tenantId)} + ${pendingInvitesCount(tenantId)})::int`;
 }
+
+export function unlockedSeatsInUse(tenantId: SQLWrapper | string): SQL<number> {
+  return sql<number>`(${unlockedMembershipsCount(tenantId)} + ${pendingInvitesCount(tenantId)})::int`;
+}
