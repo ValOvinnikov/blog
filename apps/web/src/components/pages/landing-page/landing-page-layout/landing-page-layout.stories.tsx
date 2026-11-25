@@ -40,8 +40,10 @@ const meta = {
         }}
       />
     ),
-    sectionNavigation: mockLandingSectionNavigation(),
-    adjacentPages: mockLandingAdjacentPages(),
+    navigation: {
+      sectionNavigation: mockLandingSectionNavigation(),
+      adjacentPages: mockLandingAdjacentPages(),
+    },
     children: (
       <div className="py-section text-muted text-center">
         Page modules render here
@@ -68,7 +70,7 @@ export const SectionedWithBannerHero: TStory = {
 };
 
 export const WithoutSection: TStory = {
-  args: { sectionNavigation: undefined, adjacentPages: undefined },
+  args: { navigation: undefined },
 };
 
 export const MobileWithHero: TStory = {

@@ -116,14 +116,18 @@ describe(`<${LandingPage.name}/>`, () => {
 
       expect(sectionNav).not.toBeInTheDocument();
     });
+  });
 
-    it('renders no previous and next links when the page is outside a section', () => {
-      const adjacentNav = screen.queryByRole('navigation', {
-        name: ADJACENT_PAGES_NAME,
-      });
+  it('renders no previous and next links when the page is outside a section', async () => {
+    resolvePageWith({ adjacentPages: mockLandingAdjacentPages() });
 
-      expect(adjacentNav).not.toBeInTheDocument();
+    await setup();
+
+    const adjacentNav = screen.queryByRole('navigation', {
+      name: ADJACENT_PAGES_NAME,
     });
+
+    expect(adjacentNav).not.toBeInTheDocument();
   });
 
   it('redirects permanently when the missing path has moved', async () => {

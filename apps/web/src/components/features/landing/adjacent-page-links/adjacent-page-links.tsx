@@ -5,16 +5,16 @@ import { useTranslations } from 'next-intl';
 import { adjacentPageLinksVariants } from './adjacent-page-links-variants';
 import { AdjacentPageLink } from './components/adjacent-page-link/adjacent-page-link';
 
-export type TAdjacentPageLinksProps = IWithClassName & {
+interface IAdjacentPageLinksProps extends IWithClassName {
   adjacentPages: TLandingAdjacentPages;
-};
+}
 
 const s = adjacentPageLinksVariants();
 
 export const AdjacentPageLinks = ({
   adjacentPages,
   className,
-}: TAdjacentPageLinksProps) => {
+}: IAdjacentPageLinksProps) => {
   const t = useTranslations('sectionNavigation');
   const paginationT = useTranslations('pagination');
   const { previous, next } = adjacentPages;

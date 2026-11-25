@@ -5,11 +5,7 @@ import type {
   TPageLandingType,
   TContentAlignmentOf,
 } from '@shinefold/config';
-import type {
-  TLandingAdjacentPages,
-  TLandingSectionNavigation,
-  TModule,
-} from '@shinefold/service';
+import type { TModule } from '@shinefold/service';
 import { PageHeading } from '@web/components/shared/page-heading';
 import { ContactFormModule } from '@web/modules/contact-form/contact-form-module';
 import { ContentModule } from '@web/modules/content/content-module';
@@ -40,7 +36,10 @@ import { TestimonialModule } from '@web/modules/testimonial/testimonial-module';
 import { TimelineModule } from '@web/modules/timeline/timeline-module';
 import type { ReactNode } from 'react';
 
-import { LandingPageLayout } from './landing-page-layout';
+import {
+  LandingPageLayout,
+  type ILandingPageLayoutProps,
+} from './landing-page-layout';
 
 const LANDING_MAP: Partial<Record<TPageLandingType, TModuleComponent>> = {
   module_heroBlog: HeroBlogModule,
@@ -75,8 +74,7 @@ export interface ILandingModuleRendererProps {
   >;
   modules: TModule<TPageLandingType>[];
   landingPage: { id: string; path: string };
-  sectionNavigation?: TLandingSectionNavigation;
-  adjacentPages?: TLandingAdjacentPages;
+  navigation?: ILandingPageLayoutProps['navigation'];
 }
 
 export const LandingModuleRenderer = async ({
@@ -85,8 +83,7 @@ export const LandingModuleRenderer = async ({
   headingAlignment,
   modules,
   landingPage,
-  sectionNavigation,
-  adjacentPages,
+  navigation,
 }: ILandingModuleRendererProps): Promise<ReactNode> => {
   const heroNode = hero
     ? await renderHeroModule({ hero, map: LANDING_MAP })
@@ -99,8 +96,7 @@ export const LandingModuleRenderer = async ({
           <PageHeading headingBlock={headingBlock} align={headingAlignment} />
         )
       }
-      sectionNavigation={sectionNavigation}
-      adjacentPages={adjacentPages}
+      navigation={navigation}
     >
       {renderModules({ modules, map: LANDING_MAP, context: { landingPage } })}
     </LandingPageLayout>

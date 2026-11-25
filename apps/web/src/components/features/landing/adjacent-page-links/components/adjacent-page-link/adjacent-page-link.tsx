@@ -4,11 +4,11 @@ import { SmartLink } from '@web/components/shared/smart-link';
 
 import { adjacentPageLinkVariants } from './adjacent-page-link-variants';
 
-type TAdjacentPageLinkProps = {
+interface IAdjacentPageLinkProps {
   page: TLandingBreadcrumb;
   direction: string;
   isNext: boolean;
-};
+}
 
 const s = adjacentPageLinkVariants();
 
@@ -16,7 +16,7 @@ export const AdjacentPageLink = ({
   page,
   direction,
   isNext,
-}: TAdjacentPageLinkProps) => (
+}: IAdjacentPageLinkProps) => (
   <SmartLink
     href={routes.landingPage(page.path)}
     className={s.root({ isNext })}
