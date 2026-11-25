@@ -6,6 +6,7 @@ import {
   MOCK_LAST_TAG,
   mockComparedCommit,
   mockReleaseCandidate,
+  RELEASE_UNAVAILABLE_TITLE,
 } from '@platform/testing/releases/fixtures';
 import { RELEASE_CHANGE } from '@shinefold/config';
 import { errorResult, okResult } from '@shinefold/utils';
@@ -179,7 +180,7 @@ describe(`<${ReleaseCandidateSection.name}/>`, () => {
     const refresh = mockRouterRefresh();
     setup({ result: errorResult(GITHUB_FAILURE.GITHUB_ERROR) });
 
-    const title = screen.getByText('Release information is unavailable');
+    const title = screen.getByText(RELEASE_UNAVAILABLE_TITLE);
     const detail = screen.getByText(
       'GitHub could not be reached or answered with an error.',
     );
