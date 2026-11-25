@@ -132,6 +132,18 @@ describe(`<${TenantsTable.name}/>`, () => {
       expect(actionsHeader).toBeVisible();
     });
 
+    it('labels each stacked cell with its column for phones', () => {
+      const planCell = screen.getByRole('cell', { name: 'Plan Free' });
+      const statusCell = screen.getByRole('cell', { name: 'Status Active' });
+      const createdCell = screen.getByRole('cell', {
+        name: 'Created Apr 2, 2026',
+      });
+
+      expect(planCell).toBeInTheDocument();
+      expect(statusCell).toBeInTheDocument();
+      expect(createdCell).toBeInTheDocument();
+    });
+
     it('renders the created date as a machine-readable time', () => {
       const createdTime = screen.getByText('Apr 2, 2026');
 

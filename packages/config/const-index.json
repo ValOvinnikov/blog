@@ -7682,6 +7682,20 @@
         "file": "apps/platform/src/constants/data-request.ts"
       }
     ],
+    "ACTIONS": [
+      {
+        "ref": "DATA_TABLE_COLUMN.ACTIONS",
+        "scope": "app:platform",
+        "from": "@platform/constants/data-table",
+        "file": "apps/platform/src/constants/data-table.ts"
+      },
+      {
+        "ref": "TEAM_COLUMN.ACTIONS",
+        "scope": "app:platform",
+        "from": "@platform/constants/team-access",
+        "file": "apps/platform/src/constants/team-access.ts"
+      }
+    ],
     "PAGE": [
       {
         "ref": "DEVICE_FRAME_FIT.PAGE",
@@ -10789,14 +10803,6 @@
     "ROLE": [
       {
         "ref": "TEAM_COLUMN.ROLE",
-        "scope": "app:platform",
-        "from": "@platform/constants/team-access",
-        "file": "apps/platform/src/constants/team-access.ts"
-      }
-    ],
-    "ACTIONS": [
-      {
-        "ref": "TEAM_COLUMN.ACTIONS",
         "scope": "app:platform",
         "from": "@platform/constants/team-access",
         "file": "apps/platform/src/constants/team-access.ts"
