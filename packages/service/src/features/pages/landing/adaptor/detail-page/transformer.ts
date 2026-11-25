@@ -11,6 +11,7 @@ import type { InferResultType } from 'groqd';
 
 import type { landingPageQuery } from './query';
 import type {
+  TLandingAdjacentPages,
   TLandingBreadcrumb,
   TLandingPageDocument,
   TLandingSectionNavigation,
@@ -21,10 +22,11 @@ export type TRawLandingPage = NonNullable<
   InferResultType<typeof landingPageQuery>
 >;
 
-type TRawSectionPage = Pick<
-  TRawLandingPage['sectionChain'][number],
-  '_id' | 'title' | 'path'
->;
+type TRawSectionRoot = TRawLandingPage['sectionChain'][number];
+
+type TRawSectionPage = Pick<TRawSectionRoot, '_id' | 'title' | 'path'>;
+
+type TRawSectionTreePage = NonNullable<TRawSectionRoot['children']>[number];
 
 function toBreadcrumb({
   title,
@@ -73,6 +75,42 @@ function toSectionNavigation({
   };
 }
 
+function toReadingOrder(
+  page: TRawSectionPage & { children?: TRawSectionTreePage[] | null },
+): TRawSectionPage[] {
+  return [page, ...(page.children ?? []).flatMap(toReadingOrder)];
+}
+
+function toAdjacentPages({
+  sectionChain,
+  showSectionNavigation,
+}: TRawLandingPage): TMaybeUndefined<TLandingAdjacentPages> {
+  const [current] = sectionChain;
+  const sectionRoot = sectionChain.find((page) => page.sectionNavigation);
+  if (
+    showSectionNavigation === false ||
+    !current ||
+    !sectionRoot?.showPreviousNextLinks
+  ) {
+    return undefined;
+  }
+
+  const pages = toReadingOrder(sectionRoot).filter(
+    (page) => page._id === current._id || toBreadcrumb(page),
+  );
+  const index = pages.findIndex(({ _id }) => _id === current._id);
+  if (index < 0) return undefined;
+
+  const previous = pages[index - 1];
+  const next = pages[index + 1];
+  if (!previous && !next) return undefined;
+
+  return {
+    previous: previous && toBreadcrumb(previous),
+    next: next && toBreadcrumb(next),
+  };
+}
+
 export function toLandingPage(raw: TRawLandingPage): TLandingPageDocument {
   return {
     id: raw._id,
@@ -84,5 +122,6 @@ export function toLandingPage(raw: TRawLandingPage): TLandingPageDocument {
     seo: resolveSeo(raw.seo),
     translations: toPageTranslations(raw.translations),
     sectionNavigation: toSectionNavigation(raw),
+    adjacentPages: toAdjacentPages(raw),
   };
 }
