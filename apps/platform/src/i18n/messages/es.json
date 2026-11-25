@@ -341,11 +341,6 @@
     "viewRunLabel": "Ver la ejecución de contraste del commit {sha} (se abre en una pestaña nueva)",
     "openReleases": "Abrir Releases"
   },
-  "contrastDueBanner": {
-    "title": "Comprobación de contraste pendiente",
-    "description": "El renderizado ha cambiado desde la última comprobación de contraste superada. Ejecuta una antes del próximo release.",
-    "openReleases": "Abrir Releases"
-  },
   "findingsCard": {
     "title": "Incidencias abiertas",
     "empty": "No hay incidencias abiertas para este cliente: todo funciona correctamente.",

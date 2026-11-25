@@ -341,11 +341,6 @@
     "viewRunLabel": "Kontrastlauf für Commit {sha} ansehen (öffnet in neuem Tab)",
     "openReleases": "Releases öffnen"
   },
-  "contrastDueBanner": {
-    "title": "Kontrastprüfung fällig",
-    "description": "Das Rendering hat sich seit der letzten bestandenen Kontrastprüfung geändert. Führe vor dem nächsten Release eine aus.",
-    "openReleases": "Releases öffnen"
-  },
   "findingsCard": {
     "title": "Offene Befunde",
     "empty": "Keine offenen Befunde für diesen Mandanten — alles in Ordnung.",

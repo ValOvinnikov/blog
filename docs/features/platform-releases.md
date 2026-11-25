@@ -27,12 +27,11 @@ epics: [5271]
 A SUPERADMIN sees the release candidate on the platform Releases page, runs
 the contrast check from it, deploys `main`'s HEAD to development, cuts a production release by dispatching
 `release.yml`, and runs tenant content migrations on development or retries a
-tenant whose production migration failed; a contrast-due banner on the
-operator pages links there. What
+tenant whose production migration failed. What
 exists is the shared vocabulary, the server-side reader that works out the
 release candidate from GitHub and the database, the signed route the contrast
 workflow posts its result to, the page, the contrast and release Server
-Actions, the release run state and the banner. The `release.yml` workflow the
+Actions and the release run state. The `release.yml` workflow the
 Release button dispatches is built separately.
 
 The candidate is `main`'s HEAD measured against the greatest `vX.Y.Z` tag:
@@ -191,11 +190,7 @@ The candidate is `main`'s HEAD measured against the greatest `vX.Y.Z` tag:
   `getContrastFinding` reports `hasPassed` only for a row whose own run
   passed, and `getLatestPassingContrastSha` returns only such a SHA. The
   SHA's own later run drops `supersededBy`.
-- The contrast-due banner at the top of every `(operator)` page, for
-  SUPERADMINs only, when the candidate's contrast status is `DUE`
-  (`isContrastDue`). It reads the candidate without the migration summary,
-  streams in after the page, and renders nothing on any GitHub or db failure.
-  Contrast findings on `/findings` are described in
+- Contrast findings on `/findings` are described in
   [Audit events and findings](audit-and-findings.md).
 
 ## Data
@@ -253,8 +248,7 @@ values are stored as plain `text`, so none of them needs a db migration:
   would bound nothing, and the release card's 10-second poll sees live
   state. Only a 200 is cached, so a failure is retried on the next read, and
   a response over Next's 2 MB cache limit is simply re-fetched.
-- The candidate comparison is deduped per render (`React.cache`), so the
-  contrast-due banner and the releases page share one result.
+- The candidate comparison is deduped per render (`React.cache`).
 - At the 300-file limit the file list is truncated (`isFileListTruncated` on
   the candidate): it counts as touching every set, so a rendering change is
   never missed, and the migration counts are minimums.
@@ -276,17 +270,14 @@ values are stored as plain `text`, so none of them needs a db migration:
 ## Entry points
 
 - `parseReleaseVersion` and `isReleaseVersionGreater` (`@shinefold/utils/version`).
-- `getReleaseCandidate` and `isContrastDue`, both built on
-  `getCandidateComparison` (`apps/platform/src/server/releases/`).
+- `getReleaseCandidate`, built on `getCandidateComparison`
+  (`apps/platform/src/server/releases/`).
 - `startContrastCheckAction`, `startDevDeployAction`, `startReleaseAction`, `getReleaseRun`,
   `getReleaseRunAction`, `startTenantMigrationsAction` and
   `listFailedMigrationTenants` (`apps/platform/src/server/releases/`).
 - `isReleaseOverrideRequired` and `isReleaseRunActive`
   (`apps/platform/src/utils/release-state/`).
 - `ReleasesView` (`apps/platform/src/components/features/releases/`).
-- `ContrastDueBanner`
-  (`apps/platform/src/components/features/releases/contrast-due-banner/`),
-  passed to `PlatformShell`'s `notice` slot by the operator layout.
 
 ## Tests and stories
 

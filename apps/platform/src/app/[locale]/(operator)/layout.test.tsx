@@ -2,9 +2,7 @@ import { faker } from '@faker-js/faker';
 import messages from '@platform/i18n/messages/en.json';
 import { mockAdmin } from '@platform/testing/admins/fixtures';
 import { customRenderAsync, screen } from '@platform/testing/custom-render';
-import { useGitHubFetch } from '@platform/testing/github/github-fetch';
 import { mockDbConstants } from '@platform/testing/mock-db-constants';
-import { respondWithDueContrastCheck } from '@platform/testing/releases/contrast-due-github';
 import { adminRoutes } from '@platform/utils/routes/routes';
 import { NEXT_NAVIGATION_ERROR } from '@shinefold/config';
 import { ADMIN_ROLE } from '@shinefold/db/constants';
@@ -29,10 +27,6 @@ vi.mock('@shinefold/db', async () => ({
   ...(await mockDbConstants()),
   queries: {
     admins: { getAdminByUserId: getAdminByUserIdMock },
-    findings: {
-      getContrastFinding: vi.fn(),
-      getLatestPassingContrastSha: vi.fn(),
-    },
   },
 }));
 
@@ -43,8 +37,6 @@ const setup = customRenderAsync(OperatorLayout, {
 });
 
 describe(`<${OperatorLayout.name}/>`, () => {
-  const github = useGitHubFetch();
-
   beforeEach(() => {
     getAdminByUserIdMock.mockReset();
   });
@@ -77,38 +69,5 @@ describe(`<${OperatorLayout.name}/>`, () => {
     });
 
     expect(releasesLink).toHaveAttribute('href', adminRoutes.releases());
-  });
-
-  describe('when a contrast check is due', () => {
-    beforeEach(() => {
-      respondWithDueContrastCheck(github);
-    });
-
-    it('warns a SUPERADMIN that a contrast check is due', async () => {
-      getAdminByUserIdMock.mockResolvedValueOnce(
-        mockAdmin({ role: ADMIN_ROLE.SUPERADMIN }),
-      );
-
-      await setup();
-
-      const banner = await screen.findByText(messages.contrastDueBanner.title);
-
-      expect(banner).toBeVisible();
-    });
-
-    it.each([ADMIN_ROLE.ADMIN, ADMIN_ROLE.MODERATOR])(
-      'never warns an %s that a contrast check is due',
-      async (role) => {
-        getAdminByUserIdMock.mockResolvedValueOnce(mockAdmin({ role }));
-
-        await setup();
-
-        const content = screen.getByText(MOCK_CONTENT);
-        const banner = screen.queryByText(messages.contrastDueBanner.title);
-
-        expect(content).toBeVisible();
-        expect(banner).not.toBeInTheDocument();
-      },
-    );
   });
 });

@@ -47,13 +47,6 @@ platform-wide Findings page. Tenant owners see neither.
   platform-wide), source, kind, severity and last-seen date. A contrast
   finding also shows its short commit SHA, its tag once released, the failure
   count, a link to the workflow run and a link to `/releases`.
-- Operator banner (every page under `(operator)`, SUPERADMIN only): a
-  warning that a contrast check is due, linking to `/releases`, shown when
-  the release candidate's contrast status is `DUE`
-  ([Platform releases](platform-releases.md)). It streams in through
-  `Suspense` after the page, and renders nothing while loading, when contrast
-  is green or nothing rendering changed, or when GitHub or the db cannot be
-  read. ADMINs and MODERATORs never trigger the read.
 - `/tenants/{id}` overview: the Findings card (OPEN findings, with a
   disclosure that loads `details` on open) and the Recent activity card (the
   last five `TENANT` audit events: action, actor, relative time), with a
@@ -221,8 +214,6 @@ Nothing is configurable. Only admins (any role) see either record.
 - `packages/db/src/queries/findings/record-contrast-result/record-contrast-result.ts`
 - `packages/db/scripts/validate-tenant-documents/run.ts`
 - `apps/platform/src/app/[locale]/(operator)/findings/page.tsx`
-- `apps/platform/src/components/features/releases/contrast-due-banner/contrast-due-banner.tsx`
-- `apps/platform/src/server/releases/is-contrast-due.ts`
 - `apps/platform/src/components/features/tenants/tenant-overview-view/tenant-overview-view.tsx`
 - `apps/platform/src/app/[locale]/tenants/[tenantId]/(detail)/activity/page.tsx`
 
@@ -235,9 +226,7 @@ Nothing is configurable. Only admins (any role) see either record.
   `apps/platform/src/server/findings/get-finding-details-action.test.ts`, the
   findings page test, and the component tests beside the findings table,
   view, card, details, contrast-finding details, recent-activity card,
-  activity list, activity page content and activity route,
-  the contrast-due banner, `is-contrast-due.test.ts` and the operator
-  layout test. Fixtures live in
+  activity list, activity page content and activity route. Fixtures live in
   `apps/platform/src/testing/`. No Storybook.
 
 ## Related

@@ -341,11 +341,6 @@
     "viewRunLabel": "View the contrast run for commit {sha} (opens in new tab)",
     "openReleases": "Open Releases"
   },
-  "contrastDueBanner": {
-    "title": "Contrast check due",
-    "description": "Rendering has changed since the last passing contrast check. Run one before the next release.",
-    "openReleases": "Open Releases"
-  },
   "findingsCard": {
     "title": "Open findings",
     "empty": "No open findings for this tenant — everything's healthy.",
