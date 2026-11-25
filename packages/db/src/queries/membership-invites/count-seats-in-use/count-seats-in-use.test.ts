@@ -19,6 +19,13 @@ vi.mock('@shinefold/db/client');
 
 const db = useQueryTestDb();
 
+function insertLockedEditor(tenantId: string) {
+  return insertTestMember(db(), tenantId, MOCK_EDITOR_EMAIL, {
+    role: MEMBERSHIP_ROLE.EDITOR,
+    lockedAt: MOCK_NOW,
+  });
+}
+
 afterEach(async () => {
   await deleteSeatRows(db());
 });
@@ -46,6 +53,13 @@ describe(countSeatsInUse, () => {
     expect(await countSeatsInUse(tenantId)).toBe(3);
   });
 
+  it('counts a locked member', async () => {
+    await insertTeam(db(), tenantId, [MEMBERSHIP_ROLE.OWNER]);
+    await insertLockedEditor(tenantId);
+
+    expect(await countSeatsInUse(tenantId)).toBe(2);
+  });
+
   it("does not count another tenant's seats", async () => {
     const { id: otherTenantId } = await insertTestTenant(db());
     await insertTeam(db(), otherTenantId, [MEMBERSHIP_ROLE.OWNER]);
@@ -61,10 +75,7 @@ describe(countUnlockedSeatsInUse, () => {
   beforeEach(async () => {
     ({ id: tenantId } = await insertTestTenant(db()));
     await insertTeam(db(), tenantId, [MEMBERSHIP_ROLE.OWNER]);
-    await insertTestMember(db(), tenantId, MOCK_EDITOR_EMAIL, {
-      role: MEMBERSHIP_ROLE.EDITOR,
-      lockedAt: MOCK_NOW,
-    });
+    await insertLockedEditor(tenantId);
     await mockMembershipInvite(db(), tenantId, {
       role: MEMBERSHIP_ROLE.EDITOR,
     });
@@ -72,9 +83,5 @@ describe(countUnlockedSeatsInUse, () => {
 
   it('counts unlocked members and pending invites, but not a locked member', async () => {
     expect(await countUnlockedSeatsInUse(tenantId)).toBe(2);
-  });
-
-  it('still counts the locked member in every seat in use', async () => {
-    expect(await countSeatsInUse(tenantId)).toBe(3);
   });
 });
