@@ -35,4 +35,34 @@ export const OWNER_GRACE_EMAIL_COPY_NL: TOwnerGraceEmailCopy = {
       ],
     }),
   },
+  fewerSeats: {
+    teamActionLabel: 'Team openen',
+    memberLock: ({ members, date }) =>
+      `Op ${date} verliezen deze teamleden de toegang tot het beheer van de site: ${members}. Hun accounts blijven bestaan.`,
+    closing: (date) =>
+      `Kies zelf wie toegang houdt: verwijder vóór ${date} leden op de pagina Team, of stap over op een abonnement met meer plaatsen.`,
+    emails: {
+      [GRACE_EMAIL.STARTED]: ({ siteName, date }) => ({
+        subject: `${siteName} heeft meer teamleden dan het abonnement plaatsen heeft`,
+        previewText: `Kies vóór ${date} wie toegang houdt.`,
+        paragraphs: [
+          `${siteName} is overgestapt op een abonnement met minder plaatsen, en het team zit nu boven de limiet.`,
+        ],
+      }),
+      [GRACE_EMAIL.HALFWAY]: ({ siteName, date }) => ({
+        subject: `${siteName}: nog één week tot teamleden boven de plaatsen van het abonnement hun toegang verliezen`,
+        previewText: `Verwijder leden of wijzig je abonnement vóór ${date}.`,
+        paragraphs: [
+          `${siteName} is een week geleden overgestapt op een abonnement met minder plaatsen, en het team zit nog steeds boven de limiet.`,
+        ],
+      }),
+      [GRACE_EMAIL.ENDING]: ({ siteName, date }) => ({
+        subject: `${siteName}: teamleden boven de plaatsen van het abonnement verliezen morgen hun toegang`,
+        previewText: 'Kies vandaag wie toegang houdt.',
+        paragraphs: [
+          `Het team van ${siteName} zit nog steeds boven de plaatsen van het abonnement, en morgen, ${date}, gaat de limiet in.`,
+        ],
+      }),
+    },
+  },
 };

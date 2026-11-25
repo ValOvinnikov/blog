@@ -15,6 +15,7 @@ import type { TInactivitySweepContext } from '@worker/utils/inactivity-sweep/ina
 import { logger } from '@worker/utils/logger/logger';
 import { invalidateSiteCache } from '@worker/utils/site-cache/invalidate-site-cache';
 
+import { isFewerSeatsGrace } from './fewer-seats-grace-email';
 import { sendOwnerGraceEmail } from './grace-emails';
 
 export type TGraceStepInput = {
@@ -46,7 +47,9 @@ export async function sendGraceEmail(
     hosts,
     env.tenantRootDomain,
   );
-  if (email !== GRACE_EMAIL.STARTED && !hasGraceLocks(locks)) return false;
+  const isLockRequired =
+    email !== GRACE_EMAIL.STARTED || isFewerSeatsGrace(tenant);
+  if (isLockRequired && !hasGraceLocks(locks)) return false;
 
   const claimed = await claimGraceEmail(tenantId, email, now);
   if (!claimed?.downgradeGraceStartedAt) return false;

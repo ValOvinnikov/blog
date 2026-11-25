@@ -9,7 +9,7 @@ type TOwnerEmailCopyInput = {
   ownerEmail: string;
 };
 
-type TOwnerEmailText = {
+export type TOwnerEmailText = {
   subject: string;
   previewText: string;
   paragraphs: string[];
@@ -52,10 +52,27 @@ type TMemberLockInput = {
   date: string;
 };
 
+type TNamedMemberLockInput = {
+  members: string;
+  date: string;
+};
+
 type TDomainLockInput = {
   customDomain: string;
   subdomain: string;
   date: string;
+};
+
+type TGraceEmails = Record<
+  TGraceEmail,
+  (input: TGraceEmailCopyInput) => TOwnerEmailText
+>;
+
+type TFewerSeatsGraceEmailCopy = {
+  teamActionLabel: string;
+  memberLock: (input: TNamedMemberLockInput) => string;
+  closing: (date: string) => string;
+  emails: TGraceEmails;
 };
 
 export type TOwnerGraceEmailCopy = {
@@ -64,5 +81,6 @@ export type TOwnerGraceEmailCopy = {
   keepAsTheyAre: (date: string) => string;
   memberLock: (input: TMemberLockInput) => string;
   domainLock: (input: TDomainLockInput) => string;
-  emails: Record<TGraceEmail, (input: TGraceEmailCopyInput) => TOwnerEmailText>;
+  emails: TGraceEmails;
+  fewerSeats: TFewerSeatsGraceEmailCopy;
 };
