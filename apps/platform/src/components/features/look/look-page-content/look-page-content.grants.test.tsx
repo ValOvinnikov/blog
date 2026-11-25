@@ -26,10 +26,7 @@ import {
   ENTITLEMENT_KIND,
   LOOK_FIELD,
 } from '@shinefold/db/constants';
-import {
-  MOCK_SHINEFOLD_PRESET_GRANT,
-  mockEntitlementGrant,
-} from '@shinefold/db/testing/tenant-entitlement-grants/mock-entitlement-grant';
+import { mockEntitlementGrant } from '@shinefold/db/testing/tenant-entitlement-grants/mock-entitlement-grant';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
 
 import { LookPageContent } from './look-page-content';
@@ -43,7 +40,6 @@ vi.mock('@platform/server/settings-features/get-enabled-capabilities');
 vi.mock('@platform/utils/env/env');
 
 const { radiusScaleOptionLabel: RADIUS_LABEL } = messages.lookForm;
-const { shinefold: SHINEFOLD } = messages.presetPicker;
 
 describe(`<${LookPageContent.name}/> grants and Growth-only values`, () => {
   let user: UserEvent;
@@ -140,30 +136,6 @@ describe(`<${LookPageContent.name}/> grants and Growth-only values`, () => {
 
       expect(noneRadius).toBeEnabled();
       expect(granted).toBeVisible();
-    });
-  });
-
-  describe('the Shinefold preset', () => {
-    beforeEach(() => {
-      getSiteConfigMock.mockResolvedValue(mockSiteConfig());
-    });
-
-    it('is not offered without its grant', async () => {
-      await setup({ tenant: mockReadyTenant({ plan: TENANT_PLAN.GROWTH }) });
-
-      const shinefoldPreset = screen.queryByRole('radio', { name: SHINEFOLD });
-      expect(shinefoldPreset).not.toBeInTheDocument();
-    });
-
-    it('is offered with its grant', async () => {
-      await setup({
-        tenant: mockTenant({ plan: TENANT_PLAN.FREE }, [
-          MOCK_SHINEFOLD_PRESET_GRANT,
-        ]),
-      });
-
-      const shinefoldPreset = screen.getByRole('radio', { name: SHINEFOLD });
-      expect(shinefoldPreset).toBeVisible();
     });
   });
 });
