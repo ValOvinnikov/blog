@@ -95,6 +95,28 @@ describe(teamViewModel, () => {
     });
   });
 
+  it('shows the real count of people holding a seat while over the seats', () => {
+    const { shownUsed, seatsOver } = modelFor({
+      tenant: mockTenant({ plan: TENANT_PLAN.STARTER }),
+      members: [MOCK_OWNER, mockTenantMember({ membershipId: 'a' })],
+      invites: [mockPendingInvite()],
+    });
+
+    expect({ shownUsed, seatsOver }).toEqual({ shownUsed: 3, seatsOver: 2 });
+  });
+
+  it('counts no one over the seats once the lock leaves only those who fit', () => {
+    const { shownUsed, seatsOver } = modelFor({
+      tenant: mockTenant({ plan: TENANT_PLAN.STARTER }),
+      members: [
+        MOCK_OWNER,
+        mockTenantMember({ membershipId: 'a', lockedAt: MOCK_JOINED_AT }),
+      ],
+    });
+
+    expect({ shownUsed, seatsOver }).toEqual({ shownUsed: 1, seatsOver: 0 });
+  });
+
   it('counts no one over the seats and no deadline within the seats', () => {
     const { seatsOver, graceEndsAt } = modelFor();
 

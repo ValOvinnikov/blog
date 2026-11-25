@@ -101,7 +101,7 @@ describe(`<${TeamView.name}/>`, () => {
         plan: TENANT_PLAN.STARTER,
         team: mockTeamViewModel({
           seats: 1,
-          shownUsed: 1,
+          shownUsed: 3,
           isFull: true,
           freeSeats: 0,
           seatsOver: 2,
@@ -131,10 +131,12 @@ describe(`<${TeamView.name}/>`, () => {
       });
 
       it('says how many must go, with no full notice and no deadline', () => {
+        const seatsUsed = screen.getByText('3 of 1 seat used');
         const title = screen.getByText('Remove 2 people to fit Starter');
         const full = screen.queryByText(SEAT_LIMIT_TITLE);
         const deadline = screen.queryByText(/loses Studio access/);
 
+        expect(seatsUsed).toBeVisible();
         expect(title).toBeVisible();
         expect(full).not.toBeInTheDocument();
         expect(deadline).not.toBeInTheDocument();

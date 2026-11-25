@@ -71,6 +71,9 @@ export const teamViewModel = (
   const { entitlements, downgradeGraceStartedAt } = tenant;
   const { seats } = entitlements;
   const used = members.length + invites.length;
+  const holding =
+    members.filter(({ lockedAt }) => !lockedAt).length + invites.length;
+  const seatsOver = Math.max(holding - seats, 0);
   const ownerCount = members.filter(
     ({ role }) => role === MEMBERSHIP_ROLE.OWNER,
   ).length;
@@ -80,10 +83,10 @@ export const teamViewModel = (
 
   return {
     seats,
-    shownUsed: Math.min(used, seats),
+    shownUsed: seatsOver > 0 ? holding : Math.min(used, seats),
     isFull: used >= seats,
     freeSeats: Math.max(seats - used, 0),
-    seatsOver: Math.max(used - seats, 0),
+    seatsOver,
     graceEndsAt: downgradeGraceStartedAt
       ? graceEndDate(downgradeGraceStartedAt)
       : undefined,
