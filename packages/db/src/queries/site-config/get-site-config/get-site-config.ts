@@ -17,6 +17,8 @@ export type TSiteConfigResult = Omit<
   | 'logoAssetUrl'
   | 'logoDarkAssetUrl'
   | 'faviconAssetUrl'
+  | 'buttonColor'
+  | 'buttonColorDark'
   | 'lookSavedAt'
   | 'voiceSavedAt'
 > & {
@@ -25,6 +27,8 @@ export type TSiteConfigResult = Omit<
   logoAssetUrl: TMaybeUndefined<string>;
   logoDarkAssetUrl: TMaybeUndefined<string>;
   faviconAssetUrl: TMaybeUndefined<string>;
+  buttonColor: TMaybeUndefined<string>;
+  buttonColorDark: TMaybeUndefined<string>;
   lookSavedAt: TMaybeUndefined<Date>;
   voiceSavedAt: TMaybeUndefined<Date>;
   /** @deprecated The default locale's slice of `voiceOverridesByLocale`, kept until every caller reads per language. */
@@ -42,6 +46,8 @@ export function toSiteConfigResult(
     logoAssetUrl: row.logoAssetUrl ?? undefined,
     logoDarkAssetUrl: row.logoDarkAssetUrl ?? undefined,
     faviconAssetUrl: row.faviconAssetUrl ?? undefined,
+    buttonColor: row.buttonColor ?? undefined,
+    buttonColorDark: row.buttonColorDark ?? undefined,
     lookSavedAt: row.lookSavedAt ?? undefined,
     voiceSavedAt: row.voiceSavedAt ?? undefined,
     voiceOverrides: row.voiceOverridesByLocale[defaultLocale] ?? {},

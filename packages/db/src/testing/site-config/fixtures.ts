@@ -24,6 +24,7 @@ import {
   PRESET_ID,
   RADIUS_SCALE,
 } from '@shinefold/config/constants';
+import type { TSiteConfigResult } from '@shinefold/db/queries/site-config/get-site-config';
 import type { TUpdateSiteConfigInput } from '@shinefold/db/queries/site-config/upsert-site-config';
 import * as schema from '@shinefold/db/schema';
 import type { TSiteConfig } from '@shinefold/db/schema/site-config';
@@ -73,6 +74,18 @@ export const DEFAULT_CONTROL_STYLES = {
   footerSurface: FOOTER_SURFACE.FULL_WIDTH,
   cookieSettingsButton: COOKIE_SETTINGS_BUTTON.HIDDEN,
 } satisfies Partial<TUpdateSiteConfigInput>;
+
+export const UNSET_OPTIONAL_COLUMNS = {
+  logoHue: undefined,
+  brandName: undefined,
+  logoAssetUrl: undefined,
+  logoDarkAssetUrl: undefined,
+  faviconAssetUrl: undefined,
+  buttonColor: undefined,
+  buttonColorDark: undefined,
+  lookSavedAt: undefined,
+  voiceSavedAt: undefined,
+} satisfies Partial<TSiteConfigResult>;
 
 export async function insertTestSiteConfig(
   db: TTestDb,

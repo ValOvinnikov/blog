@@ -93,6 +93,8 @@ export const mockSiteConfig = (
   logoAssetUrl: undefined,
   logoDarkAssetUrl: undefined,
   faviconAssetUrl: undefined,
+  buttonColor: undefined,
+  buttonColorDark: undefined,
   voiceOverridesByLocale: {},
   voiceOverrides: {},
   lookSavedAt: undefined,
