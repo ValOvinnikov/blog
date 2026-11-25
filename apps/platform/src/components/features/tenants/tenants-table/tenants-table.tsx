@@ -10,6 +10,7 @@ import { StatusBadge } from '@platform/components/shared/status-badge';
 import { AVATAR_VARIANT } from '@platform/constants/avatar';
 import { BADGE_TONE } from '@platform/constants/badge-tone';
 import { BUTTON_VARIANT } from '@platform/constants/button';
+import { DATA_TABLE_COLUMN } from '@platform/constants/data-table';
 import type { TClientTenant } from '@platform/server/tenants/to-client-tenant';
 import { formatDate } from '@platform/utils/format-date/format-date';
 import { adminRoutes } from '@platform/utils/routes/routes';
@@ -34,8 +35,6 @@ const COLUMN_LABEL_KEYS = {
   [TENANT_SORT_COLUMN.STATUS]: 'columnStatus',
   [TENANT_SORT_COLUMN.CREATED]: 'columnCreated',
 } as const satisfies Record<TTenantSortColumn, string>;
-
-const ACTIONS_COLUMN = 'actions';
 
 export type TTenantsTableTenant = TClientTenant &
   Pick<TListedTenant, 'matchedDomain'>;
@@ -89,7 +88,7 @@ export const TenantsTable = ({
           },
         })),
         {
-          key: ACTIONS_COLUMN,
+          key: DATA_TABLE_COLUMN.ACTIONS,
           label: t('columnActions'),
           isLabelHidden: true,
         },
@@ -125,7 +124,7 @@ export const TenantsTable = ({
               {formatDate(tenant.createdAt, locale)}
             </time>
           </DataTableShell.Cell>
-          <DataTableShell.Cell column={ACTIONS_COLUMN}>
+          <DataTableShell.Cell column={DATA_TABLE_COLUMN.ACTIONS}>
             <LinkButton
               href={manageHrefFor(tenant)}
               variant={BUTTON_VARIANT.SECONDARY}

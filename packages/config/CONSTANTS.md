@@ -568,6 +568,10 @@ Every key/value const an agent should reuse before writing a literal. The
 - **DATA_REQUEST_EXPORT_FORMAT**: `JSON`, `CSV`
 - **DATA_REQUEST_LOG**: `AUDIT_FAILED`=`"data_request.audit_failed"`, `FAILED`=`"data_request.failed"`
 
+### `@platform/constants/data-table` — `apps/platform/src/constants/data-table.ts`
+
+- **DATA_TABLE_COLUMN**: `ACTIONS`
+
 ### `@platform/constants/device-frame` — `apps/platform/src/constants/device-frame.ts`
 
 - **DEVICE_FRAME_FIT**: `PAGE`, `STAGE`, `FULLSCREEN`
