@@ -24,7 +24,7 @@ const MOCK_HEAD = faker.git.commitSha();
 const COMMITS_PER_PAGE = 100;
 const MANY_COMMITS = 250;
 const TWO_PAGES_OF_COMMITS = 150;
-const THOUSANDS_OF_COMMITS = 5000;
+const MOCK_THOUSANDS_OF_COMMITS = 5000;
 
 describe(compareCommits, () => {
   const github = useGitHubFetch();
@@ -94,7 +94,7 @@ describe(compareCommits, () => {
   it.each([
     { total: 10, pages: [1] },
     { total: TWO_PAGES_OF_COMMITS, pages: [1, 2] },
-    { total: THOUSANDS_OF_COMMITS, pages: [1, 49, 50] },
+    { total: MOCK_THOUSANDS_OF_COMMITS, pages: [1, 49, 50] },
   ])(
     'requests commit pages $pages for $total commits and no file pages',
     async ({ total, pages }) => {
@@ -112,7 +112,7 @@ describe(compareCommits, () => {
 
   it('flags a thousands-commit comparison at the file limit as truncated', async () => {
     const commits = Array.from(
-      { length: THOUSANDS_OF_COMMITS },
+      { length: MOCK_THOUSANDS_OF_COMMITS },
       mockGitHubCommit,
     );
     const files = mockChangedFiles(GITHUB_COMPARE_FILE_LIMIT);
@@ -120,7 +120,9 @@ describe(compareCommits, () => {
 
     const result = await compareCommits(MOCK_BASE, MOCK_HEAD);
 
-    expect(result.ok && result.data.totalCommits).toBe(THOUSANDS_OF_COMMITS);
+    expect(result.ok && result.data.totalCommits).toBe(
+      MOCK_THOUSANDS_OF_COMMITS,
+    );
     expect(result.ok && result.data.files).toEqual(files);
     expect(result.ok && result.data.isFileListTruncated).toBe(true);
   });

@@ -42,21 +42,13 @@ vi.mock('@shinefold/db', async () => ({
   },
 }));
 
-vi.mock('@platform/server/releases/start-contrast-check-action', () => ({
-  startContrastCheckAction: vi.fn(),
-}));
+vi.mock('@platform/server/releases/start-contrast-check-action');
 
-vi.mock('@platform/server/releases/start-release-action', () => ({
-  startReleaseAction: vi.fn(),
-}));
+vi.mock('@platform/server/releases/start-release-action');
 
-vi.mock('@platform/server/releases/get-release-run-action', () => ({
-  getReleaseRunAction: vi.fn(),
-}));
+vi.mock('@platform/server/releases/get-release-run-action');
 
-vi.mock('@platform/server/releases/start-tenant-migrations-action', () => ({
-  startTenantMigrationsAction: vi.fn(),
-}));
+vi.mock('@platform/server/releases/start-tenant-migrations-action');
 
 const MOCK_HEAD_SHA = faker.git.commitSha();
 const MOCK_COMMIT_SUBJECT = faker.git.commitMessage();
