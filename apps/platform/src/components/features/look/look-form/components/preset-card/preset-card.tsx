@@ -11,7 +11,7 @@ import {
   LOOK_ANCHOR_CLASSES,
   toLookAnchorId,
 } from '@platform/utils/look-anchor/look-anchor';
-import { SIZE, type TPresetId } from '@shinefold/config';
+import { SIZE } from '@shinefold/config';
 import { useTranslations } from 'next-intl';
 import { useId } from 'react';
 
@@ -19,17 +19,13 @@ import { PresetStrip } from './components/preset-strip';
 import { presetCardVariants } from './preset-card-variants';
 import { PRESET_SWATCH } from './preset-swatch';
 
-type TPresetCardProps = {
-  presets: readonly TPresetId[];
-};
-
-export const PresetCard = ({ presets: presetIds }: TPresetCardProps) => {
+export const PresetCard = () => {
   const { isArchived, archivedDescribedBy } = useSettingsFormState();
-  const { values, changePreset, resetToPreset, canResetToPreset } =
+  const { values, presets, changePreset, resetToPreset, canResetToPreset } =
     useLookForm();
   const t = useTranslations('lookForm');
   const tPreset = useTranslations('presetPicker');
-  const presets = presetIds.map((id) => {
+  const presetOptions = presets.map((id) => {
     const labelKey = PRESET_LABEL_KEY[id];
     return {
       id,
@@ -56,7 +52,7 @@ export const PresetCard = ({ presets: presetIds }: TPresetCardProps) => {
         </div>
         <div className={strip()}>
           <PresetStrip
-            presets={presets}
+            presets={presetOptions}
             value={values.preset}
             onChange={changePreset}
             labelledBy={titleId}

@@ -57,7 +57,7 @@ export const LookForm = ({
   features,
   savedAt,
 }: TLookFormProps) => {
-  const { siteHost, presets } = tenant;
+  const { siteHost } = tenant;
   const { hasCookieBanner } = features;
   const layoutRef = useRef<HTMLDivElement>(null);
   const layoutWidth = useElementSize(layoutRef)?.width;
@@ -113,7 +113,6 @@ export const LookForm = ({
               className={editPanel({ isActive: view === 'edit' })}
             >
               <LookEditCards
-                presets={presets}
                 styleGroup={groupProps(STYLE_ROWS)}
                 sitePartsGroup={groupProps(SITE_PARTS_ROWS)}
                 hasCookieBanner={hasCookieBanner}

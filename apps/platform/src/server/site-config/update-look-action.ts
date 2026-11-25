@@ -23,16 +23,29 @@ import {
   AUDIT_ACTION,
   AUDIT_TARGET_TYPE,
   type TActionResult,
+  type TPresetId,
 } from '@shinefold/config';
 import { queries } from '@shinefold/db';
 import { SITE_CONFIG_SAVED_AT } from '@shinefold/db/constants';
-import { pickLookWithin } from '@shinefold/db/utils/effective-look/effective-look';
+import {
+  pickLookWithin,
+  toEffectivePreset,
+} from '@shinefold/db/utils/effective-look/effective-look';
+import type { TTenantEntitlements } from '@shinefold/db/utils/resolve-tenant-entitlements/resolve-tenant-entitlements';
 import { hasArrayGotItems } from '@shinefold/utils/primitives';
 import { toOutcome } from '@shinefold/utils/to-outcome';
 
 export type TUpdateLookResult =
   | TActionResult<typeof ACTION_OUTCOME.SERVER_ERROR, keyof TUpdateLookInput>
   | TNotInPlanRefusal;
+
+// The form shows Console in place of a preset the tenant may no longer use; resubmitting it keeps that stored choice for a later grant.
+const toStoredPreset = (
+  submitted: TPresetId,
+  stored: TPresetId,
+  entitlements: Pick<TTenantEntitlements, 'unlockedPresets'>,
+): TPresetId =>
+  submitted === toEffectivePreset(stored, entitlements) ? stored : submitted;
 
 export const updateLookAction = async (
   tenantId: string,
@@ -60,7 +73,7 @@ export const updateLookAction = async (
     }
 
     const look = {
-      preset,
+      preset: toStoredPreset(preset, stored.preset, tenant.entitlements),
       ...pickLookWithin(
         { ...rest, brandName: blankToNull(brandName) },
         tenant.entitlements,

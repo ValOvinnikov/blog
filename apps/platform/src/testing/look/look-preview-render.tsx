@@ -18,7 +18,11 @@ import {
   type TLookFormValues,
 } from '@platform/utils/default-look-values/default-look-values';
 import type { TLookFollowTarget } from '@platform/utils/look-follow-target/look-follow-target';
-import { LANGUAGE_SWITCHER_STYLE, LOCALE_ISO_CODES } from '@shinefold/config';
+import {
+  LANGUAGE_SWITCHER_STYLE,
+  LOCALE_ISO_CODES,
+  OPEN_PRESET_IDS,
+} from '@shinefold/config';
 
 export type TRenderPreviewOptions = {
   values?: Partial<TLookFormValues>;
@@ -49,6 +53,7 @@ export const lookPreview = ({
       languageSwitcherStyle: LANGUAGE_SWITCHER_STYLE.CODES,
       ...values,
     },
+    presets: OPEN_PRESET_IDS,
     updateField: vi.fn(),
     isLocked: () => false,
     hasLockedFields,

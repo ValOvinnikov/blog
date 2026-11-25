@@ -5,7 +5,7 @@ import { getEnabledCapabilities } from '@platform/server/settings-features/get-e
 import { toGrantTarget } from '@platform/utils/grant-target/grant-target';
 import type { TPlatformTenant } from '@platform/utils/platform-tenant/platform-tenant';
 import { lookFormValuesOrDefaults } from '@platform/utils/to-look-form-values/to-look-form-values';
-import { CAPABILITY, OPEN_PRESET_IDS } from '@shinefold/config';
+import { CAPABILITY } from '@shinefold/config';
 import { queries } from '@shinefold/db';
 import { toEffectiveLookWithin } from '@shinefold/db/utils/effective-look/effective-look';
 
@@ -38,12 +38,12 @@ export const LookPageContent = async ({
           id: tenant.id,
           name: tenant.name,
           siteHost: tenant.primaryDomain,
-          presets: [...OPEN_PRESET_IDS, ...tenant.entitlements.unlockedPresets],
           grants: {
             target: toGrantTarget(tenant, canGrantEntitlements),
             granted: tenant.grantedEntitlements.lookFields,
           },
           lookFields: tenant.entitlements.lookFields,
+          unlockedPresets: tenant.entitlements.unlockedPresets,
           archivedAt: tenant.archivedAt,
         }}
         initialValues={toEffectiveLookWithin(

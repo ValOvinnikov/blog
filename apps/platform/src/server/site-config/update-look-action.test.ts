@@ -275,6 +275,39 @@ describe(updateLookAction, () => {
     expect(upsertSiteConfigMock).not.toHaveBeenCalled();
   });
 
+  describe('with the Shinefold preset stored and no grant', () => {
+    beforeEach(() => {
+      getSiteConfigMock.mockResolvedValue(
+        mockSiteConfig({
+          ...VALID_INPUT,
+          preset: PRESET_ID.SHINEFOLD,
+          logoHue: undefined,
+        }),
+      );
+    });
+
+    it('keeps the stored preset when the Console shown in its place is saved', async () => {
+      await updateLookAction(MOCK_TENANT_ID, {
+        ...VALID_INPUT,
+        preset: PRESET_ID.CONSOLE,
+      });
+
+      expect(upsertSiteConfigMock).toHaveBeenCalledWith(
+        MOCK_TENANT_ID,
+        expect.objectContaining({ preset: PRESET_ID.SHINEFOLD }),
+      );
+    });
+
+    it('writes another preset the owner picks', async () => {
+      await updateLookAction(MOCK_TENANT_ID, VALID_INPUT);
+
+      expect(upsertSiteConfigMock).toHaveBeenCalledWith(
+        MOCK_TENANT_ID,
+        expect.objectContaining({ preset: PRESET_ID.EDITORIAL }),
+      );
+    });
+  });
+
   it('clears the brand name when it is saved blank', async () => {
     await updateLookAction(MOCK_TENANT_ID, { ...VALID_INPUT, brandName: ' ' });
 

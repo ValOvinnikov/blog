@@ -93,7 +93,9 @@ const STARTER = PLAN_ENTITLEMENTS[TENANT_PLAN.STARTER];
 const MOCK_ENTITLEMENTS_LABEL = 'a heading-font grant';
 const MOCK_ENTITLEMENTS = {
   lookFields: [LOOK_FIELD.PRESET, LOOK_FIELD.HEADING_FONT],
+  unlockedPresets: [],
 };
+const SHINEFOLD_LOOK = { ...STORED_LOOK, preset: PRESET_ID.SHINEFOLD };
 
 describe(toEffectiveLookWithin, () => {
   it('returns every stored value on Growth', () => {
@@ -173,6 +175,24 @@ describe(toEffectiveLookWithin, () => {
         MOCK_ENTITLEMENTS,
       ),
     ).toEqual({ preset, headingFont, bodyFont: FONT_CHOICE.INTER });
+  });
+
+  it('renders Console for a stored Shinefold preset without its grant', () => {
+    expect(toEffectiveLookWithin(SHINEFOLD_LOOK, FREE)).toEqual(
+      toEffectiveLookWithin(
+        { ...SHINEFOLD_LOOK, preset: PRESET_ID.CONSOLE },
+        FREE,
+      ),
+    );
+  });
+
+  it('keeps a stored Shinefold preset with its grant', () => {
+    expect(
+      toEffectiveLookWithin(SHINEFOLD_LOOK, {
+        ...GROWTH,
+        unlockedPresets: [PRESET_ID.SHINEFOLD],
+      }),
+    ).toEqual(SHINEFOLD_LOOK);
   });
 });
 

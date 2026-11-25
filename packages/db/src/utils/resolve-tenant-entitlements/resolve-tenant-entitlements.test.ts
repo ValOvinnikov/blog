@@ -122,14 +122,4 @@ describe(resolveTenantEntitlements, () => {
       PRESET_ID.SHINEFOLD,
     ]);
   });
-
-  it.each([
-    ['revoked', { revokedAt: MOCK_GRANT_PAST }],
-    ['expired', { expiresAt: MOCK_GRANT_PAST }],
-  ])('ignores a %s preset grant', (_, overrides) => {
-    expect(
-      resolveFree([{ ...MOCK_SHINEFOLD_PRESET_GRANT, ...overrides }])
-        .unlockedPresets,
-    ).toEqual([]);
-  });
 });

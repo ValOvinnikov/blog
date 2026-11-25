@@ -14,11 +14,9 @@ import { LookGrowthNote } from '@platform/components/features/look/look-growth-n
 import type { TLookCard } from '@platform/constants/look-card';
 import { LOOK_GROUP } from '@platform/constants/look-group';
 import { LOOK_ROW, type TLookRow } from '@platform/constants/look-row';
-import type { TPresetId } from '@shinefold/config';
 import { useTranslations } from 'next-intl';
 
 export type TLookEditCardsProps = {
-  presets: readonly TPresetId[];
   styleGroup: TLookRowsGroup;
   sitePartsGroup: TLookRowsGroup;
   hasCookieBanner: boolean;
@@ -29,7 +27,6 @@ export type TLookEditCardsProps = {
 };
 
 export const LookEditCards = ({
-  presets,
   styleGroup,
   sitePartsGroup,
   hasCookieBanner,
@@ -43,7 +40,7 @@ export const LookEditCards = ({
   return (
     <>
       {hasGrowthNote && <LookGrowthNote onSelectCard={onSelectCard} />}
-      <PresetCard presets={presets} />
+      <PresetCard />
       <LookGroup
         anchor={LOOK_GROUP.STYLE}
         title={t('styleGroupHeading')}
