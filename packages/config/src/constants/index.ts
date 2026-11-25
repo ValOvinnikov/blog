@@ -71,6 +71,7 @@ export * from './portable-text-block-type';
 export * from './post-summary';
 export * from './preset';
 export * from './preset-registry';
+export * from './shinefold-preset-bundle';
 export * from './price-period';
 export * from './redirect';
 export * from './release';

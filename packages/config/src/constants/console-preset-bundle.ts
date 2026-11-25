@@ -48,6 +48,7 @@ export const CONSOLE_BUNDLE: TPresetBundle = {
   busyButtonStyle: BUSY_BUTTON_STYLE.LABEL,
   spinnerStyle: SPINNER_STYLE.BRAILLE,
   buttonShape: BUTTON_SHAPE.ROUNDED,
+  buttonColor: null,
   headerLayout: HEADER_LAYOUT.CLASSIC,
   headerSubmenuStyle: HEADER_SUBMENU_STYLE.DROPDOWN,
   headerBarStyle: HEADER_BAR_STYLE.FULL_WIDTH,

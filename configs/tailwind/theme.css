@@ -101,6 +101,33 @@
   --color-info-muted: var(--info-muted); /* @role informational tint background */
   /* prettier-ignore */
   --color-heading-highlight: var(--heading-highlight); /* @role highlighted words in a heading */
+  --color-heading: var(--heading); /* @role page, section and card titles */
+  --color-link-text: var(--link-text); /* @role in-text link */
+  /* prettier-ignore */
+  --color-link-underline: var(--link-underline); /* @role in-text link underline */
+  --color-eyebrow-text: var(--eyebrow-text); /* @role eyebrow text */
+  /* prettier-ignore */
+  --color-eyebrow-chip: var(--eyebrow-chip, transparent); /* @role eyebrow background */
+  /* prettier-ignore */
+  --color-feature-icon-tile: var(--feature-icon-tile, var(--media-fill, var(--surface-2))); /* @role feature card icon tile */
+  /* prettier-ignore */
+  --color-feature-icon-glyph: var(--feature-icon-glyph); /* @role feature card icon */
+  /* prettier-ignore */
+  --color-tier-highlight-border: var(--tier-highlight-border); /* @role highlighted pricing tier border */
+  --color-tier-badge-fill: var(
+    --tier-badge-fill
+  ); /* @role pricing tier badge */
+  /* prettier-ignore */
+  --color-tier-badge-label: var(--tier-badge-label); /* @role text on tier-badge-fill */
+  /* prettier-ignore */
+  --color-timeline-marker-fill: var(--timeline-marker-fill); /* @role numbered timeline marker */
+  /* prettier-ignore */
+  --color-timeline-marker-numeral: var(--timeline-marker-numeral); /* @role numeral on timeline-marker-fill */
+  --color-aside-bar: var(--aside-bar); /* @role aside left bar */
+  /* prettier-ignore */
+  --color-sidenav-current-bar: var(--sidenav-current-bar); /* @role current side-navigation item bar */
+  /* prettier-ignore */
+  --color-sidenav-current-text: var(--sidenav-current-text); /* @role current side-navigation item text */
 
   --color-on-image: var(--on-image); /* @role copy over a scrimmed image */
   /* prettier-ignore */
@@ -316,6 +343,19 @@
   --info: var(--brand-primary);
   --info-muted: var(--brand-primary-muted);
   --heading-highlight: var(--brand-primary);
+  --heading: var(--text);
+  --link-text: var(--brand-primary);
+  --link-underline: var(--brand-primary);
+  --eyebrow-text: var(--brand-primary);
+  --feature-icon-glyph: var(--brand-primary);
+  --tier-highlight-border: var(--brand-primary);
+  --tier-badge-fill: var(--brand-primary-solid);
+  --tier-badge-label: var(--brand-primary-contrast);
+  --timeline-marker-fill: var(--brand-primary-solid);
+  --timeline-marker-numeral: var(--brand-primary-contrast);
+  --aside-bar: var(--brand-primary-muted);
+  --sidenav-current-bar: var(--brand-primary);
+  --sidenav-current-text: var(--brand-primary);
 
   --success: oklch(0.49 0.15 150);
   --warn: oklch(0.52 0.15 75);
@@ -370,6 +410,10 @@
   --item-divider-width: 0px;
   --item-stack-gap: 0.75rem;
   --item-stack-radius: var(--radius-md);
+
+  --link-underline-width: 1px;
+  --link-underline-width-hover: 2px;
+  --tier-highlight-border-width: 1px;
 }
 
 /* The defaults again in each skin scope, since a var() resolves where it is declared; a site's own values reach a skin scope only where it re-declares them there. */
@@ -426,6 +470,19 @@
   --info: var(--brand-primary);
   --info-muted: var(--brand-primary-muted);
   --heading-highlight: var(--brand-primary);
+  --heading: var(--text);
+  --link-text: var(--brand-primary);
+  --link-underline: var(--brand-primary);
+  --eyebrow-text: var(--brand-primary);
+  --feature-icon-glyph: var(--brand-primary);
+  --tier-highlight-border: var(--brand-primary);
+  --tier-badge-fill: var(--brand-primary-solid);
+  --tier-badge-label: var(--brand-primary-contrast);
+  --timeline-marker-fill: var(--brand-primary-solid);
+  --timeline-marker-numeral: var(--brand-primary-contrast);
+  --aside-bar: var(--brand-primary-muted);
+  --sidenav-current-bar: var(--brand-primary);
+  --sidenav-current-text: var(--brand-primary);
 
   --success: oklch(0.72 0.16 150);
   --warn: oklch(0.8 0.15 80);

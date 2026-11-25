@@ -15,6 +15,7 @@ import {
   ACCOUNT_PANEL_STYLE,
   ACCOUNT_PHONE_PLACEMENT,
   BUSY_BUTTON_STYLE,
+  BUTTON_SHAPE,
   CARD_STYLE,
   DENSITY,
   DIVIDER_WIDTH,
@@ -30,6 +31,7 @@ import {
   IMAGE_PROPORTION,
   LANGUAGE_SWITCHER_STYLE,
   LOCALE_ISO_CODES,
+  OPEN_PRESET_IDS,
   PRESET_ID,
   RADIUS_SCALE,
   SPINNER_STYLE,
@@ -537,7 +539,7 @@ describe(upsertSiteConfig, () => {
       },
     );
 
-    it.each(Object.values(PRESET_ID))(
+    it.each(OPEN_PRESET_IDS)(
       'gives a new %s config the default control styles',
       async (preset) => {
         const result = expectOk(await save({ preset }));
@@ -545,6 +547,17 @@ describe(upsertSiteConfig, () => {
         expect(result).toMatchObject(DEFAULT_CONTROL_STYLES);
       },
     );
+
+    it('seeds a new SHINEFOLD config with its buttons, cards and footer', async () => {
+      const result = expectOk(await save({ preset: PRESET_ID.SHINEFOLD }));
+
+      expect(result).toMatchObject({
+        buttonShape: BUTTON_SHAPE.PILL,
+        cardStyle: CARD_STYLE.OUTLINED,
+        footerBackground: BRAND_VARIANT.INK,
+        footerLayout: FOOTER_LAYOUT.COLUMNS,
+      });
+    });
   });
 
   describe('voice field caps', () => {

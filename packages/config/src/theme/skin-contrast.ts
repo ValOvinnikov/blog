@@ -89,7 +89,7 @@ export const effectiveSchemeOf = (
   scheme: TColorScheme,
 ): TColorScheme => (mode === SKIN_MODE.INVERSE ? COLOR_SCHEME.DARK : scheme);
 
-const skinScopeOf = (
+export const skinScopeOf = (
   roles: TSkinRoles,
   scheme: TColorScheme,
   effectiveScheme: TColorScheme,
