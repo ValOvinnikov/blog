@@ -13,10 +13,13 @@ import {
 } from '@shinefold/service/testing/modules/fixtures';
 import { mockRawHeroStatementModule } from '@shinefold/service/testing/modules/hero-statement/fixtures';
 import {
-  mockRawHeadingBlock,
   mockRawHeroLayout,
   mockRawSanityImage,
 } from '@shinefold/service/testing/shared/fixtures';
+import {
+  mockRawModuleHeadingBlock,
+  mockModuleHeadingBlockView,
+} from '@shinefold/service/testing/shared/localized';
 
 import { toHeroStatementModule } from './transformer';
 
@@ -31,17 +34,16 @@ describe(toHeroStatementModule, () => {
     const raw = mockRawHeroStatementModule({
       brandVariant: BRAND_VARIANT.BRAND_PRIMARY,
       variant: HERO_VARIANT.BANNER,
-      headingBlock: mockRawHeadingBlock(MOCK_STATEMENT_HEADING),
+      headingBlock: mockRawModuleHeadingBlock(MOCK_STATEMENT_HEADING),
     });
 
     const hero = toHeroStatementModule(raw);
 
     expect(hero.brandVariant).toBe(BRAND_VARIANT.BRAND_PRIMARY);
     expect(hero.presentation.variant).toBe(HERO_VARIANT.BANNER);
-    expect(hero.headingBlock).toEqual({
-      heading: MOCK_STATEMENT_HEADING,
-      supportingText: undefined,
-    });
+    expect(hero.headingBlock).toEqual(
+      mockModuleHeadingBlockView(MOCK_STATEMENT_HEADING),
+    );
   });
 
   it.each([
@@ -57,7 +59,7 @@ describe(toHeroStatementModule, () => {
     (eyebrow, supportingText, expectedEyebrow, expectedSupportingText) => {
       const raw = mockRawHeroStatementModule({
         eyebrow,
-        headingBlock: mockRawHeadingBlock(MOCK_STATEMENT_HEADING, {
+        headingBlock: mockRawModuleHeadingBlock(MOCK_STATEMENT_HEADING, {
           supportingText,
         }),
       });

@@ -10,8 +10,8 @@ import {
   MOCK_HERO_MODULE_ID,
   mockRawContentRef,
   mockRawCtaRef,
-  mockRawLandingPage,
 } from '@shinefold/service/testing/pages/fixtures';
+import { mockRawLandingPage } from '@shinefold/service/testing/pages/landing-page/fixtures';
 import {
   mockRawHeadingBlock,
   mockReference,
@@ -26,6 +26,7 @@ import {
   MOCK_PRICING_NL_SLUG,
   MOCK_PRICING_SLUG,
 } from '@shinefold/service/testing/shared/translated-pages-dataset';
+import { isUndefined } from '@shinefold/utils/primitives';
 
 import { landingPageQuery } from './query';
 
@@ -42,6 +43,7 @@ const MOCK_FAQ_SLUG = mockSlug();
 const MOCK_ANSWERS_SLUG = mockSlug();
 const MOCK_SIDEBAR_TITLE = faker.lorem.words(2);
 const MOCK_FAQ_PATH = `${MOCK_SECTION_SLUG}/${MOCK_FAQ_SLUG}`;
+const MOCK_ANSWERS_PATH = `${MOCK_FAQ_PATH}/${MOCK_ANSWERS_SLUG}`;
 
 function runAtPath(dataset: unknown[], segments: string[]): Promise<unknown> {
   return evaluateGroqExpression(landingPageQuery.query, dataset, null, {
@@ -287,12 +289,14 @@ describe('landingPageQuery', () => {
         orderRank,
         sectionNavigation,
         sectionNavigationTitle,
+        showPreviousNextLinks,
         language = EN,
       }: {
         parent?: string;
         orderRank?: string;
         sectionNavigation?: boolean;
         sectionNavigationTitle?: string;
+        showPreviousNextLinks?: boolean;
         language?: string;
       } = {},
     ) {
@@ -303,8 +307,11 @@ describe('landingPageQuery', () => {
         language,
         headingBlock: { heading: `${id} heading` },
         ...(orderRank ? { orderRank } : {}),
-        ...(sectionNavigation === undefined ? {} : { sectionNavigation }),
+        ...(isUndefined(sectionNavigation) ? {} : { sectionNavigation }),
         ...(sectionNavigationTitle ? { sectionNavigationTitle } : {}),
+        ...(isUndefined(showPreviousNextLinks)
+          ? {}
+          : { showPreviousNextLinks }),
         ...(parent ? { parent: mockReference(parent) } : {}),
       };
     }
@@ -341,6 +348,7 @@ describe('landingPageQuery', () => {
         title: `${id} heading`,
         sectionNavigation: false,
         sectionNavigationTitle: null,
+        showPreviousNextLinks: true,
         children: null,
         ...overrides,
       };
@@ -357,11 +365,19 @@ describe('landingPageQuery', () => {
             _id: MOCK_FAQ_SLUG,
             title: `${MOCK_FAQ_SLUG} heading`,
             path: MOCK_FAQ_PATH,
+            children: [
+              {
+                _id: MOCK_ANSWERS_SLUG,
+                title: `${MOCK_ANSWERS_SLUG} heading`,
+                path: MOCK_ANSWERS_PATH,
+              },
+            ],
           },
           {
             _id: MOCK_PRICING_SLUG,
             title: `${MOCK_PRICING_SLUG} heading`,
             path: `${MOCK_SECTION_SLUG}/${MOCK_PRICING_SLUG}`,
+            children: [],
           },
         ],
       },
@@ -375,10 +391,7 @@ describe('landingPageQuery', () => {
           MOCK_ANSWERS_SLUG,
         ]),
       ).toHaveProperty('sectionChain', [
-        mockChainEntry(
-          MOCK_ANSWERS_SLUG,
-          `${MOCK_FAQ_PATH}/${MOCK_ANSWERS_SLUG}`,
-        ),
+        mockChainEntry(MOCK_ANSWERS_SLUG, MOCK_ANSWERS_PATH),
         mockChainEntry(MOCK_FAQ_SLUG, MOCK_FAQ_PATH),
         sectionRootEntry,
       ]);
@@ -391,6 +404,19 @@ describe('landingPageQuery', () => {
         mockChainEntry(MOCK_FAQ_SLUG, MOCK_FAQ_PATH),
         sectionRootEntry,
       ]);
+    });
+
+    it("returns a section root's previous and next links switch as stored", async () => {
+      const switchedOff = dataset.map((document) =>
+        document._id === MOCK_SECTION_SLUG
+          ? { ...document, showPreviousNextLinks: false }
+          : document,
+      );
+
+      expect(await runAtPath(switchedOff, [MOCK_SECTION_SLUG])).toHaveProperty(
+        'sectionChain',
+        [{ ...sectionRootEntry, showPreviousNextLinks: false }],
+      );
     });
   });
 });

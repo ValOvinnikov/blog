@@ -1,4 +1,4 @@
-import { toHeadingBlock } from '@shinefold/service/shared/transformers/heading-block/to-heading-block';
+import { toModuleHeadingBlock } from '@shinefold/service/shared/transformers/heading-block/to-module-heading-block';
 import { toLayout } from '@shinefold/service/shared/transformers/layout/to-layout';
 import { toPortableText } from '@shinefold/service/shared/transformers/portable-text/to-portable-text-mark-def';
 import type { InferResultType } from 'groqd';
@@ -15,7 +15,7 @@ export function toContactFormModule(
 ): TContactFormModule {
   return {
     brandVariant: raw.brandVariant,
-    headingBlock: toHeadingBlock(raw.headingBlock),
+    headingBlock: toModuleHeadingBlock(raw.headingBlock),
     successMessage: raw.successMessage,
     privacyNote: raw.privacyNote?.map(toPortableText) ?? undefined,
     layout: toLayout(raw.layout),

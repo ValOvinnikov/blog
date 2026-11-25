@@ -24,6 +24,7 @@ const MOCK_LOOK_TENANT: TLookFormTenant = {
   siteHost: MOCK_TENANT_DOMAIN,
   grants: mockGrantAccess(),
   lookFields: PLAN_ENTITLEMENTS[TENANT_PLAN.GROWTH].lookFields,
+  unlockedPresets: [],
 };
 
 const MOCK_LOOK_FEATURES: TLookFormFeatures = {

@@ -341,11 +341,6 @@
     "viewRunLabel": "View the contrast run for commit {sha} (opens in new tab)",
     "openReleases": "Open Releases"
   },
-  "contrastDueBanner": {
-    "title": "Contrast check due",
-    "description": "Rendering has changed since the last passing contrast check. Run one before the next release.",
-    "openReleases": "Open Releases"
-  },
   "findingsCard": {
     "title": "Open findings",
     "empty": "No open findings for this tenant — everything's healthy.",
@@ -772,6 +767,8 @@
     "editorialMiniSecondary": "Dispatches from the coast",
     "morePresets": "More presets",
     "morePresetsAriaLabel": "More presets, {count} more",
+    "shinefold": "Shinefold",
+    "shinefoldDescription": "Yellow and ink, in the Shinefold brand.",
     "presetCount": "{count, plural, one {# preset} other {# presets}}",
     "choosePreset": "Choose a preset",
     "close": "Close"
@@ -789,7 +786,7 @@
     "sitePartsGroupHeading": "Site parts",
     "viewTabsAriaLabel": "Look view",
     "jumpIndexAriaLabel": "Look sections",
-    "growthAddsColour": "A logo hue of its own",
+    "growthAddsColour": "A logo hue of its own, and a site locked to light or dark",
     "growthAddsType": "Fonts, heading weight and case",
     "growthAddsShape": "Corners, spacing, image proportions and dividers",
     "growthAddsCards": "Card style",
@@ -812,6 +809,13 @@
     "accentHueInaccessible": "This hue doesn't keep body text readable on its tinted surfaces, so the site would replace it. Choose another hue.",
     "logoHueLabel": "Logo hue",
     "logoHueDescription": "Tints your wordmark. Follows the accent hue unless you choose another.",
+    "colorModeLabel": "Colour mode",
+    "colorModeDescription": "Whether readers switch between light and dark, or the site always shows one.",
+    "colorModeOptionLabel": {
+      "READER": "Reader chooses",
+      "LIGHT": "Always light",
+      "DARK": "Always dark"
+    },
     "brandImagesDescription": "Images are used exactly as uploaded — nothing is resized or cropped.",
     "brandNameLabel": "Brand name",
     "brandNameHint": "Your site's name. Leave it blank to use your account name.",
@@ -928,7 +932,7 @@
       "CODES": "Language codes side by side, for a few languages"
     },
     "colourHeading": "Colour",
-    "colourDescription": "Only the hue changes, so text stays readable.",
+    "colourDescription": "Pick the accent hue and whether readers choose light or dark. Text stays readable either way.",
     "typeHeading": "Type",
     "typeDescription": "Each font is shown in its own face.",
     "shapeHeading": "Corners & spacing",
@@ -2723,6 +2727,7 @@
       "headingCase": "Heading case",
       "imageProportion": "Image proportions",
       "dividerWidth": "Section dividers",
+      "colorMode": "Colour mode",
       "footerLayout": "Footer layout",
       "footerBackground": "Footer background",
       "footerSurface": "Footer surface",

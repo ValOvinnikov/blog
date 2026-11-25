@@ -14,6 +14,7 @@ import {
 } from '@shinefold/service/testing/modules/fixtures';
 import { mockRawPostListModule } from '@shinefold/service/testing/modules/post-list/fixtures';
 import { evaluateGroqExpression } from '@shinefold/service/testing/shared/groq';
+import { mockParagraphBlocks } from '@shinefold/service/testing/shared/localized';
 
 import { postListModuleQuery } from './query';
 
@@ -89,6 +90,6 @@ describe('postListModuleQuery', () => {
   ])('resolves the heading text for a %s visitor', async (locale, expected) => {
     const { headingBlock } = await runPostList(locale);
 
-    expect(headingBlock.heading).toBe(expected);
+    expect(headingBlock.heading).toEqual(mockParagraphBlocks(expected));
   });
 });

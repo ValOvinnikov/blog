@@ -1,9 +1,9 @@
-import type { TPresetId } from '@shinefold/config';
+import type { TOpenPresetId } from '@shinefold/config';
 
 import { presetMiniVariants } from './preset-mini-variants';
 
 export type TPresetMiniProps = {
-  preset: TPresetId;
+  preset: TOpenPresetId;
   title: string;
   tagline: string;
   titleFontFamily: string;

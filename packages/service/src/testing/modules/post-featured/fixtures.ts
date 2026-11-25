@@ -1,6 +1,6 @@
 import { BRAND_VARIANT, DISPLAY_MODE, POST_SOURCE } from '@shinefold/config';
 import type { TRawPostFeaturedModule } from '@shinefold/service/features/modules/post-featured/adaptor/transformer';
-import { mockRawHeadingBlock } from '@shinefold/service/testing/shared/fixtures';
+import { mockRawModuleHeadingBlock } from '@shinefold/service/testing/shared/localized';
 import { mockRawModuleAppearance } from '@shinefold/service/testing/shared/module-appearance';
 
 export function mockRawPostFeaturedModule(
@@ -8,7 +8,7 @@ export function mockRawPostFeaturedModule(
 ): TRawPostFeaturedModule {
   return {
     brandVariant: BRAND_VARIANT.PRIMARY,
-    headingBlock: mockRawHeadingBlock('Featured'),
+    headingBlock: mockRawModuleHeadingBlock('Featured'),
     postSource: POST_SOURCE.PINNED,
     posts: [],
     limit: null,

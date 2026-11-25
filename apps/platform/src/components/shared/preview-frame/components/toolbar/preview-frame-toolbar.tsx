@@ -4,15 +4,15 @@ import type { TIconToggleGroupProps } from '@platform/components/shared/icon-tog
 import { IconToolbar } from '@platform/components/shared/icon-toolbar';
 import { usePreviewDeviceGroup } from '@platform/components/shared/preview-device-group';
 import { usePreviewModeGroup } from '@platform/components/shared/preview-mode-group';
-import type { TPreviewDevice, TPreviewMode } from '@platform/constants/preview';
+import type { TPreviewDevice } from '@platform/constants/preview';
+import type { TPreviewColorScheme } from '@platform/utils/use-preview-color-scheme/use-preview-color-scheme';
 import { useTranslations } from 'next-intl';
 import type { PropsWithChildren } from 'react';
 
 export type TPreviewFrameToolbarProps = PropsWithChildren<{
   device: TPreviewDevice;
   onDeviceChange(device: TPreviewDevice): void;
-  mode: TPreviewMode;
-  onModeChange(mode: TPreviewMode): void;
+  colorScheme: TPreviewColorScheme;
   extraGroups?: TIconToggleGroupProps<string>[];
   isEndOnOwnLine?: boolean;
 }>;
@@ -20,15 +20,14 @@ export type TPreviewFrameToolbarProps = PropsWithChildren<{
 export const PreviewFrameToolbar = ({
   device,
   onDeviceChange,
-  mode,
-  onModeChange,
+  colorScheme: { mode, modes, setMode },
   extraGroups = [],
   isEndOnOwnLine,
   children,
 }: TPreviewFrameToolbarProps) => {
   const t = useTranslations('devicePreview');
   const deviceGroup = usePreviewDeviceGroup(device, onDeviceChange);
-  const modeGroup = usePreviewModeGroup(mode, onModeChange);
+  const modeGroup = usePreviewModeGroup(mode, setMode, modes);
 
   return (
     <IconToolbar

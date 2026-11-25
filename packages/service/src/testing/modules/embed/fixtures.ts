@@ -1,7 +1,7 @@
 import { BRAND_VARIANT } from '@shinefold/config';
 import type { TRawEmbedModule } from '@shinefold/service/features/modules/embed/adaptor/transformer';
 import { createMockFaker } from '@shinefold/service/testing/mock-faker';
-import { mockRawHeadingBlock } from '@shinefold/service/testing/shared/fixtures';
+import { mockRawModuleHeadingBlock } from '@shinefold/service/testing/shared/localized';
 
 const mockFaker = createMockFaker(3772);
 
@@ -27,7 +27,7 @@ export function mockRawEmbedModule(
 ): TRawEmbedModule {
   return {
     brandVariant: BRAND_VARIANT.PRIMARY,
-    headingBlock: mockRawHeadingBlock(mockFaker.lorem.words(3)),
+    headingBlock: mockRawModuleHeadingBlock(mockFaker.lorem.words(3)),
     embed: mockRawEmbed(),
     ctaButtons: null,
     contentAlignment: null,

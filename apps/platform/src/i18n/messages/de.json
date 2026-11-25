@@ -341,11 +341,6 @@
     "viewRunLabel": "Kontrastlauf für Commit {sha} ansehen (öffnet in neuem Tab)",
     "openReleases": "Releases öffnen"
   },
-  "contrastDueBanner": {
-    "title": "Kontrastprüfung fällig",
-    "description": "Das Rendering hat sich seit der letzten bestandenen Kontrastprüfung geändert. Führe vor dem nächsten Release eine aus.",
-    "openReleases": "Releases öffnen"
-  },
   "findingsCard": {
     "title": "Offene Befunde",
     "empty": "Keine offenen Befunde für diesen Mandanten — alles in Ordnung.",
@@ -772,6 +767,8 @@
     "editorialMiniSecondary": "Berichte von der Küste",
     "morePresets": "Weitere Vorlagen",
     "morePresetsAriaLabel": "Weitere Vorlagen, {count} mehr",
+    "shinefold": "Shinefold",
+    "shinefoldDescription": "Gelb und Tinte, im Shinefold-Markenstil.",
     "presetCount": "{count, plural, one {# Vorlage} other {# Vorlagen}}",
     "choosePreset": "Wähle eine Vorlage",
     "close": "Schließen"
@@ -789,7 +786,7 @@
     "sitePartsGroupHeading": "Website-Bereiche",
     "viewTabsAriaLabel": "Look-Ansicht",
     "jumpIndexAriaLabel": "Look-Abschnitte",
-    "growthAddsColour": "Ein eigener Logo-Farbton",
+    "growthAddsColour": "Ein eigener Logo-Farbton und eine Website, die fest hell oder dunkel bleibt",
     "growthAddsType": "Schriften, Stärke und Schreibweise der Überschriften",
     "growthAddsShape": "Ecken, Abstände, Bildproportionen und Trennlinien",
     "growthAddsCards": "Kartenstil",
@@ -812,6 +809,13 @@
     "accentHueInaccessible": "Mit diesem Farbton bleibt Fließtext auf seinen getönten Flächen nicht lesbar, daher würde die Website ihn ersetzen. Wählen Sie einen anderen Farbton.",
     "logoHueLabel": "Logo-Farbton",
     "logoHueDescription": "Färbt die Wortmarke. Folgt dem Akzentfarbton, solange kein anderer gewählt ist.",
+    "colorModeLabel": "Farbmodus",
+    "colorModeDescription": "Ob Leser zwischen hell und dunkel wechseln oder die Website immer einen Modus zeigt.",
+    "colorModeOptionLabel": {
+      "READER": "Leser wählen",
+      "LIGHT": "Immer hell",
+      "DARK": "Immer dunkel"
+    },
     "brandImagesDescription": "Bilder werden genau so verwendet, wie sie hochgeladen werden — nichts wird verkleinert oder zugeschnitten.",
     "brandNameLabel": "Markenname",
     "brandNameHint": "Der Name Ihrer Website. Leer lassen, um den Kontonamen zu verwenden.",
@@ -928,7 +932,7 @@
       "CODES": "Sprachcodes nebeneinander, für wenige Sprachen"
     },
     "colourHeading": "Farbe",
-    "colourDescription": "Nur der Farbton ändert sich, damit Text lesbar bleibt.",
+    "colourDescription": "Akzentfarbton wählen und festlegen, ob Leser zwischen hell und dunkel wählen. Text bleibt in beiden Fällen lesbar.",
     "typeHeading": "Schrift",
     "typeDescription": "Jede Schrift wird in ihrem eigenen Schnitt gezeigt.",
     "shapeHeading": "Ecken & Abstände",
@@ -2723,6 +2727,7 @@
       "headingCase": "Schreibweise der Überschriften",
       "imageProportion": "Bildproportionen",
       "dividerWidth": "Abschnittstrenner",
+      "colorMode": "Farbmodus",
       "footerLayout": "Fußzeilen-Layout",
       "footerBackground": "Fußzeilen-Hintergrund",
       "footerSurface": "Fußzeilen-Fläche",

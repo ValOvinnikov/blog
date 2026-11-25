@@ -4,6 +4,7 @@ import {
   PREVIEW_DEVICE_WIDTH,
   PREVIEW_HEADING_LAYOUT,
   PREVIEW_MODE,
+  PREVIEW_MODES,
   PREVIEW_READOUT,
   type TPreviewDevice,
   type TPreviewHeadingLayout,
@@ -250,8 +251,11 @@ describe(`<${PreviewFrame.name}/>`, () => {
           <PreviewFrame.Toolbar
             device={PREVIEW_DEVICE.PHONE}
             onDeviceChange={vi.fn()}
-            mode={PREVIEW_MODE.LIGHT}
-            onModeChange={vi.fn()}
+            colorScheme={{
+              mode: PREVIEW_MODE.LIGHT,
+              modes: PREVIEW_MODES,
+              setMode: vi.fn(),
+            }}
           />
         </PreviewFrame>,
       );
@@ -275,8 +279,11 @@ describe(`<${PreviewFrame.name}/>`, () => {
           <PreviewFrame.Toolbar
             device={PREVIEW_DEVICE.TABLET}
             onDeviceChange={onDeviceChange}
-            mode={PREVIEW_MODE.DARK}
-            onModeChange={onModeChange}
+            colorScheme={{
+              mode: PREVIEW_MODE.DARK,
+              modes: PREVIEW_MODES,
+              setMode: onModeChange,
+            }}
           >
             <span>{MOCK_END_SLOT}</span>
           </PreviewFrame.Toolbar>

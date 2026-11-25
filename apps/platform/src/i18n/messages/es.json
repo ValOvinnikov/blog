@@ -341,11 +341,6 @@
     "viewRunLabel": "Ver la ejecución de contraste del commit {sha} (se abre en una pestaña nueva)",
     "openReleases": "Abrir Releases"
   },
-  "contrastDueBanner": {
-    "title": "Comprobación de contraste pendiente",
-    "description": "El renderizado ha cambiado desde la última comprobación de contraste superada. Ejecuta una antes del próximo release.",
-    "openReleases": "Abrir Releases"
-  },
   "findingsCard": {
     "title": "Incidencias abiertas",
     "empty": "No hay incidencias abiertas para este cliente: todo funciona correctamente.",
@@ -772,6 +767,8 @@
     "editorialMiniSecondary": "Crónicas desde la costa",
     "morePresets": "Más ajustes",
     "morePresetsAriaLabel": "Más ajustes, {count} más",
+    "shinefold": "Shinefold",
+    "shinefoldDescription": "Amarillo y tinta, con la marca Shinefold.",
     "presetCount": "{count, plural, one {# ajuste} other {# ajustes}}",
     "choosePreset": "Elige un ajuste predefinido",
     "close": "Cerrar"
@@ -789,7 +786,7 @@
     "sitePartsGroupHeading": "Partes del sitio",
     "viewTabsAriaLabel": "Vista de Look",
     "jumpIndexAriaLabel": "Secciones de Look",
-    "growthAddsColour": "Un tono de logotipo propio",
+    "growthAddsColour": "Un tono de logotipo propio y un sitio fijado en claro u oscuro",
     "growthAddsType": "Fuentes, grosor y mayúsculas de los títulos",
     "growthAddsShape": "Esquinas, espaciado, proporciones de imagen y separadores",
     "growthAddsCards": "Estilo de tarjeta",
@@ -812,6 +809,13 @@
     "accentHueInaccessible": "Este tono no mantiene legible el texto sobre sus superficies tintadas, así que el sitio lo sustituiría. Elija otro tono.",
     "logoHueLabel": "Tono del logotipo",
     "logoHueDescription": "Tiñe el logotipo de texto. Sigue el tono de acento si no se elige otro.",
+    "colorModeLabel": "Modo de color",
+    "colorModeDescription": "Si los lectores cambian entre claro y oscuro, o el sitio muestra siempre uno.",
+    "colorModeOptionLabel": {
+      "READER": "Elige el lector",
+      "LIGHT": "Siempre claro",
+      "DARK": "Siempre oscuro"
+    },
     "brandImagesDescription": "Las imágenes se usan tal como se suben: no se redimensionan ni se recortan.",
     "brandNameLabel": "Nombre de la marca",
     "brandNameHint": "El nombre de tu sitio. Déjalo en blanco para usar el nombre de la cuenta.",
@@ -928,7 +932,7 @@
       "CODES": "Códigos de idioma uno al lado del otro, para pocos idiomas"
     },
     "colourHeading": "Color",
-    "colourDescription": "Solo cambia el tono, para que el texto siga siendo legible.",
+    "colourDescription": "Elige el tono de acento y si los lectores eligen entre claro y oscuro. El texto sigue siendo legible en ambos casos.",
     "typeHeading": "Tipografía",
     "typeDescription": "Cada fuente se muestra con su propio estilo.",
     "shapeHeading": "Esquinas y espaciado",
@@ -2723,6 +2727,7 @@
       "headingCase": "Mayúsculas en títulos",
       "imageProportion": "Proporciones de imagen",
       "dividerWidth": "Separadores de sección",
+      "colorMode": "Modo de color",
       "footerLayout": "Diseño del pie de página",
       "footerBackground": "Fondo del pie de página",
       "footerSurface": "Superficie del pie de página",

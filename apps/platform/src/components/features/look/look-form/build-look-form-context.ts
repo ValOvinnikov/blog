@@ -15,8 +15,11 @@ import {
 } from '@platform/utils/look-preset/look-preset';
 import { isAccentHueAccessible, type TPresetId } from '@shinefold/config';
 import { LOOK_FIELDS, type TLookField } from '@shinefold/db/constants';
-import { isLookFieldWithin } from '@shinefold/db/utils/effective-look/effective-look';
-import type { TTenantEntitlements } from '@shinefold/db/utils/resolve-tenant-entitlements/resolve-tenant-entitlements';
+import {
+  isLookFieldWithin,
+  presetsWithin,
+  type TEffectiveLookEntitlements,
+} from '@shinefold/db/utils/effective-look/effective-look';
 import type { Dispatch, SetStateAction } from 'react';
 
 type TBuildLookFormContextArgs = Pick<
@@ -37,25 +40,26 @@ type TBuildLookFormContextArgs = Pick<
 > & {
   savedValues: TLookFormValues;
   setValues: Dispatch<SetStateAction<TLookFormValues>>;
-  lookFields: TTenantEntitlements['lookFields'];
+  entitlements: TEffectiveLookEntitlements;
 };
 
 export const buildLookFormContext = ({
   values,
   savedValues,
   setValues,
-  lookFields,
+  entitlements,
   ...rest
 }: TBuildLookFormContextArgs): TLookFormContext => {
   const hasFieldChanged = (field: keyof TLookFormValues) =>
     isFieldChanged(field, values, savedValues);
   const isLocked = (field: TLookField) =>
-    !isLookFieldWithin(field, { lookFields });
+    !isLookFieldWithin(field, entitlements);
   const hasLockedFields = LOOK_FIELDS.some(isLocked);
 
   return {
     ...rest,
     values,
+    presets: presetsWithin(entitlements),
     isLocked,
     hasLockedFields,
     hasCardChanges: (card: TLookCard) =>

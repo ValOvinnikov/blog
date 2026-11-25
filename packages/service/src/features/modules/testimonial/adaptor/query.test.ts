@@ -24,6 +24,7 @@ import {
   mockLocalizedImage,
   mockLocalizedListedText,
   mockLocalizedStrings,
+  mockParagraphBlocks,
 } from '@shinefold/service/testing/shared/localized';
 
 import { testimonialModuleQuery } from './query';
@@ -172,7 +173,9 @@ describe('testimonialModuleQuery', () => {
     async (locale, language) => {
       const module = await runTestimonial(locale);
 
-      expect(module.headingBlock.heading).toBe(MOCK_HEADING[language]);
+      expect(module.headingBlock.heading).toEqual(
+        mockParagraphBlocks(MOCK_HEADING[language]),
+      );
       expect(testimonialText(module)).toEqual([
         {
           name: MOCK_TRANSLATED_NAME,

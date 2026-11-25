@@ -2,6 +2,7 @@ import { faker } from '@faker-js/faker';
 import type * as BlogConfig from '@shinefold/config';
 import {
   BRAND_VARIANT,
+  COLOR_MODE,
   COOKIE_SETTINGS_BUTTON,
   FOOTER_LAYOUT,
   FOOTER_SURFACE,
@@ -141,6 +142,7 @@ const STYLE_FIELDS = [
   { field: 'headingCase', value: HEADING_CASE.UPPERCASE },
   { field: 'imageProportion', value: IMAGE_PROPORTION.SQUARE },
   { field: 'dividerWidth', value: DIVIDER_WIDTH.BOLD },
+  { field: 'colorMode', value: COLOR_MODE.DARK },
 ] as const;
 
 const NEW_CONFIG_DEFAULTS = [
@@ -251,6 +253,12 @@ const INVALID_INPUTS: [string, Partial<TUpdateSiteConfigInput>][] = [
     {
       dividerWidth:
         MOCK_UNKNOWN_VALUE as TUpdateSiteConfigInput['dividerWidth'],
+    },
+  ],
+  [
+    'an unknown colour mode',
+    {
+      colorMode: MOCK_UNKNOWN_VALUE as TUpdateSiteConfigInput['colorMode'],
     },
   ],
   [

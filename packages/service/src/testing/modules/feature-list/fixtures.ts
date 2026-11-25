@@ -7,7 +7,7 @@ import {
 } from '@shinefold/config';
 import type { TRawFeatureListModule } from '@shinefold/service/features/modules/feature-list/adaptor/transformer';
 import { MOCK_SHIP_FASTER_HEADING } from '@shinefold/service/testing/modules/fixtures';
-import { mockRawHeadingBlock } from '@shinefold/service/testing/shared/fixtures';
+import { mockRawModuleHeadingBlock } from '@shinefold/service/testing/shared/localized';
 import { mockRawModuleAppearance } from '@shinefold/service/testing/shared/module-appearance';
 
 export const MOCK_FEATURE_LIST_MODULE_ID = 'feature-list-1';
@@ -21,7 +21,7 @@ export function mockRawFeatureListItem(
 ): TRawFeatureListItem {
   return {
     _id: 'block-feature-1',
-    headingBlock: mockRawHeadingBlock(MOCK_SHIP_FASTER_HEADING),
+    headingBlock: mockRawModuleHeadingBlock(MOCK_SHIP_FASTER_HEADING),
     icon: ICONS.ROCKET,
     image: null,
     link: null,
@@ -34,7 +34,7 @@ export function mockRawFeatureListModule(
 ): TRawFeatureListModule {
   return {
     brandVariant: BRAND_VARIANT.PRIMARY,
-    headingBlock: mockRawHeadingBlock('Features'),
+    headingBlock: mockRawModuleHeadingBlock('Features'),
     features: [
       mockRawFeatureListItem(),
       mockRawFeatureListItem({ _id: 'block-feature-2' }),

@@ -1,6 +1,7 @@
 import { PRESET_LABEL_KEY } from '@platform/components/shared/preset-picker';
 import type { TLookFormValues } from '@platform/utils/default-look-values/default-look-values';
 import type { TStagedImage } from '@platform/utils/staged-image/staged-image';
+import { LOOK_FIELD } from '@shinefold/db/constants';
 import { isUndefined } from '@shinefold/utils/primitives';
 import { useTranslations } from 'next-intl';
 
@@ -42,6 +43,12 @@ export const useLookDraftFields = () => {
         isUndefined(logoHue)
           ? tHue('followsAccent')
           : tHue('hueValue', { hue: logoHue }),
+    },
+    {
+      id: LOOK_FIELD.COLOR_MODE,
+      label: t('colorModeLabel'),
+      display: ({ colorMode }: TLookFormValues) =>
+        t(`colorModeOptionLabel.${colorMode}`),
     },
     ...styleDraftFields,
     ...headerDraftFields,

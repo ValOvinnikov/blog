@@ -20,6 +20,7 @@ import {
 } from '@web/testing/custom-render';
 import { mockSanityImage } from '@web/testing/modules/hero/fixtures';
 import { STATIC_SANITY_IMAGE_BASE_URL } from '@web/testing/providers';
+import { mockAsideBlock } from '@web/testing/shared/portable-text/aside-fixtures';
 import {
   mockExpandableSectionBlock,
   mockPortableTextBlock,
@@ -48,10 +49,6 @@ const setup = customRender(PortableText, {
 });
 
 type TBlock = TPortableTextBody[number];
-type TAsideBlock = Extract<
-  TBlock,
-  { _type: typeof PORTABLE_TEXT_BLOCK_TYPE.ASIDE }
->;
 type TBodyImageBlock = Extract<
   TBlock,
   { _type: typeof PORTABLE_TEXT_BLOCK_TYPE.BODY_IMAGE }
@@ -101,16 +98,6 @@ const RESOLVED_LINK_REF = {
   _key: MOCK_LINK_KEY,
   link: { href: MOCK_LINK_HREF, target: undefined },
 } as const;
-
-const mockAsideBlock = (
-  body: TAsideBlock['body'],
-  kind?: TAsideBlock['kind'],
-): TAsideBlock => ({
-  _type: PORTABLE_TEXT_BLOCK_TYPE.ASIDE,
-  _key: 'aside-1',
-  kind,
-  body,
-});
 
 const mockSectionWithBody = () =>
   mockExpandableSectionBlock(MOCK_SECTION_TITLE, [

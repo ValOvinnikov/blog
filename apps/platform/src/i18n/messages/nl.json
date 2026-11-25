@@ -341,11 +341,6 @@
     "viewRunLabel": "Contrastrun voor commit {sha} bekijken (opent in nieuw tabblad)",
     "openReleases": "Releases openen"
   },
-  "contrastDueBanner": {
-    "title": "Contrastcontrole nodig",
-    "description": "De weergave is gewijzigd sinds de laatste geslaagde contrastcontrole. Voer er een uit vóór de volgende release.",
-    "openReleases": "Releases openen"
-  },
   "findingsCard": {
     "title": "Openstaande bevindingen",
     "empty": "Geen openstaande bevindingen voor deze tenant — alles is in orde.",
@@ -772,6 +767,8 @@
     "editorialMiniSecondary": "Berichten van de kust",
     "morePresets": "Meer voorinstellingen",
     "morePresetsAriaLabel": "Meer voorinstellingen, nog {count}",
+    "shinefold": "Shinefold",
+    "shinefoldDescription": "Geel en inkt, in de Shinefold-huisstijl.",
     "presetCount": "{count, plural, one {# voorinstelling} other {# voorinstellingen}}",
     "choosePreset": "Kies een voorinstelling",
     "close": "Sluiten"
@@ -789,7 +786,7 @@
     "sitePartsGroupHeading": "Sitedelen",
     "viewTabsAriaLabel": "Look-weergave",
     "jumpIndexAriaLabel": "Look-onderdelen",
-    "growthAddsColour": "Een eigen tint voor het logo",
+    "growthAddsColour": "Een eigen tint voor het logo, en een site die vast licht of donker blijft",
     "growthAddsType": "Lettertypen, dikte en hoofdletters van koppen",
     "growthAddsShape": "Hoeken, ruimte, beeldverhoudingen en scheidingslijnen",
     "growthAddsCards": "Kaartstijl",
@@ -812,6 +809,13 @@
     "accentHueInaccessible": "Met deze tint blijft lopende tekst op de getinte vlakken niet leesbaar, dus de site zou hem vervangen. Kies een andere tint.",
     "logoHueLabel": "Logotint",
     "logoHueDescription": "Kleurt het woordmerk. Volgt de accenttint, tenzij er een andere is gekozen.",
+    "colorModeLabel": "Kleurmodus",
+    "colorModeDescription": "Of lezers wisselen tussen licht en donker, of de site altijd één modus toont.",
+    "colorModeOptionLabel": {
+      "READER": "Lezer kiest",
+      "LIGHT": "Altijd licht",
+      "DARK": "Altijd donker"
+    },
     "brandImagesDescription": "Afbeeldingen worden gebruikt zoals ze zijn geüpload — er wordt niets verkleind of bijgesneden.",
     "brandNameLabel": "Merknaam",
     "brandNameHint": "De naam van je site. Laat leeg om de accountnaam te gebruiken.",
@@ -928,7 +932,7 @@
       "CODES": "Taalcodes naast elkaar, voor een paar talen"
     },
     "colourHeading": "Kleur",
-    "colourDescription": "Alleen de tint verandert, zodat tekst leesbaar blijft.",
+    "colourDescription": "Kies de accenttint en of lezers zelf licht of donker kiezen. Tekst blijft in beide gevallen leesbaar.",
     "typeHeading": "Lettertype",
     "typeDescription": "Elk lettertype wordt in zijn eigen stijl getoond.",
     "shapeHeading": "Hoeken & ruimte",
@@ -2723,6 +2727,7 @@
       "headingCase": "Hoofdletters in koppen",
       "imageProportion": "Beeldverhoudingen",
       "dividerWidth": "Sectiescheidingen",
+      "colorMode": "Kleurmodus",
       "footerLayout": "Indeling van de voettekst",
       "footerBackground": "Achtergrond van de voettekst",
       "footerSurface": "Oppervlak van de voettekst",

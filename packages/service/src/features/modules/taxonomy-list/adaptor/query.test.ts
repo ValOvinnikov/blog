@@ -13,7 +13,11 @@ import {
   mockRawTaxonomyListModule,
 } from '@shinefold/service/testing/modules/fixtures';
 import { evaluateGroqExpression } from '@shinefold/service/testing/shared/groq';
-import { mockLocalizedStrings } from '@shinefold/service/testing/shared/localized';
+import {
+  mockLocalizedStrings,
+  mockParagraphBlocks,
+  mockRawModuleHeadingBlock,
+} from '@shinefold/service/testing/shared/localized';
 import {
   MOCK_DESIGN_EN_POST_ID,
   MOCK_DESIGN_NL_POST_ID,
@@ -90,10 +94,7 @@ describe('taxonomyListModuleQuery', () => {
 
     expect(module).toEqual({
       brandVariant: BRAND_VARIANT.PRIMARY,
-      headingBlock: {
-        heading: MOCK_ENGLISH_MODULE_HEADING,
-        supportingText: null,
-      },
+      headingBlock: mockRawModuleHeadingBlock(MOCK_ENGLISH_MODULE_HEADING),
       layout: null,
       contentAlignment: null,
       taxonomy: TAXONOMY_KIND.TOPICS,
@@ -136,7 +137,9 @@ describe('taxonomyListModuleQuery', () => {
   ])('resolves a %s visitor to the %s heading', async (locale, language) => {
     const { headingBlock } = await runTaxonomyList(locale);
 
-    expect(headingBlock.heading).toBe(MOCK_HEADING_BY_LOCALE[language]);
+    expect(headingBlock.heading).toEqual(
+      mockParagraphBlocks(MOCK_HEADING_BY_LOCALE[language]),
+    );
   });
 
   describe('language scoping', () => {

@@ -1,5 +1,5 @@
 import { toCtaButtons } from '@shinefold/service/shared/transformers/cta/to-cta-buttons';
-import { toHeadingBlock } from '@shinefold/service/shared/transformers/heading-block/to-heading-block';
+import { toModuleHeadingBlock } from '@shinefold/service/shared/transformers/heading-block/to-module-heading-block';
 import { toLayout } from '@shinefold/service/shared/transformers/layout/to-layout';
 import type { InferResultType } from 'groqd';
 
@@ -20,7 +20,7 @@ function toStatItems(raw: TRawStatsModule['stats']): TStatItem[] {
 export function toStatsModule(raw: TRawStatsModule): TStatsModule {
   return {
     brandVariant: raw.brandVariant,
-    headingBlock: toHeadingBlock(raw.headingBlock),
+    headingBlock: toModuleHeadingBlock(raw.headingBlock),
     stats: toStatItems(raw.stats),
     footnote: raw.footnote ?? undefined,
     ctaButtons: toCtaButtons(raw.ctaButtons),

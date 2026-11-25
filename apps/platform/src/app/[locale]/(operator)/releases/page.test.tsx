@@ -17,7 +17,7 @@ import {
   useGitHubFetch,
 } from '@platform/testing/github/github-fetch';
 import { mockDbConstants } from '@platform/testing/mock-db-constants';
-import { MOCK_LAST_RELEASE_TAG } from '@platform/testing/releases/contrast-due-github';
+import { MOCK_RELEASE_LAST_TAG } from '@platform/testing/releases/fixtures';
 import { NEXT_NAVIGATION_ERROR } from '@shinefold/config';
 
 import ReleasesPage from './page';
@@ -62,13 +62,13 @@ describe(`<${ReleasesPage.name}/>`, () => {
 
   beforeEach(() => {
     github.respond(MOCK_GITHUB_RELEASE_TAGS_PATH, () =>
-      mockGitHubResponse([mockGitHubTagRef(MOCK_LAST_RELEASE_TAG)]),
+      mockGitHubResponse([mockGitHubTagRef(MOCK_RELEASE_LAST_TAG)]),
     );
     github.respond(MOCK_GITHUB_MAIN_BRANCH_PATH, () =>
       mockGitHubResponse({ commit: { sha: MOCK_HEAD_SHA } }),
     );
     github.respond(
-      `/compare/${MOCK_LAST_RELEASE_TAG}...${MOCK_HEAD_SHA}`,
+      `/compare/${MOCK_RELEASE_LAST_TAG}...${MOCK_HEAD_SHA}`,
       (path) =>
         mockGitHubCompareResponse(
           path,

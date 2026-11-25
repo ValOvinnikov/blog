@@ -35,6 +35,18 @@ export const Context: TStory = {
   args: { kind: ASIDE_KIND.CONTEXT, label: 'Context' },
 };
 
+export const Tip: TStory = {
+  args: { kind: ASIDE_KIND.TIP, label: 'Tip' },
+};
+
+export const Note: TStory = {
+  args: { kind: ASIDE_KIND.NOTE, label: 'Note' },
+};
+
+export const Warning: TStory = {
+  args: { kind: ASIDE_KIND.WARNING, label: 'Warning' },
+};
+
 export const InArticleBody: TStory = {
   args: { kind: ASIDE_KIND.DIGRESSION, label: 'Digression' },
   render: (args) => (

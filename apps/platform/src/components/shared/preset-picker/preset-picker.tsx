@@ -14,6 +14,7 @@ import {
   ICONS,
   PRESET_ID,
   type TNamedControlAria,
+  type TOpenPresetId,
   type TPresetId,
 } from '@shinefold/config';
 import { useTranslations } from 'next-intl';
@@ -31,7 +32,7 @@ export type TPresetPickerProps = {
 };
 
 type TPresetOption = {
-  value: TPresetId;
+  value: TOpenPresetId;
   label: string;
   description: string;
   miniPrimary: string;
@@ -39,12 +40,7 @@ type TPresetOption = {
   miniPrimaryFontFamily: string;
 };
 
-/**
- * Choosing a preset re-applies every one of its `PRESET_REGISTRY` defaults —
- * the caller owns that reset, this component only reports the selection. The
- * mini preview inside each card is illustrative only, not a live render of
- * the preset's actual tokens.
- */
+/** Reports the chosen preset only; the caller re-applies that preset's `PRESET_REGISTRY` defaults. */
 export const PresetPicker = ({
   value,
   onChange,

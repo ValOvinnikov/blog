@@ -1,6 +1,6 @@
 import { BRAND_VARIANT, HERO_VARIANT } from '@shinefold/config';
 import type { TRawHeroStatementModule } from '@shinefold/service/features/modules/hero-statement/adaptor/transformer';
-import { mockRawHeadingBlock } from '@shinefold/service/testing/shared/fixtures';
+import { mockRawModuleHeadingBlock } from '@shinefold/service/testing/shared/localized';
 
 export function mockRawHeroStatementModule(
   overrides: Partial<TRawHeroStatementModule> = {},
@@ -9,7 +9,7 @@ export function mockRawHeroStatementModule(
     brandVariant: BRAND_VARIANT.PRIMARY,
     variant: HERO_VARIANT.SPLIT,
     eyebrow: null,
-    headingBlock: mockRawHeadingBlock('Statement heading'),
+    headingBlock: mockRawModuleHeadingBlock('Statement heading'),
     image: null,
     ctaButtons: null,
     footnote: null,

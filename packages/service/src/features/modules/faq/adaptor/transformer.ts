@@ -1,5 +1,5 @@
 import { toCtaButtons } from '@shinefold/service/shared/transformers/cta/to-cta-buttons';
-import { toHeadingBlock } from '@shinefold/service/shared/transformers/heading-block/to-heading-block';
+import { toModuleHeadingBlock } from '@shinefold/service/shared/transformers/heading-block/to-module-heading-block';
 import { toLayout } from '@shinefold/service/shared/transformers/layout/to-layout';
 import { toModuleAppearance } from '@shinefold/service/shared/transformers/module/to-module-appearance';
 import { toPortableText } from '@shinefold/service/shared/transformers/portable-text/to-portable-text-mark-def';
@@ -23,7 +23,7 @@ function toFaqQuestion(raw: TRawFaqQuestion): TFaqQuestion {
 export function toFaqModule(raw: TRawFaqModule): TFaqModule {
   return {
     brandVariant: raw.brandVariant,
-    headingBlock: toHeadingBlock(raw.headingBlock),
+    headingBlock: toModuleHeadingBlock(raw.headingBlock),
     questions: raw.questions.map(toFaqQuestion),
     ctaButtons: toCtaButtons(raw.ctaButtons),
     contentAlignment: raw.contentAlignment ?? undefined,

@@ -3,7 +3,10 @@ import { defaultLookFormValues } from '@platform/utils/default-look-values/defau
 import { HUE_MIN, PRESET_ID, RADIUS_SCALE } from '@shinefold/config';
 import { TENANT_PLAN } from '@shinefold/config/constants';
 import { ENTITLEMENT_KIND, LOOK_FIELD } from '@shinefold/db/constants';
-import { mockEntitlementGrant } from '@shinefold/db/testing/tenant-entitlement-grants/mock-entitlement-grant';
+import {
+  MOCK_SHINEFOLD_PRESET_GRANT,
+  mockEntitlementGrant,
+} from '@shinefold/db/testing/tenant-entitlement-grants/mock-entitlement-grant';
 import { toEffectiveLookWithin } from '@shinefold/db/utils/effective-look/effective-look';
 
 import { listRefusedLookFields } from './refused-look-fields';
@@ -56,5 +59,28 @@ describe(listRefusedLookFields, () => {
     expect(listRefusedLookFields(MOCK_SMALLER_RADIUS, STORED, GROWTH)).toEqual(
       [],
     );
+  });
+
+  it('lists the Shinefold preset chosen without a grant', () => {
+    const submitted = { ...STORED, preset: PRESET_ID.SHINEFOLD };
+
+    expect(listRefusedLookFields(submitted, STORED, GROWTH)).toEqual([
+      LOOK_FIELD.PRESET,
+    ]);
+  });
+
+  it('passes the Shinefold preset chosen with a grant', () => {
+    const granted = mockTenantEntitlements(TENANT_PLAN.FREE, [
+      MOCK_SHINEFOLD_PRESET_GRANT,
+    ]);
+    const submitted = { ...STORED, preset: PRESET_ID.SHINEFOLD };
+
+    expect(listRefusedLookFields(submitted, STORED, granted)).toEqual([]);
+  });
+
+  it('passes the Shinefold preset already stored once its grant is gone', () => {
+    const stored = { ...STORED, preset: PRESET_ID.SHINEFOLD };
+
+    expect(listRefusedLookFields(stored, stored, GROWTH)).toEqual([]);
   });
 });

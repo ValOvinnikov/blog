@@ -8,8 +8,8 @@ import {
   mockHeroSlotView,
   mockRawCtaRef,
   mockRawHeroRef,
-  mockRawLandingPage,
 } from '@shinefold/service/testing/pages/fixtures';
+import { mockRawLandingPage } from '@shinefold/service/testing/pages/landing-page/fixtures';
 import {
   MOCK_PAGE_LANDING_CACHE_TAG,
   MOCK_TEMPLATE_LANDING_CACHE_TAG,
@@ -25,9 +25,11 @@ import {
   MOCK_PRICING_SLUG,
 } from '@shinefold/service/testing/shared/translated-pages-dataset';
 import { mockTenant } from '@shinefold/service/testing/tenant';
+import { isNull } from '@shinefold/utils/primitives';
 
 import { getPageDocument } from './loader';
 import { landingPageQuery } from './query';
+import type { TRawLandingPage } from './transformer';
 
 vi.mock('@shinefold/service/sanity/query/query');
 
@@ -46,6 +48,24 @@ const MOCK_FAQ_PATH = `${MOCK_SECTION_SLUG}/${MOCK_FAQ_SLUG}`;
 const MOCK_PRICING_PATH = `${MOCK_SECTION_SLUG}/${MOCK_PRICING_SLUG}`;
 const MOCK_ANSWERS_PATH = `${MOCK_FAQ_PATH}/${MOCK_ANSWERS_SLUG}`;
 const MOCK_GLOSSARY_PATH = `${MOCK_FAQ_PATH}/${MOCK_GLOSSARY_SLUG}`;
+
+type TSectionPage = {
+  _id: string;
+  title: string | null;
+  path: string | null;
+  children?: TSectionPage[];
+};
+
+function mockSectionPage(id: string, path: string): TSectionPage {
+  return { _id: id, title: faker.lorem.words(2), path };
+}
+
+const faq = mockSectionPage(MOCK_FAQ_SLUG, MOCK_FAQ_PATH);
+const pricing = mockSectionPage(MOCK_PRICING_SLUG, MOCK_PRICING_PATH);
+const answers = mockSectionPage(MOCK_ANSWERS_SLUG, MOCK_ANSWERS_PATH);
+const glossary = mockSectionPage(MOCK_GLOSSARY_SLUG, MOCK_GLOSSARY_PATH);
+const catalog = mockSectionPage(MOCK_CATALOG_SLUG, MOCK_CATALOG_SLUG);
+const sectionRoot = mockSectionPage(MOCK_SECTION_SLUG, MOCK_SECTION_SLUG);
 
 async function loadPage(
   overrides: Parameters<typeof mockRawLandingPage>[0] = {},
@@ -138,31 +158,15 @@ describe(getPageDocument, () => {
   });
 
   describe('section navigation', () => {
-    type TSectionPage = {
-      _id: string;
-      title: string | null;
-      path: string | null;
-    };
-
-    function mockSectionPage(id: string, path: string): TSectionPage {
-      return { _id: id, title: faker.lorem.words(2), path };
-    }
-
-    const faq = mockSectionPage(MOCK_FAQ_SLUG, MOCK_FAQ_PATH);
-    const pricing = mockSectionPage(MOCK_PRICING_SLUG, MOCK_PRICING_PATH);
-    const answers = mockSectionPage(MOCK_ANSWERS_SLUG, MOCK_ANSWERS_PATH);
-    const glossary = mockSectionPage(MOCK_GLOSSARY_SLUG, MOCK_GLOSSARY_PATH);
-    const catalog = mockSectionPage(MOCK_CATALOG_SLUG, MOCK_CATALOG_SLUG);
-    const sectionRoot = mockSectionPage(MOCK_SECTION_SLUG, MOCK_SECTION_SLUG);
-
     function mockChainNode(
       page: TSectionPage,
       children: TSectionPage[] | null = null,
     ) {
       return {
         ...page,
-        sectionNavigation: children !== null,
+        sectionNavigation: !isNull(children),
         sectionNavigationTitle: null,
+        showPreviousNextLinks: true,
         children,
       };
     }
@@ -324,5 +328,104 @@ describe(getPageDocument, () => {
     ])('returns none when %s', async (_, overrides) => {
       expect(await navigationFor(overrides)).toBeUndefined();
     });
+  });
+
+  describe('adjacent pages', () => {
+    function mockSection(
+      overrides: Partial<TRawLandingPage['sectionChain'][number]> = {},
+    ) {
+      return {
+        ...sectionRoot,
+        sectionNavigation: true,
+        sectionNavigationTitle: null,
+        showPreviousNextLinks: true,
+        children: [{ ...faq, children: [answers, glossary] }, pricing],
+        ...overrides,
+      };
+    }
+
+    function mockAncestor(page: TSectionPage) {
+      return {
+        ...page,
+        sectionNavigation: false,
+        sectionNavigationTitle: null,
+        showPreviousNextLinks: true,
+        children: null,
+      };
+    }
+
+    function toLink({ title, path }: TSectionPage) {
+      return { title, path };
+    }
+
+    async function adjacentPagesFor(
+      overrides: Parameters<typeof mockRawLandingPage>[0],
+    ) {
+      const page = await loadPage(overrides, MOCK_SECTION_SLUG);
+
+      return page.adjacentPages;
+    }
+
+    it.each([
+      ['a nested page', answers, faq, glossary, [faq]],
+      ["a nested section's last page", glossary, answers, pricing, [faq]],
+      ['a top-level page', pricing, glossary, undefined, []],
+      ['the section root', sectionRoot, undefined, faq, null],
+    ])(
+      'returns the neighbours of %s in the side navigation order',
+      async (_, current, previous, next, ancestors) => {
+        const sectionChain = isNull(ancestors)
+          ? [mockSection()]
+          : [
+              mockAncestor(current),
+              ...ancestors.map(mockAncestor),
+              mockSection(),
+            ];
+
+        expect(await adjacentPagesFor({ sectionChain })).toEqual({
+          previous: previous && toLink(previous),
+          next: next && toLink(next),
+        });
+      },
+    );
+
+    it('skips a neighbour that has no path for the next one that has', async () => {
+      const adjacentPages = await adjacentPagesFor({
+        sectionChain: [
+          mockAncestor(pricing),
+          mockSection({
+            children: [faq, { ...answers, path: null }, pricing],
+          }),
+        ],
+      });
+
+      expect(adjacentPages?.previous).toEqual(toLink(faq));
+    });
+
+    it.each([
+      [
+        'the section sectionRoot switches the links off',
+        [mockAncestor(pricing), mockSection({ showPreviousNextLinks: false })],
+        null,
+      ],
+      [
+        'the page is not in a section',
+        [mockAncestor(pricing), mockAncestor(sectionRoot)],
+        null,
+      ],
+      [
+        'the page hides its section navigation',
+        [mockAncestor(pricing), mockSection()],
+        false,
+      ],
+      ['the section has no other page', [mockSection({ children: [] })], null],
+    ])(
+      'returns no neighbours when %s',
+      async (_, sectionChain, showSectionNavigation) => {
+        expect(
+          await adjacentPagesFor({ sectionChain, showSectionNavigation }),
+        ).toBeUndefined();
+      },
+    );
   });
 });

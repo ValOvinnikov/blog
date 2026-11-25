@@ -28,6 +28,7 @@ import { evaluateGroqExpression } from '@shinefold/service/testing/shared/groq';
 import {
   mockLocalizedHeadingBlock,
   mockLocalizedStrings,
+  mockParagraphBlocks,
 } from '@shinefold/service/testing/shared/localized';
 
 import { pricingModuleQuery } from './query';
@@ -218,7 +219,7 @@ describe('pricingModuleQuery', () => {
     const pricing = await runPricing(MOCK_PRICING_DOCUMENT, NL);
 
     expect(pricing).toMatchObject({
-      headingBlock: { heading: MOCK_DUTCH_HEADING },
+      headingBlock: { heading: mockParagraphBlocks(MOCK_DUTCH_HEADING) },
       footnote: MOCK_DUTCH_VAT_FOOTNOTE,
       tiers: [
         {
@@ -246,7 +247,7 @@ describe('pricingModuleQuery', () => {
     const pricing = await runPricing(MOCK_PRICING_DOCUMENT, FR);
 
     expect(pricing).toMatchObject({
-      headingBlock: { heading: MOCK_ENGLISH_HEADING },
+      headingBlock: { heading: mockParagraphBlocks(MOCK_ENGLISH_HEADING) },
       footnote: MOCK_PRICING_FOOTNOTE,
       tiers: [
         {

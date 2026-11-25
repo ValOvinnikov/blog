@@ -8,9 +8,9 @@ import {
 } from '@shinefold/service/testing/sanity/query/cache-tags';
 import {
   MOCK_MISSING_ID,
-  mockRawHeadingBlock,
   mockValidationError,
 } from '@shinefold/service/testing/shared/fixtures';
+import { mockRawModuleHeadingBlock } from '@shinefold/service/testing/shared/localized';
 import { MOCK_TENANT } from '@shinefold/service/testing/tenant';
 
 import { getHeroStatement } from './loader';
@@ -27,7 +27,7 @@ describe(getHeroStatement, () => {
   beforeEach(() => {
     mockRun.mockResolvedValue(
       mockRawHeroStatementModule({
-        headingBlock: mockRawHeadingBlock(MOCK_HERO_STATEMENT_HEADING),
+        headingBlock: mockRawModuleHeadingBlock(MOCK_HERO_STATEMENT_HEADING),
       }),
     );
   });

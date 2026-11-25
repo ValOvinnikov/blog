@@ -4,7 +4,7 @@ import { buildBaseDocuments } from './base-documents';
 import type { TStarterCopy } from './copy/starter-copy';
 import type { TStarterDocumentUnion } from './starter-document';
 import { STARTER_DOCUMENT_IDS } from './starter-document-ids';
-import { moduleSlot, paragraphs, reference } from './starter-fields';
+import { moduleSlot, reference } from './starter-fields';
 import { internalLink, navigationLink } from './starter-links';
 import { INTRODUCTION_MODULE_TITLE } from './starter-module-titles';
 import {
@@ -13,6 +13,7 @@ import {
   buildContentModule,
   buildProfileHero,
 } from './starter-modules';
+import { paragraphs } from './starter-portable-text';
 import { buildSectionPages } from './starter-section-pages';
 
 const ids = STARTER_DOCUMENT_IDS;

@@ -72,7 +72,13 @@ URLs carry no locale prefix (next-intl `localePrefix: 'never'`).
   typing. Visibility, sort and search live in the URL
   (`?archived=1&sort=<column>&direction=<ascending|descending>&q=`), so a
   reload or shared link keeps them; `listTenants`' own default order stays by
-  name, which the dashboard tenant picker relies on.
+  name, which the dashboard tenant picker relies on. Below `md` the table
+  uses `DataTableShell`'s stacked layout (`isStacked`): no column headers and
+  no sideways scroll, each tenant one block of lines — avatar with the name
+  over its domain (and the matched domain, when there is one), then plan,
+  status, created date and a 44px-tall Manage. A long name or domain is cut
+  with an ellipsis. Sorting is offered from `md` up only, where the table
+  keeps its columns.
 - **Operator tenant view**: `/tenants/{id}` and its Look, Voice, Features,
   Languages, Domain, Email, Studio, Provisioning, Danger zone and Help pages.
   The sidebar shows the Platform section plus the tenant's own sections, ending

@@ -22,4 +22,11 @@ export const PRESET_SWATCH = {
     ground: '#f6efe4',
     ink: '#3b2a14',
   },
+  [PRESET_ID.SHINEFOLD]: {
+    glyph: 'S',
+    font: FONT_CHOICE.SPACE_GROTESK,
+    glyphSize: SIZE.LG,
+    ground: '#ffc233',
+    ink: '#0e1726',
+  },
 } as const satisfies Record<TPresetId, TPresetSwatch>;
