@@ -1,14 +1,13 @@
 import { faker } from '@faker-js/faker';
-import { HTTP_STATUS } from '@shinefold/config';
+import { HTTP_STATUS, REQUEST_HEADER } from '@shinefold/config';
 import { errorResult, okResult } from '@shinefold/utils';
 import { toInitial } from '@shinefold/utils/primitives';
-import { CACHE_CONTROL } from '@web/constants/http';
+import { CACHE_CONTROL, CACHE_CONTROL_HEADER } from '@web/constants/http';
 import { ICON_LOG } from '@web/constants/icon';
 import { getSiteConfig } from '@web/server/site-config/get-site-config/get-site-config';
 import { resolveRequestTenant } from '@web/server/tenant/request-tenant/request-tenant';
 import { mockSiteConfig } from '@web/testing/server/site-config/fixtures';
 import { MOCK_ERROR } from '@web/testing/shared/error/fixtures';
-import { CACHE_CONTROL_HEADER } from '@web/testing/shared/http/constants';
 import {
   MOCK_TENANT_ID,
   MOCK_TENANT_NAME,
@@ -38,7 +37,6 @@ const MOCK_ACCENT_HUE = faker.number.int({ min: 0, max: 359 });
 const MOCK_LOGO_HUE = faker.number.int({ min: 0, max: 179 });
 const MOCK_OTHER_LOGO_HUE = MOCK_LOGO_HUE + 180;
 const PNG_CONTENT_TYPE = 'image/png';
-const CONTENT_TYPE_HEADER = 'content-type';
 const SVG_MARKUP_START = '<svg';
 const RETIRED_MARK_ELEMENT = '<polygon';
 
@@ -52,7 +50,7 @@ const letterOf = (markup: string) =>
   markup.match(/<text[^>]*>([^<]*)<\/text>/)?.[1];
 
 const readSvg = async (response: Response) => {
-  expect(response.headers.get(CONTENT_TYPE_HEADER)).toBe(contentType);
+  expect(response.headers.get(REQUEST_HEADER.CONTENT_TYPE)).toBe(contentType);
   const markup = await response.text();
   expect(markup).toContain(SVG_MARKUP_START);
   expect(markup).not.toContain(RETIRED_MARK_ELEMENT);
@@ -83,7 +81,7 @@ describe(Icon, () => {
     const fetchMock = vi.fn().mockResolvedValue(
       new Response(MOCK_FAVICON_BYTES, {
         status: HTTP_STATUS.OK,
-        headers: { 'Content-Type': PNG_CONTENT_TYPE },
+        headers: { [REQUEST_HEADER.CONTENT_TYPE]: PNG_CONTENT_TYPE },
       }),
     );
     stubFetch(fetchMock);
@@ -97,7 +95,9 @@ describe(Icon, () => {
 
     expect(requestedUrl).toBe(MOCK_FAVICON_URL);
     expect(init.signal).toBeInstanceOf(AbortSignal);
-    expect(response.headers.get(CONTENT_TYPE_HEADER)).toBe(PNG_CONTENT_TYPE);
+    expect(response.headers.get(REQUEST_HEADER.CONTENT_TYPE)).toBe(
+      PNG_CONTENT_TYPE,
+    );
     expect(bytes).toEqual(MOCK_FAVICON_BYTES);
   });
 
