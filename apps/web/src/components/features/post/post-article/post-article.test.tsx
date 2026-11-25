@@ -1,5 +1,5 @@
 import { faker } from '@faker-js/faker';
-import { routes, SITE_MESSAGES } from '@shinefold/config';
+import { ASIDE_KIND, routes, SITE_MESSAGES } from '@shinefold/config';
 import { NEXT_NAVIGATION_ERROR } from '@shinefold/config/constants';
 import {
   service,
@@ -31,6 +31,7 @@ import {
   ARIA_EXPANDED,
 } from '@web/testing/shared/aria/constants';
 import { MOCK_ERROR } from '@web/testing/shared/error/fixtures';
+import { mockAsideBlock } from '@web/testing/shared/portable-text/aside-fixtures';
 import { mockPortableTextBlock } from '@web/testing/shared/portable-text/fixtures';
 import { MOCK_TAG_SLUG, mockTag } from '@web/testing/shared/tag/fixtures';
 import { MOCK_TENANT_SANITY_CONTEXT } from '@web/testing/shared/tenant/fixtures';
@@ -219,6 +220,24 @@ describe(`<${PostArticle.name}/>`, () => {
 
     expect(headingLink).toHaveAttribute('href', `#${MOCK_RAIL_HEADING_KEY}`);
   });
+
+  it.each(Object.values(ASIDE_KIND))(
+    'names a %s aside with its catalogue label',
+    async (kind) => {
+      const body: TPortableTextBody = [
+        mockAsideBlock([mockPortableTextBlock(MOCK_BODY_TEXT)], kind),
+      ];
+      getPostMock.mockResolvedValueOnce(okResult({ ...MOCK_POST, body }));
+
+      await setup();
+
+      const aside = screen.getByRole('note', {
+        name: SITE_MESSAGES.blogPostPage.asideKind[kind],
+      });
+
+      expect(aside).toBeVisible();
+    },
+  );
 
   it('links each post tag to its tag page', async () => {
     getPostMock.mockResolvedValueOnce(
