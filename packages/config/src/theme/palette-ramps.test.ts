@@ -1,7 +1,7 @@
 import { PRESET_ID, PRESET_REGISTRY } from '@shinefold/config/constants';
 import {
   readCssBlock,
-  readRepoFile,
+  readThemeCss,
 } from '@shinefold/config/testing/theme-css';
 
 import { BRAND_PALETTE, formatPaletteDeclarations } from './palette-ramps';
@@ -21,7 +21,7 @@ const toOpaqueOklch = (colour: string): string =>
   colour.replace(/\s*\/[^)]*\)$/, ')').replace(/\(\s*(.*?)\s*\)/, '($1)');
 
 describe('the palette', () => {
-  const themeCss = readRepoFile('configs/tailwind/theme.css');
+  const themeCss = readThemeCss();
   const stops = Object.values(formatPaletteDeclarations(CONSOLE_HUE));
 
   it.each([':root', '.dark'])(

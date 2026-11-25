@@ -1,3 +1,4 @@
+import { MOCK_YELLOW_HEX } from '@shinefold/config/testing/button-colors';
 import {
   hexToOklch,
   isHexColor,
@@ -32,7 +33,6 @@ vi.mock(import('@shinefold/utils/color'), async (importOriginal) => {
 
 const MOCK_ACCENT_HUE = 65;
 const MOCK_LOGO_HUE = 274;
-const MOCK_BUTTON_COLOR = '#ffd400';
 
 const hexAt = ({ l, c, h }: TOklchStop, hue: number) =>
   oklchToHex(l, c, h ?? hue);
@@ -114,7 +114,7 @@ describe.each(MODES)('the $mode email brand', ({ resolve, ramps }) => {
     const brand = resolve({
       preset: PRESET_ID.CONSOLE,
       accentHue: MOCK_ACCENT_HUE,
-      buttonColor: MOCK_BUTTON_COLOR,
+      buttonColor: MOCK_YELLOW_HEX,
     });
 
     expect({
@@ -125,7 +125,7 @@ describe.each(MODES)('the $mode email brand', ({ resolve, ramps }) => {
     }).toEqual({
       brand: {
         ...expectedBrandHex(ramps, MOCK_ACCENT_HUE),
-        brandPrimarySolid: MOCK_BUTTON_COLOR,
+        brandPrimarySolid: MOCK_YELLOW_HEX,
         brandPrimaryContrast: expect.any(String),
       },
       labelContrast: true,

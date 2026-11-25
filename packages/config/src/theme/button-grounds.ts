@@ -58,7 +58,6 @@ const selectorsOn = (ground: TColorScheme): string[] => [
   ),
 ];
 
-/** The site's button colours: each ground's literal set on `:root`, and every page and band scope pointed at the set for how dark its ground is. */
 export const formatButtonStyleBlock = (colors: TButtonColorsByGround): string =>
   [
     ...formatBlock(

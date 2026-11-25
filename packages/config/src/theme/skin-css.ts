@@ -97,10 +97,10 @@ const formatDarkVariant = (skins: TSkins): string[] => {
     .filter(([, { mode }]) => mode === SKIN_MODE.INVERSE)
     .flatMap(([key]) => [skinSelector(key), `${skinSelector(key)} *`]);
 
-  return [
-    `@custom-variant dark (&:where(${['.dark', '.dark *', ...inverseSelectors].join(', ')}));`,
-    '',
-  ];
+  const darkPage = PAGE_SCHEME_SELECTORS[COLOR_SCHEME.DARK];
+  const selectors = [darkPage, `${darkPage} *`, ...inverseSelectors];
+
+  return [`@custom-variant dark (&:where(${selectors.join(', ')}));`, ''];
 };
 
 const formatPalette = (): string[] =>

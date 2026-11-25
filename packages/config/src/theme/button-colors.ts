@@ -77,7 +77,7 @@ export const deriveButtonColors = ({
   darkGroundColor,
 }: TButtonColorInput): TButtonColorsByGround => {
   const light = parseHex(color);
-  const darkHex = darkGroundColor ?? darkGroundHexOf(light, color);
+  const darkHex = darkGroundColor || darkGroundHexOf(light, color);
 
   return {
     [COLOR_SCHEME.LIGHT]: colorsOf(light, color),
