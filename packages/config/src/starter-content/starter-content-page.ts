@@ -6,15 +6,9 @@ import type {
 
 import type { TStarterDocumentUnion, TStarterPage } from './starter-document';
 import type { TStarterTemplate } from './starter-document-shape';
-import {
-  moduleSlot,
-  pageHeadingBlock,
-  paragraphs,
-  reference,
-  seo,
-  slug,
-} from './starter-fields';
+import { moduleSlot, paragraphs, reference, slug } from './starter-fields';
 import { buildContentModule } from './starter-modules';
+import { pageFields, starterTemplate } from './starter-pages';
 
 export type TPageCopy = {
   title: string;
@@ -50,21 +44,23 @@ export function buildContentPage({
       body: paragraphs(page.body),
     }),
     {
-      _id: templateId,
-      _type: 'template_landing',
-      title: `${page.title} Template`,
+      ...starterTemplate(
+        templateId,
+        'template_landing',
+        `${page.title} Template`,
+      ),
       modules: [moduleSlot(bodyId, 'module_content')],
     } satisfies TStarterTemplate<Template_landing>,
     {
       _id: pageId,
       _type: 'page_landing',
-      language: locale,
-      title: page.title,
+      ...pageFields(locale, templateId, {
+        ...page,
+        heading: page.title,
+        supportingText: page.summary,
+      }),
       ...(parentId && { parent: reference(parentId) }),
       slug: slug(page.slug),
-      headingBlock: pageHeadingBlock(page.title, page.summary),
-      template: reference(templateId),
-      seo: seo(page.metaTitle, page.metaDescription),
     } satisfies TStarterPage<Page_landing>,
   ];
 }
