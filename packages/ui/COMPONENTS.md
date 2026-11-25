@@ -468,7 +468,7 @@ Slots:
 ### Hero — `components/organisms/hero/hero.tsx`
 
 The page-top band every hero kind renders, where a page states what it is.
-Props: title: string · titleId: string · eyebrow?: string · excerpt?: string · variant?: THeroVariant · layout?: THeroLayout · tone: TBrandVariant · children?: TCompoundChildren<typeof HeroParts> _(extends IWithClassName, IWithDataTestId)_
+Props: title: string · titleId: string · eyebrow?: string · excerpt?: string · footnote?: string · variant?: THeroVariant · layout?: THeroLayout · tone: TBrandVariant · children?: TCompoundChildren<typeof HeroParts> _(extends IWithClassName, IWithDataTestId)_
 Variants: variant: HERO_VARIANT.SPLIT|HERO_VARIANT.STACKED|HERO_VARIANT.BANNER · hasMedia: (boolean) · position: CONTENT_ALIGNMENT.LEFT|CONTENT_ALIGNMENT.CENTER|CONTENT_ALIGNMENT.RIGHT · alignment: CONTENT_ALIGNMENT.LEFT|CONTENT_ALIGNMENT.CENTER|CONTENT_ALIGNMENT.RIGHT · mediaOrder: MEDIA_ORDER.FIRST|MEDIA_ORDER.LAST
 
 Slots:

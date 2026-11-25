@@ -15,6 +15,7 @@ export const heroVariants = tv({
     heading: [],
     excerpt: ['m-0'],
     body: ['font-medium text-text'],
+    footnote: ['mt-3.5 max-w-measure'],
     media: [],
   },
   variants: {
@@ -38,8 +39,13 @@ export const heroVariants = tv({
       [CONTENT_ALIGNMENT.CENTER]: {
         copy: ['text-center'],
         group: ['mx-auto'],
+        footnote: ['mx-auto'],
       },
-      [CONTENT_ALIGNMENT.RIGHT]: { copy: ['text-right'], group: ['ml-auto'] },
+      [CONTENT_ALIGNMENT.RIGHT]: {
+        copy: ['text-right'],
+        group: ['ml-auto'],
+        footnote: ['ml-auto'],
+      },
     },
     mediaOrder: {
       [MEDIA_ORDER.FIRST]: {},

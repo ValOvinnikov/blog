@@ -24,6 +24,7 @@ const PROFILE_EYEBROW = 'Senior frontend engineer';
 const PROFILE_EXCERPT =
   'Architecture, performance, and design systems — from fintech and retail.';
 const BANNER_IMAGE_ALT = 'Bright mountain sunrise';
+const HERO_FOOTNOTE = 'Free for 14 days · no card required';
 
 const bannerContent = (
   <>
@@ -684,4 +685,51 @@ export const SplitAndStackedOnEveryBrandBand: TStory = {
       }
     </EveryBrandBand>
   ),
+};
+
+export const SplitWithFootnote: TStory = {
+  args: {
+    variant: HERO_VARIANT.SPLIT,
+    footnote: HERO_FOOTNOTE,
+  },
+};
+
+export const StackedWithFootnoteCenter: TStory = {
+  args: {
+    variant: HERO_VARIANT.STACKED,
+    footnote: HERO_FOOTNOTE,
+    layout: {
+      contentAlignment: CONTENT_ALIGNMENT.CENTER,
+    },
+  },
+};
+
+export const BannerWithFootnoteRight: TStory = {
+  args: {
+    variant: HERO_VARIANT.BANNER,
+    tone: BRAND_VARIANT.BRAND_PRIMARY,
+    footnote: HERO_FOOTNOTE,
+    layout: {
+      contentPosition: CONTENT_ALIGNMENT.RIGHT,
+      contentAlignment: CONTENT_ALIGNMENT.RIGHT,
+    },
+    children: bannerContent,
+  },
+};
+
+export const BannerWithoutMediaWithFootnote: TStory = {
+  args: {
+    variant: HERO_VARIANT.BANNER,
+    tone: BRAND_VARIANT.SECONDARY,
+    footnote: HERO_FOOTNOTE,
+    children: bannerWithoutMediaContent,
+  },
+};
+
+export const FootnoteWithoutActions: TStory = {
+  args: {
+    variant: HERO_VARIANT.STACKED,
+    footnote: HERO_FOOTNOTE,
+    children: undefined,
+  },
 };
