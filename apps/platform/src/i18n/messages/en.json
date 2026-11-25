@@ -9,6 +9,7 @@
     "selectTenant": "Choose a workspace",
     "signInTitle": "Sign in",
     "signInError": "Sign-in problem",
+    "noAccess": "No access",
     "addTenant": "Add tenant",
     "tenantOverview": "Tenant overview",
     "tenantActivity": "Tenant activity",
@@ -146,6 +147,22 @@
     "description": "Something went wrong while signing you in. Go back to sign-in and try again.",
     "backToSignIn": "Back to sign-in",
     "badge": "Sign-in"
+  },
+  "noAccessPage": {
+    "badge": "No access",
+    "backLink": "Back to home",
+    "SITE": {
+      "heading": "You don't have access to this site",
+      "description": "Ask the site owner."
+    },
+    "SITE_INVITE": {
+      "heading": "This invite can't be used right now",
+      "description": "Ask the site owner."
+    },
+    "ADMIN_INVITE": {
+      "heading": "This invite is no longer valid",
+      "description": "Ask the person who invited you."
+    }
   },
   "notFoundPage": {
     "heading": "Page not found",
@@ -2397,6 +2414,9 @@
     "nextPaymentLabel": "Next payment",
     "nextPayment": "{amount} on <time>{date}</time>",
     "noNextPayment": "None scheduled",
+    "amountOverdueLabel": "Amount overdue",
+    "amountOverdueRetry": "{amount}, tried again on <time>{date}</time>",
+    "amountOverdueNoRetry": "{amount}, not tried again automatically",
     "planEnds": "Your plan ends on <time>{date}</time>.",
     "noPayments": "Your site has no payments yet.",
     "invoicesTitle": "Invoices",

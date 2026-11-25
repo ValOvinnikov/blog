@@ -11,7 +11,8 @@ import { useId } from 'react';
 
 import { subscribersListVariants } from './subscribers-list-variants';
 
-const ACTIONS_COLUMN_WIDTH = '64px';
+// Fits the small icon button, whose hidden busy face (spinner beside the icon) sets its width.
+const ACTIONS_COLUMN_WIDTH = '80px';
 
 export type TSubscribersListProps = {
   tenantId: string;

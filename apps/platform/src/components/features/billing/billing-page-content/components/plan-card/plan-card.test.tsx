@@ -1,5 +1,9 @@
 import messages from '@platform/i18n/messages/en.json';
-import { MOCK_NEXT_PAYMENT } from '@platform/testing/billing/overview';
+import {
+  MOCK_AMOUNT_OWED,
+  MOCK_NEXT_PAYMENT,
+  MOCK_RETRY_AT,
+} from '@platform/testing/billing/overview';
 import { customRender, screen } from '@platform/testing/custom-render';
 import { adminRoutes } from '@platform/utils/routes/routes';
 import { TENANT_PLAN } from '@shinefold/config/constants';
@@ -9,6 +13,7 @@ import { PlanCard } from './plan-card';
 
 const { billingPage } = messages;
 const MOCK_DATE_TEXT = 'Dec 2, 2026';
+const MOCK_RETRY_DATE_TEXT = 'Nov 28, 2026';
 
 const setup = customRender(PlanCard, {
   plan: TENANT_PLAN.GROWTH,
@@ -61,6 +66,33 @@ describe(`<${PlanCard.name}/>`, () => {
     const nextPayment = screen.getByText('None scheduled');
 
     expect(nextPayment).toBeVisible();
+  });
+
+  describe('a past-due site', () => {
+    it('shows the amount owed and when it is tried again, not the next payment', () => {
+      setup({ amountOwed: MOCK_AMOUNT_OWED });
+
+      const owed = screen.getByText(/^\$29\.00, tried again on/);
+      const retryDate = screen.getByText(MOCK_RETRY_DATE_TEXT);
+      const nextPaymentLabel = screen.queryByText(billingPage.nextPaymentLabel);
+
+      expect(owed).toHaveTextContent(
+        `$29.00, tried again on ${MOCK_RETRY_DATE_TEXT}`,
+      );
+      expect(retryDate).toHaveAttribute(
+        'dateTime',
+        MOCK_RETRY_AT.toISOString(),
+      );
+      expect(nextPaymentLabel).not.toBeInTheDocument();
+    });
+
+    it('says the amount is not tried again once Stripe has stopped', () => {
+      setup({ amountOwed: { ...MOCK_AMOUNT_OWED, retryAt: undefined } });
+
+      const owed = screen.getByText('$29.00, not tried again automatically');
+
+      expect(owed).toBeVisible();
+    });
   });
 
   describe('a plan cancelled to end', () => {

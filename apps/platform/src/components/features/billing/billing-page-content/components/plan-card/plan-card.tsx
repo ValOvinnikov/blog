@@ -4,6 +4,7 @@ import { LinkButton } from '@platform/components/shared/link-button';
 import { StatusBadge } from '@platform/components/shared/status-badge';
 import { Text } from '@platform/components/shared/text';
 import type { TBillingNextPayment } from '@platform/server/billing/fetch-stripe-billing';
+import type { TBillingAmountOwed } from '@platform/server/billing/read-amount-owed';
 import { richDate } from '@platform/utils/rich-date/rich-date';
 import { adminRoutes } from '@platform/utils/routes/routes';
 import { tenantStatusTone } from '@platform/utils/status-tone/status-tone';
@@ -22,6 +23,7 @@ export type TPlanCardProps = {
   hasPayments: boolean;
   isSubscribed: boolean;
   nextPayment?: TBillingNextPayment;
+  amountOwed?: TBillingAmountOwed;
   endsAt?: Date;
 };
 
@@ -31,6 +33,7 @@ export const PlanCard = ({
   hasPayments,
   isSubscribed,
   nextPayment,
+  amountOwed,
   endsAt,
 }: TPlanCardProps) => {
   const t = useTranslations('billingPage');
@@ -46,6 +49,16 @@ export const PlanCard = ({
         })
       : t('noNextPayment');
 
+  const amountOwedText = ({ amount, retryAt }: TBillingAmountOwed) => {
+    const formattedAmount = formatStripeAmount(amount, locale);
+    return retryAt
+      ? t.rich('amountOverdueRetry', {
+          amount: formattedAmount,
+          ...richDate(retryAt, locale),
+        })
+      : t('amountOverdueNoRetry', { amount: formattedAmount });
+  };
+
   return (
     <Card>
       <Card.Header
@@ -60,7 +73,12 @@ export const PlanCard = ({
       <Card.Body>
         <DetailList>
           <DetailList.Row label={t('planLabel')}>{tPlan(plan)}</DetailList.Row>
-          {hasPayments && !endsAt && (
+          {amountOwed && (
+            <DetailList.Row label={t('amountOverdueLabel')}>
+              {amountOwedText(amountOwed)}
+            </DetailList.Row>
+          )}
+          {hasPayments && !endsAt && !amountOwed && (
             <DetailList.Row label={t('nextPaymentLabel')}>
               {nextPaymentText(nextPayment)}
             </DetailList.Row>

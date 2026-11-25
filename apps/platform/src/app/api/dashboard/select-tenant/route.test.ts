@@ -1,4 +1,5 @@
 import { faker } from '@faker-js/faker';
+import { NO_ACCESS_REASON } from '@platform/constants/no-access';
 import { auth } from '@platform/server/auth/auth';
 import { mockAdmin } from '@platform/testing/admins/fixtures';
 import { MOCK_SIGN_IN_USER_ID } from '@platform/testing/auth/fixtures';
@@ -41,13 +42,15 @@ const authMock = vi.mocked<() => Promise<TMaybeNull<Partial<Session>>>>(auth);
 
 const MOCK_ORIGIN = faker.internet.url();
 const DASHBOARD_URL = new URL(adminRoutes.dashboard(), MOCK_ORIGIN).href;
+const NO_SITE_ACCESS_URL = new URL(
+  adminRoutes.noAccess(NO_ACCESS_REASON.SITE),
+  MOCK_ORIGIN,
+).href;
+
+const getHref = (href: string) => GET(new Request(new URL(href, MOCK_ORIGIN)));
 
 const getSelectTenant = (tenantId: string) =>
-  GET(
-    new Request(
-      new URL(adminRoutes.dashboardSelectTenantHref(tenantId), MOCK_ORIGIN),
-    ),
-  );
+  getHref(adminRoutes.dashboardSelectTenantHref(tenantId));
 
 describe(GET, () => {
   beforeEach(() => {
@@ -89,20 +92,38 @@ describe(GET, () => {
     expect(getMembershipMock).not.toHaveBeenCalled();
   });
 
-  it('returns 404 without a cookie for a non-member who is not a superadmin', async () => {
-    authMock.mockResolvedValueOnce({ user: { id: MOCK_SIGN_IN_USER_ID } });
+  describe('for a signed-in non-member', () => {
+    beforeEach(() => {
+      authMock.mockResolvedValueOnce({ user: { id: MOCK_SIGN_IN_USER_ID } });
+    });
 
-    const response = await getSelectTenant(MOCK_OTHER_TENANT_ID);
-    const location = response.headers.get('location');
-    const cookie = response.cookies.get(ACTIVE_TENANT_COOKIE);
+    it('sends them to the no-access page without a cookie', async () => {
+      const response = await getSelectTenant(MOCK_OTHER_TENANT_ID);
+      const location = response.headers.get('location');
+      const cookie = response.cookies.get(ACTIVE_TENANT_COOKIE);
 
-    expect(getMembershipMock).toHaveBeenCalledWith(
-      MOCK_SIGN_IN_USER_ID,
-      MOCK_OTHER_TENANT_ID,
-    );
-    expect(response.status).toBe(HTTP_STATUS.NOT_FOUND);
-    expect(location).toBeNull();
-    expect(cookie).toBeUndefined();
+      expect(getMembershipMock).toHaveBeenCalledWith(
+        MOCK_SIGN_IN_USER_ID,
+        MOCK_OTHER_TENANT_ID,
+      );
+      expect(response.status).toBe(HTTP_STATUS.TEMPORARY_REDIRECT);
+      expect(location).toBe(NO_SITE_ACCESS_URL);
+      expect(cookie).toBeUndefined();
+    });
+
+    it('says an invite cannot be used to a non-member arriving from one', async () => {
+      const response = await getHref(
+        adminRoutes.dashboardSelectTenantFromInviteHref(MOCK_OTHER_TENANT_ID),
+      );
+      const location = response.headers.get('location');
+      const cookie = response.cookies.get(ACTIVE_TENANT_COOKIE);
+
+      expect(location).toBe(
+        new URL(adminRoutes.noAccess(NO_ACCESS_REASON.SITE_INVITE), MOCK_ORIGIN)
+          .href,
+      );
+      expect(cookie).toBeUndefined();
+    });
   });
 
   it('sets the active-tenant cookie and opens the dashboard for a member', async () => {
@@ -124,15 +145,14 @@ describe(GET, () => {
       );
     });
 
-    it('returns 404 without a cookie for a tenant that does not exist', async () => {
+    it('sends them to the no-access page for a missing tenant', async () => {
       listTenantsByIdsMock.mockResolvedValueOnce([]);
 
       const response = await getSelectTenant(MOCK_OTHER_TENANT_ID);
       const location = response.headers.get('location');
       const cookie = response.cookies.get(ACTIVE_TENANT_COOKIE);
 
-      expect(response.status).toBe(HTTP_STATUS.NOT_FOUND);
-      expect(location).toBeNull();
+      expect(location).toBe(NO_SITE_ACCESS_URL);
       expect(cookie).toBeUndefined();
     });
 

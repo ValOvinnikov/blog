@@ -9,6 +9,7 @@
     "selectTenant": "Arbeitsbereich wählen",
     "signInTitle": "Anmelden",
     "signInError": "Problem bei der Anmeldung",
+    "noAccess": "Kein Zugriff",
     "addTenant": "Mandant hinzufügen",
     "tenantOverview": "Mandantenübersicht",
     "tenantActivity": "Mandantenaktivität",
@@ -146,6 +147,22 @@
     "description": "Bei der Anmeldung ist etwas schiefgelaufen. Kehren Sie zur Anmeldung zurück und versuchen Sie es erneut.",
     "backToSignIn": "Zurück zur Anmeldung",
     "badge": "Anmeldung"
+  },
+  "noAccessPage": {
+    "badge": "Kein Zugriff",
+    "backLink": "Zur Startseite",
+    "SITE": {
+      "heading": "Du hast keinen Zugriff auf diese Website",
+      "description": "Frag die Inhaberin oder den Inhaber der Website."
+    },
+    "SITE_INVITE": {
+      "heading": "Diese Einladung kann gerade nicht verwendet werden",
+      "description": "Frag die Inhaberin oder den Inhaber der Website."
+    },
+    "ADMIN_INVITE": {
+      "heading": "Diese Einladung ist nicht mehr gültig",
+      "description": "Frag die Person, die dich eingeladen hat."
+    }
   },
   "notFoundPage": {
     "heading": "Seite nicht gefunden",
@@ -2397,6 +2414,9 @@
     "nextPaymentLabel": "Nächste Zahlung",
     "nextPayment": "{amount} am <time>{date}</time>",
     "noNextPayment": "Keine geplant",
+    "amountOverdueLabel": "Überfälliger Betrag",
+    "amountOverdueRetry": "{amount}, neuer Versuch am <time>{date}</time>",
+    "amountOverdueNoRetry": "{amount}, kein automatischer neuer Versuch",
     "planEnds": "Ihr Tarif endet am <time>{date}</time>.",
     "noPayments": "Für Ihre Website gibt es noch keine Zahlungen.",
     "invoicesTitle": "Rechnungen",

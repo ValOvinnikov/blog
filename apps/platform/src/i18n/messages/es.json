@@ -9,6 +9,7 @@
     "selectTenant": "Elija un espacio de trabajo",
     "signInTitle": "Iniciar sesión",
     "signInError": "Problema al iniciar sesión",
+    "noAccess": "Sin acceso",
     "addTenant": "Añadir cliente",
     "tenantOverview": "Resumen del cliente",
     "tenantActivity": "Actividad del cliente",
@@ -146,6 +147,22 @@
     "description": "Algo ha fallado al iniciar sesión. Vuelve al inicio de sesión e inténtalo de nuevo.",
     "backToSignIn": "Volver al inicio de sesión",
     "badge": "Inicio de sesión"
+  },
+  "noAccessPage": {
+    "badge": "Sin acceso",
+    "backLink": "Volver al inicio",
+    "SITE": {
+      "heading": "No tienes acceso a este sitio",
+      "description": "Pregunta a la persona propietaria del sitio."
+    },
+    "SITE_INVITE": {
+      "heading": "Esta invitación no se puede usar ahora mismo",
+      "description": "Pregunta a la persona propietaria del sitio."
+    },
+    "ADMIN_INVITE": {
+      "heading": "Esta invitación ya no es válida",
+      "description": "Pregunta a la persona que te invitó."
+    }
   },
   "notFoundPage": {
     "heading": "Página no encontrada",
@@ -2397,6 +2414,9 @@
     "nextPaymentLabel": "Próximo pago",
     "nextPayment": "{amount} el <time>{date}</time>",
     "noNextPayment": "Ninguno programado",
+    "amountOverdueLabel": "Importe vencido",
+    "amountOverdueRetry": "{amount}, nuevo intento el <time>{date}</time>",
+    "amountOverdueNoRetry": "{amount}, sin nuevo intento automático",
     "planEnds": "Tu plan termina el <time>{date}</time>.",
     "noPayments": "Tu sitio aún no tiene pagos.",
     "invoicesTitle": "Facturas",

@@ -9,6 +9,7 @@
     "selectTenant": "Kies een werkruimte",
     "signInTitle": "Inloggen",
     "signInError": "Probleem bij inloggen",
+    "noAccess": "Geen toegang",
     "addTenant": "Tenant toevoegen",
     "tenantOverview": "Tenantoverzicht",
     "tenantActivity": "Tenantactiviteit",
@@ -146,6 +147,22 @@
     "description": "Er ging iets mis bij het inloggen. Ga terug naar inloggen en probeer het opnieuw.",
     "backToSignIn": "Terug naar inloggen",
     "badge": "Inloggen"
+  },
+  "noAccessPage": {
+    "badge": "Geen toegang",
+    "backLink": "Terug naar start",
+    "SITE": {
+      "heading": "Je hebt geen toegang tot deze site",
+      "description": "Vraag het aan de eigenaar van de site."
+    },
+    "SITE_INVITE": {
+      "heading": "Deze uitnodiging kan nu niet worden gebruikt",
+      "description": "Vraag het aan de eigenaar van de site."
+    },
+    "ADMIN_INVITE": {
+      "heading": "Deze uitnodiging is niet meer geldig",
+      "description": "Vraag het aan de persoon die je heeft uitgenodigd."
+    }
   },
   "notFoundPage": {
     "heading": "Pagina niet gevonden",
@@ -2397,6 +2414,9 @@
     "nextPaymentLabel": "Volgende betaling",
     "nextPayment": "{amount} op <time>{date}</time>",
     "noNextPayment": "Geen gepland",
+    "amountOverdueLabel": "Achterstallig bedrag",
+    "amountOverdueRetry": "{amount}, nieuwe poging op <time>{date}</time>",
+    "amountOverdueNoRetry": "{amount}, geen automatische nieuwe poging",
     "planEnds": "Je abonnement eindigt op <time>{date}</time>.",
     "noPayments": "Je site heeft nog geen betalingen.",
     "invoicesTitle": "Facturen",

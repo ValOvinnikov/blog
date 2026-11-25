@@ -14,7 +14,9 @@ import {
   mockStripeInvoice,
 } from '@platform/testing/billing/fixtures';
 import {
+  MOCK_AMOUNT_OWED,
   MOCK_DRAFT_INVOICE_STATUS,
+  MOCK_RETRY_AT,
   MOCK_STRIPE_AMOUNT,
 } from '@platform/testing/billing/overview';
 import {
@@ -26,6 +28,7 @@ import { mockStripeSubscription } from '@platform/testing/billing/stripe-subscri
 import Stripe from 'stripe';
 
 import { listBillingInvoices, previewRenewal } from './fetch-stripe-billing';
+import { toStripeTime } from './stripe-time';
 
 const {
   autoPagingToArrayMock,
@@ -212,6 +215,63 @@ describe(previewRenewal, () => {
       expect(createPreviewMock).not.toHaveBeenCalled();
     },
   );
+
+  describe('a past-due subscription', () => {
+    const openInvoice = (overrides: Partial<Stripe.Invoice>) =>
+      listMock.mockResolvedValueOnce({
+        data: [
+          mockStripeInvoice({
+            status: STRIPE_INVOICE_STATUS.OPEN,
+            amount_remaining: MOCK_STRIPE_AMOUNT.minorUnits,
+            ...overrides,
+          }),
+        ],
+      } as never);
+
+    beforeEach(() => {
+      retrieveSubscriptionMock.mockResolvedValue(
+        mockStripeSubscription({ status: STRIPE_SUBSCRIPTION_STATUS.PAST_DUE }),
+      );
+    });
+
+    it("reads the open invoice's amount owed and retry date, with no preview", async () => {
+      openInvoice({ next_payment_attempt: toStripeTime(MOCK_RETRY_AT) });
+
+      const renewal = await preview();
+
+      expect(listMock).toHaveBeenCalledWith({
+        subscription: MOCK_STRIPE_SUBSCRIPTION_ID,
+        status: STRIPE_INVOICE_STATUS.OPEN,
+        limit: 1,
+      });
+      expect(createPreviewMock).not.toHaveBeenCalled();
+      expect(renewal).toEqual({
+        nextPayment: undefined,
+        endsAt: undefined,
+        amountOwed: MOCK_AMOUNT_OWED,
+      });
+    });
+
+    it('reads no retry date once Stripe has stopped retrying', async () => {
+      openInvoice({ next_payment_attempt: null });
+
+      const { amountOwed } = await preview();
+
+      expect(amountOwed).toEqual({
+        amount: MOCK_STRIPE_AMOUNT,
+        retryAt: undefined,
+      });
+    });
+
+    it('reads nothing owed when there is no open invoice', async () => {
+      listMock.mockResolvedValueOnce({ data: [] } as never);
+
+      const { amountOwed, nextPayment } = await preview();
+
+      expect(amountOwed).toBeUndefined();
+      expect(nextPayment).toBeUndefined();
+    });
+  });
 
   it('rethrows any other failure', async () => {
     const failure = stripeError('rate_limit');

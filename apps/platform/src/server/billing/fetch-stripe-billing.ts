@@ -5,12 +5,14 @@ import {
   BILLING_INVOICE_LIMIT,
   STRIPE_ERROR_CODE,
   STRIPE_LIVE_SUBSCRIPTION_STATUSES,
+  STRIPE_SUBSCRIPTION_STATUS,
   type TBilledInvoiceStatus,
 } from '@platform/constants/billing';
 import { type TStripeAmount, type TMaybeUndefined } from '@shinefold/config';
 import { isOneOf } from '@shinefold/utils/primitives';
 import Stripe from 'stripe';
 
+import { readAmountOwed, type TBillingAmountOwed } from './read-amount-owed';
 import { fromStripeTime } from './stripe-time';
 import { subscriptionEndsAt } from './subscription-ends-at';
 
@@ -30,6 +32,13 @@ export type TBillingNextPayment = {
 export type TBillingRenewal = {
   nextPayment: TMaybeUndefined<TBillingNextPayment>;
   endsAt: TMaybeUndefined<Date>;
+  amountOwed: TMaybeUndefined<TBillingAmountOwed>;
+};
+
+export const NO_RENEWAL: TBillingRenewal = {
+  nextPayment: undefined,
+  endsAt: undefined,
+  amountOwed: undefined,
 };
 
 const toBillingInvoice = ({
@@ -91,15 +100,18 @@ export const previewRenewal = async (
   subscriptionId: string,
 ): Promise<TBillingRenewal> => {
   const subscription = await stripe.subscriptions.retrieve(subscriptionId);
-  if (!isOneOf(STRIPE_LIVE_SUBSCRIPTION_STATUSES, subscription.status)) {
-    return { nextPayment: undefined, endsAt: undefined };
-  }
+  const { status } = subscription;
+  if (!isOneOf(STRIPE_LIVE_SUBSCRIPTION_STATUSES, status)) return NO_RENEWAL;
   const endsAt = subscriptionEndsAt(subscription);
-  if (endsAt) return { nextPayment: undefined, endsAt };
+  if (status === STRIPE_SUBSCRIPTION_STATUS.PAST_DUE) {
+    const amountOwed = await readAmountOwed(stripe, subscriptionId);
+    return { ...NO_RENEWAL, endsAt, amountOwed };
+  }
+  if (endsAt) return { ...NO_RENEWAL, endsAt };
   const nextPayment = await previewNextPayment(
     stripe,
     customer,
     subscriptionId,
   );
-  return { nextPayment, endsAt };
+  return { ...NO_RENEWAL, nextPayment };
 };
