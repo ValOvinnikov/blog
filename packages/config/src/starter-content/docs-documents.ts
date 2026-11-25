@@ -4,14 +4,9 @@ import { buildBaseDocuments } from './base-documents';
 import type { TStarterCopy } from './copy/starter-copy';
 import type { TStarterDocumentUnion } from './starter-document';
 import { STARTER_DOCUMENT_IDS } from './starter-document-ids';
-import { buildFaqModule } from './starter-faq';
-import { moduleSlot, paragraphs, reference } from './starter-fields';
+import { reference } from './starter-fields';
+import { buildHomeSections } from './starter-home-sections';
 import { internalLink, navigationLink } from './starter-links';
-import {
-  INTRODUCTION_MODULE_TITLE,
-  QUESTIONS_MODULE_TITLE,
-} from './starter-module-titles';
-import { buildContentModule } from './starter-modules';
 import { buildSectionPages } from './starter-section-pages';
 import { buildStatementHero } from './starter-statement-hero';
 
@@ -26,6 +21,12 @@ export function buildDocsDocuments({
 }): TStarterDocumentUnion[] {
   const { hero, intro, faq, guides, pages } = copy.docs;
 
+  const homeSections = buildHomeSections({
+    locale,
+    intro: { id: ids.DOCS_INTRO, ...intro },
+    faq: { id: ids.DOCS_FAQ, ...faq },
+  });
+
   return [
     ...buildBaseDocuments({
       locale,
@@ -33,10 +34,7 @@ export function buildDocsDocuments({
       navigationItems: [navigationLink(ids.DOCS_GUIDES_LINK)],
       homeLayout: {
         hero: reference(ids.DOCS_HERO),
-        modules: [
-          moduleSlot(ids.DOCS_INTRO, 'module_content'),
-          moduleSlot(ids.DOCS_FAQ, 'module_faq'),
-        ],
+        modules: homeSections.modules,
       },
     }),
     buildStatementHero({
@@ -45,18 +43,7 @@ export function buildDocsDocuments({
       hero,
       linkId: ids.DOCS_GUIDES_LINK,
     }),
-    buildContentModule({
-      id: ids.DOCS_INTRO,
-      title: INTRODUCTION_MODULE_TITLE,
-      locale,
-      body: paragraphs(intro.body),
-    }),
-    ...buildFaqModule({
-      id: ids.DOCS_FAQ,
-      title: QUESTIONS_MODULE_TITLE,
-      locale,
-      faq,
-    }),
+    ...homeSections.documents,
     internalLink(ids.DOCS_GUIDES_LINK, guides.title, locale, ids.DOCS_GUIDES),
     ...buildSectionPages({
       locale,

@@ -77,6 +77,12 @@ export function buildContentModule({
   };
 }
 
+export type TCalloutCtaInput = TModuleInput & {
+  heading: string;
+  supportingText: string;
+  linkId: string;
+};
+
 export function buildCalloutCta({
   id,
   title,
@@ -84,11 +90,7 @@ export function buildCalloutCta({
   heading,
   supportingText,
   linkId,
-}: TModuleInput & {
-  heading: string;
-  supportingText: string;
-  linkId: string;
-}): TStarterModule<Module_cta> {
+}: TCalloutCtaInput): TStarterModule<Module_cta> {
   return {
     _id: id,
     _type: 'module_cta',
