@@ -82,7 +82,8 @@
   },
   "sectionNavigation": {
     "label": "In diesem Bereich",
-    "backTo": "Zurück zu {title}"
+    "backTo": "Zurück zu {title}",
+    "adjacentPages": "Vorherige und nächste Seite"
   },
   "topicPage": {
     "empty": "Noch keine Beiträge zu {name}.",

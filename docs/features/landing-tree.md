@@ -62,7 +62,7 @@ Landing pages are the site's free-form pages, and they nest: an editor puts a pa
 - A page whose chain is broken (a missing, unpublished or slugless ancestor, or one past the depth bound) has no path and is not routable.
 - Section navigation: the section root is the nearest ancestor-or-self with `sectionNavigation` on, so a nested parent can run its own branch. The sidebar lists the root and its direct children in drag order, marks the current page (or the child whose branch contains it) and links back to the enclosing section. Breadcrumbs follow the parent chain. Labels are each page's public heading, never its internal `title`. `showSectionNavigation: false` hides the sidebar and the section breadcrumb trail on that page only; the breadcrumb bar still shows, as Home → this page.
 - Without section navigation, the breadcrumb is Home → this page.
-- **Previous and next pages.** A page inside a section gets its previous and next page (title and path) in the side navigation's reading order: the section root, then each child in drag order followed by its own descendants, down to the depth bound. The first page has no previous and the last no next. A neighbour with no page in the request language, or no path, is skipped for the next one that has one. Neither is returned when the section root has "Show previous and next links" off (stored as `showPreviousNextLinks`, on when unset), when the page has "Show section navigation on this page" off, when it is outside any section, or when the section has no other page.
+- **Previous and next pages.** A page inside a section gets its previous and next page (title and path) in the side navigation's reading order: the section root, then each child in drag order followed by its own descendants, down to the depth bound. The first page has no previous and the last no next. A neighbour with no page in the request language, or no path, is skipped for the next one that has one. Neither is returned when the section root has "Show previous and next links" off (stored as `showPreviousNextLinks`, on when unset), when the page has "Show section navigation on this page" off, when it is outside any section, or when the section has no other page. The site renders them under the page's modules, in the content column beside the side navigation, as a navigation landmark named by the fixed catalogue string `sectionNavigation.adjacentPages`: Previous on the left and Next on the right from `md` up, stacked full width below it with previous above next. Each link shows its direction (`pagination.previous` / `pagination.next`) above the neighbour's title, so its name says which way it goes; a lone link keeps its side.
 - **Redirects cover Landing paths only.** When a Landing path finds no page, the site looks up redirects for that language: an exact source first, then the longest prefix redirect, carrying the rest of the path. Permanent answers 308, Temporary 307; otherwise the page 404s. A destination that is not a same-origin path is ignored.
 - A published page at the source always wins over a redirect (the Studio warns). A destination with no published page in that language is an error, as are a duplicate source, a redirect chain in either direction, a destination equal to the source, and `/` as a source.
 - On publishing a moved page, the Studio creates an automatic Permanent redirect from the old path (a prefix redirect when the page has descendants), rebases redirects that pointed under the old path, and deletes redirects whose source is now a live page or that would loop. If that write fails, the publish is cancelled with a "Not published" toast.
@@ -83,14 +83,15 @@ Landing pages are the site's free-form pages, and they nest: an editor puts a pa
 - `packages/service/src/shared/expressions/landing-page/landing-page-path.ts`
 - `apps/web/src/components/pages/landing-page/landing-page.tsx`
 - `apps/web/src/components/features/landing/section-navigation/section-navigation.tsx`
+- `apps/web/src/components/features/landing/adjacent-page-links/adjacent-page-links.tsx`
 - `apps/web/src/utils/redirect-moved-landing-page/redirect-moved-landing-page.ts`
 
 ## Tests and stories
 
 - Studio: `validate-landing-parent`, `validate-landing-slug`, `validate-landing-slug-unique-among-siblings`, `validate-redirect-chain`, `validate-redirect-page`, `validate-setting-matches-default-language`, `is-inside-section`, `landing-parent-chain`, `page-tree`, `plan-landing-redirects` and `apply-landing-redirects` tests beside their sources.
 - Service: `packages/service/src/features/pages/landing/**/*.test.ts`, `landing-page-path.test.ts`.
-- Web: `landing-page.test.tsx`, `landing-module-renderer.test.tsx`, `landing-breadcrumbs.test.tsx`, `section-navigation.test.tsx`, `redirect-moved-landing-page.test.ts`, `build-landing-page-metadata.test.ts`.
-- Stories: `landing-page-layout.stories.tsx`, `section-navigation.stories.tsx`.
+- Web: `landing-page.test.tsx`, `landing-module-renderer.test.tsx`, `landing-breadcrumbs.test.tsx`, `section-navigation.test.tsx`, `adjacent-page-links.test.tsx`, `redirect-moved-landing-page.test.ts`, `build-landing-page-metadata.test.ts`.
+- Stories: `landing-page-layout.stories.tsx`, `section-navigation.stories.tsx`, `adjacent-page-links.stories.tsx`.
 
 ## Related
 

@@ -23,6 +23,7 @@ export const LandingPage = async ({ path }: TLandingPageProps) => {
     modules,
     faqs,
     sectionNavigation,
+    adjacentPages,
   } = page;
 
   return (
@@ -38,6 +39,7 @@ export const LandingPage = async ({ path }: TLandingPageProps) => {
         modules={modules}
         landingPage={{ id, path }}
         sectionNavigation={sectionNavigation}
+        adjacentPages={adjacentPages}
       />
     </PageShell>
   );

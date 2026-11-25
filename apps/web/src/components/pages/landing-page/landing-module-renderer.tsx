@@ -5,7 +5,11 @@ import type {
   TPageLandingType,
   TContentAlignmentOf,
 } from '@shinefold/config';
-import type { TLandingSectionNavigation, TModule } from '@shinefold/service';
+import type {
+  TLandingAdjacentPages,
+  TLandingSectionNavigation,
+  TModule,
+} from '@shinefold/service';
 import { PageHeading } from '@web/components/shared/page-heading';
 import { ContactFormModule } from '@web/modules/contact-form/contact-form-module';
 import { ContentModule } from '@web/modules/content/content-module';
@@ -72,6 +76,7 @@ export interface ILandingModuleRendererProps {
   modules: TModule<TPageLandingType>[];
   landingPage: { id: string; path: string };
   sectionNavigation?: TLandingSectionNavigation;
+  adjacentPages?: TLandingAdjacentPages;
 }
 
 export const LandingModuleRenderer = async ({
@@ -81,6 +86,7 @@ export const LandingModuleRenderer = async ({
   modules,
   landingPage,
   sectionNavigation,
+  adjacentPages,
 }: ILandingModuleRendererProps): Promise<ReactNode> => {
   const heroNode = hero
     ? await renderHeroModule({ hero, map: LANDING_MAP })
@@ -94,6 +100,7 @@ export const LandingModuleRenderer = async ({
         )
       }
       sectionNavigation={sectionNavigation}
+      adjacentPages={adjacentPages}
     >
       {renderModules({ modules, map: LANDING_MAP, context: { landingPage } })}
     </LandingPageLayout>

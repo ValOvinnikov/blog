@@ -12,6 +12,7 @@ import {
 } from '@web/testing/custom-render';
 import { mockHeroBlogData } from '@web/testing/modules/hero-blog/fixtures';
 import {
+  mockLandingAdjacentPages,
   mockLandingSectionNavigation,
   MOCK_LANDING_PAGE,
   MOCK_SECTION_FAQ_TITLE,
@@ -60,6 +61,7 @@ const MOCK_PAGE_HEADING = MOCK_LANDING_PAGE.headingBlock.heading;
 const MOCK_MOVED_DESTINATION = `/${faker.lorem.slug()}`;
 const MOCK_SUPPORTING_TEXT = faker.lorem.sentence();
 const SECTION_NAV_NAME = SITE_MESSAGES.sectionNavigation.label;
+const ADJACENT_PAGES_NAME = SITE_MESSAGES.sectionNavigation.adjacentPages;
 
 const resolvePageWith = (overrides: Partial<TLandingPage>) =>
   getPageMock.mockResolvedValueOnce(
@@ -113,6 +115,14 @@ describe(`<${LandingPage.name}/>`, () => {
       });
 
       expect(sectionNav).not.toBeInTheDocument();
+    });
+
+    it('renders no previous and next links when the page is outside a section', () => {
+      const adjacentNav = screen.queryByRole('navigation', {
+        name: ADJACENT_PAGES_NAME,
+      });
+
+      expect(adjacentNav).not.toBeInTheDocument();
     });
   });
 
@@ -180,6 +190,22 @@ describe(`<${LandingPage.name}/>`, () => {
     });
 
     expect(currentPageLink).toHaveAttribute(ARIA_CURRENT, 'page');
+  });
+
+  it('renders the previous and next links inside main', async () => {
+    resolvePageWith({
+      sectionNavigation: mockLandingSectionNavigation(),
+      adjacentPages: mockLandingAdjacentPages(),
+    });
+
+    await setup();
+
+    const main = screen.getByRole('main');
+    const adjacentNav = within(main).getByRole('navigation', {
+      name: ADJACENT_PAGES_NAME,
+    });
+
+    expect(adjacentNav).toBeVisible();
   });
 
   it('renders the FAQPage JSON-LD when the page has FAQ questions', async () => {
