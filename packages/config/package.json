@@ -10,6 +10,7 @@
     "./constants/*": "./src/constants/*.ts",
     "./client/objects": "./src/client/objects.ts",
     "./sanity/generated/types": "./src/sanity/generated/types.ts",
+    "./testing/button-colors": "./src/testing/button-colors.ts",
     "./testing/placeholder-images": "./src/testing/placeholder-images.ts",
     "./testing/theme-css": "./src/testing/theme-css.ts",
     "./theme": "./src/theme/index.ts",

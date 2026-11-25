@@ -1,4 +1,3 @@
-import { MOCK_YELLOW_HEX } from '@shinefold/config/testing/button-colors';
 import {
   hexToOklch,
   isHexColor,
@@ -8,6 +7,7 @@ import {
 } from '@shinefold/utils/color';
 
 import { PRESET_ID, PRESET_REGISTRY } from '@shinefold/config/constants';
+import { MOCK_YELLOW_HEX } from '@shinefold/config/testing/button-colors';
 
 import {
   ACCENT_RAMP_DARK,

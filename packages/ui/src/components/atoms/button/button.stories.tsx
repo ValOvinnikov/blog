@@ -1,4 +1,13 @@
-import { BRAND_VARIANT, SIZE } from '@shinefold/config';
+import { BRAND_VARIANT, COLOR_SCHEME, SIZE } from '@shinefold/config';
+import {
+  MOCK_BLACK_HEX,
+  MOCK_YELLOW_HEX,
+} from '@shinefold/config/testing/button-colors';
+import {
+  deriveButtonColors,
+  formatButtonStyleBlock,
+} from '@shinefold/config/theme';
+import { EveryBrandBand } from '@shinefold/ui/testing/brand-bands';
 import {
   BUSY_STYLES,
   SPINNER_VARIANTS,
@@ -125,6 +134,37 @@ export const OnBrandPrimaryBackgroundFocused: TStory = {
     const canvas = within(canvasElement);
     canvas.getByRole('button').focus();
   },
+};
+
+const ButtonColor = ({ color }: { color: string }) => (
+  <div className="flex flex-col gap-6">
+    <style>{formatButtonStyleBlock(deriveButtonColors({ color }))}</style>
+    {Object.values(COLOR_SCHEME).map((scheme) => (
+      <div
+        key={scheme}
+        className={scheme === COLOR_SCHEME.DARK ? 'dark' : undefined}
+      >
+        <EveryBrandBand>
+          {() => (
+            <>
+              <Button variant="primary">Continue</Button>
+              <Button variant="ghost">Continue</Button>
+            </>
+          )}
+        </EveryBrandBand>
+      </div>
+    ))}
+  </div>
+);
+
+export const BrightButtonColor: TStory = {
+  name: 'Bright button colour on every band, light and dark',
+  render: () => <ButtonColor color={MOCK_YELLOW_HEX} />,
+};
+
+export const DeepButtonColor: TStory = {
+  name: 'Deep button colour on every band, light and dark',
+  render: () => <ButtonColor color={MOCK_BLACK_HEX} />,
 };
 
 export const Busy: TStory = {
