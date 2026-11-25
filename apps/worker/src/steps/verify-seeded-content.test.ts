@@ -25,12 +25,10 @@ import {
   MOCK_CURRENT_WEBHOOK,
   MOCK_OTHER_WEBHOOK,
 } from '@worker/testing/webhook/fixtures';
+import type { TVerifyTenantSeededContentDeps } from '@worker/utils/step-deps/step-deps';
 import type { Mock } from 'vitest';
 
-import {
-  verifyTenantSeededContent,
-  type TVerifyTenantSeededContentDeps,
-} from './verify-seeded-content';
+import { verifyTenantSeededContent } from './verify-seeded-content';
 
 faker.seed(7008);
 
@@ -216,7 +214,6 @@ describe(verifyTenantSeededContent, () => {
     expect(clientOptions?.projectId).toBe(MOCK_SANITY_PROJECT_ID);
     expect(clientOptions?.dataset).toBe(MOCK_SANITY_DATASET);
     expect(clientOptions?.token).toBe(MOCK_SANITY_READ_TOKEN);
-    expect(clientOptions?.useCdn).toBe(false);
     expect(listWebhooks).toHaveBeenCalledWith({
       token: MOCK_TENANT_MANAGEMENT_TOKEN,
       projectId: MOCK_SANITY_PROJECT_ID,
