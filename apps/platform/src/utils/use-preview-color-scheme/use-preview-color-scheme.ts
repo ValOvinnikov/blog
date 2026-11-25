@@ -6,6 +6,11 @@ import {
 import { isUndefined } from '@shinefold/utils/primitives';
 import { useState } from 'react';
 
+export type TPreviewColorScheme = Pick<
+  ReturnType<typeof usePreviewColorScheme>,
+  'mode' | 'modes' | 'setMode'
+>;
+
 export const usePreviewColorScheme = (lockedMode?: TPreviewMode) => {
   const [chosenMode, setMode] = useState<TPreviewMode>(PREVIEW_MODE.LIGHT);
   const mode = lockedMode ?? chosenMode;

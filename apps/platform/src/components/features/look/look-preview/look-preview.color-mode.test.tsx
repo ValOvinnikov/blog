@@ -14,7 +14,7 @@ import { LookPreview } from './look-preview';
 const { previewModeControl: PREVIEW_MODE_CONTROL, lookPreview: LOOK_PREVIEW } =
   messages;
 
-const LOGOS = {
+const MOCK_LOGOS = {
   logo: { url: MOCK_LOGO_URL },
   logoDark: { url: MOCK_LOGO_DARK_URL },
 };
@@ -43,7 +43,7 @@ describe(`<${LookPreview.name}/>`, () => {
   ])(
     'shows a $colorMode site only in its locked mode, with no sample theme toggle',
     ({ colorMode, shown, removed, logo }) => {
-      renderPreview({ values: { colorMode, ...LOGOS } });
+      renderPreview({ values: { colorMode, ...MOCK_LOGOS } });
 
       const shownButton = screen.getByRole('button', { name: shown });
       const removedButton = screen.queryByRole('button', { name: removed });

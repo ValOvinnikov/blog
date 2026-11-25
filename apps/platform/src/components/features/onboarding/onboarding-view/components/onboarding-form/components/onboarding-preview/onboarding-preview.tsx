@@ -46,7 +46,7 @@ export const OnboardingPreview = ({
   preset,
   accentHue,
   tier: { isPhone, isFull },
-  options: { device, setDevice, mode, setMode, isDark },
+  options: { device, setDevice, colorScheme, isDark },
 }: TOnboardingPreviewProps) => {
   const t = useTranslations('onboardingForm');
   const tPreview = useTranslations('previewModeControl');
@@ -82,8 +82,7 @@ export const OnboardingPreview = ({
       <PreviewFrame.Toolbar
         device={device}
         onDeviceChange={setDevice}
-        mode={mode}
-        onModeChange={setMode}
+        colorScheme={colorScheme}
         isEndOnOwnLine={isAddressOnOwnLine}
       >
         <PreviewSiteAddress address={siteAddress} />

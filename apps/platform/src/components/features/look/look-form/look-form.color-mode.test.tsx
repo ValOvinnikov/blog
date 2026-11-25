@@ -65,32 +65,33 @@ describe(`<${LookForm.name}/>`, () => {
       },
     );
 
-    it('restores both preview views when the reader chooses again', async () => {
-      const group = screen.getByRole('group', {
-        name: LOOK_FORM.colorModeLabel,
+    describe('with Always dark chosen', () => {
+      beforeEach(async () => {
+        await chooseSegment(
+          user,
+          LOOK_FORM.colorModeLabel,
+          COLOR_MODE_OPTION.DARK,
+        );
       });
-      const option = (name: string) =>
-        within(group).getByRole('button', { name });
-      await user.click(option(COLOR_MODE_OPTION.DARK));
 
-      await user.click(option(COLOR_MODE_OPTION.READER));
+      it('restores both preview views when the reader chooses again', async () => {
+        await chooseSegment(
+          user,
+          `${LOOK_FORM.colorModeLabel} ${LOOK_FORM.fieldUnsavedLabel}`,
+          COLOR_MODE_OPTION.READER,
+        );
 
-      expect(
-        previewModeButton(PREVIEW_MODE_CONTROL.modeLight),
-      ).toBeInTheDocument();
-      expect(
-        previewModeButton(PREVIEW_MODE_CONTROL.modeDark),
-      ).toBeInTheDocument();
-    });
+        expect(
+          previewModeButton(PREVIEW_MODE_CONTROL.modeLight),
+        ).toBeInTheDocument();
+        expect(
+          previewModeButton(PREVIEW_MODE_CONTROL.modeDark),
+        ).toBeInTheDocument();
+      });
 
-    it('saves the chosen colour mode', async () => {
-      await chooseSegment(
-        user,
-        LOOK_FORM.colorModeLabel,
-        COLOR_MODE_OPTION.DARK,
-      );
-
-      await saveAndExpectLook(user, { colorMode: COLOR_MODE.DARK });
+      it('saves the chosen colour mode', async () => {
+        await saveAndExpectLook(user, { colorMode: COLOR_MODE.DARK });
+      });
     });
   });
 

@@ -6,13 +6,14 @@ import {
 } from '@platform/utils/brand-asset-limits/brand-asset-limits';
 import type { TLookFormValues } from '@platform/utils/default-look-values/default-look-values';
 import { isSameStagedImage } from '@platform/utils/staged-image/staged-image';
+import { LOOK_FIELD } from '@shinefold/db/constants';
 import { toEffectiveLookWithin } from '@shinefold/db/utils/effective-look/effective-look';
 import type { TTenantEntitlements } from '@shinefold/db/utils/resolve-tenant-entitlements/resolve-tenant-entitlements';
 import { isUndefined } from '@shinefold/utils/primitives';
 
 export const CARD_FIELDS = {
   [LOOK_CARD.PRESET]: ['preset'],
-  [LOOK_ROW.COLOUR]: ['accentHue', 'logoHue', 'colorMode'],
+  [LOOK_ROW.COLOUR]: ['accentHue', 'logoHue', LOOK_FIELD.COLOR_MODE],
   [LOOK_ROW.TYPE]: ['headingFont', 'bodyFont', 'headingWeight', 'headingCase'],
   [LOOK_ROW.SHAPE]: [
     'radiusScale',

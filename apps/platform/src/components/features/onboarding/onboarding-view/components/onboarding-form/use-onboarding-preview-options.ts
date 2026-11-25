@@ -13,14 +13,13 @@ export type TOnboardingPreviewOptions = ReturnType<
 export const useOnboardingPreviewOptions = (isPhone: boolean) => {
   const [pressedDevice, setDevice] =
     useState<TMaybeUndefined<TPreviewDevice>>();
-  const { mode, setMode, isDark } = usePreviewColorScheme();
+  const { isDark, ...colorScheme } = usePreviewColorScheme();
   const arrivalDevice = isPhone ? PREVIEW_DEVICE.PHONE : PREVIEW_DEVICE.DESKTOP;
 
   return {
     device: pressedDevice ?? arrivalDevice,
     setDevice,
-    mode,
-    setMode,
+    colorScheme,
     isDark,
   };
 };

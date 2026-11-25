@@ -10,7 +10,7 @@ export const useLookPreviewToolbar = (hasReaderAccounts: boolean) => {
     setPreviewDevice,
     values: { colorMode },
   } = useLookForm();
-  const { mode, modes, setMode, isDark } = usePreviewColorScheme(
+  const { isDark, ...colorScheme } = usePreviewColorScheme(
     LOCKED_PREVIEW_MODE[colorMode],
   );
   const { readerGroup, isSignedIn } = useReaderGroup();
@@ -19,9 +19,7 @@ export const useLookPreviewToolbar = (hasReaderAccounts: boolean) => {
     toolbarProps: {
       device: previewDevice,
       onDeviceChange: setPreviewDevice,
-      mode,
-      modes,
-      onModeChange: setMode,
+      colorScheme,
       extraGroups: hasReaderAccounts ? [readerGroup] : [],
     },
     isDark,
