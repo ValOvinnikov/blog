@@ -13,6 +13,7 @@ import {
   mockLocalizedHeadingBlock,
   mockLocalizedStrings,
   mockLocalizedValues,
+  mockParagraphBlocks,
 } from '@shinefold/service/testing/shared/localized';
 
 import { newsletterModuleQuery } from './query';
@@ -115,7 +116,7 @@ describe('newsletterModuleQuery', () => {
 
     it('picks the heading and supporting text in the visitor language', () => {
       expect(newsletter.headingBlock).toEqual({
-        heading: MOCK_DUTCH_HEADING,
+        heading: mockParagraphBlocks(MOCK_DUTCH_HEADING),
         supportingText: MOCK_DUTCH_SUPPORTING_TEXT,
       });
     });
@@ -141,7 +142,7 @@ describe('newsletterModuleQuery', () => {
 
     it('falls back to the default language for heading and supporting text', () => {
       expect(newsletter.headingBlock).toEqual({
-        heading: MOCK_ENGLISH_HEADING,
+        heading: mockParagraphBlocks(MOCK_ENGLISH_HEADING),
         supportingText: MOCK_ENGLISH_SUPPORTING_TEXT,
       });
     });

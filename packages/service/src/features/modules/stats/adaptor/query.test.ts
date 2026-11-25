@@ -9,6 +9,7 @@ import { evaluateGroqExpression } from '@shinefold/service/testing/shared/groq';
 import {
   mockLocalizedHeadingBlock,
   mockLocalizedStrings,
+  mockParagraphBlocks,
 } from '@shinefold/service/testing/shared/localized';
 
 import { statsModuleQuery } from './query';
@@ -111,7 +112,10 @@ describe('statsModuleQuery', () => {
 
     expect(stats).toEqual({
       brandVariant: BRAND_VARIANT.PRIMARY,
-      headingBlock: { heading: MOCK_HEADING[NL], supportingText: null },
+      headingBlock: {
+        heading: mockParagraphBlocks(MOCK_HEADING[NL]),
+        supportingText: null,
+      },
       footnote: MOCK_FOOTNOTE[NL],
       stats: [
         {
@@ -136,7 +140,10 @@ describe('statsModuleQuery', () => {
 
     expect(stats).toEqual({
       brandVariant: BRAND_VARIANT.PRIMARY,
-      headingBlock: { heading: MOCK_HEADING[EN], supportingText: null },
+      headingBlock: {
+        heading: mockParagraphBlocks(MOCK_HEADING[EN]),
+        supportingText: null,
+      },
       footnote: MOCK_FOOTNOTE[EN],
       stats: [
         {

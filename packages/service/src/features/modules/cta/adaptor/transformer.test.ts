@@ -17,11 +17,14 @@ import {
   MOCK_LINK_LABEL,
   MOCK_POST_HREF,
   MOCK_POST_SLUG,
-  mockRawHeadingBlock,
   mockRawSanityImage,
   mockRawWideLayout,
   mockSanityImageView,
 } from '@shinefold/service/testing/shared/fixtures';
+import {
+  mockRawModuleHeadingBlock,
+  mockPlainHeadingPieces,
+} from '@shinefold/service/testing/shared/localized';
 
 import { toCtaModule } from './transformer';
 
@@ -37,7 +40,7 @@ const MOCK_AUTHORED_EYEBROW_AND_FOOTNOTE = {
 describe(toCtaModule, () => {
   it('maps headingBlock', () => {
     const raw = mockRawCtaModule({
-      headingBlock: mockRawHeadingBlock(MOCK_HEADING, {
+      headingBlock: mockRawModuleHeadingBlock(MOCK_HEADING, {
         supportingText: MOCK_SUPPORTING_TEXT,
       }),
     });
@@ -46,6 +49,7 @@ describe(toCtaModule, () => {
 
     expect(cta.headingBlock).toEqual({
       heading: MOCK_HEADING,
+      headingPieces: mockPlainHeadingPieces(MOCK_HEADING),
       supportingText: MOCK_SUPPORTING_TEXT,
     });
   });

@@ -135,7 +135,10 @@ describe('timelineModuleQuery', () => {
 
       expect(timeline).toEqual({
         brandVariant: BRAND_VARIANT.PRIMARY,
-        headingBlock: { heading, supportingText: null },
+        headingBlock: {
+          heading: mockParagraphBlocks(heading),
+          supportingText: null,
+        },
         markerStyle: TIMELINE_MARKER_STYLE.LABELLED,
         items: [
           {

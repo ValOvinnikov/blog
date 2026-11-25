@@ -1,6 +1,6 @@
 import { BRAND_VARIANT, DISPLAY_MODE } from '@shinefold/config';
 import type { TRawPostRelatedModule } from '@shinefold/service/features/modules/post-related/adaptor/module/transformer';
-import { mockRawHeadingBlock } from '@shinefold/service/testing/shared/fixtures';
+import { mockRawModuleHeadingBlock } from '@shinefold/service/testing/shared/localized';
 import { mockRawModuleAppearance } from '@shinefold/service/testing/shared/module-appearance';
 
 export const MOCK_POST_RELATED_MODULE_ID = 'post-related-1';
@@ -10,7 +10,7 @@ export function mockRawPostRelatedModule(
 ): TRawPostRelatedModule {
   return {
     brandVariant: BRAND_VARIANT.PRIMARY,
-    headingBlock: mockRawHeadingBlock('Related reading'),
+    headingBlock: mockRawModuleHeadingBlock('Related reading'),
     limit: 3,
     layout: null,
     contentAlignment: null,

@@ -1,6 +1,6 @@
 import { BRAND_VARIANT, PRICE_PERIOD } from '@shinefold/config';
 import type { TRawPricingModule } from '@shinefold/service/features/modules/pricing/adaptor/transformer';
-import { mockRawHeadingBlock } from '@shinefold/service/testing/shared/fixtures';
+import { mockRawModuleHeadingBlock } from '@shinefold/service/testing/shared/localized';
 import { mockRawModuleAppearance } from '@shinefold/service/testing/shared/module-appearance';
 
 export const MOCK_PRICING_MODULE_ID = 'pricing-1';
@@ -61,7 +61,7 @@ export function mockRawPricingModule(
 ): TRawPricingModule {
   return {
     brandVariant: BRAND_VARIANT.PRIMARY,
-    headingBlock: mockRawHeadingBlock('Pricing'),
+    headingBlock: mockRawModuleHeadingBlock('Pricing'),
     tiers: [
       mockRawPricingTier(),
       mockRawPricingTier({ _key: 'tier-2', name: 'Team' }),

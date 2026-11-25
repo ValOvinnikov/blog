@@ -1,5 +1,5 @@
 import { POST_SOURCE } from '@shinefold/config';
-import { toHeadingBlock } from '@shinefold/service/shared/transformers/heading-block/to-heading-block';
+import { toModuleHeadingBlock } from '@shinefold/service/shared/transformers/heading-block/to-module-heading-block';
 import { toLayout } from '@shinefold/service/shared/transformers/layout/to-layout';
 import { toModuleAppearance } from '@shinefold/service/shared/transformers/module/to-module-appearance';
 import { toPostCard } from '@shinefold/service/shared/transformers/post/to-post-card';
@@ -23,7 +23,7 @@ export function toPostFeaturedModule(
 
   return {
     brandVariant: raw.brandVariant,
-    headingBlock: toHeadingBlock(raw.headingBlock),
+    headingBlock: toModuleHeadingBlock(raw.headingBlock),
     posts: limitedPosts.map((post) => toPostCard(post)),
     layout: toLayout(raw.layout),
     contentAlignment: raw.contentAlignment ?? undefined,

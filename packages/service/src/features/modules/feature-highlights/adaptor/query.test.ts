@@ -15,6 +15,7 @@ import {
   mockLocalizedImage,
   mockLocalizedListedText,
   mockLocalizedStrings,
+  mockParagraphBlocks,
 } from '@shinefold/service/testing/shared/localized';
 
 import { featureHighlightsModuleQuery } from './query';
@@ -153,7 +154,9 @@ describe('featureHighlightsModuleQuery', () => {
       locale,
     );
 
-    expect(module.headingBlock.heading).toBe(copy.heading);
+    expect(module.headingBlock.heading).toEqual(
+      mockParagraphBlocks(copy.heading),
+    );
     expect(rowText(module)).toEqual([
       { ...copy.row, body: [[copy.row.body]] },
       { ...MOCK_UNTRANSLATED_ROW, body: [[MOCK_UNTRANSLATED_ROW.body]] },

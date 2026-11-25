@@ -2,10 +2,13 @@ import { faker } from '@faker-js/faker';
 import { BRAND_VARIANT, CONTENT_ALIGNMENT } from '@shinefold/config';
 import { mockRawContactFormModule } from '@shinefold/service/testing/modules/fixtures';
 import {
-  mockRawHeadingBlock,
   mockRawParagraphTextBlock,
   mockRawWideLayout,
 } from '@shinefold/service/testing/shared/fixtures';
+import {
+  mockRawModuleHeadingBlock,
+  mockPlainHeadingPieces,
+} from '@shinefold/service/testing/shared/localized';
 
 import { toContactFormModule, type TRawContactFormModule } from './transformer';
 
@@ -28,7 +31,7 @@ describe(toContactFormModule, () => {
     });
     const raw = mockRawContactFormModule({
       brandVariant: BRAND_VARIANT.SECONDARY,
-      headingBlock: mockRawHeadingBlock(MOCK_HEADING, {
+      headingBlock: mockRawModuleHeadingBlock(MOCK_HEADING, {
         supportingText: MOCK_SUPPORTING_TEXT,
       }),
       successMessage: MOCK_SUCCESS_MESSAGE,
@@ -43,6 +46,7 @@ describe(toContactFormModule, () => {
       brandVariant: BRAND_VARIANT.SECONDARY,
       headingBlock: {
         heading: MOCK_HEADING,
+        headingPieces: mockPlainHeadingPieces(MOCK_HEADING),
         supportingText: MOCK_SUPPORTING_TEXT,
       },
       successMessage: MOCK_SUCCESS_MESSAGE,

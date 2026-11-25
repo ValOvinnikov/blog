@@ -9,6 +9,7 @@ import { evaluateModuleQuery } from '@shinefold/service/testing/shared/groq';
 import {
   mockLocalizedHeadingBlock,
   mockLocalizedStrings,
+  mockParagraphBlocks,
 } from '@shinefold/service/testing/shared/localized';
 
 import { embedModuleQuery } from './query';
@@ -69,7 +70,10 @@ describe('embedModuleQuery', () => {
 
     expect(module).toEqual({
       brandVariant: BRAND_VARIANT.PRIMARY,
-      headingBlock: { heading: MOCK_HEADING[copyLocale], supportingText: null },
+      headingBlock: {
+        heading: mockParagraphBlocks(MOCK_HEADING[copyLocale]),
+        supportingText: null,
+      },
       embed: {
         url: MOCK_VIMEO_URL,
         title: MOCK_TITLE[copyLocale],

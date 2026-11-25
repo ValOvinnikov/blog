@@ -9,6 +9,7 @@ import {
   mockLocalizedImage,
   mockLocalizedStrings,
   mockLocalizedValues,
+  mockParagraphBlocks,
 } from '@shinefold/service/testing/shared/localized';
 
 import { heroStatementModuleQuery } from './query';
@@ -82,7 +83,7 @@ describe('heroStatementModuleQuery', () => {
 
     expect(eyebrow).toBe(copy.eyebrow);
     expect(headingBlock).toEqual({
-      heading: copy.heading,
+      heading: mockParagraphBlocks(copy.heading),
       supportingText: copy.supportingText,
     });
     expect(image?.alt).toBe(copy.alt);

@@ -11,9 +11,9 @@ import {
 } from '@shinefold/service/testing/sanity/query/cache-tags';
 import {
   MOCK_MISSING_ID,
-  mockRawHeadingBlock,
   mockValidationError,
 } from '@shinefold/service/testing/shared/fixtures';
+import { mockRawModuleHeadingBlock } from '@shinefold/service/testing/shared/localized';
 import { MOCK_TENANT } from '@shinefold/service/testing/tenant';
 
 import { getLogoWallModule } from './loader';
@@ -35,7 +35,7 @@ describe(getLogoWallModule, () => {
   it('maps the module document with its logos in authored order', async () => {
     mockRun.mockResolvedValue(
       mockRawLogoWallModule({
-        headingBlock: mockRawHeadingBlock(MOCK_HEADING),
+        headingBlock: mockRawModuleHeadingBlock(MOCK_HEADING),
         logos: MOCK_LOGO_KEYS.map((_key) => mockRawLogoItem({ _key })),
       }),
     );

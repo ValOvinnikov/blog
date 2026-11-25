@@ -10,10 +10,11 @@ import {
 } from '@shinefold/config/constants';
 import { mockRawPostFeaturedModule } from '@shinefold/service/testing/modules/post-featured/fixtures';
 import { mockRawPostCard } from '@shinefold/service/testing/pages/fixtures';
+import { mockRawWideLayout } from '@shinefold/service/testing/shared/fixtures';
 import {
-  mockRawHeadingBlock,
-  mockRawWideLayout,
-} from '@shinefold/service/testing/shared/fixtures';
+  mockRawModuleHeadingBlock,
+  mockPlainHeadingPieces,
+} from '@shinefold/service/testing/shared/localized';
 
 import { toPostFeaturedModule } from './transformer';
 
@@ -32,7 +33,7 @@ const MOCK_THREE_POSTS = MOCK_POST_IDS.map((_id) => ({
 describe(toPostFeaturedModule, () => {
   it('maps headingBlock straight through', () => {
     const raw = mockRawPostFeaturedModule({
-      headingBlock: mockRawHeadingBlock(MOCK_HEADING, {
+      headingBlock: mockRawModuleHeadingBlock(MOCK_HEADING, {
         supportingText: MOCK_SUPPORTING_TEXT,
       }),
     });
@@ -41,6 +42,7 @@ describe(toPostFeaturedModule, () => {
 
     expect(module.headingBlock).toEqual({
       heading: MOCK_HEADING,
+      headingPieces: mockPlainHeadingPieces(MOCK_HEADING),
       supportingText: MOCK_SUPPORTING_TEXT,
     });
   });

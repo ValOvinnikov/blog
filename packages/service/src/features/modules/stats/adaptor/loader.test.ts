@@ -11,9 +11,9 @@ import {
 } from '@shinefold/service/testing/sanity/query/cache-tags';
 import {
   MOCK_MISSING_ID,
-  mockRawHeadingBlock,
   mockValidationError,
 } from '@shinefold/service/testing/shared/fixtures';
+import { mockRawModuleHeadingBlock } from '@shinefold/service/testing/shared/localized';
 import { MOCK_TENANT } from '@shinefold/service/testing/tenant';
 
 import { getStatsModule } from './loader';
@@ -28,7 +28,9 @@ const MOCK_HEADING = faker.lorem.words(3);
 describe(getStatsModule, () => {
   beforeEach(() => {
     mockRun.mockResolvedValue(
-      mockRawStatsModule({ headingBlock: mockRawHeadingBlock(MOCK_HEADING) }),
+      mockRawStatsModule({
+        headingBlock: mockRawModuleHeadingBlock(MOCK_HEADING),
+      }),
     );
   });
 

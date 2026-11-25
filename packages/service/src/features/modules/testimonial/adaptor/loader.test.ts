@@ -12,9 +12,9 @@ import {
 } from '@shinefold/service/testing/sanity/query/cache-tags';
 import {
   MOCK_MISSING_ID,
-  mockRawHeadingBlock,
   mockValidationError,
 } from '@shinefold/service/testing/shared/fixtures';
+import { mockRawModuleHeadingBlock } from '@shinefold/service/testing/shared/localized';
 import { MOCK_TENANT } from '@shinefold/service/testing/tenant';
 
 import { getTestimonialModule } from './loader';
@@ -33,7 +33,7 @@ describe(getTestimonialModule, () => {
   beforeEach(() => {
     mockRun.mockResolvedValue(
       mockRawTestimonialModule({
-        headingBlock: mockRawHeadingBlock(MOCK_HEADING),
+        headingBlock: mockRawModuleHeadingBlock(MOCK_HEADING),
         testimonials: [
           mockRawTestimonialItem({ _id: MOCK_FIRST_QUOTE_ID }),
           mockRawTestimonialItem({ _id: MOCK_SECOND_QUOTE_ID }),

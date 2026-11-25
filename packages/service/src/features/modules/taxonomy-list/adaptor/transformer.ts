@@ -1,6 +1,6 @@
 import { TAXONOMY_SORT } from '@shinefold/config';
 import type { postLinkFragment } from '@shinefold/service/shared/fragments/post/post-link';
-import { toHeadingBlock } from '@shinefold/service/shared/transformers/heading-block/to-heading-block';
+import { toModuleHeadingBlock } from '@shinefold/service/shared/transformers/heading-block/to-module-heading-block';
 import { toLayout } from '@shinefold/service/shared/transformers/layout/to-layout';
 import type { InferFragmentType, InferResultType } from 'groqd';
 
@@ -57,7 +57,7 @@ export function toTaxonomyListModule(
 
   return {
     brandVariant: raw.brandVariant,
-    headingBlock: toHeadingBlock(raw.headingBlock),
+    headingBlock: toModuleHeadingBlock(raw.headingBlock),
     layout: toLayout(raw.layout),
     contentAlignment: raw.contentAlignment ?? undefined,
     taxonomy: raw.taxonomy ?? undefined,

@@ -5,10 +5,11 @@ import {
   NEWSLETTER_VARIANT,
 } from '@shinefold/config/constants';
 import { mockRawNewsletterModule } from '@shinefold/service/testing/modules/fixtures';
+import { mockRawWideLayout } from '@shinefold/service/testing/shared/fixtures';
 import {
-  mockRawHeadingBlock,
-  mockRawWideLayout,
-} from '@shinefold/service/testing/shared/fixtures';
+  mockRawModuleHeadingBlock,
+  mockPlainHeadingPieces,
+} from '@shinefold/service/testing/shared/localized';
 
 import { toNewsletterModule } from './transformer';
 
@@ -25,7 +26,7 @@ type TNewsletterModule = ReturnType<typeof toNewsletterModule>;
 describe(toNewsletterModule, () => {
   it('maps headingBlock straight through', () => {
     const raw = mockRawNewsletterModule({
-      headingBlock: mockRawHeadingBlock(MOCK_HEADING, {
+      headingBlock: mockRawModuleHeadingBlock(MOCK_HEADING, {
         supportingText: MOCK_SUPPORTING_TEXT,
       }),
     });
@@ -34,6 +35,7 @@ describe(toNewsletterModule, () => {
 
     expect(module.headingBlock).toEqual({
       heading: MOCK_HEADING,
+      headingPieces: mockPlainHeadingPieces(MOCK_HEADING),
       supportingText: MOCK_SUPPORTING_TEXT,
     });
   });
@@ -103,7 +105,7 @@ describe(toNewsletterModule, () => {
 
   it('leaves supportingText undefined when not set', () => {
     const raw = mockRawNewsletterModule({
-      headingBlock: mockRawHeadingBlock(MOCK_HEADING),
+      headingBlock: mockRawModuleHeadingBlock(MOCK_HEADING),
     });
 
     const module = toNewsletterModule(raw);

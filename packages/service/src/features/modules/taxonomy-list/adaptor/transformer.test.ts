@@ -20,10 +20,13 @@ import {
 import { MOCK_TOPIC_INDEX_HEADING } from '@shinefold/service/testing/pages/fixtures';
 import {
   MOCK_POST_ID,
-  mockRawHeadingBlock,
   mockRawPostLink,
   mockRawWideLayout,
 } from '@shinefold/service/testing/shared/fixtures';
+import {
+  mockRawModuleHeadingBlock,
+  mockPlainHeadingPieces,
+} from '@shinefold/service/testing/shared/localized';
 
 import { toTaxonomyListModule } from './transformer';
 
@@ -59,7 +62,7 @@ describe(toTaxonomyListModule, () => {
 
   it('maps headingBlock when authored', () => {
     const raw = mockRawTaxonomyListModule({
-      headingBlock: mockRawHeadingBlock(MOCK_TOPIC_INDEX_HEADING, {
+      headingBlock: mockRawModuleHeadingBlock(MOCK_TOPIC_INDEX_HEADING, {
         supportingText: MOCK_SUPPORTING_TEXT,
       }),
     });
@@ -68,6 +71,7 @@ describe(toTaxonomyListModule, () => {
 
     expect(module.headingBlock).toEqual({
       heading: MOCK_TOPIC_INDEX_HEADING,
+      headingPieces: mockPlainHeadingPieces(MOCK_TOPIC_INDEX_HEADING),
       supportingText: MOCK_SUPPORTING_TEXT,
     });
   });

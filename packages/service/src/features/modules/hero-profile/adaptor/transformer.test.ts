@@ -11,16 +11,19 @@ import {
   MOCK_HERO_IMAGE_ALT,
   mockCtaButtonView,
   mockRawCtaButton,
-  mockRawHeroProfileModule,
 } from '@shinefold/service/testing/modules/fixtures';
+import { mockRawHeroProfileModule } from '@shinefold/service/testing/modules/hero-profile/fixtures';
 import {
   MOCK_BIO_BLOCK_KEY,
   mockLinkView,
   mockRawExternalLinkDocument,
-  mockRawHeadingBlock,
   mockRawHeroLayout,
   mockRawSanityImage,
 } from '@shinefold/service/testing/shared/fixtures';
+import {
+  mockRawModuleHeadingBlock,
+  mockPlainHeadingPieces,
+} from '@shinefold/service/testing/shared/localized';
 
 import { toHeroProfileModule, type TRawHeroProfileModule } from './transformer';
 
@@ -52,7 +55,7 @@ describe(toHeroProfileModule, () => {
     const raw = mockRawHeroProfileModule({
       brandVariant: BRAND_VARIANT.BRAND_PRIMARY,
       variant: HERO_VARIANT.BANNER,
-      headingBlock: mockRawHeadingBlock(MOCK_PROFILE_HEADING),
+      headingBlock: mockRawModuleHeadingBlock(MOCK_PROFILE_HEADING),
     });
 
     const hero = toHeroProfileModule(raw);
@@ -61,6 +64,7 @@ describe(toHeroProfileModule, () => {
     expect(hero.presentation.variant).toBe(HERO_VARIANT.BANNER);
     expect(hero.headingBlock).toEqual({
       heading: MOCK_PROFILE_HEADING,
+      headingPieces: mockPlainHeadingPieces(MOCK_PROFILE_HEADING),
       supportingText: undefined,
     });
   });

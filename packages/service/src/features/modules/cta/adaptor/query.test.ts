@@ -12,6 +12,7 @@ import {
   mockLocalizedListedText,
   mockLocalizedStrings,
   mockLocalizedValues,
+  mockParagraphBlocks,
 } from '@shinefold/service/testing/shared/localized';
 
 import { ctaModuleQuery } from './query';
@@ -99,7 +100,7 @@ describe('ctaModuleQuery', () => {
     expect(cta).toMatchObject({
       eyebrow: copy.eyebrow,
       headingBlock: {
-        heading: copy.heading,
+        heading: mockParagraphBlocks(copy.heading),
         supportingText: copy.supportingText,
       },
       footnote: copy.footnote,

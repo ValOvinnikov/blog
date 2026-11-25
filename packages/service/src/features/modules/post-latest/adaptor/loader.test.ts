@@ -16,9 +16,9 @@ import {
 } from '@shinefold/service/testing/sanity/query/cache-tags';
 import {
   MOCK_MISSING_ID,
-  mockRawHeadingBlock,
   mockValidationError,
 } from '@shinefold/service/testing/shared/fixtures';
+import { mockRawModuleHeadingBlock } from '@shinefold/service/testing/shared/localized';
 import { MOCK_TENANT } from '@shinefold/service/testing/tenant';
 
 import { getPostLatest } from './loader';
@@ -47,7 +47,7 @@ describe(getPostLatest, () => {
       mockRun
         .mockResolvedValueOnce(
           mockRawPostLatestModule({
-            headingBlock: mockRawHeadingBlock(MOCK_RECENT_POSTS_HEADING),
+            headingBlock: mockRawModuleHeadingBlock(MOCK_RECENT_POSTS_HEADING),
             limit: MOCK_LIMIT,
           }),
         )

@@ -1,16 +1,16 @@
 import { faker } from '@faker-js/faker';
 import { SANITY_CONTENT_REVALIDATE_SECONDS } from '@shinefold/config';
 import { mockRun } from '@shinefold/service/testing/mock-run-query';
-import { mockRawHeroStatementModule } from '@shinefold/service/testing/modules/fixtures';
+import { mockRawHeroStatementModule } from '@shinefold/service/testing/modules/hero-statement/fixtures';
 import {
   MOCK_LINK_TARGET_CACHE_TAGS,
   mockCacheTag,
 } from '@shinefold/service/testing/sanity/query/cache-tags';
 import {
   MOCK_MISSING_ID,
-  mockRawHeadingBlock,
   mockValidationError,
 } from '@shinefold/service/testing/shared/fixtures';
+import { mockRawModuleHeadingBlock } from '@shinefold/service/testing/shared/localized';
 import { MOCK_TENANT } from '@shinefold/service/testing/tenant';
 
 import { getHeroStatement } from './loader';
@@ -27,7 +27,7 @@ describe(getHeroStatement, () => {
   beforeEach(() => {
     mockRun.mockResolvedValue(
       mockRawHeroStatementModule({
-        headingBlock: mockRawHeadingBlock(MOCK_HERO_STATEMENT_HEADING),
+        headingBlock: mockRawModuleHeadingBlock(MOCK_HERO_STATEMENT_HEADING),
       }),
     );
   });
