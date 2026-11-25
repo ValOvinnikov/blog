@@ -47,6 +47,8 @@ const MOCK_BRAND_NAME = faker.company.name();
 const MOCK_LOGO_ASSET_URL = faker.internet.url();
 const MOCK_LOGO_DARK_ASSET_URL = faker.internet.url();
 const MOCK_FAVICON_ASSET_URL = faker.internet.url();
+const MOCK_BUTTON_COLOR = faker.color.rgb();
+const MOCK_BUTTON_COLOR_DARK = faker.color.rgb();
 
 const STORED_LOOK: TLook = {
   preset: PRESET_ID.EDITORIAL,
@@ -85,6 +87,8 @@ const STORED_LOOK: TLook = {
   logoAssetUrl: MOCK_LOGO_ASSET_URL,
   logoDarkAssetUrl: MOCK_LOGO_DARK_ASSET_URL,
   faviconAssetUrl: MOCK_FAVICON_ASSET_URL,
+  buttonColor: MOCK_BUTTON_COLOR,
+  buttonColorDark: MOCK_BUTTON_COLOR_DARK,
 };
 
 const GROWTH = PLAN_ENTITLEMENTS[TENANT_PLAN.GROWTH];
@@ -140,6 +144,8 @@ describe(toEffectiveLookWithin, () => {
       logoAssetUrl: MOCK_LOGO_ASSET_URL,
       logoDarkAssetUrl: MOCK_LOGO_DARK_ASSET_URL,
       faviconAssetUrl: MOCK_FAVICON_ASSET_URL,
+      buttonColor: undefined,
+      buttonColorDark: undefined,
     });
   });
 
@@ -165,6 +171,29 @@ describe(toEffectiveLookWithin, () => {
       { preset, headingFont: FONT_CHOICE.FRAUNCES, extra },
     );
   });
+
+  it.each([LOOK_FIELD.BUTTON_COLOR, LOOK_FIELD.BUTTON_COLOR_DARK])(
+    'returns no %s on Starter without its grant',
+    (field) => {
+      expect(
+        toEffectiveLookWithin(STORED_LOOK, STARTER)[field],
+      ).toBeUndefined();
+    },
+  );
+
+  it.each([LOOK_FIELD.BUTTON_COLOR, LOOK_FIELD.BUTTON_COLOR_DARK])(
+    'keeps a stored %s on Starter with its grant',
+    (field) => {
+      const granted = {
+        ...STARTER,
+        lookFields: [...STARTER.lookFields, field],
+      };
+
+      expect(toEffectiveLookWithin(STORED_LOOK, granted)[field]).toBe(
+        STORED_LOOK[field],
+      );
+    },
+  );
 
   it('keeps a granted stored value and replaces the rest', () => {
     const { preset, headingFont, bodyFont } = STORED_LOOK;

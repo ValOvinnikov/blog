@@ -110,6 +110,8 @@ export const siteConfig = pgTable('site_config', {
   logoAssetUrl: text('logo_asset_url'),
   logoDarkAssetUrl: text('logo_dark_asset_url'),
   faviconAssetUrl: text('favicon_asset_url'),
+  buttonColor: text('button_color'),
+  buttonColorDark: text('button_color_dark'),
   voiceOverridesByLocale: jsonb('voice_overrides')
     .$type<TVoiceOverridesByLocale>()
     .notNull()
