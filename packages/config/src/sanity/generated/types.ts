@@ -1062,6 +1062,7 @@ export type Settings_navigation = {
         _key: string;
       } & LinkRefWithSubItems)
   >;
+  headerAction?: LinkReference;
   tagline?: BrandTagline;
   showLanguageSwitcher?: boolean;
 };

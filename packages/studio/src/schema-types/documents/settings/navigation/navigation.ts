@@ -1,4 +1,5 @@
 import { languageSwitcherField } from '@shinefold/studio/schema-types/fields/language-switcher-field/language-switcher-field';
+import { linkReferenceField } from '@shinefold/studio/schema-types/fields/link-reference-field/link-reference-field';
 import { titleField } from '@shinefold/studio/schema-types/fields/title-field/title-field';
 import { brandTaglineSchema } from '@shinefold/studio/schema-types/objects/brand-tagline/brand-tagline';
 import { linkRefSchema } from '@shinefold/studio/schema-types/objects/link-ref/link-ref';
@@ -25,6 +26,12 @@ export const navigationSettingsSchema = defineType({
         defineArrayMember({ type: linkRefSchema.name }),
         defineArrayMember({ type: linkRefWithSubItemsSchema.name }),
       ],
+    }),
+    linkReferenceField({
+      name: 'headerAction',
+      title: 'Header Action',
+      description:
+        'Optional link shown as a button in the site header, after the header links.',
     }),
     defineField({
       name: 'tagline',

@@ -7567,6 +7567,14 @@
         },
         "optional": true
       },
+      "headerAction": {
+        "type": "objectAttribute",
+        "value": {
+          "type": "inline",
+          "name": "link.reference"
+        },
+        "optional": true
+      },
       "tagline": {
         "type": "objectAttribute",
         "value": {
