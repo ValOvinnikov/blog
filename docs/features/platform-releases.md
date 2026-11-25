@@ -263,7 +263,6 @@ values are stored as plain `text`, so none of them needs a db migration:
   a moving ref would bound nothing, and the release card's 10-second poll
   sees live state. A new commit on `main` changes the head, so the first view
   after it reads the comparison again.
-- The candidate comparison is deduped per render (`React.cache`).
 - At the 300-file limit the file list is truncated (`isFileListTruncated` on
   the candidate): it counts as touching every set, so a rendering change is
   never missed, and the migration counts are minimums.

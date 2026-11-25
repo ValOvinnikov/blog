@@ -31,12 +31,15 @@ import {
 } from '@shinefold/config/constants';
 import { BRAND_NAME_MAX_LENGTH, LOOK_FIELD } from '@shinefold/db/constants';
 import type { siteConfig } from '@shinefold/db/schema/site-config';
+import { isHexColor } from '@shinefold/utils/color';
 import { isUndefined } from '@shinefold/utils/primitives';
 import { z } from 'zod';
 
 import type { TVoiceOverridesByLocaleInput } from './parse-voice-overrides';
 
 const hueSchema = z.number().int().min(HUE_MIN).max(HUE_MAX);
+
+const hexColorSchema = z.string().trim().refine(isHexColor);
 
 // A field absent from the input is left untouched on `UPDATE` and takes the
 // preset's value on `INSERT`: Look and Voice save separately, and a plan may
@@ -87,6 +90,8 @@ export const updateSiteConfigInputSchema = z.object({
   logoAssetUrl: z.string().trim().url().nullable().optional(),
   logoDarkAssetUrl: z.string().trim().url().nullable().optional(),
   faviconAssetUrl: z.string().trim().url().nullable().optional(),
+  buttonColor: hexColorSchema.nullable().optional(),
+  buttonColorDark: hexColorSchema.nullable().optional(),
 });
 
 export type TUpdateSiteConfigInput = z.input<

@@ -39,6 +39,8 @@ export const LOOK_FIELD = {
   LOGO_ASSET_URL: 'logoAssetUrl',
   LOGO_DARK_ASSET_URL: 'logoDarkAssetUrl',
   FAVICON_ASSET_URL: 'faviconAssetUrl',
+  BUTTON_COLOR: 'buttonColor',
+  BUTTON_COLOR_DARK: 'buttonColorDark',
 } as const satisfies Record<string, keyof TSiteConfig>;
 
 export type TLookField = TValueOf<typeof LOOK_FIELD>;

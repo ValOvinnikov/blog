@@ -1,5 +1,5 @@
 {
-  "id": "807fef95-21fc-4852-822d-51cfc23fc092",
+  "id": "ad0e827c-86d0-46ac-a392-70ec50761fea",
   "prevId": "8e0f8857-d1f8-4c78-a155-ca27afbcba64",
   "version": "7",
   "dialect": "postgresql",
@@ -81,12 +81,8 @@
           "name": "admin_invites_invited_by_users_id_fk",
           "tableFrom": "admin_invites",
           "tableTo": "users",
-          "columnsFrom": [
-            "invited_by"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["invited_by"],
+          "columnsTo": ["id"],
           "onDelete": "set null",
           "onUpdate": "no action"
         }
@@ -96,9 +92,7 @@
         "admin_invites_email_exact_index_unique": {
           "name": "admin_invites_email_exact_index_unique",
           "nullsNotDistinct": false,
-          "columns": [
-            "email_exact_index"
-          ]
+          "columns": ["email_exact_index"]
         }
       },
       "policies": {},
@@ -161,12 +155,8 @@
           "name": "admins_user_id_users_id_fk",
           "tableFrom": "admins",
           "tableTo": "users",
-          "columnsFrom": [
-            "user_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["user_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         },
@@ -174,12 +164,8 @@
           "name": "admins_granted_by_users_id_fk",
           "tableFrom": "admins",
           "tableTo": "users",
-          "columnsFrom": [
-            "granted_by"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["granted_by"],
+          "columnsTo": ["id"],
           "onDelete": "set null",
           "onUpdate": "no action"
         }
@@ -189,9 +175,7 @@
         "admins_user_id_unique": {
           "name": "admins_user_id_unique",
           "nullsNotDistinct": false,
-          "columns": [
-            "user_id"
-          ]
+          "columns": ["user_id"]
         }
       },
       "policies": {},
@@ -354,12 +338,8 @@
           "name": "accounts_userId_users_id_fk",
           "tableFrom": "accounts",
           "tableTo": "users",
-          "columnsFrom": [
-            "userId"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["userId"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -367,10 +347,7 @@
       "compositePrimaryKeys": {
         "accounts_provider_providerAccountId_pk": {
           "name": "accounts_provider_providerAccountId_pk",
-          "columns": [
-            "provider",
-            "providerAccountId"
-          ]
+          "columns": ["provider", "providerAccountId"]
         }
       },
       "uniqueConstraints": {},
@@ -414,12 +391,8 @@
           "name": "sessions_userId_users_id_fk",
           "tableFrom": "sessions",
           "tableTo": "users",
-          "columnsFrom": [
-            "userId"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["userId"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -518,9 +491,7 @@
         "users_email_unique": {
           "name": "users_email_unique",
           "nullsNotDistinct": false,
-          "columns": [
-            "email"
-          ]
+          "columns": ["email"]
         }
       },
       "policies": {},
@@ -555,10 +526,7 @@
       "compositePrimaryKeys": {
         "verification_tokens_identifier_token_pk": {
           "name": "verification_tokens_identifier_token_pk",
-          "columns": [
-            "identifier",
-            "token"
-          ]
+          "columns": ["identifier", "token"]
         }
       },
       "uniqueConstraints": {},
@@ -615,12 +583,8 @@
           "name": "blocked_signup_identities_created_by_admin_id_admins_id_fk",
           "tableFrom": "blocked_signup_identities",
           "tableTo": "admins",
-          "columnsFrom": [
-            "created_by_admin_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["created_by_admin_id"],
+          "columnsTo": ["id"],
           "onDelete": "set null",
           "onUpdate": "no action"
         }
@@ -630,10 +594,7 @@
         "blocked_signup_identities_kind_value_unique": {
           "name": "blocked_signup_identities_kind_value_unique",
           "nullsNotDistinct": false,
-          "columns": [
-            "kind",
-            "value"
-          ]
+          "columns": ["kind", "value"]
         }
       },
       "policies": {},
@@ -676,12 +637,8 @@
           "name": "bookmarks_tenant_id_tenants_id_fk",
           "tableFrom": "bookmarks",
           "tableTo": "tenants",
-          "columnsFrom": [
-            "tenant_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["tenant_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         },
@@ -689,12 +646,8 @@
           "name": "bookmarks_user_id_users_id_fk",
           "tableFrom": "bookmarks",
           "tableTo": "users",
-          "columnsFrom": [
-            "user_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["user_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -702,11 +655,7 @@
       "compositePrimaryKeys": {
         "bookmarks_tenant_id_user_id_post_id_pk": {
           "name": "bookmarks_tenant_id_user_id_post_id_pk",
-          "columns": [
-            "tenant_id",
-            "user_id",
-            "post_id"
-          ]
+          "columns": ["tenant_id", "user_id", "post_id"]
         }
       },
       "uniqueConstraints": {},
@@ -757,12 +706,8 @@
           "name": "custom_domain_claims_tenant_id_tenants_id_fk",
           "tableFrom": "custom_domain_claims",
           "tableTo": "tenants",
-          "columnsFrom": [
-            "tenant_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["tenant_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -772,9 +717,7 @@
         "custom_domain_claims_tenant_id_unique": {
           "name": "custom_domain_claims_tenant_id_unique",
           "nullsNotDistinct": false,
-          "columns": [
-            "tenant_id"
-          ]
+          "columns": ["tenant_id"]
         }
       },
       "policies": {},
@@ -862,12 +805,8 @@
           "name": "email_config_tenant_id_tenants_id_fk",
           "tableFrom": "email_config",
           "tableTo": "tenants",
-          "columnsFrom": [
-            "tenant_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["tenant_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -877,9 +816,7 @@
         "email_config_tenant_id_unique": {
           "name": "email_config_tenant_id_unique",
           "nullsNotDistinct": false,
-          "columns": [
-            "tenant_id"
-          ]
+          "columns": ["tenant_id"]
         }
       },
       "policies": {},
@@ -929,12 +866,8 @@
           "name": "email_template_logos_tenant_id_tenants_id_fk",
           "tableFrom": "email_template_logos",
           "tableTo": "tenants",
-          "columnsFrom": [
-            "tenant_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["tenant_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -942,10 +875,7 @@
       "compositePrimaryKeys": {
         "email_template_logos_tenant_id_template_type_pk": {
           "name": "email_template_logos_tenant_id_template_type_pk",
-          "columns": [
-            "tenant_id",
-            "template_type"
-          ]
+          "columns": ["tenant_id", "template_type"]
         }
       },
       "uniqueConstraints": {},
@@ -1008,12 +938,8 @@
           "name": "email_templates_tenant_id_tenants_id_fk",
           "tableFrom": "email_templates",
           "tableTo": "tenants",
-          "columnsFrom": [
-            "tenant_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["tenant_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -1021,11 +947,7 @@
       "compositePrimaryKeys": {
         "email_templates_tenant_id_template_type_locale_pk": {
           "name": "email_templates_tenant_id_template_type_locale_pk",
-          "columns": [
-            "tenant_id",
-            "template_type",
-            "locale"
-          ]
+          "columns": ["tenant_id", "template_type", "locale"]
         }
       },
       "uniqueConstraints": {},
@@ -1062,12 +984,8 @@
           "name": "email_delivery_events_tenant_id_tenants_id_fk",
           "tableFrom": "email_delivery_events",
           "tableTo": "tenants",
-          "columnsFrom": [
-            "tenant_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["tenant_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -1114,12 +1032,8 @@
           "name": "email_delivery_outcome_counts_tenant_id_tenants_id_fk",
           "tableFrom": "email_delivery_outcome_counts",
           "tableTo": "tenants",
-          "columnsFrom": [
-            "tenant_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["tenant_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -1127,11 +1041,7 @@
       "compositePrimaryKeys": {
         "email_delivery_outcome_counts_tenant_id_day_outcome_pk": {
           "name": "email_delivery_outcome_counts_tenant_id_day_outcome_pk",
-          "columns": [
-            "tenant_id",
-            "day",
-            "outcome"
-          ]
+          "columns": ["tenant_id", "day", "outcome"]
         }
       },
       "uniqueConstraints": {},
@@ -1175,12 +1085,8 @@
           "name": "email_send_counts_tenant_id_tenants_id_fk",
           "tableFrom": "email_send_counts",
           "tableTo": "tenants",
-          "columnsFrom": [
-            "tenant_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["tenant_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -1188,11 +1094,7 @@
       "compositePrimaryKeys": {
         "email_send_counts_tenant_id_day_email_type_pk": {
           "name": "email_send_counts_tenant_id_day_email_type_pk",
-          "columns": [
-            "tenant_id",
-            "day",
-            "email_type"
-          ]
+          "columns": ["tenant_id", "day", "email_type"]
         }
       },
       "uniqueConstraints": {},
@@ -1229,10 +1131,7 @@
       "compositePrimaryKeys": {
         "platform_email_send_counts_day_email_type_pk": {
           "name": "platform_email_send_counts_day_email_type_pk",
-          "columns": [
-            "day",
-            "email_type"
-          ]
+          "columns": ["day", "email_type"]
         }
       },
       "uniqueConstraints": {},
@@ -1367,12 +1266,8 @@
           "name": "findings_tenant_id_tenants_id_fk",
           "tableFrom": "findings",
           "tableTo": "tenants",
-          "columnsFrom": [
-            "tenant_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["tenant_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -1484,12 +1379,8 @@
           "name": "leads_tenant_id_tenants_id_fk",
           "tableFrom": "leads",
           "tableTo": "tenants",
-          "columnsFrom": [
-            "tenant_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["tenant_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -1608,12 +1499,8 @@
           "name": "membership_invites_tenant_id_tenants_id_fk",
           "tableFrom": "membership_invites",
           "tableTo": "tenants",
-          "columnsFrom": [
-            "tenant_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["tenant_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -1623,10 +1510,7 @@
         "membership_invites_tenant_id_email_exact_index_unique": {
           "name": "membership_invites_tenant_id_email_exact_index_unique",
           "nullsNotDistinct": false,
-          "columns": [
-            "tenant_id",
-            "email_exact_index"
-          ]
+          "columns": ["tenant_id", "email_exact_index"]
         }
       },
       "policies": {},
@@ -1712,12 +1596,8 @@
           "name": "memberships_user_id_users_id_fk",
           "tableFrom": "memberships",
           "tableTo": "users",
-          "columnsFrom": [
-            "user_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["user_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         },
@@ -1725,12 +1605,8 @@
           "name": "memberships_tenant_id_tenants_id_fk",
           "tableFrom": "memberships",
           "tableTo": "tenants",
-          "columnsFrom": [
-            "tenant_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["tenant_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -1740,10 +1616,7 @@
         "memberships_user_id_tenant_id_unique": {
           "name": "memberships_user_id_tenant_id_unique",
           "nullsNotDistinct": false,
-          "columns": [
-            "user_id",
-            "tenant_id"
-          ]
+          "columns": ["user_id", "tenant_id"]
         }
       },
       "policies": {},
@@ -1785,12 +1658,8 @@
           "name": "newsletter_limit_notices_tenant_id_tenants_id_fk",
           "tableFrom": "newsletter_limit_notices",
           "tableTo": "tenants",
-          "columnsFrom": [
-            "tenant_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["tenant_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -1798,11 +1667,7 @@
       "compositePrimaryKeys": {
         "newsletter_limit_notices_tenant_id_month_kind_pk": {
           "name": "newsletter_limit_notices_tenant_id_month_kind_pk",
-          "columns": [
-            "tenant_id",
-            "month",
-            "kind"
-          ]
+          "columns": ["tenant_id", "month", "kind"]
         }
       },
       "uniqueConstraints": {},
@@ -1906,12 +1771,8 @@
           "name": "newsletter_post_sends_tenant_id_tenants_id_fk",
           "tableFrom": "newsletter_post_sends",
           "tableTo": "tenants",
-          "columnsFrom": [
-            "tenant_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["tenant_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -1919,93 +1780,7 @@
       "compositePrimaryKeys": {
         "newsletter_post_sends_tenant_id_post_id_pk": {
           "name": "newsletter_post_sends_tenant_id_post_id_pk",
-          "columns": [
-            "tenant_id",
-            "post_id"
-          ]
-        }
-      },
-      "uniqueConstraints": {},
-      "policies": {},
-      "checkConstraints": {},
-      "isRLSEnabled": false
-    },
-    "public.pinned_tenants": {
-      "name": "pinned_tenants",
-      "schema": "",
-      "columns": {
-        "admin_id": {
-          "name": "admin_id",
-          "type": "uuid",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "tenant_id": {
-          "name": "tenant_id",
-          "type": "uuid",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "pinned_at": {
-          "name": "pinned_at",
-          "type": "timestamp",
-          "primaryKey": false,
-          "notNull": true,
-          "default": "now()"
-        }
-      },
-      "indexes": {
-        "pinned_tenants_tenant_id_idx": {
-          "name": "pinned_tenants_tenant_id_idx",
-          "columns": [
-            {
-              "expression": "tenant_id",
-              "isExpression": false,
-              "asc": true,
-              "nulls": "last"
-            }
-          ],
-          "isUnique": false,
-          "concurrently": false,
-          "method": "btree",
-          "with": {}
-        }
-      },
-      "foreignKeys": {
-        "pinned_tenants_admin_id_admins_id_fk": {
-          "name": "pinned_tenants_admin_id_admins_id_fk",
-          "tableFrom": "pinned_tenants",
-          "tableTo": "admins",
-          "columnsFrom": [
-            "admin_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
-          "onDelete": "cascade",
-          "onUpdate": "no action"
-        },
-        "pinned_tenants_tenant_id_tenants_id_fk": {
-          "name": "pinned_tenants_tenant_id_tenants_id_fk",
-          "tableFrom": "pinned_tenants",
-          "tableTo": "tenants",
-          "columnsFrom": [
-            "tenant_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
-          "onDelete": "cascade",
-          "onUpdate": "no action"
-        }
-      },
-      "compositePrimaryKeys": {
-        "pinned_tenants_admin_id_tenant_id_pk": {
-          "name": "pinned_tenants_admin_id_tenant_id_pk",
-          "columns": [
-            "admin_id",
-            "tenant_id"
-          ]
+          "columns": ["tenant_id", "post_id"]
         }
       },
       "uniqueConstraints": {},
@@ -2107,12 +1882,8 @@
           "name": "settings_features_tenant_id_tenants_id_fk",
           "tableFrom": "settings_features",
           "tableTo": "tenants",
-          "columnsFrom": [
-            "tenant_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["tenant_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -2122,9 +1893,7 @@
         "settings_features_tenant_id_unique": {
           "name": "settings_features_tenant_id_unique",
           "nullsNotDistinct": false,
-          "columns": [
-            "tenant_id"
-          ]
+          "columns": ["tenant_id"]
         }
       },
       "policies": {},
@@ -2389,6 +2158,18 @@
           "primaryKey": false,
           "notNull": false
         },
+        "button_color": {
+          "name": "button_color",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "button_color_dark": {
+          "name": "button_color_dark",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
         "voice_overrides": {
           "name": "voice_overrides",
           "type": "jsonb",
@@ -2429,12 +2210,8 @@
           "name": "site_config_tenant_id_tenants_id_fk",
           "tableFrom": "site_config",
           "tableTo": "tenants",
-          "columnsFrom": [
-            "tenant_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["tenant_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -2444,9 +2221,7 @@
         "site_config_tenant_id_unique": {
           "name": "site_config_tenant_id_unique",
           "nullsNotDistinct": false,
-          "columns": [
-            "tenant_id"
-          ]
+          "columns": ["tenant_id"]
         }
       },
       "policies": {},
@@ -2515,10 +2290,7 @@
       "compositePrimaryKeys": {
         "stripe_prices_lookup_key_currency_pk": {
           "name": "stripe_prices_lookup_key_currency_pk",
-          "columns": [
-            "lookup_key",
-            "currency"
-          ]
+          "columns": ["lookup_key", "currency"]
         }
       },
       "uniqueConstraints": {},
@@ -2789,12 +2561,8 @@
           "name": "subscribers_tenant_id_tenants_id_fk",
           "tableFrom": "subscribers",
           "tableTo": "tenants",
-          "columnsFrom": [
-            "tenant_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["tenant_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -2804,17 +2572,12 @@
         "subscribers_confirmation_token_hash_unique": {
           "name": "subscribers_confirmation_token_hash_unique",
           "nullsNotDistinct": false,
-          "columns": [
-            "confirmation_token_hash"
-          ]
+          "columns": ["confirmation_token_hash"]
         },
         "subscribers_tenant_id_email_exact_index_unique": {
           "name": "subscribers_tenant_id_email_exact_index_unique",
           "nullsNotDistinct": false,
-          "columns": [
-            "tenant_id",
-            "email_exact_index"
-          ]
+          "columns": ["tenant_id", "email_exact_index"]
         }
       },
       "policies": {},
@@ -2851,12 +2614,8 @@
           "name": "takeaway_generation_counts_tenant_id_tenants_id_fk",
           "tableFrom": "takeaway_generation_counts",
           "tableTo": "tenants",
-          "columnsFrom": [
-            "tenant_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["tenant_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -2864,10 +2623,7 @@
       "compositePrimaryKeys": {
         "takeaway_generation_counts_tenant_id_month_pk": {
           "name": "takeaway_generation_counts_tenant_id_month_pk",
-          "columns": [
-            "tenant_id",
-            "month"
-          ]
+          "columns": ["tenant_id", "month"]
         }
       },
       "uniqueConstraints": {},
@@ -2918,12 +2674,8 @@
           "name": "tenant_analytics_tenant_id_tenants_id_fk",
           "tableFrom": "tenant_analytics",
           "tableTo": "tenants",
-          "columnsFrom": [
-            "tenant_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["tenant_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -2971,12 +2723,8 @@
           "name": "tenant_domains_tenant_id_tenants_id_fk",
           "tableFrom": "tenant_domains",
           "tableTo": "tenants",
-          "columnsFrom": [
-            "tenant_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["tenant_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -2986,9 +2734,7 @@
         "tenant_domains_domain_unique": {
           "name": "tenant_domains_domain_unique",
           "nullsNotDistinct": false,
-          "columns": [
-            "domain"
-          ]
+          "columns": ["domain"]
         }
       },
       "policies": {},
@@ -3103,12 +2849,8 @@
           "name": "tenant_entitlement_grants_tenant_id_tenants_id_fk",
           "tableFrom": "tenant_entitlement_grants",
           "tableTo": "tenants",
-          "columnsFrom": [
-            "tenant_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["tenant_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         },
@@ -3116,12 +2858,8 @@
           "name": "tenant_entitlement_grants_granted_by_admins_id_fk",
           "tableFrom": "tenant_entitlement_grants",
           "tableTo": "admins",
-          "columnsFrom": [
-            "granted_by"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["granted_by"],
+          "columnsTo": ["id"],
           "onDelete": "set null",
           "onUpdate": "no action"
         },
@@ -3129,12 +2867,8 @@
           "name": "tenant_entitlement_grants_revoked_by_admins_id_fk",
           "tableFrom": "tenant_entitlement_grants",
           "tableTo": "admins",
-          "columnsFrom": [
-            "revoked_by"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["revoked_by"],
+          "columnsTo": ["id"],
           "onDelete": "set null",
           "onUpdate": "no action"
         }
@@ -3200,12 +2934,8 @@
           "name": "tenant_oauth_credentials_tenant_id_tenants_id_fk",
           "tableFrom": "tenant_oauth_credentials",
           "tableTo": "tenants",
-          "columnsFrom": [
-            "tenant_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["tenant_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -3213,10 +2943,7 @@
       "compositePrimaryKeys": {
         "tenant_oauth_credentials_tenant_id_provider_pk": {
           "name": "tenant_oauth_credentials_tenant_id_provider_pk",
-          "columns": [
-            "tenant_id",
-            "provider"
-          ]
+          "columns": ["tenant_id", "provider"]
         }
       },
       "uniqueConstraints": {},
@@ -3309,12 +3036,8 @@
           "name": "tenant_suspensions_tenant_id_tenants_id_fk",
           "tableFrom": "tenant_suspensions",
           "tableTo": "tenants",
-          "columnsFrom": [
-            "tenant_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["tenant_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         },
@@ -3322,12 +3045,8 @@
           "name": "tenant_suspensions_suspended_by_admins_id_fk",
           "tableFrom": "tenant_suspensions",
           "tableTo": "admins",
-          "columnsFrom": [
-            "suspended_by"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["suspended_by"],
+          "columnsTo": ["id"],
           "onDelete": "set null",
           "onUpdate": "no action"
         },
@@ -3335,12 +3054,8 @@
           "name": "tenant_suspensions_lifted_by_admins_id_fk",
           "tableFrom": "tenant_suspensions",
           "tableTo": "admins",
-          "columnsFrom": [
-            "lifted_by"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["lifted_by"],
+          "columnsTo": ["id"],
           "onDelete": "set null",
           "onUpdate": "no action"
         }
@@ -3350,9 +3065,7 @@
         "tenant_suspensions_reference_unique": {
           "name": "tenant_suspensions_reference_unique",
           "nullsNotDistinct": false,
-          "columns": [
-            "reference"
-          ]
+          "columns": ["reference"]
         }
       },
       "policies": {},
@@ -3729,23 +3442,17 @@
         "tenants_sanity_project_id_unique": {
           "name": "tenants_sanity_project_id_unique",
           "nullsNotDistinct": false,
-          "columns": [
-            "sanity_project_id"
-          ]
+          "columns": ["sanity_project_id"]
         },
         "tenants_stripe_customer_id_unique": {
           "name": "tenants_stripe_customer_id_unique",
           "nullsNotDistinct": false,
-          "columns": [
-            "stripe_customer_id"
-          ]
+          "columns": ["stripe_customer_id"]
         },
         "tenants_stripe_subscription_id_unique": {
           "name": "tenants_stripe_subscription_id_unique",
           "nullsNotDistinct": false,
-          "columns": [
-            "stripe_subscription_id"
-          ]
+          "columns": ["stripe_subscription_id"]
         }
       },
       "policies": {},
@@ -3788,135 +3495,77 @@
     "public.admin_role": {
       "name": "admin_role",
       "schema": "public",
-      "values": [
-        "SUPERADMIN",
-        "ADMIN",
-        "MODERATOR"
-      ]
+      "values": ["SUPERADMIN", "ADMIN", "MODERATOR"]
     },
     "public.granted_via": {
       "name": "granted_via",
       "schema": "public",
-      "values": [
-        "BREAK_GLASS",
-        "PROMOTION",
-        "INVITE"
-      ]
+      "values": ["BREAK_GLASS", "PROMOTION", "INVITE"]
     },
     "public.blocked_identity_kind": {
       "name": "blocked_identity_kind",
       "schema": "public",
-      "values": [
-        "ADDRESS",
-        "DOMAIN"
-      ]
+      "values": ["ADDRESS", "DOMAIN"]
     },
     "public.membership_role": {
       "name": "membership_role",
       "schema": "public",
-      "values": [
-        "OWNER",
-        "EDITOR",
-        "READER"
-      ]
+      "values": ["OWNER", "EDITOR", "READER"]
     },
     "public.account_button_style": {
       "name": "account_button_style",
       "schema": "public",
-      "values": [
-        "PILL",
-        "CIRCLE"
-      ]
+      "values": ["PILL", "CIRCLE"]
     },
     "public.account_panel_style": {
       "name": "account_panel_style",
       "schema": "public",
-      "values": [
-        "CARD",
-        "PROFILE",
-        "HUB"
-      ]
+      "values": ["CARD", "PROFILE", "HUB"]
     },
     "public.account_phone_placement": {
       "name": "account_phone_placement",
       "schema": "public",
-      "values": [
-        "BAR",
-        "MENU"
-      ]
+      "values": ["BAR", "MENU"]
     },
     "public.breadcrumb_background": {
       "name": "breadcrumb_background",
       "schema": "public",
-      "values": [
-        "PRIMARY",
-        "SECONDARY",
-        "BRAND_PRIMARY",
-        "INK"
-      ]
+      "values": ["PRIMARY", "SECONDARY", "BRAND_PRIMARY", "INK"]
     },
     "public.busy_button_style": {
       "name": "busy_button_style",
       "schema": "public",
-      "values": [
-        "LABEL",
-        "KEPT",
-        "EDGE"
-      ]
+      "values": ["LABEL", "KEPT", "EDGE"]
     },
     "public.button_shape": {
       "name": "button_shape",
       "schema": "public",
-      "values": [
-        "SQUARE",
-        "ROUNDED",
-        "PILL"
-      ]
+      "values": ["SQUARE", "ROUNDED", "PILL"]
     },
     "public.card_style": {
       "name": "card_style",
       "schema": "public",
-      "values": [
-        "ACCENT_BAR",
-        "OUTLINED",
-        "FILLED",
-        "RAISED",
-        "PLAIN"
-      ]
+      "values": ["ACCENT_BAR", "OUTLINED", "FILLED", "RAISED", "PLAIN"]
     },
     "public.color_mode": {
       "name": "color_mode",
       "schema": "public",
-      "values": [
-        "READER",
-        "LIGHT",
-        "DARK"
-      ]
+      "values": ["READER", "LIGHT", "DARK"]
     },
     "public.cookie_settings_button": {
       "name": "cookie_settings_button",
       "schema": "public",
-      "values": [
-        "HIDDEN",
-        "SHOWN",
-        "ONLY"
-      ]
+      "values": ["HIDDEN", "SHOWN", "ONLY"]
     },
     "public.density": {
       "name": "density",
       "schema": "public",
-      "values": [
-        "DEFAULT",
-        "COMPACT"
-      ]
+      "values": ["DEFAULT", "COMPACT"]
     },
     "public.divider_width": {
       "name": "divider_width",
       "schema": "public",
-      "values": [
-        "HAIRLINE",
-        "BOLD"
-      ]
+      "values": ["HAIRLINE", "BOLD"]
     },
     "public.font_choice": {
       "name": "font_choice",
@@ -3932,66 +3581,37 @@
     "public.footer_background": {
       "name": "footer_background",
       "schema": "public",
-      "values": [
-        "PRIMARY",
-        "SECONDARY",
-        "BRAND_PRIMARY",
-        "INK"
-      ]
+      "values": ["PRIMARY", "SECONDARY", "BRAND_PRIMARY", "INK"]
     },
     "public.footer_layout": {
       "name": "footer_layout",
       "schema": "public",
-      "values": [
-        "COLUMNS",
-        "CENTRED",
-        "COMPACT",
-        "BIG_WORDMARK"
-      ]
+      "values": ["COLUMNS", "CENTRED", "COMPACT", "BIG_WORDMARK"]
     },
     "public.footer_surface": {
       "name": "footer_surface",
       "schema": "public",
-      "values": [
-        "FULL_WIDTH",
-        "CARD"
-      ]
+      "values": ["FULL_WIDTH", "CARD"]
     },
     "public.header_background": {
       "name": "header_background",
       "schema": "public",
-      "values": [
-        "PRIMARY",
-        "SECONDARY",
-        "BRAND_PRIMARY",
-        "INK"
-      ]
+      "values": ["PRIMARY", "SECONDARY", "BRAND_PRIMARY", "INK"]
     },
     "public.header_bar_style": {
       "name": "header_bar_style",
       "schema": "public",
-      "values": [
-        "FULL_WIDTH",
-        "FLOATING"
-      ]
+      "values": ["FULL_WIDTH", "FLOATING"]
     },
     "public.header_control_shape": {
       "name": "header_control_shape",
       "schema": "public",
-      "values": [
-        "ROUND",
-        "ROUNDED",
-        "SQUARE"
-      ]
+      "values": ["ROUND", "ROUNDED", "SQUARE"]
     },
     "public.header_control_style": {
       "name": "header_control_style",
       "schema": "public",
-      "values": [
-        "OUTLINED",
-        "SOFT",
-        "PLAIN"
-      ]
+      "values": ["OUTLINED", "SOFT", "PLAIN"]
     },
     "public.header_layout": {
       "name": "header_layout",
@@ -4008,98 +3628,52 @@
     "public.header_submenu_style": {
       "name": "header_submenu_style",
       "schema": "public",
-      "values": [
-        "DROPDOWN",
-        "WIDE_PANEL"
-      ]
+      "values": ["DROPDOWN", "WIDE_PANEL"]
     },
     "public.heading_case": {
       "name": "heading_case",
       "schema": "public",
-      "values": [
-        "AS_WRITTEN",
-        "UPPERCASE"
-      ]
+      "values": ["AS_WRITTEN", "UPPERCASE"]
     },
     "public.heading_weight": {
       "name": "heading_weight",
       "schema": "public",
-      "values": [
-        "REGULAR",
-        "MEDIUM",
-        "SEMIBOLD",
-        "BOLD"
-      ]
+      "values": ["REGULAR", "MEDIUM", "SEMIBOLD", "BOLD"]
     },
     "public.image_proportion": {
       "name": "image_proportion",
       "schema": "public",
-      "values": [
-        "AS_DESIGNED",
-        "WIDE",
-        "CLASSIC",
-        "SQUARE"
-      ]
+      "values": ["AS_DESIGNED", "WIDE", "CLASSIC", "SQUARE"]
     },
     "public.language_switcher_style": {
       "name": "language_switcher_style",
       "schema": "public",
-      "values": [
-        "MENU_CODE",
-        "MENU_GLOBE",
-        "CODES"
-      ]
+      "values": ["MENU_CODE", "MENU_GLOBE", "CODES"]
     },
     "public.nav_link_style": {
       "name": "nav_link_style",
       "schema": "public",
-      "values": [
-        "PLAIN",
-        "UNDERLINE",
-        "SOFT",
-        "PILL"
-      ]
+      "values": ["PLAIN", "UNDERLINE", "SOFT", "PILL"]
     },
     "public.preset_id": {
       "name": "preset_id",
       "schema": "public",
-      "values": [
-        "CONSOLE",
-        "EDITORIAL",
-        "SHINEFOLD"
-      ]
+      "values": ["CONSOLE", "EDITORIAL", "SHINEFOLD"]
     },
     "public.radius_scale": {
       "name": "radius_scale",
       "schema": "public",
-      "values": [
-        "NONE",
-        "SM",
-        "MD",
-        "LG",
-        "XL"
-      ]
+      "values": ["NONE", "SM", "MD", "LG", "XL"]
     },
     "public.spinner_style": {
       "name": "spinner_style",
       "schema": "public",
-      "values": [
-        "BRAILLE",
-        "RING",
-        "DOTS",
-        "PULSE"
-      ]
+      "values": ["BRAILLE", "RING", "DOTS", "PULSE"]
     },
     "public.locale_code": {
       "name": "locale_code",
       "schema": "public",
-      "values": [
-        "EN",
-        "NL",
-        "FR",
-        "DE",
-        "ES"
-      ]
+      "values": ["EN", "NL", "FR", "DE", "ES"]
     },
     "public.site_type": {
       "name": "site_type",
@@ -4117,22 +3691,12 @@
     "public.tenant_plan": {
       "name": "tenant_plan",
       "schema": "public",
-      "values": [
-        "FREE",
-        "STARTER",
-        "GROWTH"
-      ]
+      "values": ["FREE", "STARTER", "GROWTH"]
     },
     "public.tenant_status": {
       "name": "tenant_status",
       "schema": "public",
-      "values": [
-        "ACTIVE",
-        "SUSPENDED",
-        "ARCHIVED",
-        "TRIAL",
-        "PAST_DUE"
-      ]
+      "values": ["ACTIVE", "SUSPENDED", "ARCHIVED", "TRIAL", "PAST_DUE"]
     }
   },
   "schemas": {},
