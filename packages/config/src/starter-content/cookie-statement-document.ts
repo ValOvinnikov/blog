@@ -11,6 +11,7 @@ import type { TStarterCopy } from './copy/starter-copy';
 import { STARTER_DOCUMENT_IDS } from './starter-document-ids';
 import type { TStarterDocument } from './starter-document-shape';
 import { pageHeadingBlock, paragraphs, seo } from './starter-fields';
+import { linkedParagraph } from './starter-linked-paragraph';
 
 const COOKIE_PREFERENCES_MARK_KEY = 'cookiePreferences';
 
@@ -31,27 +32,14 @@ function cookieStatementContent({
       _type: PORTABLE_TEXT_BLOCK_TYPE.COOKIE_LIST,
       _key: PORTABLE_TEXT_BLOCK_TYPE.COOKIE_LIST,
     },
-    {
-      _type: 'block',
-      _key: 'preferences',
-      style: 'normal',
-      markDefs: [
-        {
-          _type: PORTABLE_TEXT_BLOCK_TYPE.COOKIE_PREFERENCES_LINK,
-          _key: COOKIE_PREFERENCES_MARK_KEY,
-        },
-      ],
-      children: [
-        { _type: 'span', _key: 'lead', text: preferencesLead, marks: [] },
-        {
-          _type: 'span',
-          _key: 'link',
-          text: preferencesLink,
-          marks: [COOKIE_PREFERENCES_MARK_KEY],
-        },
-        { _type: 'span', _key: 'tail', text: preferencesTail, marks: [] },
-      ],
-    },
+    linkedParagraph(
+      'preferences',
+      {
+        _type: PORTABLE_TEXT_BLOCK_TYPE.COOKIE_PREFERENCES_LINK,
+        _key: COOKIE_PREFERENCES_MARK_KEY,
+      },
+      { lead: preferencesLead, link: preferencesLink, tail: preferencesTail },
+    ),
   ];
 }
 

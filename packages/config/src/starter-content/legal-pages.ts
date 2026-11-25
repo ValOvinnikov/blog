@@ -19,6 +19,7 @@ import type { TStarterDocumentUnion, TStarterPage } from './starter-document';
 import { STARTER_DOCUMENT_IDS } from './starter-document-ids';
 import type { TStarterTemplate } from './starter-document-shape';
 import { moduleSlot, paragraphs, reference } from './starter-fields';
+import { linkedParagraph } from './starter-linked-paragraph';
 import { internalLink } from './starter-links';
 import { INTRODUCTION_MODULE_TITLE } from './starter-module-titles';
 import { buildContentModule } from './starter-modules';
@@ -30,26 +31,17 @@ function legalIndexIntro(intro: string, cookieStatementTitle: string) {
   return [
     ...paragraphs([intro]),
     {
-      _type: 'block',
-      _key: 'cookieStatement',
-      style: 'normal',
-      listItem: 'bullet',
-      level: 1,
-      markDefs: [
+      ...linkedParagraph(
+        'cookieStatement',
         {
           _type: PORTABLE_TEXT_BLOCK_TYPE.LINK_REF,
           _key: COOKIE_STATEMENT_LINK_MARK_KEY,
           link: reference(STARTER_DOCUMENT_IDS.COOKIE_STATEMENT_LINK),
         },
-      ],
-      children: [
-        {
-          _type: 'span',
-          _key: 'link',
-          text: cookieStatementTitle,
-          marks: [COOKIE_STATEMENT_LINK_MARK_KEY],
-        },
-      ],
+        { link: cookieStatementTitle },
+      ),
+      listItem: 'bullet',
+      level: 1,
     },
   ] satisfies ArticleText;
 }

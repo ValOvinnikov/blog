@@ -2,6 +2,7 @@ import { toDraftId, toPublishedId } from './sanity-document-id';
 
 const MOCK_PUBLISHED_ID = 'post-1';
 const MOCK_DRAFT_ID = `drafts.${MOCK_PUBLISHED_ID}`;
+const MOCK_VERSION_ID = `versions.release-1.${MOCK_PUBLISHED_ID}`;
 const ID_FORMS = [
   ['a published id', MOCK_PUBLISHED_ID],
   ['a draft id', MOCK_DRAFT_ID],
@@ -14,7 +15,10 @@ describe(toDraftId, () => {
 });
 
 describe(toPublishedId, () => {
-  it.each(ID_FORMS)('turns %s into the published id', (_label, id) => {
-    expect(toPublishedId(id)).toBe(MOCK_PUBLISHED_ID);
-  });
+  it.each([...ID_FORMS, ['a release version id', MOCK_VERSION_ID] as const])(
+    'turns %s into the published id',
+    (_label, id) => {
+      expect(toPublishedId(id)).toBe(MOCK_PUBLISHED_ID);
+    },
+  );
 });
