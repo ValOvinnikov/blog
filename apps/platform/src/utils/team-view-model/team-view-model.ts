@@ -11,6 +11,7 @@ import { STUDIO_ACCESS, type TStudioAccess } from '@shinefold/config/constants';
 import { MEMBERSHIP_ROLE, type TMembershipRole } from '@shinefold/db/constants';
 import type { TPendingMembershipInvite } from '@shinefold/db/queries/membership-invites';
 import type { TTenantMember } from '@shinefold/db/queries/memberships';
+import { graceEndDate } from '@shinefold/db/utils/grace-end-date/grace-end-date';
 import { isSameLocalDay } from '@shinefold/utils/date';
 
 export type TTeamMemberRow = {
@@ -38,6 +39,8 @@ export type TTeamViewModel = {
   shownUsed: number;
   isFull: boolean;
   freeSeats: number;
+  seatsOver: number;
+  graceEndsAt: TMaybeUndefined<Date>;
   hasEditor: boolean;
   members: TTeamMemberRow[];
   invites: TTeamInviteRow[];
@@ -65,8 +68,12 @@ export const teamViewModel = (
   { tenant, viewer, currentUserId, members, invites }: TTeamViewModelInput,
   now: Date = new Date(),
 ): TTeamViewModel => {
-  const { seats } = tenant.entitlements;
+  const { entitlements, downgradeGraceStartedAt } = tenant;
+  const { seats } = entitlements;
   const used = members.length + invites.length;
+  const holding =
+    members.filter(({ lockedAt }) => !lockedAt).length + invites.length;
+  const seatsOver = Math.max(holding - seats, 0);
   const ownerCount = members.filter(
     ({ role }) => role === MEMBERSHIP_ROLE.OWNER,
   ).length;
@@ -76,9 +83,13 @@ export const teamViewModel = (
 
   return {
     seats,
-    shownUsed: Math.min(used, seats),
+    shownUsed: seatsOver > 0 ? holding : Math.min(used, seats),
     isFull: used >= seats,
     freeSeats: Math.max(seats - used, 0),
+    seatsOver,
+    graceEndsAt: downgradeGraceStartedAt
+      ? graceEndDate(downgradeGraceStartedAt)
+      : undefined,
     hasEditor: members.some(({ role }) => role === MEMBERSHIP_ROLE.EDITOR),
     members: members.map((member) => {
       const { membershipId, email, role, joinedAt, userId } = member;

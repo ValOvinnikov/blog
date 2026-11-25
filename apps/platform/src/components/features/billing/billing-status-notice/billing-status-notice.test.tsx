@@ -1,5 +1,9 @@
 import en from '@platform/i18n/messages/en.json';
 import {
+  MOCK_GRACE_ENDS_AT,
+  MOCK_GRACE_STARTED_AT,
+} from '@platform/testing/billing/grace';
+import {
   customRenderAsync,
   screen,
   within,
@@ -42,8 +46,6 @@ const envMock: Partial<Record<keyof typeof env, string>> = env;
 const { billingStatusNotice } = en;
 const t = makeEnTranslator('billingStatusNotice');
 
-const MOCK_GRACE_STARTED_AT = new Date('2026-11-01T22:15:00.000Z');
-const MOCK_GRACE_ENDS_AT = new Date('2026-11-15T00:00:00.000Z');
 const MOCK_GRACE_ENDS_ON = 'Nov 15, 2026';
 const MOCK_LOCKED_MEMBER_COUNT = 2;
 const MEMBERS_LINE = `On ${MOCK_GRACE_ENDS_ON}, 2 team members lose access to this site's admin.`;

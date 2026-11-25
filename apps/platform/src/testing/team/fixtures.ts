@@ -94,3 +94,5 @@ export const mockMemberStudioAccessTarget = (
   },
   ...overrides,
 });
+
+export const MOCK_SEATS_OVER_ONE_SEAT = 2;

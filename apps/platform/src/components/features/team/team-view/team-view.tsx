@@ -1,5 +1,6 @@
 import { InviteEditorControl } from '@platform/components/features/team/invite-editor-control';
 import { MembersTable } from '@platform/components/features/team/members-table';
+import { OverSeatsNotice } from '@platform/components/features/team/over-seats-notice';
 import { PendingInvitesTable } from '@platform/components/features/team/pending-invites-table';
 import { Alert } from '@platform/components/shared/alert';
 import { PageHeader } from '@platform/components/shared/page-header';
@@ -23,7 +24,8 @@ export const TeamView = ({ tenantId, plan, team }: TTeamViewProps) => {
   const t = useTranslations('teamPage');
   const tPlan = useTranslations('planNames');
   const { root, headerActions } = teamViewVariants();
-  const { seats, shownUsed, isFull, invites } = team;
+  const { seats, shownUsed, isFull, seatsOver, invites } = team;
+  const isOverSeats = seatsOver > 0;
 
   return (
     <div className={root()}>
@@ -35,21 +37,27 @@ export const TeamView = ({ tenantId, plan, team }: TTeamViewProps) => {
             <Text as="span" variant="meta">
               {t('seatsUsed', { used: shownUsed, seats })}
             </Text>
-            <InviteEditorControl
-              tenantId={tenantId}
-              plan={plan}
-              isFull={isFull}
-            />
+            {!isOverSeats && (
+              <InviteEditorControl
+                tenantId={tenantId}
+                plan={plan}
+                isFull={isFull}
+              />
+            )}
           </div>
         }
       />
-      {isFull && (
-        <Alert
-          id={TEAM_SEAT_NOTICE_ID}
-          type={ALERT_TYPE.INFO}
-          title={t('seatLimitTitle')}
-          description={t('seatLimitBody', { plan: tPlan(plan), seats })}
-        />
+      {isOverSeats ? (
+        <OverSeatsNotice plan={plan} team={team} />
+      ) : (
+        isFull && (
+          <Alert
+            id={TEAM_SEAT_NOTICE_ID}
+            type={ALERT_TYPE.INFO}
+            title={t('seatLimitTitle')}
+            description={t('seatLimitBody', { plan: tPlan(plan), seats })}
+          />
+        )
       )}
       <MembersTable tenantId={tenantId} team={team} />
       {hasLength(invites) && (

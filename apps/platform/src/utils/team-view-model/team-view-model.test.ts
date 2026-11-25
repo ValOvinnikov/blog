@@ -1,6 +1,10 @@
 import { TEAM_ROW_ACCESS } from '@platform/constants/team-access';
 import { mockAdmin } from '@platform/testing/admins/fixtures';
 import {
+  MOCK_GRACE_ENDS_AT,
+  MOCK_GRACE_STARTED_AT,
+} from '@platform/testing/billing/grace';
+import {
   mockOperatorViewer,
   mockViewer,
 } from '@platform/testing/memberships/fixtures';
@@ -72,6 +76,53 @@ describe(teamViewModel, () => {
       shownUsed: 3,
       isFull: true,
       freeSeats: 0,
+    });
+  });
+
+  it('counts the people over the seats and the grace deadline after a move down', () => {
+    const { seatsOver, graceEndsAt } = modelFor({
+      tenant: mockTenant({
+        plan: TENANT_PLAN.STARTER,
+        downgradeGraceStartedAt: MOCK_GRACE_STARTED_AT,
+      }),
+      members: [MOCK_OWNER, mockTenantMember({ membershipId: 'a' })],
+      invites: [mockPendingInvite()],
+    });
+
+    expect({ seatsOver, graceEndsAt }).toEqual({
+      seatsOver: 2,
+      graceEndsAt: MOCK_GRACE_ENDS_AT,
+    });
+  });
+
+  it('shows the real count of people holding a seat while over the seats', () => {
+    const { shownUsed, seatsOver } = modelFor({
+      tenant: mockTenant({ plan: TENANT_PLAN.STARTER }),
+      members: [MOCK_OWNER, mockTenantMember({ membershipId: 'a' })],
+      invites: [mockPendingInvite()],
+    });
+
+    expect({ shownUsed, seatsOver }).toEqual({ shownUsed: 3, seatsOver: 2 });
+  });
+
+  it('counts no one over the seats once the lock leaves only those who fit', () => {
+    const { shownUsed, seatsOver } = modelFor({
+      tenant: mockTenant({ plan: TENANT_PLAN.STARTER }),
+      members: [
+        MOCK_OWNER,
+        mockTenantMember({ membershipId: 'a', lockedAt: MOCK_JOINED_AT }),
+      ],
+    });
+
+    expect({ shownUsed, seatsOver }).toEqual({ shownUsed: 1, seatsOver: 0 });
+  });
+
+  it('counts no one over the seats and no deadline within the seats', () => {
+    const { seatsOver, graceEndsAt } = modelFor();
+
+    expect({ seatsOver, graceEndsAt }).toEqual({
+      seatsOver: 0,
+      graceEndsAt: undefined,
     });
   });
 

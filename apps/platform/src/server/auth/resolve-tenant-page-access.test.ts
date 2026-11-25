@@ -3,6 +3,7 @@ import {
   mockOperatorViewer,
   mockViewer,
 } from '@platform/testing/memberships/fixtures';
+import { MOCK_SEATS_OVER_ONE_SEAT } from '@platform/testing/team/fixtures';
 import {
   MOCK_TENANT_ID,
   mockReadyTenant,
@@ -18,11 +19,17 @@ import {
 import { resolveTenantPageAccess } from './resolve-tenant-page-access';
 
 vi.mock('@shinefold/db', () => ({
-  queries: { leads: { countLeadsForTenant: vi.fn() } },
+  queries: {
+    leads: { countLeadsForTenant: vi.fn() },
+    membershipInvites: { countUnlockedSeatsInUse: vi.fn() },
+  },
 }));
 
 const MOCK_STORED_LEAD_COUNT = 2;
 const countLeadsForTenant = vi.mocked(queries.leads.countLeadsForTenant);
+const countUnlockedSeatsInUse = vi.mocked(
+  queries.membershipInvites.countUnlockedSeatsInUse,
+);
 
 const resolveFor = (plan: TTenantPlan, role: TMembershipRole) =>
   resolveTenantPageAccess(
@@ -34,6 +41,8 @@ describe(resolveTenantPageAccess, () => {
   beforeEach(() => {
     countLeadsForTenant.mockReset();
     countLeadsForTenant.mockResolvedValue(0);
+    countUnlockedSeatsInUse.mockReset();
+    countUnlockedSeatsInUse.mockResolvedValue(1);
   });
 
   it('opens Leads to an owner on a plan with the contact form', async () => {
@@ -131,5 +140,26 @@ describe(resolveTenantPageAccess, () => {
     const { team } = await resolveFor(plan, role);
 
     expect(team).toBe(isOpen);
+  });
+
+  it.each([
+    ['a Starter owner', TENANT_PLAN.STARTER, MEMBERSHIP_ROLE.OWNER, true],
+    ['a Free owner', TENANT_PLAN.FREE, MEMBERSHIP_ROLE.OWNER, true],
+    ['a Starter editor', TENANT_PLAN.STARTER, MEMBERSHIP_ROLE.EDITOR, false],
+  ])(
+    'opens Team to %s while the site is over its seats: %s',
+    async (_label, plan, role, isOpen) => {
+      countUnlockedSeatsInUse.mockResolvedValue(MOCK_SEATS_OVER_ONE_SEAT);
+
+      const { team } = await resolveFor(plan, role);
+
+      expect(team).toBe(isOpen);
+    },
+  );
+
+  it('counts no seats when the plan already opens Team', async () => {
+    await resolveFor(TENANT_PLAN.GROWTH, MEMBERSHIP_ROLE.OWNER);
+
+    expect(countUnlockedSeatsInUse).not.toHaveBeenCalled();
   });
 });

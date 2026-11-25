@@ -2,7 +2,11 @@ import messages from '@platform/i18n/messages/en.json';
 import { customRenderAsync, screen } from '@platform/testing/custom-render';
 import { mockMembership } from '@platform/testing/memberships/fixtures';
 import { mockDbConstants } from '@platform/testing/mock-db-constants';
-import { mockTenantMember } from '@platform/testing/team/fixtures';
+import {
+  MOCK_SEATS_OVER_ONE_SEAT,
+  mockTenantMember,
+} from '@platform/testing/team/fixtures';
+import { mockTeamOwner } from '@platform/testing/team/team-view';
 import {
   MOCK_TENANT_ID,
   mockReadyTenant,
@@ -18,10 +22,12 @@ const {
   listMembershipsWithTenantsForUserMock,
   listTenantMembersMock,
   listPendingMembershipInvitesMock,
+  countUnlockedSeatsInUseMock,
 } = vi.hoisted(() => ({
   listMembershipsWithTenantsForUserMock: vi.fn(),
   listTenantMembersMock: vi.fn(),
   listPendingMembershipInvitesMock: vi.fn(),
+  countUnlockedSeatsInUseMock: vi.fn(),
 }));
 
 vi.mock('@platform/server/auth/auth');
@@ -41,6 +47,7 @@ vi.mock('@shinefold/db', async () => ({
     },
     membershipInvites: {
       listPendingMembershipInvites: listPendingMembershipInvitesMock,
+      countUnlockedSeatsInUse: countUnlockedSeatsInUseMock,
     },
     admins: { getAdminByUserId: vi.fn(async () => undefined) },
     leads: { countLeadsForTenant: vi.fn(async () => 0) },
@@ -64,6 +71,7 @@ describe(`<${DashboardTeamPage.name}/>`, () => {
       mockTenantMember({ role: MEMBERSHIP_ROLE.OWNER }),
     ]);
     listPendingMembershipInvitesMock.mockResolvedValue([]);
+    countUnlockedSeatsInUseMock.mockResolvedValue(1);
   });
 
   it("shows the owner their site's team on Growth", async () => {
@@ -89,5 +97,26 @@ describe(`<${DashboardTeamPage.name}/>`, () => {
     await expect(setup()).rejects.toThrow(NEXT_NAVIGATION_ERROR.NEXT_NOT_FOUND);
 
     expect(listTenantMembersMock).not.toHaveBeenCalled();
+  });
+
+  it('shows the owner of a Starter site over its seats its team, with no Invite editor', async () => {
+    signInAs(MEMBERSHIP_ROLE.OWNER, TENANT_PLAN.STARTER);
+    countUnlockedSeatsInUseMock.mockResolvedValue(MOCK_SEATS_OVER_ONE_SEAT);
+    listTenantMembersMock.mockResolvedValue([
+      mockTeamOwner(),
+      mockTenantMember(),
+    ]);
+
+    await setup();
+    const heading = screen.getByRole('heading', {
+      level: 1,
+      name: messages.teamPage.title,
+    });
+    const invite = screen.queryByRole('button', {
+      name: messages.teamPage.inviteEditor,
+    });
+
+    expect(heading).toBeVisible();
+    expect(invite).not.toBeInTheDocument();
   });
 });

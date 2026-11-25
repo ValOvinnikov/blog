@@ -10,6 +10,7 @@ import {
 import { makeEnTranslator } from '@platform/testing/en-translator';
 import { mockMembership } from '@platform/testing/memberships/fixtures';
 import { mockDbConstants } from '@platform/testing/mock-db-constants';
+import { MOCK_SEATS_OVER_ONE_SEAT } from '@platform/testing/team/fixtures';
 import {
   MOCK_OTHER_TENANT_DOMAIN,
   MOCK_OTHER_TENANT_ID,
@@ -34,12 +35,14 @@ const {
   listTenantsMock,
   getAdminByUserIdMock,
   countLeadsForTenantMock,
+  countUnlockedSeatsInUseMock,
   cookiesMock,
 } = vi.hoisted(() => ({
   listMembershipsWithTenantsForUserMock: vi.fn(),
   listTenantsMock: vi.fn(),
   getAdminByUserIdMock: vi.fn(),
   countLeadsForTenantMock: vi.fn(),
+  countUnlockedSeatsInUseMock: vi.fn(),
   cookiesMock: vi.fn(),
 }));
 
@@ -63,6 +66,7 @@ vi.mock('@shinefold/db', async () => ({
     leads: {
       countLeadsForTenant: countLeadsForTenantMock,
     },
+    membershipInvites: { countUnlockedSeatsInUse: countUnlockedSeatsInUseMock },
   },
 }));
 
@@ -97,6 +101,7 @@ describe(`<${DashboardTenantLayout.name}/>`, () => {
     getAdminByUserIdMock.mockResolvedValue(undefined);
     listTenantsMock.mockResolvedValue([MOCK_FREE_TENANT]);
     countLeadsForTenantMock.mockResolvedValue(0);
+    countUnlockedSeatsInUseMock.mockResolvedValue(1);
     listMembershipsWithTenantsForUserMock.mockResolvedValue([
       { membership: MOCK_FREE_MEMBERSHIP, tenant: MOCK_FREE_TENANT },
       { membership: MOCK_GROWTH_MEMBERSHIP, tenant: MOCK_GROWTH_TENANT },
@@ -151,6 +156,12 @@ describe(`<${DashboardTenantLayout.name}/>`, () => {
       expect(switcher).not.toBeInTheDocument();
     });
 
+    it('offers no Team on Free within its seats', () => {
+      const teamLink = screen.queryByRole('link', { name: navSections.team });
+
+      expect(teamLink).not.toBeInTheDocument();
+    });
+
     it('links the nav to /dashboard pages, without a Platform section', () => {
       const lookLink = screen.getByRole('link', { name: navSections.look });
       const platformSection = screen.queryByRole('navigation', {
@@ -193,5 +204,17 @@ describe(`<${DashboardTenantLayout.name}/>`, () => {
     expect(content).toBeVisible();
     expect(platformRole).toBeVisible();
     expect(ownerRole).not.toBeInTheDocument();
+  });
+
+  it('offers Team to the owner of a Free site over its seats', async () => {
+    listMembershipsWithTenantsForUserMock.mockResolvedValue([
+      { membership: MOCK_FREE_MEMBERSHIP, tenant: MOCK_FREE_TENANT },
+    ]);
+    countUnlockedSeatsInUseMock.mockResolvedValue(MOCK_SEATS_OVER_ONE_SEAT);
+
+    await setup();
+    const teamLink = screen.getByRole('link', { name: navSections.team });
+
+    expect(teamLink).toHaveAttribute('href', adminRoutes.dashboardTeam());
   });
 });
