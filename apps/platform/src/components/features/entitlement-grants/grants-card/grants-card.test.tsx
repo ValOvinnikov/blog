@@ -25,6 +25,7 @@ import { ACTION_OUTCOME, LOCALE_ISO_CODES } from '@shinefold/config';
 import {
   CAPABILITY,
   MODULE_PACK,
+  PRESET_ID,
   TENANT_PLAN,
 } from '@shinefold/config/constants';
 import { DAY_MS, ENTITLEMENT_KIND } from '@shinefold/db/constants';
@@ -143,6 +144,25 @@ describe(`<${GrantsCard.name}/>`, () => {
       makeEnTranslator('grantItemNames')('languages', { count: 3 }),
     );
     const kind = screen.getByText(grantsCard.kind.LOCALE_LIMIT);
+
+    expect(item).toBeVisible();
+    expect(kind).toBeVisible();
+  });
+
+  it('names a preset grant by the preset', () => {
+    setup({
+      grants: [
+        mockGrantRow({
+          kind: ENTITLEMENT_KIND.PRESET,
+          key: PRESET_ID.SHINEFOLD,
+        }),
+      ],
+    });
+
+    const item = screen.getByText(
+      en.grantItemNames.preset[PRESET_ID.SHINEFOLD],
+    );
+    const kind = screen.getByText(grantsCard.kind.PRESET);
 
     expect(item).toBeVisible();
     expect(kind).toBeVisible();

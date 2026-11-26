@@ -2700,6 +2700,7 @@
   "grantEntitlement": {
     "trigger": "Diesem Mandanten gewähren",
     "triggerAriaLabel": "Diesem Mandanten gewähren: {item}",
+    "presetTrigger": "Vorlage {preset} gewähren",
     "title": "{item} für {tenant} gewähren",
     "description": "{tenant} erhält {item} außerhalb des Tarifs {plan}. Der Inhaber sieht die Funktion freigeschaltet und kann sie einschalten. Es entstehen keine Kosten.",
     "granted": "{item} gewährt.",
@@ -2745,6 +2746,9 @@
       "CORE": "Core-Module",
       "STARTER": "Starter-Module",
       "GROWTH": "Growth-Module"
+    },
+    "preset": {
+      "SHINEFOLD": "Shinefold-Vorlage"
     },
     "lookField": {
       "preset": "Vorlage",
@@ -2800,6 +2804,7 @@
     "kind": {
       "CAPABILITY": "Funktion",
       "LOOK_FIELD": "Look",
+      "PRESET": "Vorlage",
       "MODULE_PACK": "Modulpaket",
       "LOCALE_LIMIT": "Sprachen"
     },

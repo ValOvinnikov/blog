@@ -2700,6 +2700,7 @@
   "grantEntitlement": {
     "trigger": "Aan deze tenant toekennen",
     "triggerAriaLabel": "Aan deze tenant toekennen: {item}",
+    "presetTrigger": "Voorinstelling {preset} toekennen",
     "title": "{item} toekennen aan {tenant}",
     "description": "{tenant} krijgt {item} buiten het {plan}-abonnement. De eigenaar ziet het ontgrendeld en kan het inschakelen. Er wordt niets in rekening gebracht.",
     "granted": "{item} toegekend.",
@@ -2745,6 +2746,9 @@
       "CORE": "Core-modules",
       "STARTER": "Starter-modules",
       "GROWTH": "Growth-modules"
+    },
+    "preset": {
+      "SHINEFOLD": "Shinefold-voorinstelling"
     },
     "lookField": {
       "preset": "Voorinstelling",
@@ -2800,6 +2804,7 @@
     "kind": {
       "CAPABILITY": "Functie",
       "LOOK_FIELD": "Look",
+      "PRESET": "Voorinstelling",
       "MODULE_PACK": "Modulepakket",
       "LOCALE_LIMIT": "Talen"
     },

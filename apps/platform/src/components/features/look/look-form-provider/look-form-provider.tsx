@@ -1,5 +1,6 @@
 'use client';
 
+import type { TLookGrants } from '@platform/components/features/look/look-form/look-form-tenant';
 import type { TLookCard } from '@platform/constants/look-card';
 import type { TPreviewDevice } from '@platform/constants/preview';
 import type { TBrandAssetKind } from '@platform/utils/brand-asset-limits/brand-asset-limits';
@@ -8,7 +9,6 @@ import type {
   TLookFormFieldSetter,
   TLookFormValues,
 } from '@platform/utils/default-look-values/default-look-values';
-import type { TGrantAccess } from '@platform/utils/grant-target/grant-target';
 import type { TPresetSeededField } from '@platform/utils/look-preset/look-preset';
 import type { TMaybeUndefined, TPresetId } from '@shinefold/config';
 import type { IWithChildren } from '@shinefold/config/react';
@@ -17,7 +17,7 @@ import { createContext, useContext } from 'react';
 
 export type TLookFormContext = {
   tenantName: string;
-  grants: TGrantAccess<TLookField>;
+  grants: TLookGrants;
   values: TLookFormValues;
   presets: readonly TPresetId[];
   updateField: TLookFormFieldSetter;

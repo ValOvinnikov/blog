@@ -1,6 +1,7 @@
 import {
   SITE_THEME_BUTTON_STYLE_TEST_ID,
   SITE_THEME_FRAME_ATTRIBUTE,
+  SITE_THEME_PRESET_STYLE_TEST_ID,
   SKIN_ATTRIBUTE,
 } from '@platform/constants/site-theme-frame';
 import { toScopedDeclarationsCss } from '@platform/utils/scoped-declarations-css/scoped-declarations-css';
@@ -27,6 +28,7 @@ export const SiteThemeFrame = ({
     tokenStyle,
     skinScopeTokens,
     buttonStyleBlock,
+    presetStyleBlock,
     isDark,
     headingFontFamily,
     bodyFontFamily,
@@ -58,6 +60,11 @@ export const SiteThemeFrame = ({
       {buttonStyleBlock && (
         <style data-testid={SITE_THEME_BUTTON_STYLE_TEST_ID}>
           {buttonStyleBlock}
+        </style>
+      )}
+      {presetStyleBlock && (
+        <style data-testid={SITE_THEME_PRESET_STYLE_TEST_ID}>
+          {presetStyleBlock}
         </style>
       )}
       {children}

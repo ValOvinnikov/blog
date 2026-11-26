@@ -1,4 +1,5 @@
 import type { SIZE, TFontChoice } from '@shinefold/config';
+import type { ReactNode } from 'react';
 
 export type TPresetSwatch = {
   glyph: string;
@@ -13,4 +14,5 @@ export type TPresetOption<TId extends string> = {
   name: string;
   description: string;
   swatch: TPresetSwatch;
+  badge?: ReactNode;
 };

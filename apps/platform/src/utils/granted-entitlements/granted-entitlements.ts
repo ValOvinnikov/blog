@@ -1,8 +1,10 @@
 import {
   CAPABILITY,
   CAPABILITY_PARENT,
+  GRANTABLE_PRESET_IDS,
   MODULE_PACK,
   type TCapability,
+  type TGrantablePresetId,
   type TModulePack,
   type TTenantPlan,
 } from '@shinefold/config/constants';
@@ -27,6 +29,7 @@ export type TGrantedEntitlements = {
   capabilities: Partial<Record<TCapability, TGrantProvenance>>;
   lookFields: Partial<Record<TLookField, TGrantProvenance>>;
   modulePacks: Partial<Record<TModulePack, TGrantProvenance>>;
+  presets: Partial<Record<TGrantablePresetId, TGrantProvenance>>;
   localeLimit: TMaybeUndefined<TGrantProvenance>;
 };
 
@@ -65,6 +68,7 @@ export const grantedEntitlements = (
     capabilities: {},
     lookFields: {},
     modulePacks: {},
+    presets: {},
     localeLimit: undefined,
   };
 
@@ -94,6 +98,13 @@ export const grantedEntitlements = (
     ) {
       if (!planEntitlements.modulePacks.includes(key)) {
         record(granted.modulePacks, key, expiresAt);
+      }
+    } else if (
+      kind === ENTITLEMENT_KIND.PRESET &&
+      isOneOf(GRANTABLE_PRESET_IDS, key)
+    ) {
+      if (!planEntitlements.unlockedPresets.includes(key)) {
+        record(granted.presets, key, expiresAt);
       }
     } else if (
       kind === ENTITLEMENT_KIND.LOCALE_LIMIT &&

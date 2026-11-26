@@ -30,6 +30,7 @@ import {
   CAPABILITY,
   MODULE_PACK,
   NEXT_NAVIGATION_ERROR,
+  PRESET_ID,
   TENANT_PLAN,
 } from '@shinefold/config';
 import { ERROR_CODE } from '@shinefold/config/constants';
@@ -173,6 +174,32 @@ describe(grantEntitlementAction, () => {
     expect(grantEntitlement).toHaveBeenCalledWith(
       expectedGrantInput({ item: MOCK_LOCALE_LIMIT_ITEM }),
     );
+  });
+
+  it('passes a Shinefold preset grant through as the item', async () => {
+    const presetItem = {
+      kind: ENTITLEMENT_KIND.PRESET,
+      key: PRESET_ID.SHINEFOLD,
+    } as const;
+
+    const result = await grant({ item: presetItem });
+
+    expect(result).toEqual({ outcome: ACTION_OUTCOME.SUCCESS });
+    expect(grantEntitlement).toHaveBeenCalledWith(
+      expectedGrantInput({ item: presetItem }),
+    );
+  });
+
+  it('rejects a preset every tenant already has', async () => {
+    const result = await grant({
+      item: { kind: ENTITLEMENT_KIND.PRESET, key: PRESET_ID.CONSOLE },
+    });
+
+    expect(result).toEqual({
+      outcome: ACTION_OUTCOME.INVALID,
+      fieldErrors: {},
+    });
+    expect(grantEntitlement).not.toHaveBeenCalled();
   });
 
   it.each([
