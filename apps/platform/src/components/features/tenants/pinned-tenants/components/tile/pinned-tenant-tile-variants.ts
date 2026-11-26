@@ -10,7 +10,7 @@ export const pinnedTenantTileVariants = tv({
       'max-md:w-64 max-md:shrink-0 max-md:snap-start',
     ],
     link: [
-      'col-span-2 row-start-1 grid grid-cols-subgrid content-start gap-y-2.5 p-3',
+      'col-span-2 col-start-1 row-start-1 grid grid-cols-subgrid content-start gap-y-2.5 p-3',
       'rounded-platform-control border border-platform-control-line bg-platform-surface',
       'hover:bg-platform-hover-tint',
       COLOUR_TRANSITION_CLASSES,
