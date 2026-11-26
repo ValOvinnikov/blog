@@ -2,8 +2,8 @@ import { hasLength } from '@shinefold/utils/primitives';
 
 import { COLOR_SCHEME } from '@shinefold/config/constants';
 
-import { findPairFailures, type TContrastFailure } from './contrast-check';
-import { KNOWN_CONTRAST_FAILURES } from './contrast-known-failures';
+import { findPairFailures } from './contrast-check';
+import { isKnownFailure } from './contrast-known-failures';
 import {
   CONTRAST_PAIRS,
   type TContrastPair,
@@ -20,20 +20,6 @@ const ACCENT_PAIRS: Partial<Record<TContrastPairId, TContrastPair>> =
 const SCHEME_SCOPES = Object.values(COLOR_SCHEME).map((scheme) => ({
   scheme,
 }));
-
-const FAILURE_CASE_KEYS = [
-  'pair',
-  'surface',
-  'scheme',
-  'cardStyle',
-  'headerControlStyle',
-  'navLinkStyle',
-] as const satisfies readonly (keyof TContrastFailure)[];
-
-const isKnownFailure = (failure: TContrastFailure): boolean =>
-  KNOWN_CONTRAST_FAILURES.some((known) =>
-    FAILURE_CASE_KEYS.every((key) => known[key] === failure[key]),
-  );
 
 export const findFailingAccentPairs = (hue: number): TContrastPairId[] => [
   ...new Set(

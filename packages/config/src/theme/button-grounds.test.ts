@@ -8,7 +8,7 @@ import {
 import {
   readCssBlock,
   readCssDeclarations,
-  readThemeCss,
+  readDefaultRoleScopes,
 } from '@shinefold/config/testing/theme-css';
 import type { TMaybeUndefined } from '@shinefold/config/types';
 
@@ -25,7 +25,6 @@ import {
   BUTTON_FILL_HOVER,
   BUTTON_LABEL,
 } from './contrast-surfaces';
-import { formatSkinCss } from './skin-css';
 
 const MOCK_ACCENT_HUE = 65;
 const MOCK_DARK_GREY = '#1a1a1a';
@@ -70,26 +69,11 @@ const resolveIn = (
     : value;
 };
 
-const MOCK_THEME_CSS = readThemeCss();
-
-const DEFAULT_SCOPES = [
-  ['the page', MOCK_THEME_CSS, ':root'],
-  ['the dark page', MOCK_THEME_CSS, '.dark'],
-  ...Object.values(BRAND_VARIANT).flatMap((variant) => [
-    [`the ${variant} band`, formatSkinCss(), `[data-skin='${variant}']`],
-    [
-      `the dark ${variant} band`,
-      formatSkinCss(),
-      `.dark [data-skin='${variant}']`,
-    ],
-  ]),
-];
-
 describe('the button roles with no button colour', () => {
-  it.each(DEFAULT_SCOPES)(
+  it.each(readDefaultRoleScopes())(
     'equal the accent solid roles on %s',
     (_scope, css, selector) => {
-      const declarations = readCssDeclarations(readCssBlock(css!, selector!));
+      const declarations = readCssDeclarations(readCssBlock(css, selector));
       const mismatched = BUTTON_TO_ACCENT_ROLES.filter(
         ([button, accent]) =>
           !declarations[accent!] ||
