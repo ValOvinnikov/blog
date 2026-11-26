@@ -12,10 +12,13 @@ import {
   within,
 } from '@platform/testing/custom-render';
 import {
+  mockEmptyPersonalDataExport,
+  mockPersonalDataExport,
+} from '@platform/testing/data-requests/export-fixtures';
+import {
   MOCK_DATA_REQUEST_EMAIL,
   MOCK_DATA_REQUEST_SITE_NAME,
   mockDataRequestMatch,
-  mockPersonalDataExport,
   mockPersonalDataReaderAccount,
 } from '@platform/testing/data-requests/fixtures';
 import { makeEnTranslator } from '@platform/testing/en-translator';
@@ -149,26 +152,43 @@ describe(`<${DataRequestPanel.name}/>`, () => {
     expect(table).not.toBeInTheDocument();
   });
 
-  it('says in one line that nothing is held, with no table, export or erasure', async () => {
-    lookUpPersonalDataActionMock.mockResolvedValueOnce({
-      outcome: ACTION_OUTCOME.SUCCESS,
-      matches: [],
-      readerAccount: undefined,
+  describe('after a lookup that finds nothing', () => {
+    beforeEach(async () => {
+      lookUpPersonalDataActionMock.mockResolvedValueOnce({
+        outcome: ACTION_OUTCOME.SUCCESS,
+        matches: [],
+        readerAccount: undefined,
+      });
+      exportPersonalDataActionMock.mockResolvedValueOnce({
+        outcome: ACTION_OUTCOME.SUCCESS,
+        data: mockEmptyPersonalDataExport(),
+      });
+      await lookUp();
     });
 
-    await lookUp();
+    it('says in one line that nothing is held, with downloads but no table or erasure', async () => {
+      const summary = await screen.findByText(
+        t('dataRequestResultCard.matchCount', { count: 0 }),
+      );
+      const table = screen.queryByRole('region', RESULTS_TABLE);
+      const jsonButton = screen.getByRole('button', EXPORT_JSON_BUTTON);
+      const csvButton = screen.getByRole('button', EXPORT_CSV_BUTTON);
+      const eraseButton = screen.queryByRole('button', ERASE_BUTTON);
 
-    const summary = await screen.findByText(
-      t('dataRequestResultCard.matchCount', { count: 0 }),
-    );
-    const table = screen.queryByRole('region', RESULTS_TABLE);
-    const exportButton = screen.queryByRole('button', EXPORT_JSON_BUTTON);
-    const eraseButton = screen.queryByRole('button', ERASE_BUTTON);
+      expect(summary).toBeVisible();
+      expect(table).not.toBeInTheDocument();
+      expect(jsonButton).toBeVisible();
+      expect(csvButton).toBeVisible();
+      expect(eraseButton).not.toBeInTheDocument();
+    });
 
-    expect(summary).toBeVisible();
-    expect(table).not.toBeInTheDocument();
-    expect(exportButton).not.toBeInTheDocument();
-    expect(eraseButton).not.toBeInTheDocument();
+    it('downloads a JSON export stating that no data is held', async () => {
+      await exportAs(EXPORT_JSON_BUTTON);
+
+      const [, , content] = downloadFileMock.mock.lastCall ?? [];
+
+      expect(JSON.parse(content)).toMatchObject({ isDataHeld: false });
+    });
   });
 
   describe('after a lookup that finds records', () => {

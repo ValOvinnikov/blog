@@ -7,14 +7,17 @@ import {
   type TDataRequestFailure,
   type TDataRequestInput,
 } from '@platform/server/data-requests/run-data-request';
+import { toDataRequestMatches } from '@platform/server/data-requests/to-data-request-matches';
 import { ACTION_OUTCOME, AUDIT_ACTION } from '@shinefold/config';
 import { queries } from '@shinefold/db';
 import type { TPersonalDataMatches } from '@shinefold/db/queries/personal-data/find-personal-data';
+import { hasLength } from '@shinefold/utils/primitives';
 
 export type TPersonalDataExportHeader = {
   generatedAt: string;
   searchedEmail: string;
   operatorId: string;
+  isDataHeld: boolean;
 };
 
 export type TPersonalDataExport = TPersonalDataExportHeader &
@@ -53,6 +56,7 @@ export const exportPersonalDataAction = async (
       generatedAt: new Date().toISOString(),
       searchedEmail: input.email.trim(),
       operatorId: userId,
+      isDataHeld: hasLength(toDataRequestMatches(result.data)),
       subscribers,
       leads,
       membershipInvites,

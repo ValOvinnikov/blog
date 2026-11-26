@@ -3000,6 +3000,14 @@
         "file": "packages/config/src/constants/icon.ts"
       }
     ],
+    "PIN": [
+      {
+        "ref": "ICONS.PIN",
+        "scope": "config",
+        "from": "@shinefold/config/constants",
+        "file": "packages/config/src/constants/icon.ts"
+      }
+    ],
     "FULL_BLEED": [
       {
         "ref": "IMAGE_LAYOUT.FULL_BLEED",

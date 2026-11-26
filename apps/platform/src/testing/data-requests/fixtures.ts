@@ -1,8 +1,6 @@
 import { faker } from '@faker-js/faker';
 import { DATA_REQUEST_MATCH_KIND } from '@platform/constants/data-request';
-import type { TPersonalDataExport } from '@platform/server/data-requests/export-personal-data-action';
 import type { TDataRequestMatch } from '@platform/server/data-requests/to-data-request-matches';
-import { mockAdmin } from '@platform/testing/admins/fixtures';
 import { AUDIT_ACTION, AUDIT_TARGET_TYPE } from '@shinefold/config';
 import { MEMBERSHIP_ROLE, SUBSCRIBER_STATUS } from '@shinefold/db/constants';
 import type { TPersonalDataMatches } from '@shinefold/db/queries/personal-data/find-personal-data';
@@ -124,33 +122,6 @@ export const mockPersonalDataMatches = (
   ],
   ...overrides,
 });
-
-export const mockPersonalDataExport = (): TPersonalDataExport => {
-  const {
-    subscribers,
-    leads,
-    membershipInvites,
-    unsentStudioReinvites,
-    selfServeOwnerSites,
-    readerAccount,
-    blockedSignupIdentities,
-    auditEvents,
-  } = mockPersonalDataMatches();
-
-  return {
-    generatedAt: MOCK_EXPORT_GENERATED_AT.toISOString(),
-    searchedEmail: MOCK_DATA_REQUEST_EMAIL,
-    operatorId: mockAdmin().userId,
-    subscribers,
-    leads,
-    membershipInvites,
-    unsentStudioReinvites,
-    selfServeOwnerSites,
-    readerAccount,
-    blockedSignupIdentities,
-    auditEvents,
-  };
-};
 
 export const mockDataRequestMatch = (
   overrides: Partial<TDataRequestMatch> = {},

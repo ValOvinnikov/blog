@@ -28,6 +28,7 @@ export * from './email-template';
 export * from './email-type';
 export * from './embed';
 export * from './error';
+export * from './feature-icon';
 export * from './finding';
 export * from './footer-fine-print';
 export * from './footer-layout';

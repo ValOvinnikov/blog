@@ -2,23 +2,13 @@ import {
   PRESET_ID,
   PRESET_REGISTRY,
   resolveTenantEmailBrand,
-  type TPresetId,
+  type TMaybeUndefined,
+  type TResolveTenantEmailBrandInput,
   type TTenantEmailBrand,
 } from '@shinefold/config';
 
-type TSiteConfigBrandRow = {
-  preset: TPresetId;
-  accentHue: number;
-  logoHue?: number;
-};
-
-/**
- * Builds a tenant's resolved email brand from a `site_config` row (or
- * `undefined`, when no row exists or the fetch failed), falling back to the
- * Console preset the same way `toThemeTokens` does for the site itself.
- */
 export const toTenantEmailBrand = (
-  row: TSiteConfigBrandRow | undefined,
+  row: TMaybeUndefined<TResolveTenantEmailBrandInput>,
 ): TTenantEmailBrand => {
   const preset = row?.preset ?? PRESET_ID.CONSOLE;
   const base = PRESET_REGISTRY[preset].themeTokens;
@@ -27,5 +17,6 @@ export const toTenantEmailBrand = (
     preset,
     accentHue: row?.accentHue ?? base.accentHue,
     logoHue: row?.logoHue ?? base.logoHue,
+    buttonColor: row?.buttonColor,
   });
 };
