@@ -4,7 +4,11 @@ import {
   buildContentSecurityPolicy,
   FRAME_ANCESTORS_NONE,
 } from '@web/config/content-security-policy';
-import { CACHE_CONTROL, ROBOTS_DIRECTIVE } from '@web/constants/http';
+import {
+  CACHE_CONTROL,
+  CACHE_CONTROL_HEADER,
+  ROBOTS_DIRECTIVE,
+} from '@web/constants/http';
 import {
   PREVIEW_TOKEN_HEADER,
   PREVIEW_TOKEN_QUERY_PARAM,
@@ -22,7 +26,7 @@ const buildDraftPreviewHeaders = (): Record<string, string> => ({
     toPlatformFrameAncestor(),
     EMBED_ORIGINS,
   ),
-  'Cache-Control': CACHE_CONTROL.PRIVATE_NO_STORE,
+  [CACHE_CONTROL_HEADER]: CACHE_CONTROL.PRIVATE_NO_STORE,
   'Referrer-Policy': 'no-referrer',
   'X-Robots-Tag': ROBOTS_DIRECTIVE.NOINDEX,
 });

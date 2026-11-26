@@ -1,8 +1,7 @@
 import { faker } from '@faker-js/faker';
 import { BILLING_CURRENCY } from '@shinefold/db/constants';
 import { COUNTRY_CODE } from '@web/constants/country';
-import { CACHE_CONTROL } from '@web/constants/http';
-import { CACHE_CONTROL_HEADER } from '@web/testing/shared/http/constants';
+import { CACHE_CONTROL, CACHE_CONTROL_HEADER } from '@web/constants/http';
 import {
   VISITOR_COUNTRY_HEADER,
   VISITOR_CURRENCY_PATH,
