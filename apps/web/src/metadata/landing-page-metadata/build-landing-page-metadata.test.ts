@@ -2,6 +2,7 @@ import { faker } from '@faker-js/faker';
 import { LOCALE_ISO_CODES, routes } from '@shinefold/config';
 import { urlForSanityImage } from '@shinefold/service';
 import { errorResult, okResult } from '@shinefold/utils';
+import { LANDING_PAGE_LOG } from '@web/constants/landing-page';
 import { getRequestContext } from '@web/server/request-context/request-context';
 import {
   MOCK_BILINGUAL_REQUEST_CONTEXT,
@@ -111,7 +112,7 @@ describe(buildLandingPageMetadata, () => {
 
       expect(metadata).toEqual({});
       expect(vi.mocked(logger.error)).toHaveBeenCalledWith(
-        'landing_page_metadata.fetch_failed',
+        LANDING_PAGE_LOG.METADATA_FETCH_FAILED,
         { path: MOCK_MISSING_PATH, error: MOCK_ERROR },
       );
     });

@@ -6,6 +6,7 @@ import {
   type TMaybeUndefined,
 } from '@shinefold/config';
 import { EMAIL_TEMPLATE_DEFAULT_COPY_BY_LOCALE } from '@shinefold/db/constants';
+import { NEWSLETTER_LOG } from '@web/constants/newsletter';
 import {
   mockEmailConfig,
   mockEmailTemplate,
@@ -30,12 +31,6 @@ vi.mock('@shinefold/db', async () => ({
 }));
 
 faker.seed(5802);
-
-const EMAIL_CONFIG_FETCH_FAILED_EVENT =
-  'newsletter_email_settings.email_config_fetch_failed';
-const EMAIL_TEMPLATE_FETCH_FAILED_EVENT =
-  'newsletter_email_settings.email_template_fetch_failed';
-const REPLY_TO_INVALID_EVENT = 'newsletter_email_settings.reply_to_invalid';
 
 const MOCK_FROM_ADDRESS = faker.internet.email();
 const MOCK_CONFIGURED_FROM_ADDRESS = `${faker.company.name()} <${MOCK_FROM_ADDRESS}>`;
@@ -173,19 +168,33 @@ describe(resolveNewsletterEmailSettings, () => {
 
     expect(replyTo).toBeUndefined();
     expect(vi.mocked(logger.warn)).toHaveBeenCalledWith(
-      REPLY_TO_INVALID_EVENT,
+      NEWSLETTER_LOG.REPLY_TO_INVALID,
       { tenantId: MOCK_TENANT_ID },
     );
   });
 
-  it('falls back to product defaults and logs when the email config read fails', async () => {
-    getEmailConfigMock.mockRejectedValue(MOCK_ERROR);
+  describe('when the email config read fails', () => {
+    beforeEach(() => {
+      getEmailConfigMock.mockRejectedValue(MOCK_ERROR);
+    });
 
-    await expect(resolve()).resolves.toEqual(DEFAULT_SETTINGS);
-    expect(vi.mocked(logger.warn)).toHaveBeenCalledWith(
-      EMAIL_CONFIG_FETCH_FAILED_EVENT,
-      { tenantId: MOCK_TENANT_ID, error: MOCK_ERROR },
-    );
+    it('falls back to product defaults and logs when the email config read fails', async () => {
+      await expect(resolve()).resolves.toEqual(DEFAULT_SETTINGS);
+      expect(vi.mocked(logger.warn)).toHaveBeenCalledWith(
+        NEWSLETTER_LOG.EMAIL_CONFIG_FETCH_FAILED,
+        { tenantId: MOCK_TENANT_ID, error: MOCK_ERROR },
+      );
+    });
+
+    it('keeps the per-template logo when the email config read fails', async () => {
+      getEmailTemplateMock.mockResolvedValue(
+        mockEmailTemplate({ logoAssetUrl: MOCK_TEMPLATE_LOGO_URL }),
+      );
+
+      const { logoImageUrl } = await resolve();
+
+      expect(logoImageUrl).toBe(MOCK_TEMPLATE_LOGO_URL);
+    });
   });
 
   it.each([LOCALE_ISO_CODES.EN, LOCALE_ISO_CODES.FR])(
@@ -200,22 +209,11 @@ describe(resolveNewsletterEmailSettings, () => {
         body,
       });
       expect(vi.mocked(logger.warn)).toHaveBeenCalledWith(
-        EMAIL_TEMPLATE_FETCH_FAILED_EVENT,
+        NEWSLETTER_LOG.EMAIL_TEMPLATE_FETCH_FAILED,
         { tenantId: MOCK_TENANT_ID, error: MOCK_ERROR },
       );
     },
   );
-
-  it('keeps the per-template logo when the email config read fails', async () => {
-    getEmailConfigMock.mockRejectedValue(MOCK_ERROR);
-    getEmailTemplateMock.mockResolvedValue(
-      mockEmailTemplate({ logoAssetUrl: MOCK_TEMPLATE_LOGO_URL }),
-    );
-
-    const { logoImageUrl } = await resolve();
-
-    expect(logoImageUrl).toBe(MOCK_TEMPLATE_LOGO_URL);
-  });
 
   it('keeps the email config values when the template read fails', async () => {
     const { subject, body } = defaultCopyFor(LOCALE_ISO_CODES.EN);

@@ -1,4 +1,6 @@
 import { routes } from '@shinefold/config';
+import { OG_TYPE } from '@web/constants/metadata';
+import { POST_LOG } from '@web/constants/post';
 import { toLocalizedPageMetadata } from '@web/metadata/to-localized-page-metadata';
 import { getPostPage } from '@web/server/post/get-post-page/get-post-page';
 import { logger } from '@web/utils/logger/logger';
@@ -8,7 +10,7 @@ export const buildPostMetadata = async (slug: string): Promise<Metadata> => {
   const result = await getPostPage(slug);
 
   if (!result.ok) {
-    logger.error('post_metadata.fetch_failed', { slug, error: result.error });
+    logger.error(POST_LOG.METADATA_FETCH_FAILED, { slug, error: result.error });
     return {};
   }
 
@@ -24,7 +26,7 @@ export const buildPostMetadata = async (slug: string): Promise<Metadata> => {
       language,
       href: routes.post(translatedSlug),
     })),
-    ogType: 'article',
+    ogType: OG_TYPE.ARTICLE,
     article: {
       publishedTime: publishedAt,
       authors: [author.name],

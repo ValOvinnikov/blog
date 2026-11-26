@@ -11630,6 +11630,22 @@
         "file": "apps/web/src/constants/account.ts"
       }
     ],
+    "account.export_failed": [
+      {
+        "ref": "ACCOUNT_LOG.EXPORT_FAILED",
+        "scope": "app:web",
+        "from": "@web/constants/account",
+        "file": "apps/web/src/constants/account.ts"
+      }
+    ],
+    "account.delete_failed": [
+      {
+        "ref": "ACCOUNT_LOG.DELETE_FAILED",
+        "scope": "app:web",
+        "from": "@web/constants/account",
+        "file": "apps/web/src/constants/account.ts"
+      }
+    ],
     "bar_backgrounds.site_config_fetch_failed": [
       {
         "ref": "BAR_BACKGROUNDS_LOG.SITE_CONFIG_FETCH_FAILED",
@@ -11662,6 +11678,14 @@
         "file": "apps/web/src/constants/bookmark.ts"
       }
     ],
+    "bookmarks_page.posts_resolve_failed": [
+      {
+        "ref": "BOOKMARK_LOG.PAGE_POSTS_RESOLVE_FAILED",
+        "scope": "app:web",
+        "from": "@web/constants/bookmark",
+        "file": "apps/web/src/constants/bookmark.ts"
+      }
+    ],
     "busy_style.site_config_fetch_failed": [
       {
         "ref": "BUSY_STYLE_LOG.SITE_CONFIG_FETCH_FAILED",
@@ -11676,6 +11700,14 @@
         "scope": "app:web",
         "from": "@web/constants/client-log",
         "file": "apps/web/src/constants/client-log.ts"
+      }
+    ],
+    "copy_to_clipboard.write_failed": [
+      {
+        "ref": "CLIPBOARD_LOG.WRITE_FAILED",
+        "scope": "app:web",
+        "from": "@web/constants/clipboard",
+        "file": "apps/web/src/constants/clipboard.ts"
       }
     ],
     "UNKNOWN": [
@@ -11732,6 +11764,54 @@
         "scope": "app:web",
         "from": "@web/constants/contact-form",
         "file": "apps/web/src/constants/contact-form.ts"
+      }
+    ],
+    "contact_form.lead_store_failed": [
+      {
+        "ref": "CONTACT_FORM_LOG.LEAD_STORE_FAILED",
+        "scope": "app:web",
+        "from": "@web/constants/contact-form",
+        "file": "apps/web/src/constants/contact-form.ts"
+      }
+    ],
+    "contact_form.tenant_unresolved": [
+      {
+        "ref": "CONTACT_FORM_LOG.TENANT_UNRESOLVED",
+        "scope": "app:web",
+        "from": "@web/constants/contact-form",
+        "file": "apps/web/src/constants/contact-form.ts"
+      }
+    ],
+    "contact_form.notification_send_failed": [
+      {
+        "ref": "CONTACT_FORM_LOG.NOTIFICATION_SEND_FAILED",
+        "scope": "app:web",
+        "from": "@web/constants/contact-form",
+        "file": "apps/web/src/constants/contact-form.ts"
+      }
+    ],
+    "contact_form.platform_url_missing": [
+      {
+        "ref": "CONTACT_FORM_LOG.PLATFORM_URL_MISSING",
+        "scope": "app:web",
+        "from": "@web/constants/contact-form",
+        "file": "apps/web/src/constants/contact-form.ts"
+      }
+    ],
+    "contact_form.submit_blocked": [
+      {
+        "ref": "CONTACT_FORM_LOG.SUBMIT_BLOCKED",
+        "scope": "app:web",
+        "from": "@web/constants/contact-form",
+        "file": "apps/web/src/constants/contact-form.ts"
+      }
+    ],
+    "content_module.fetch_failed": [
+      {
+        "ref": "CONTENT_LOG.MODULE_FETCH_FAILED",
+        "scope": "app:web",
+        "from": "@web/constants/content",
+        "file": "apps/web/src/constants/content.ts"
       }
     ],
     "FIRST_PARTY": [
@@ -12238,6 +12318,14 @@
         "file": "apps/web/src/constants/faq.ts"
       }
     ],
+    "feature_highlights_module.fetch_failed": [
+      {
+        "ref": "FEATURE_HIGHLIGHTS_LOG.MODULE_FETCH_FAILED",
+        "scope": "app:web",
+        "from": "@web/constants/feature-highlights",
+        "file": "apps/web/src/constants/feature-highlights.ts"
+      }
+    ],
     "feature_list_module.fetch_failed": [
       {
         "ref": "FEATURE_LIST_LOG.MODULE_FETCH_FAILED",
@@ -12518,6 +12606,22 @@
         "file": "apps/web/src/constants/hero-statement.ts"
       }
     ],
+    "home_page.metadata_fetch_failed": [
+      {
+        "ref": "HOME_PAGE_LOG.METADATA_FETCH_FAILED",
+        "scope": "app:web",
+        "from": "@web/constants/home-page",
+        "file": "apps/web/src/constants/home-page.ts"
+      }
+    ],
+    "home_page.fetch_failed": [
+      {
+        "ref": "HOME_PAGE_LOG.PAGE_FETCH_FAILED",
+        "scope": "app:web",
+        "from": "@web/constants/home-page",
+        "file": "apps/web/src/constants/home-page.ts"
+      }
+    ],
     "private, no-store": [
       {
         "ref": "CACHE_CONTROL.PRIVATE_NO_STORE",
@@ -12596,6 +12700,46 @@
         "scope": "app:web",
         "from": "@web/constants/internal-pages",
         "file": "apps/web/src/constants/internal-pages.ts"
+      }
+    ],
+    "landing_page_metadata.fetch_failed": [
+      {
+        "ref": "LANDING_PAGE_LOG.METADATA_FETCH_FAILED",
+        "scope": "app:web",
+        "from": "@web/constants/landing-page",
+        "file": "apps/web/src/constants/landing-page.ts"
+      }
+    ],
+    "landing_redirect.fetch_failed": [
+      {
+        "ref": "LANDING_PAGE_LOG.REDIRECT_FETCH_FAILED",
+        "scope": "app:web",
+        "from": "@web/constants/landing-page",
+        "file": "apps/web/src/constants/landing-page.ts"
+      }
+    ],
+    "landing_page.fetch_failed": [
+      {
+        "ref": "LANDING_PAGE_LOG.PAGE_FETCH_FAILED",
+        "scope": "app:web",
+        "from": "@web/constants/landing-page",
+        "file": "apps/web/src/constants/landing-page.ts"
+      }
+    ],
+    "landing_breadcrumbs.fetch_failed": [
+      {
+        "ref": "LANDING_PAGE_LOG.BREADCRUMBS_FETCH_FAILED",
+        "scope": "app:web",
+        "from": "@web/constants/landing-page",
+        "file": "apps/web/src/constants/landing-page.ts"
+      }
+    ],
+    "logo_wall_module.fetch_failed": [
+      {
+        "ref": "LOGO_WALL_LOG.MODULE_FETCH_FAILED",
+        "scope": "app:web",
+        "from": "@web/constants/logo-wall",
+        "file": "apps/web/src/constants/logo-wall.ts"
       }
     ],
     "website": [
@@ -12814,6 +12958,54 @@
         "file": "apps/web/src/constants/newsletter.ts"
       }
     ],
+    "newsletter.confirm_tenant_not_active": [
+      {
+        "ref": "NEWSLETTER_LOG.CONFIRM_TENANT_NOT_ACTIVE",
+        "scope": "app:web",
+        "from": "@web/constants/newsletter",
+        "file": "apps/web/src/constants/newsletter.ts"
+      }
+    ],
+    "newsletter.confirm_failed": [
+      {
+        "ref": "NEWSLETTER_LOG.CONFIRM_FAILED",
+        "scope": "app:web",
+        "from": "@web/constants/newsletter",
+        "file": "apps/web/src/constants/newsletter.ts"
+      }
+    ],
+    "newsletter_email_settings.email_config_fetch_failed": [
+      {
+        "ref": "NEWSLETTER_LOG.EMAIL_CONFIG_FETCH_FAILED",
+        "scope": "app:web",
+        "from": "@web/constants/newsletter",
+        "file": "apps/web/src/constants/newsletter.ts"
+      }
+    ],
+    "newsletter_email_settings.email_template_fetch_failed": [
+      {
+        "ref": "NEWSLETTER_LOG.EMAIL_TEMPLATE_FETCH_FAILED",
+        "scope": "app:web",
+        "from": "@web/constants/newsletter",
+        "file": "apps/web/src/constants/newsletter.ts"
+      }
+    ],
+    "newsletter_email_settings.reply_to_invalid": [
+      {
+        "ref": "NEWSLETTER_LOG.REPLY_TO_INVALID",
+        "scope": "app:web",
+        "from": "@web/constants/newsletter",
+        "file": "apps/web/src/constants/newsletter.ts"
+      }
+    ],
+    "newsletter.subscribe_blocked": [
+      {
+        "ref": "NEWSLETTER_LOG.SUBSCRIBE_BLOCKED",
+        "scope": "app:web",
+        "from": "@web/constants/newsletter",
+        "file": "apps/web/src/constants/newsletter.ts"
+      }
+    ],
     "post_featured_module.fetch_failed": [
       {
         "ref": "POST_FEATURED_LOG.MODULE_FETCH_FAILED",
@@ -12889,6 +13081,30 @@
     "blog_post_page.fetch_failed": [
       {
         "ref": "POST_LOG.PAGE_FETCH_FAILED",
+        "scope": "app:web",
+        "from": "@web/constants/post",
+        "file": "apps/web/src/constants/post.ts"
+      }
+    ],
+    "post_metadata.fetch_failed": [
+      {
+        "ref": "POST_LOG.METADATA_FETCH_FAILED",
+        "scope": "app:web",
+        "from": "@web/constants/post",
+        "file": "apps/web/src/constants/post.ts"
+      }
+    ],
+    "post_breadcrumbs.fetch_failed": [
+      {
+        "ref": "POST_LOG.BREADCRUMBS_FETCH_FAILED",
+        "scope": "app:web",
+        "from": "@web/constants/post",
+        "file": "apps/web/src/constants/post.ts"
+      }
+    ],
+    "blog_posting_schema.fetch_failed": [
+      {
+        "ref": "POST_LOG.BLOG_POSTING_SCHEMA_FETCH_FAILED",
         "scope": "app:web",
         "from": "@web/constants/post",
         "file": "apps/web/src/constants/post.ts"
@@ -13294,6 +13510,22 @@
         "file": "apps/web/src/constants/rss.ts"
       }
     ],
+    "tag_rss.tag_fetch_failed": [
+      {
+        "ref": "RSS_LOG.TAG_FETCH_FAILED",
+        "scope": "app:web",
+        "from": "@web/constants/rss",
+        "file": "apps/web/src/constants/rss.ts"
+      }
+    ],
+    "tag_rss.posts_fetch_failed": [
+      {
+        "ref": "RSS_LOG.TAG_POSTS_FETCH_FAILED",
+        "scope": "app:web",
+        "from": "@web/constants/rss",
+        "file": "apps/web/src/constants/rss.ts"
+      }
+    ],
     "section_appearance.site_config_fetch_failed": [
       {
         "ref": "SECTION_APPEARANCE_LOG.SITE_CONFIG_FETCH_FAILED",
@@ -13340,6 +13572,22 @@
         "scope": "app:web",
         "from": "@web/constants/section-index",
         "file": "apps/web/src/constants/section-index.ts"
+      }
+    ],
+    "section_pages_module.missing_landing_page_context": [
+      {
+        "ref": "SECTION_PAGES_LOG.MISSING_LANDING_PAGE_CONTEXT",
+        "scope": "app:web",
+        "from": "@web/constants/section-pages",
+        "file": "apps/web/src/constants/section-pages.ts"
+      }
+    ],
+    "section_pages_module.fetch_failed": [
+      {
+        "ref": "SECTION_PAGES_LOG.MODULE_FETCH_FAILED",
+        "scope": "app:web",
+        "from": "@web/constants/section-pages",
+        "file": "apps/web/src/constants/section-pages.ts"
       }
     ],
     "authenticated": [
@@ -13470,6 +13718,14 @@
         "file": "apps/web/src/constants/site-config.ts"
       }
     ],
+    "language_switcher_style.site_config_fetch_failed": [
+      {
+        "ref": "SITE_CONFIG_LOG.LANGUAGE_SWITCHER_STYLE_FETCH_FAILED",
+        "scope": "app:web",
+        "from": "@web/constants/site-config",
+        "file": "apps/web/src/constants/site-config.ts"
+      }
+    ],
     "sitemap.site_url_missing": [
       {
         "ref": "SITEMAP_LOG.SITE_URL_MISSING",
@@ -13582,6 +13838,14 @@
         "file": "apps/web/src/constants/tag-index.ts"
       }
     ],
+    "tag_index_metadata.fetch_failed": [
+      {
+        "ref": "TAG_INDEX_LOG.METADATA_FETCH_FAILED",
+        "scope": "app:web",
+        "from": "@web/constants/tag-index",
+        "file": "apps/web/src/constants/tag-index.ts"
+      }
+    ],
     "tag_page.fetch_failed": [
       {
         "ref": "TAG_LOG.PAGE_FETCH_FAILED",
@@ -13686,6 +13950,14 @@
         "file": "apps/web/src/constants/topic-index.ts"
       }
     ],
+    "topic_index_metadata.fetch_failed": [
+      {
+        "ref": "TOPIC_INDEX_LOG.METADATA_FETCH_FAILED",
+        "scope": "app:web",
+        "from": "@web/constants/topic-index",
+        "file": "apps/web/src/constants/topic-index.ts"
+      }
+    ],
     "topic_page.fetch_failed": [
       {
         "ref": "TOPIC_LOG.PAGE_FETCH_FAILED",
@@ -13708,6 +13980,22 @@
         "scope": "app:web",
         "from": "@web/constants/topic",
         "file": "apps/web/src/constants/topic.ts"
+      }
+    ],
+    "topics.fetch_failed": [
+      {
+        "ref": "TOPIC_LOG.LIST_FETCH_FAILED",
+        "scope": "app:web",
+        "from": "@web/constants/topic",
+        "file": "apps/web/src/constants/topic.ts"
+      }
+    ],
+    "translation_map.fetch_failed": [
+      {
+        "ref": "TRANSLATION_MAP_LOG.FETCH_FAILED",
+        "scope": "app:web",
+        "from": "@web/constants/translation-map",
+        "file": "apps/web/src/constants/translation-map.ts"
       }
     ],
     "access_run.workflow_call_started": [

@@ -3,6 +3,7 @@ import { EMAIL_ACCOUNT } from '@shinefold/config/constants';
 import { queries } from '@shinefold/db';
 import { buildOwnerNoticeEmailTag, sendEmail } from '@shinefold/email';
 import type * as TEmail from '@shinefold/email';
+import { CONTACT_FORM_LOG } from '@web/constants/contact-form';
 import { mockLeadInput } from '@web/testing/server/contact-form/fixtures';
 import { firstSentEmail } from '@web/testing/server/newsletter/fixtures';
 import {
@@ -99,7 +100,7 @@ describe(sendContactNotification, () => {
     expect(sendEmail).toHaveBeenCalledOnce();
     expect(html).not.toContain(MOCK_PLATFORM_URL);
     expect(logger.warn).toHaveBeenCalledWith(
-      'contact_form.platform_url_missing',
+      CONTACT_FORM_LOG.PLATFORM_URL_MISSING,
     );
   });
 

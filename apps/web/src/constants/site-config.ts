@@ -6,4 +6,6 @@ export const SITE_CONFIG_LOG = {
   ANALYTICS_FETCH_FAILED: 'site_config.analytics_fetch_failed',
   VOICE_RICH_FETCH_FAILED: 'voice_rich.fetch_failed',
   COLOR_MODE_FETCH_FAILED: 'color_mode.site_config_fetch_failed',
+  LANGUAGE_SWITCHER_STYLE_FETCH_FAILED:
+    'language_switcher_style.site_config_fetch_failed',
 } as const;

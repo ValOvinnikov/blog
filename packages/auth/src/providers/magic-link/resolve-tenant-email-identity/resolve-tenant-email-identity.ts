@@ -5,6 +5,7 @@ import {
 } from '@shinefold/config';
 import type { TLocaleIsoCode } from '@shinefold/config/constants';
 import { queries } from '@shinefold/db';
+import { toEffectiveLookWithin } from '@shinefold/db/utils/effective-look/effective-look';
 import { resolveTenantEntitlements } from '@shinefold/db/utils/resolve-tenant-entitlements/resolve-tenant-entitlements';
 
 export type TResolvedTenantEmailIdentity = {
@@ -31,18 +32,29 @@ export async function resolveTenantEmailIdentity(
     ]);
     if (!siteConfig) return undefined;
 
+    const entitlements = resolveTenantEntitlements(
+      tenant.plan,
+      grants,
+      new Date(),
+    );
+    const { preset, accentHue, logoHue, buttonColor } = toEffectiveLookWithin(
+      siteConfig,
+      entitlements,
+    );
+
     return {
       brand: resolveTenantEmailBrand({
-        preset: siteConfig.preset,
-        accentHue: siteConfig.accentHue,
-        logoHue: siteConfig.logoHue,
+        preset,
+        accentHue,
+        logoHue,
+        buttonColor,
       }),
       brandName: tenant.name,
       tenantId: tenant.id,
       defaultLocale: tenant.locale,
       liveLocales: queries.tenants.selectLiveLocalesWithin(
         tenant,
-        resolveTenantEntitlements(tenant.plan, grants, new Date()),
+        entitlements,
       ),
     };
   } catch {

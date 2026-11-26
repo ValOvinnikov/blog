@@ -1,6 +1,7 @@
 import { faker } from '@faker-js/faker';
 import { LOCALE_ISO_CODES, routes } from '@shinefold/config';
 import { errorResult, okResult } from '@shinefold/utils';
+import { HOME_PAGE_LOG } from '@web/constants/home-page';
 import { getRequestContext } from '@web/server/request-context/request-context';
 import {
   MOCK_BILINGUAL_REQUEST_CONTEXT,
@@ -10,6 +11,7 @@ import {
 } from '@web/testing/metadata/to-metadata/fixtures';
 import { MOCK_ERROR } from '@web/testing/shared/error/fixtures';
 import { logger } from '@web/utils/logger/logger';
+import type { Metadata } from 'next';
 
 import { buildHomePageMetadata } from './build-home-page-metadata';
 
@@ -55,7 +57,7 @@ describe(buildHomePageMetadata, () => {
 
       expect(metadata).toEqual({});
       expect(vi.mocked(logger.error)).toHaveBeenCalledWith(
-        'home_page.metadata_fetch_failed',
+        HOME_PAGE_LOG.METADATA_FETCH_FAILED,
         { error: MOCK_ERROR },
       );
     });
@@ -71,19 +73,19 @@ describe(buildHomePageMetadata, () => {
   });
 
   describe('when only this Home exists', () => {
-    beforeEach(() => {
+    let metadata: Metadata;
+
+    beforeEach(async () => {
       getHomePageMock.mockResolvedValue(homePage([EN]));
+
+      metadata = await buildHomePageMetadata();
     });
 
-    it('uses the seo title as the absolute title', async () => {
-      const metadata = await buildHomePageMetadata();
-
+    it('uses the seo title as the absolute title', () => {
       expect(metadata.title).toEqual({ absolute: MOCK_SEO.title });
     });
 
-    it('is self-canonical to / with no languages', async () => {
-      const metadata = await buildHomePageMetadata();
-
+    it('is self-canonical to / with no languages', () => {
       expect(metadata.alternates).toEqual({ canonical: HOME_PATH });
     });
   });

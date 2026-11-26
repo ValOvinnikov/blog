@@ -3,6 +3,7 @@ import { LOCALE_ISO_CODES, REDIRECT_STATUS } from '@shinefold/config';
 import { NEXT_NAVIGATION_ERROR } from '@shinefold/config/constants';
 import { service } from '@shinefold/service';
 import { errorResult, okResult } from '@shinefold/utils';
+import { LANDING_PAGE_LOG } from '@web/constants/landing-page';
 import { permanentRedirect, redirect } from '@web/i18n/navigation';
 import { getRequestContext } from '@web/server/request-context/request-context';
 import { MOCK_ERROR } from '@web/testing/shared/error/fixtures';
@@ -96,10 +97,13 @@ describe(redirectMovedLandingPage, () => {
     await redirectMovedLandingPage(MISSING, MOCK_OLD_PATH);
 
     expect(permanentRedirect).not.toHaveBeenCalled();
-    expect(logger.error).toHaveBeenCalledWith('landing_redirect.fetch_failed', {
-      path: MOCK_OLD_PATH,
-      error: MOCK_ERROR,
-    });
+    expect(logger.error).toHaveBeenCalledWith(
+      LANDING_PAGE_LOG.REDIRECT_FETCH_FAILED,
+      {
+        path: MOCK_OLD_PATH,
+        error: MOCK_ERROR,
+      },
+    );
   });
 
   it.each([

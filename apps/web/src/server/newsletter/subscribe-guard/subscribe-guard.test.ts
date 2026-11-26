@@ -1,5 +1,6 @@
 import { faker } from '@faker-js/faker';
 import { FORWARDED_FOR_HEADER } from '@shinefold/utils/client-key';
+import { NEWSLETTER_LOG } from '@web/constants/newsletter';
 import { MOCK_ERROR } from '@web/testing/shared/error/fixtures';
 import { MOCK_TENANT_ID } from '@web/testing/shared/tenant/fixtures';
 
@@ -22,7 +23,6 @@ vi.mock('@web/utils/env/env');
 
 faker.seed(7411);
 
-const SUBSCRIBE_BLOCKED_EVENT = 'newsletter.subscribe_blocked';
 const MOCK_CLIENT_IP = faker.internet.ipv4();
 const MOCK_OTHER_CLIENT_IP = faker.internet.ipv4();
 const MOCK_KV_URL = faker.internet.url();
@@ -50,6 +50,8 @@ const loadGuard = async ({ withKvStore = false } = {}) => {
   };
 };
 
+type TGuard = Awaited<ReturnType<typeof loadGuard>>;
+
 describe(isSubscribeAttemptRefused, () => {
   beforeEach(() => {
     vi.useFakeTimers();
@@ -61,80 +63,83 @@ describe(isSubscribeAttemptRefused, () => {
     vi.useRealTimers();
   });
 
-  it('allows five attempts from one address and refuses the sixth', async () => {
-    const { isRefused } = await loadGuard();
+  describe('without a rate-limit store', () => {
+    let isRefused: TGuard['isRefused'];
+    let warnMock: TGuard['warnMock'];
 
-    const refusals: boolean[] = [];
-    for (let i = 0; i <= ATTEMPTS_BEFORE_REFUSAL; i += 1) {
-      refusals.push(await isRefused(MOCK_TENANT_ID));
-    }
-
-    expect(refusals).toEqual([false, false, false, false, false, true]);
-  });
-
-  it('counts each address separately', async () => {
-    const { isRefused } = await loadGuard();
-    for (let i = 0; i <= ATTEMPTS_BEFORE_REFUSAL; i += 1) {
-      await isRefused(MOCK_TENANT_ID);
-    }
-
-    headersMock.mockResolvedValue(clientHeaders(MOCK_OTHER_CLIENT_IP));
-
-    await expect(isRefused(MOCK_TENANT_ID)).resolves.toBe(false);
-  });
-
-  it('refuses a bot without counting it against the address, and logs it', async () => {
-    const { isRefused, warnMock } = await loadGuard();
-    checkBotIdMock.mockResolvedValue({ isBot: true });
-
-    await expect(isRefused(MOCK_TENANT_ID)).resolves.toBe(true);
-    expect(warnMock).toHaveBeenCalledWith(SUBSCRIBE_BLOCKED_EVENT, {
-      reason: 'bot',
-    });
-    expect(headersMock).not.toHaveBeenCalled();
-  });
-
-  it('refuses and logs, without counting against the address, when BotID errors', async () => {
-    const { isRefused, warnMock } = await loadGuard();
-    checkBotIdMock.mockRejectedValue(MOCK_ERROR);
-
-    await expect(isRefused(MOCK_TENANT_ID)).resolves.toBe(true);
-    expect(warnMock).toHaveBeenCalledWith(SUBSCRIBE_BLOCKED_EVENT, {
-      reason: 'bot_check_unavailable',
-      error: MOCK_ERROR,
-    });
-    expect(headersMock).not.toHaveBeenCalled();
-  });
-
-  it('refuses and logs when the rate-limit store errors', async () => {
-    createRedisRateLimitStoreMock.mockReturnValue({
-      increment: vi.fn().mockRejectedValue(MOCK_ERROR),
-    });
-    const { isRefused, warnMock } = await loadGuard({
-      withKvStore: true,
+    beforeEach(async () => {
+      ({ isRefused, warnMock } = await loadGuard());
     });
 
-    await expect(isRefused(MOCK_TENANT_ID)).resolves.toBe(true);
-    expect(warnMock).toHaveBeenCalledWith(SUBSCRIBE_BLOCKED_EVENT, {
-      reason: 'rate_limit_store_unavailable',
-      error: MOCK_ERROR,
+    it('allows five attempts from one address and refuses the sixth', async () => {
+      const refusals: boolean[] = [];
+      for (let i = 0; i <= ATTEMPTS_BEFORE_REFUSAL; i += 1) {
+        refusals.push(await isRefused(MOCK_TENANT_ID));
+      }
+
+      expect(refusals).toEqual([false, false, false, false, false, true]);
+    });
+
+    it('counts each address separately', async () => {
+      for (let i = 0; i <= ATTEMPTS_BEFORE_REFUSAL; i += 1) {
+        await isRefused(MOCK_TENANT_ID);
+      }
+
+      headersMock.mockResolvedValue(clientHeaders(MOCK_OTHER_CLIENT_IP));
+
+      await expect(isRefused(MOCK_TENANT_ID)).resolves.toBe(false);
+    });
+
+    it('refuses a bot without counting it against the address, and logs it', async () => {
+      checkBotIdMock.mockResolvedValue({ isBot: true });
+
+      await expect(isRefused(MOCK_TENANT_ID)).resolves.toBe(true);
+      expect(warnMock).toHaveBeenCalledWith(NEWSLETTER_LOG.SUBSCRIBE_BLOCKED, {
+        reason: 'bot',
+      });
+      expect(headersMock).not.toHaveBeenCalled();
+    });
+
+    it('refuses and logs, without counting against the address, when BotID errors', async () => {
+      checkBotIdMock.mockRejectedValue(MOCK_ERROR);
+
+      await expect(isRefused(MOCK_TENANT_ID)).resolves.toBe(true);
+      expect(warnMock).toHaveBeenCalledWith(NEWSLETTER_LOG.SUBSCRIBE_BLOCKED, {
+        reason: 'bot_check_unavailable',
+        error: MOCK_ERROR,
+      });
+      expect(headersMock).not.toHaveBeenCalled();
     });
   });
 
-  it('refuses and logs when the rate-limit store cannot be configured', async () => {
-    createRedisRateLimitStoreMock.mockImplementation(() => {
-      throw MOCK_ERROR;
-    });
-    const { isRefused, warnMock } = await loadGuard({
-      withKvStore: true,
-    });
+  it.each([
+    {
+      failure: 'errors',
+      arrangeStore: () =>
+        createRedisRateLimitStoreMock.mockReturnValue({
+          increment: vi.fn().mockRejectedValue(MOCK_ERROR),
+        }),
+    },
+    {
+      failure: 'cannot be configured',
+      arrangeStore: () =>
+        createRedisRateLimitStoreMock.mockImplementation(() => {
+          throw MOCK_ERROR;
+        }),
+    },
+  ])(
+    'refuses and logs when the rate-limit store $failure',
+    async ({ arrangeStore }) => {
+      arrangeStore();
+      const { isRefused, warnMock } = await loadGuard({ withKvStore: true });
 
-    await expect(isRefused(MOCK_TENANT_ID)).resolves.toBe(true);
-    expect(warnMock).toHaveBeenCalledWith(SUBSCRIBE_BLOCKED_EVENT, {
-      reason: 'rate_limit_store_unavailable',
-      error: MOCK_ERROR,
-    });
-  });
+      await expect(isRefused(MOCK_TENANT_ID)).resolves.toBe(true);
+      expect(warnMock).toHaveBeenCalledWith(NEWSLETTER_LOG.SUBSCRIBE_BLOCKED, {
+        reason: 'rate_limit_store_unavailable',
+        error: MOCK_ERROR,
+      });
+    },
+  );
 
   it('refuses when the store does not answer in time', async () => {
     createRedisRateLimitStoreMock.mockReturnValue({
