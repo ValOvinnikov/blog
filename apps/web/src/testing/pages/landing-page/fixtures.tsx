@@ -3,6 +3,7 @@ import {
   CONTENT_ALIGNMENT,
 } from '@shinefold/config/constants';
 import type {
+  TLandingAdjacentPages,
   TLandingPage,
   TLandingSectionNavigation,
 } from '@shinefold/service';
@@ -68,3 +69,11 @@ export const mockLandingSectionNavigation = (
     ...overrides,
   };
 };
+
+export const mockLandingAdjacentPages = (
+  overrides: Partial<TLandingAdjacentPages> = {},
+): TLandingAdjacentPages => ({
+  previous: { title: MOCK_SECTION_ROOT_TITLE, path: MOCK_SECTION_ROOT_PATH },
+  next: { title: MOCK_SECTION_PRICING_TITLE, path: MOCK_SECTION_PRICING_PATH },
+  ...overrides,
+});
