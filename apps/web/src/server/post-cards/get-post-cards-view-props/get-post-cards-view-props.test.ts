@@ -26,46 +26,26 @@ const MOCK_MODULE_DATA = mockPostLatestModuleData({
 });
 
 describe(getPostCardsViewProps, () => {
-  it("builds the view's section from the module's brand, layout and appearance", async () => {
-    const { section } = await getPostCardsViewProps(
-      MOCK_REQUEST_CONTEXT.tenantId,
-      MOCK_MODULE_DATA,
-      MOCK_IDS,
-    );
-
-    expect(section).toEqual({
-      brandVariant: MOCK_MODULE_DATA.brandVariant,
-      layout: MOCK_MODULE_DATA.layout,
-      appearance: {
-        overrides: MOCK_SECTION_STYLE_OVERRIDES,
-        look: MOCK_SECTION_LOOK,
-      },
-    });
-  });
-
-  it('passes the heading, alignment and ids through to the view', async () => {
+  it("assembles the view's props from the module data and its card section", async () => {
     const viewProps = await getPostCardsViewProps(
       MOCK_REQUEST_CONTEXT.tenantId,
       MOCK_MODULE_DATA,
       MOCK_IDS,
     );
 
-    expect(viewProps).toEqual(
-      expect.objectContaining({
-        headingBlock: MOCK_MODULE_DATA.headingBlock,
-        contentAlignment: MOCK_MODULE_DATA.contentAlignment,
-        ...MOCK_IDS,
-      }),
-    );
-  });
-
-  it('maps each post to a card item', async () => {
-    const { items } = await getPostCardsViewProps(
-      MOCK_REQUEST_CONTEXT.tenantId,
-      MOCK_MODULE_DATA,
-      MOCK_IDS,
-    );
-
-    expect(items).toEqual([expect.objectContaining({ id: MOCK_POST.id })]);
+    expect(viewProps).toEqual({
+      section: {
+        brandVariant: MOCK_MODULE_DATA.brandVariant,
+        layout: MOCK_MODULE_DATA.layout,
+        appearance: {
+          overrides: MOCK_SECTION_STYLE_OVERRIDES,
+          look: MOCK_SECTION_LOOK,
+        },
+      },
+      items: [expect.objectContaining({ id: MOCK_POST.id })],
+      headingBlock: MOCK_MODULE_DATA.headingBlock,
+      contentAlignment: MOCK_MODULE_DATA.contentAlignment,
+      ...MOCK_IDS,
+    });
   });
 });

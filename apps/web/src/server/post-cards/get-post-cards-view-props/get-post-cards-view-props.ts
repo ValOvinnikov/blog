@@ -1,6 +1,5 @@
 import type { TMaybeUndefined } from '@shinefold/config';
 import type { TPostCard } from '@shinefold/service';
-import type { IMediaCardData } from '@web/components/shared/media-card-item';
 import type { IPostCardsSectionProps } from '@web/components/shared/post-cards-section';
 import type { TModuleSection } from '@web/components/shared/section';
 import {
@@ -18,20 +17,22 @@ export type TPostCardsViewIds = Pick<
   'titleId' | 'dataTestId'
 >;
 
-export interface IPostCardsViewProps
-  extends
-    TPostCardsViewIds,
-    Pick<IPostCardsSectionProps, 'headingBlock' | 'contentAlignment'> {
-  section: TModuleSection;
-  items: IMediaCardData[];
-}
+export type TPostCardsViewProps = Pick<
+  IPostCardsSectionProps,
+  | 'section'
+  | 'items'
+  | 'headingBlock'
+  | 'contentAlignment'
+  | 'titleId'
+  | 'dataTestId'
+>;
 
 export const getPostCardsViewProps = async (
   tenantId: TMaybeUndefined<string>,
   data: TPostCardsModuleData,
   ids: TPostCardsViewIds,
   renderImage?: (post: TPostCard) => ReactNode,
-): Promise<IPostCardsViewProps> => {
+): Promise<TPostCardsViewProps> => {
   const { brandVariant, layout, headingBlock, contentAlignment } = data;
   const { items, appearance } = await getPostCardsSection(
     tenantId,
