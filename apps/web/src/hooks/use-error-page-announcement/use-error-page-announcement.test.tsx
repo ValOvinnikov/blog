@@ -1,4 +1,5 @@
 import { faker } from '@faker-js/faker';
+import type { TErrorPageProps } from '@web/components/shared/error-page-layout';
 import { ERROR_BOUNDARY_LOG } from '@web/constants/error-boundary';
 import { renderHook } from '@web/testing/custom-render';
 import { MOCK_ERROR_WITH_DIGEST } from '@web/testing/shared/error/fixtures';
@@ -14,20 +15,24 @@ const MOCK_ANNOUNCEMENT = faker.lorem.sentence();
 const MOCK_REFRESHED_ANNOUNCEMENT = faker.lorem.sentence();
 const MOCK_NEXT_ERROR = new Error(faker.lorem.sentence());
 
+interface IHookProps extends Pick<TErrorPageProps, 'error'> {
+  announcement: string;
+}
+
+const MOCK_INITIAL_PROPS: IHookProps = {
+  error: MOCK_ERROR_WITH_DIGEST,
+  announcement: MOCK_ANNOUNCEMENT,
+};
+
 const setup = () =>
   renderHook(
-    ({ error, announcement }) =>
+    ({ error, announcement }: IHookProps) =>
       useErrorPageAnnouncement({
         error,
         logEvent: ERROR_BOUNDARY_LOG.LOCALE_RENDER_FAILED,
         announcement,
       }),
-    {
-      initialProps: {
-        error: MOCK_ERROR_WITH_DIGEST,
-        announcement: MOCK_ANNOUNCEMENT,
-      },
-    },
+    { initialProps: MOCK_INITIAL_PROPS },
   );
 
 describe(useErrorPageAnnouncement, () => {
