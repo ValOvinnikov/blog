@@ -7,7 +7,6 @@ import type {
 } from '@platform/components/features/tenants/tenant-details-panel/tenant-details-values';
 import { FormField } from '@platform/components/shared/form-field';
 import { TextInput } from '@platform/components/shared/text-input';
-import { TENANT_DETAILS_FIELD } from '@platform/constants/tenant-details-field';
 import type { TTenantFieldLocks } from '@platform/utils/tenant-field-locks/tenant-field-locks';
 import { usePlanOptions } from '@platform/utils/use-plan-options/use-plan-options';
 import { useTenantFieldErrorText } from '@platform/utils/use-tenant-field-error-text/use-tenant-field-error-text';
@@ -64,9 +63,9 @@ export const TenantDetailsFields = ({
             label={t(labelKey)}
             hint={lockReason}
             error={fieldErrorText(fieldErrors[key])}
+            control={{ isLocked: Boolean(lockReason) }}
           >
             <TextInput
-              isLocked={Boolean(lockReason)}
               type={'type' in field ? field.type : undefined}
               value={values[key]}
               onChange={(nextValue) => onChange(key, nextValue)}
@@ -80,7 +79,7 @@ export const TenantDetailsFields = ({
           label={t('localeLabel')}
           options={localeOptions}
           value={values.locale}
-          onChange={(locale) => onChange(TENANT_DETAILS_FIELD.LOCALE, locale)}
+          onChange={(locale) => onChange('locale', locale)}
           lockReason={lockReasonText(fieldLocks.locale)}
         />
       </div>
@@ -89,7 +88,8 @@ export const TenantDetailsFields = ({
         label={t('planLabel')}
         options={planOptions}
         value={values.plan}
-        onChange={(plan) => onChange(TENANT_DETAILS_FIELD.PLAN, plan)}
+        // eslint-disable-next-line shinefold-touched/prefer-shared-constant -- a form field key, not BADGE_TONE.PLAN
+        onChange={(plan) => onChange('plan', plan)}
         lockReason={lockReasonText(fieldLocks.plan)}
       />
     </>

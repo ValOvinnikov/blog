@@ -69,8 +69,8 @@ export const AnalyticsSettingRow = ({
             onChange({ ...draft, analyticsProvider: provider })
           }
           lock={{
-            isLocked: !hasOwnAnalytics && !isArchived,
-            isDisabled: isArchived || isPending,
+            isLocked: !hasOwnAnalytics || isArchived,
+            isDisabled: isPending,
           }}
         />
       </SettingRow>
@@ -82,7 +82,8 @@ export const AnalyticsSettingRow = ({
         }
         control={{
           id: idFieldId,
-          isDisabled: isArchived || isPending,
+          isDisabled: isPending,
+          isLocked: isArchived,
           describedBy: archivedDescribedBy,
         }}
       >

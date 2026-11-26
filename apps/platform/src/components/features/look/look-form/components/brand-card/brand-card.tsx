@@ -67,9 +67,9 @@ export const BrandCard = ({ summary }: TBrandCardProps) => {
         <FormFieldControlProvider
           id={brandNameFieldId}
           describedBy={archivedDescribedBy}
+          isLocked={isArchived}
         >
           <TextInput
-            isLocked={isArchived}
             placeholder={tenantName}
             value={brandName}
             onChange={(value) => updateField('brandName', value)}

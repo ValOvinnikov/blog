@@ -43,6 +43,7 @@ const formFieldVariants = tv({
 type TFormFieldControl = {
   id?: string;
   isDisabled?: boolean;
+  isLocked?: boolean;
   describedBy?: string;
   hasOwnAccessibleName?: boolean;
   appearance?: TFieldAppearance;
@@ -70,6 +71,7 @@ export const FormField = ({
   const {
     id,
     isDisabled = false,
+    isLocked,
     describedBy,
     hasOwnAccessibleName,
     appearance = FIELD_APPEARANCE.DEFAULT,
@@ -109,6 +111,7 @@ export const FormField = ({
         id={id}
         describedBy={describedBy}
         appearance={appearance}
+        isLocked={isLocked}
       >
         {children}
       </FormFieldControlProvider>

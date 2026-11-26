@@ -19,7 +19,7 @@ export const SendTestEmailButton = ({
   email,
 }: TSendTestEmailButtonProps) => {
   const t = useTranslations('emailPreview');
-  const { isArchived } = useSettingsFormState();
+  const { isArchived, archivedDescribedBy } = useSettingsFormState();
   const { sendTest, isSending } = useSendTestEmail(tenantId);
 
   return (
@@ -28,7 +28,8 @@ export const SendTestEmailButton = ({
       size={SIZE.SM}
       variant={BUTTON_VARIANT.SECONDARY}
       onClick={() => sendTest(email)}
-      isDisabled={isArchived}
+      isAriaDisabled={isArchived}
+      aria-describedby={archivedDescribedBy}
       isPending={isSending}
       pendingLabel={t('sendingTest')}
     >

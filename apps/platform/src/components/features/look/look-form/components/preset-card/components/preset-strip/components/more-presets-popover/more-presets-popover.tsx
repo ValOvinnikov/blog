@@ -78,7 +78,7 @@ export const MorePresetsPopover = <TId extends string>({
     <Popover.Root
       open={isOpen}
       onOpenChange={(open) => {
-        if (!isLocked) setIsOpen(open);
+        if (!isLocked || !open) setIsOpen(open);
       }}
     >
       <Popover.Trigger

@@ -10,6 +10,7 @@ import { useSettingsFormState } from '@platform/context/settings-form-provider';
 import type { TSenderFieldErrors } from '@platform/server/email-config/update-email-config-action';
 import type { TEmailSenderDraft } from '@platform/utils/email-draft/email-draft';
 import type { TStagedImage } from '@platform/utils/staged-image/staged-image';
+import { isUndefined } from '@shinefold/utils/primitives';
 import { useTranslations } from 'next-intl';
 
 import { emailSenderEditorVariants } from './email-sender-editor-variants';
@@ -38,7 +39,8 @@ export const EmailSenderEditor = ({
 }: TEmailSenderEditorProps) => {
   const { isArchived, isPending, archivedDescribedBy } = useSettingsFormState();
   const control = {
-    isDisabled: isArchived || isPending,
+    isDisabled: isPending,
+    isLocked: isArchived,
     describedBy: archivedDescribedBy,
   };
   const t = useTranslations('emailSettingsForm');
@@ -86,7 +88,7 @@ export const EmailSenderEditor = ({
               onChange={(value) => updateField('replyToAddress', value)}
             />
           </FormField>
-          {sender.contactRecipient !== undefined && (
+          {!isUndefined(sender.contactRecipient) && (
             <FormField
               label={t('contactRecipientLabel')}
               hint={t('contactRecipientHint')}

@@ -48,7 +48,7 @@ export const PresetSheet = <TId extends string>({
     <Drawer.Root
       open={isOpen}
       onOpenChange={(open) => {
-        if (!isLocked) setIsOpen(open);
+        if (!isLocked || !open) setIsOpen(open);
       }}
     >
       <Drawer.Trigger

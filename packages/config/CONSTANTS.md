@@ -494,6 +494,10 @@ Every key/value const an agent should reuse before writing a literal. The
 
 - **ACTIVITY_DETAIL**: `CHANGED_FIELDS`, `STUDIO_INVITE_SENT`, `STUDIO_INVITE_UNSENT`, `MAIN_ADDRESS_CHANGED`, `CUSTOM_DOMAIN_REQUESTED`, `CUSTOM_DOMAIN_REMOVED`, `ADDITIONAL_LANGUAGES`, `SUSPENSION_REASON`, `SUSPENSION_REFERENCE`, `PLAN`, `PLAN_CHANGED`, `SIGN_IN_PROVIDER`, `CLIENT_SECRET_REPLACED`, `GRANT_ITEM`, `GRANT_EXPIRY`, `GRANT_UNTIL_REVOKED`, `GRANT_NOTE`
 
+### `@platform/constants/aria-attribute` — `apps/platform/src/constants/aria-attribute.ts`
+
+- **ARIA_ATTRIBUTE**: `DISABLED`=`"aria-disabled"`
+
 ### `@platform/constants/aria-role` — `apps/platform/src/constants/aria-role.ts`
 
 - **ARIA_ROLE**: `REGION`=`"region"`, `TABLE`=`"table"`, `ROWGROUP`=`"rowgroup"`, `ROW`=`"row"`, `CELL`=`"cell"`
@@ -922,10 +926,6 @@ Every key/value const an agent should reuse before writing a literal. The
 - **TEAM_ACCESS_LOG**: `INVITE_FAILED`=`"team_access.invite_failed"`, `INVITE_EMAIL_FAILED`=`"team_access.invite_email_failed"`, `INVITE_AUDIT_FAILED`=`"team_access.invite_audit_failed"`, `REMOVE_FAILED`=`"team_access.remove_failed"`, `REMOVE_AUDIT_FAILED`=`"team_access.remove_audit_failed"`, `REVOKE_FAILED`=`"team_access.revoke_failed"`, `REVOKE_SKIPPED_NO_EMAIL`=`"team_access.revoke_skipped_no_email"`, `CANCEL_FAILED`=`"team_access.cancel_failed"`, `CANCEL_AUDIT_FAILED`=`"team_access.cancel_audit_failed"`, `ACCESS_REQUEST_FAILED`=`"team_access.access_request_failed"`
 - **TEAM_ROW_ACCESS**: `LOCKED`, `NO_ACCESS`
 - **TEAM_COLUMN**: `PERSON`, `ROLE`, `ACCESS`, `ACTIONS`
-
-### `@platform/constants/tenant-details-field` — `apps/platform/src/constants/tenant-details-field.ts`
-
-- **TENANT_DETAILS_FIELD**: `LOCALE`=`"locale"`, `PLAN`=`"plan"`
 
 ### `@platform/constants/tenant` — `apps/platform/src/constants/tenant.ts`
 

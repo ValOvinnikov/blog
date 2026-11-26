@@ -1,5 +1,6 @@
 import { faker } from '@faker-js/faker';
 import en from '@platform/i18n/messages/en.json';
+import { ARIA_DISABLED } from '@platform/testing/aria';
 import { screen } from '@platform/testing/custom-render';
 import { mockEmailBody } from '@platform/testing/email-draft';
 import {
@@ -66,22 +67,23 @@ describe(`<${EmailTemplateEditor.name}/>`, () => {
   });
 
   describe('with a blank subject and message', () => {
+    let subjectInput: HTMLElement;
+
     beforeEach(() => {
       setup();
+      subjectInput = screen.getByLabelText(SUBJECT_LABEL);
     });
 
     it('labels the fields with the language being edited', () => {
       const heading = screen.getByRole('heading', {
         name: templateTypeLabel.MAGIC_LINK,
       });
-      const subjectInput = screen.getByLabelText(SUBJECT_LABEL);
 
       expect(heading).toBeVisible();
       expect(subjectInput).toBeVisible();
     });
 
     it('shows the copy that would be sent in place of a blank subject', () => {
-      const subjectInput = screen.getByLabelText(SUBJECT_LABEL);
       const defaultBadges = screen.getAllByText(en.fieldStatus.default);
 
       expect(subjectInput).toHaveAttribute(
@@ -92,7 +94,6 @@ describe(`<${EmailTemplateEditor.name}/>`, () => {
     });
 
     it('reports a typed subject as the new copy', async () => {
-      const subjectInput = screen.getByLabelText(SUBJECT_LABEL);
       await user.type(subjectInput, MOCK_TYPED_CHARACTER);
 
       expect(onCopyChange).toHaveBeenLastCalledWith({
@@ -141,11 +142,8 @@ describe(`<${EmailTemplateEditor.name}/>`, () => {
     expect(resetButton).not.toBeInTheDocument();
   });
 
-  it.each([
-    { state: 'archived', formState: { isArchived: true } },
-    { state: 'pending', formState: { isPending: true } },
-  ])('locks every field while $state', ({ formState }) => {
-    setup({}, formState);
+  it('disables every field while saving', () => {
+    setup({}, { isPending: true });
 
     const subjectInput = screen.getByLabelText(SUBJECT_LABEL);
     const uploadButton = screen.getByRole('button', {
@@ -161,29 +159,33 @@ describe(`<${EmailTemplateEditor.name}/>`, () => {
       setup({}, { isArchived: true });
     });
 
-    it('describes the subject with the notice', () => {
+    it('locks the subject read-only and describes it with the notice', () => {
       const subjectInput = screen.getByLabelText(SUBJECT_LABEL);
 
+      expect(subjectInput).toHaveAttribute(ARIA_DISABLED, 'true');
+      expect(subjectInput).toHaveAttribute('readonly');
       expect(subjectInput).toHaveAccessibleDescription(
         `${ARCHIVED_NOTICE_TEXT} ${subjectHint}`,
       );
     });
 
-    it('describes the message editor with the notice', () => {
+    it('keeps the message editor read-only and describes it with the notice', () => {
       const messageEditor = screen.getByRole('textbox', {
         name: MESSAGE_LABEL,
       });
 
+      expect(messageEditor).toHaveAttribute('aria-readonly', 'true');
       expect(messageEditor).toHaveAccessibleDescription(
         `${bodyHint} ${ARCHIVED_NOTICE_TEXT}`,
       );
     });
 
-    it('describes the logo upload with the notice', () => {
+    it('locks the logo upload and describes it with the notice', () => {
       const uploadButton = screen.getByRole('button', {
         name: UPLOAD_TEMPLATE_LOGO,
       });
 
+      expect(uploadButton).toHaveAttribute(ARIA_DISABLED, 'true');
       expect(uploadButton).toHaveAccessibleDescription(
         `${logoHint} ${ARCHIVED_NOTICE_TEXT}`,
       );

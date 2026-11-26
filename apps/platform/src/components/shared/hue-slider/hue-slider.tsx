@@ -1,6 +1,7 @@
 'use client';
 
 import { Slider } from '@base-ui/react/slider';
+import { ARIA_ATTRIBUTE } from '@platform/constants/aria-attribute';
 import { accentHueGradient } from '@platform/utils/theme-preview-tokens/theme-preview-tokens';
 import { HUE_MAX, HUE_MIN } from '@shinefold/config';
 import { isUndefined } from '@shinefold/utils/primitives';
@@ -16,7 +17,6 @@ export type THueSliderProps = {
   name: THueSliderName;
   value: number;
   onChange: (value: number) => void;
-  isDisabled?: boolean;
   isLocked?: boolean;
   'aria-describedby'?: AriaAttributes['aria-describedby'];
 };
@@ -26,7 +26,6 @@ export const HueSlider = ({
   name,
   value,
   onChange,
-  isDisabled,
   isLocked = false,
   'aria-describedby': ariaDescribedBy,
 }: THueSliderProps) => {
@@ -42,7 +41,6 @@ export const HueSlider = ({
       }}
       min={HUE_MIN}
       max={HUE_MAX}
-      disabled={isDisabled}
       className={root()}
     >
       <Slider.Control className={control()}>
@@ -57,9 +55,11 @@ export const HueSlider = ({
             getAriaValueText={(_formatted, hue) => t('hueValue', { hue })}
             aria-describedby={ariaDescribedBy}
             // Thumb forwards no aria-disabled to the range input it renders.
-            inputRef={(input) =>
-              input?.setAttribute('aria-disabled', String(isLocked))
-            }
+            inputRef={(input) => {
+              if (isLocked)
+                input?.setAttribute(ARIA_ATTRIBUTE.DISABLED, 'true');
+              else input?.removeAttribute(ARIA_ATTRIBUTE.DISABLED);
+            }}
             className={thumb()}
           />
         </Slider.Track>

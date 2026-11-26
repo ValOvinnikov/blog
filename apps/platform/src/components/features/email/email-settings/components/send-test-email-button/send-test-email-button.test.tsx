@@ -5,13 +5,17 @@ import {
   type TSendTestEmailResult,
 } from '@platform/server/email/send-test-email-action';
 import { MOCK_ADMIN_EMAIL } from '@platform/testing/admins/fixtures';
+import { ARIA_DISABLED } from '@platform/testing/aria';
 import { screen } from '@platform/testing/custom-render';
 import { SEND_TEST_TO_ME } from '@platform/testing/email/fixtures';
 import {
   MOCK_EMAIL_BODY,
   mockEmailSender,
 } from '@platform/testing/email-draft';
-import { customRenderInSettingsForm } from '@platform/testing/render-in-settings-form';
+import {
+  ARCHIVED_NOTICE_TEXT,
+  customRenderInSettingsForm,
+} from '@platform/testing/render-in-settings-form';
 import { MOCK_TENANT_ID } from '@platform/testing/tenants/fixtures';
 import { ACTION_OUTCOME, EMAIL_TEMPLATE_TYPE } from '@shinefold/config';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
@@ -110,11 +114,14 @@ describe(`<${SendTestEmailButton.name}/>`, () => {
     });
   });
 
-  it('offers no test send for an archived tenant', () => {
+  it('locks the test send for an archived tenant, saying why', async () => {
     setup({}, { isArchived: true });
 
     const sendButton = screen.getByRole('button', { name: SEND_TEST_TO_ME });
+    await user.click(sendButton);
 
-    expect(sendButton).toBeDisabled();
+    expect(sendButton).toHaveAttribute(ARIA_DISABLED, 'true');
+    expect(sendButton).toHaveAccessibleDescription(ARCHIVED_NOTICE_TEXT);
+    expect(sendTestEmailAction).not.toHaveBeenCalled();
   });
 });

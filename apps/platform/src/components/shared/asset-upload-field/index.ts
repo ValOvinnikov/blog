@@ -1,5 +1,5 @@
-export {
-  AssetUploadField,
-  type TAssetUploadControl,
-  type TAssetUploadSpec,
-} from './asset-upload-field';
+export { AssetUploadField } from './asset-upload-field';
+export type {
+  TAssetUploadControl,
+  TAssetUploadSpec,
+} from './asset-upload-spec';

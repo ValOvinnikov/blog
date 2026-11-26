@@ -383,12 +383,28 @@ describe(`<${PresetStrip.name}/>`, () => {
       });
     });
 
-    it('keeps a locked More presets aria-disabled and described', () => {
+    it('keeps a locked chip focusable and its preset unchanged on click', async () => {
+      const onChange = vi.fn();
+      setup(MOCK_EDIT_COLUMN_1440, { isLocked: true, onChange });
+
+      const consoleChip = screen.getByRole('radio', { name: CONSOLE });
+      await user.click(consoleChip);
+
+      expect(consoleChip).toHaveAttribute(ARIA_DISABLED, 'true');
+      expect(consoleChip).not.toBeChecked();
+      expect(onChange).not.toHaveBeenCalled();
+    });
+
+    it('keeps a locked More presets aria-disabled, described and closed', async () => {
       setup(MOCK_EDIT_COLUMN_1440, { isLocked: true });
 
       const morePresets = screen.getByRole('button', {
         name: morePresetsName(3),
       });
+      await user.click(morePresets);
+      const dialog = screen.queryByRole(DIALOG_POPUP, { name: CHOOSE_PRESET });
+
+      expect(dialog).not.toBeInTheDocument();
 
       expect(morePresets).toHaveAttribute(ARIA_DISABLED, 'true');
       expect(morePresets).toHaveAccessibleDescription(MOCK_ARCHIVED_NOTICE);
@@ -522,12 +538,16 @@ describe(`<${PresetStrip.name}/>`, () => {
       });
     });
 
-    it('keeps a locked Preset button aria-disabled and described', () => {
+    it('keeps a locked Preset button aria-disabled, described and closed', async () => {
       setup(MOCK_EDIT_COLUMN_1280, { isLocked: true });
 
       const presetButton = screen.getByRole('button', {
         name: `${PRESET_LABEL} ${EDITORIAL}`,
       });
+      await user.click(presetButton);
+      const sheet = screen.queryByRole(DIALOG_POPUP, { name: CHOOSE_PRESET });
+
+      expect(sheet).not.toBeInTheDocument();
 
       expect(presetButton).toHaveAttribute(ARIA_DISABLED, 'true');
       expect(presetButton).toHaveAccessibleDescription(MOCK_ARCHIVED_NOTICE);
