@@ -7,6 +7,7 @@ import { BADGE_TONE } from '@platform/constants/badge-tone';
 import { BUTTON_VARIANT } from '@platform/constants/button';
 import { DATA_TABLE_COLUMN } from '@platform/constants/data-table';
 import { formatDate } from '@platform/utils/format-date/format-date';
+import { isArchivedTenant } from '@platform/utils/pinned-tenants/pinned-tenants';
 import { tenantStatusTone } from '@platform/utils/status-tone/status-tone';
 import { tenantManageHref } from '@platform/utils/tenant-manage-href/tenant-manage-href';
 import { SIZE, TENANT_SORT_COLUMN } from '@shinefold/config';
@@ -72,7 +73,7 @@ export const TenantsTableRow = ({ tenant }: TTenantsTableRowProps) => {
       </DataTableShell.Cell>
       <DataTableShell.Cell column={DATA_TABLE_COLUMN.ACTIONS}>
         <div className={actions()}>
-          <PinTenantToggle tenant={tenant} />
+          {!isArchivedTenant(tenant) && <PinTenantToggle tenant={tenant} />}
           <LinkButton
             href={tenantManageHref(tenant)}
             variant={BUTTON_VARIANT.SECONDARY}

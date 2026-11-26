@@ -35,13 +35,17 @@ export const toPinnedTenant = ({
   deprovisionedAt,
 });
 
+export const isArchivedTenant = ({
+  deprovisionedAt,
+}: Pick<TPinnedTenant, 'deprovisionedAt'>): boolean => !isNull(deprovisionedAt);
+
 export const applyPinChange = (
   pinned: TPinnedTenant[],
   { tenant, isPinned }: TPinChange,
 ): TPinnedTenant[] => {
   const others = pinned.filter(({ id }) => id !== tenant.id);
 
-  if (!isPinned || !isNull(tenant.deprovisionedAt)) {
+  if (!isPinned || isArchivedTenant(tenant)) {
     return others;
   }
 

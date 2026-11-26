@@ -7,6 +7,7 @@ import { customRenderInPinnedTenants } from '@platform/testing/pinned-tenants/re
 import {
   mockTenantsListQuery,
   mockTenantsPageRow,
+  MOCK_ARCHIVED_AT,
   MOCK_CUSTOM_DOMAIN,
   MOCK_OTHER_TENANT_DOMAIN,
   MOCK_OTHER_TENANT_ID,
@@ -17,7 +18,10 @@ import {
   MOCK_TENANT_ID,
   MOCK_TENANT_SLUG,
 } from '@platform/testing/tenants/fixtures';
-import { mockOtherPinnedTenant } from '@platform/testing/tenants/pinned-tenant';
+import {
+  mockOtherPinnedTenant,
+  mockPinnedTenant,
+} from '@platform/testing/tenants/pinned-tenant';
 import { adminRoutes } from '@platform/utils/routes/routes';
 import { SORT_DIRECTION, TENANT_SORT_COLUMN } from '@shinefold/config';
 import { TENANT_PLAN } from '@shinefold/config/constants';
@@ -116,6 +120,31 @@ describe(`<${TenantsTable.name}/>`, () => {
       'href',
       adminRoutes.tenantOverview(MOCK_OTHER_TENANT_ID),
     );
+  });
+
+  it('gives an archived tenant no pin toggle but keeps its Manage link', () => {
+    setup(
+      {
+        tenants: [mockTenantsPageRow({ deprovisionedAt: MOCK_ARCHIVED_AT })],
+      },
+      {
+        pinnedTenants: [
+          mockPinnedTenant({ deprovisionedAt: MOCK_ARCHIVED_AT }),
+        ],
+      },
+    );
+
+    const pinToggle = screen.queryByRole('button', {
+      name: tPinned('pinAriaLabel', { name: MOCK_TENANT_NAME }),
+    });
+    const unpinToggle = screen.queryByRole('button', {
+      name: tPinned('unpinAriaLabel', { name: MOCK_TENANT_NAME }),
+    });
+    const manageLink = screen.getByRole('link', { name: MANAGE_TENANT });
+
+    expect(pinToggle).not.toBeInTheDocument();
+    expect(unpinToggle).not.toBeInTheDocument();
+    expect(manageLink).toBeVisible();
   });
 
   it('gives each row a pin toggle named for its tenant', () => {

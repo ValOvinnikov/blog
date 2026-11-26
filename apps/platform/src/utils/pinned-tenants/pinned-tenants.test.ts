@@ -5,7 +5,7 @@ import {
   mockThirdPinnedTenant,
 } from '@platform/testing/tenants/pinned-tenant';
 
-import { applyPinChange } from './pinned-tenants';
+import { applyPinChange, isArchivedTenant } from './pinned-tenants';
 
 faker.seed(8079);
 
@@ -49,5 +49,19 @@ describe(applyPinChange, () => {
     });
 
     expect(result).toEqual(pinned);
+  });
+});
+
+describe(isArchivedTenant, () => {
+  it('treats a deprovisioned tenant as archived', () => {
+    const isArchived = isArchivedTenant({ deprovisionedAt: MOCK_ARCHIVED_AT });
+
+    expect(isArchived).toBe(true);
+  });
+
+  it('treats a tenant never deprovisioned as not archived', () => {
+    const isArchived = isArchivedTenant({ deprovisionedAt: null });
+
+    expect(isArchived).toBe(false);
   });
 });
