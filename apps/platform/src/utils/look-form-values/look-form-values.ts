@@ -8,6 +8,7 @@ import type { TLookFormValues } from '@platform/utils/default-look-values/defaul
 import { isSameStagedImage } from '@platform/utils/staged-image/staged-image';
 import { LOOK_FIELD } from '@shinefold/db/constants';
 import {
+  isLookFieldWithin,
   type TEffectiveLookEntitlements,
   toEffectiveLookWithin,
 } from '@shinefold/db/utils/effective-look/effective-look';
@@ -61,12 +62,23 @@ export const isBrandAssetKind = (
 ): key is TBrandAssetKind =>
   (BRAND_ASSET_KINDS as readonly string[]).includes(key);
 
+/** The effective Look for the form, keeping the saved button colour so an unsaved one follows the preset rather than reading as picked. */
+export const toLookFormValuesWithin = (
+  values: TLookFormValues,
+  entitlements: TEffectiveLookEntitlements,
+): TLookFormValues => ({
+  ...toEffectiveLookWithin(values, entitlements),
+  buttonColor: isLookFieldWithin(LOOK_FIELD.BUTTON_COLOR, entitlements)
+    ? values.buttonColor
+    : undefined,
+});
+
 export const restoreLookDraft = (
   draftValues: TLookFormValues,
   { logo, logoDark, favicon }: TLookFormValues,
   entitlements: TEffectiveLookEntitlements,
 ): TLookFormValues => ({
-  ...toEffectiveLookWithin(draftValues, entitlements),
+  ...toLookFormValuesWithin(draftValues, entitlements),
   logo,
   logoDark,
   favicon,

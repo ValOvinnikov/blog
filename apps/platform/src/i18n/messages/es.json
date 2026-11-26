@@ -1037,6 +1037,7 @@
     "buttonColorLabel": "Color de los botones",
     "buttonColorDescription": "El relleno de los botones rellenos, y de los botones con contorno al pasar el cursor. Las etiquetas pasan a blanco o negro para seguir siendo legibles.",
     "buttonColorFollowAccent": "Sigue el acento",
+    "buttonColorFollowPreset": "Sigue el ajuste predefinido",
     "buttonColorDarkLabel": "Color de los botones sobre fondos oscuros",
     "buttonColorDarkDescription": "Se usa en franjas oscuras y en el modo oscuro. Si sigue, se calcula a partir del color de los botones.",
     "buttonColorDarkFollow": "Sigue el color de los botones",
