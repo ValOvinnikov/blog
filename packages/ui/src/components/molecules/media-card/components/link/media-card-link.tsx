@@ -3,6 +3,8 @@ import type { TAnchorElementType } from '@shinefold/config/react';
 import { TextLink } from '@shinefold/ui/components/atoms/text-link';
 import type { ReactNode } from 'react';
 
+import { mediaCardLinkVariants } from './media-card-link-variants';
+
 export type TMediaCardLinkProps = IWithClassName &
   IWithDataTestId & {
     href: string;
@@ -29,7 +31,7 @@ export const MediaCardLink = ({
     ariaLabel={ariaLabel}
     appearance="quiet"
     isStretched={true}
-    className={className}
+    className={mediaCardLinkVariants({ class: className })}
     dataTestId={dataTestId}
   >
     {children}

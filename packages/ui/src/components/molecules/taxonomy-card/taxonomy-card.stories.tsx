@@ -7,6 +7,7 @@ import {
   focusLastLink,
 } from '@shinefold/ui/testing/brand-bands';
 import { inNarrowColumn, threeAcross } from '@shinefold/ui/testing/card-widths';
+import { SHINEFOLD_PRESET_STORY } from '@shinefold/ui/testing/shinefold-preset';
 import type { Meta, StoryObj } from '@storybook/react-vite';
 
 import { TaxonomyCard } from './taxonomy-card';
@@ -198,4 +199,9 @@ export const Grid: TStory = {
       <TaxonomyCard {...REACT_TAG} headingLevel={2} />
     </CardGrid>
   ),
+};
+
+export const WithDescriptionShinefoldPreset: TStory = {
+  ...WithDescription,
+  ...SHINEFOLD_PRESET_STORY,
 };

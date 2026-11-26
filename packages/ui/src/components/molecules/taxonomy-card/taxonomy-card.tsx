@@ -67,6 +67,7 @@ const TaxonomyCardRoot = ({
           as={LinkComponent}
           appearance="quiet"
           isStretched={true}
+          className={s.link()}
         >
           <span aria-hidden="true">{title}</span>
           <span className={s.accessibleName()}>
