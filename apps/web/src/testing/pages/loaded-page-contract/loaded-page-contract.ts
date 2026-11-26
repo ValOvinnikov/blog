@@ -4,17 +4,14 @@ import {
   routes,
 } from '@shinefold/config';
 import { okResult } from '@shinefold/utils';
-import { getRequestContext } from '@web/server/request-context/request-context';
 import type { TAsyncSetup } from '@web/testing/shared/async-setup/async-setup';
 import {
   testBreadcrumbsTrail,
   testForwardsArgsToLoader,
   testThrowsOnFetchFailure,
 } from '@web/testing/shared/breadcrumbs-page-contract/breadcrumbs-page-contract';
-import {
-  MOCK_REQUEST_CONTEXT,
-  MOCK_TENANT_NAME,
-} from '@web/testing/shared/tenant/fixtures';
+import { mockRequestContextForTest } from '@web/testing/shared/request-context/mock-request-context-for-test';
+import { MOCK_TENANT_NAME } from '@web/testing/shared/tenant/fixtures';
 import { notFound, redirect } from 'next/navigation';
 import type { Mock } from 'vitest';
 
@@ -70,11 +67,7 @@ export const testRedirectsMissingLanguagePage = ({
 }: IWithPageLoader) => {
   it('redirects home when this language has no page', async () => {
     pageLoaderMock.mockResolvedValue(okResult());
-    vi.mocked(getRequestContext).mockResolvedValue({
-      ...MOCK_REQUEST_CONTEXT,
-      locale: NL,
-      liveLocales: [EN, NL],
-    });
+    mockRequestContextForTest({ locale: NL, liveLocales: [EN, NL] });
 
     await expect(setup()).rejects.toThrow(NEXT_NAVIGATION_ERROR.NEXT_REDIRECT);
 

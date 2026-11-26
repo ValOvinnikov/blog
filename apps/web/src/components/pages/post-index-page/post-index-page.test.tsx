@@ -36,7 +36,6 @@ vi.mock('@shinefold/service', () => ({
     pages: { blog: { v1: { getIndexPage: vi.fn() } } },
     entities: { topics: { v1: { getTopics: vi.fn() } } },
     modules: {
-      heroBlog: { v1: { getHeroBlog: vi.fn() } },
       postList: { v1: { getPostList: vi.fn() } },
     },
   },
@@ -83,13 +82,6 @@ describe(`<${PostIndexPage.name}/>`, () => {
       getIndexPageMock.mockResolvedValue(okResult(MOCK_INDEX_PAGE));
       return setup();
     },
-    renderPageWithHero: (hero) => {
-      getIndexPageMock.mockResolvedValue(
-        okResult({ ...MOCK_INDEX_PAGE, hero }),
-      );
-      return setup();
-    },
-    heroBlogMock: vi.mocked(service.modules.heroBlog.v1.getHeroBlog),
     heading: MOCK_PAGE_HEADING,
     supportingText: MOCK_SUPPORTING_TEXT,
   });

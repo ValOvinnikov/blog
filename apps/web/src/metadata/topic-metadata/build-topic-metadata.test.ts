@@ -59,10 +59,14 @@ describe(buildTopicMetadata, () => {
   });
 
   it.each([
-    { page: undefined, canonical: routes.topic(MOCK_TOPIC_SLUG) },
-    { page: 2, canonical: routes.topic(MOCK_TOPIC_SLUG, 2) },
+    {
+      scope: 'the first page',
+      page: undefined,
+      canonical: routes.topic(MOCK_TOPIC_SLUG),
+    },
+    { scope: 'page 2', page: 2, canonical: routes.topic(MOCK_TOPIC_SLUG, 2) },
   ])(
-    'canonicalises page $page to that page of the topic',
+    'canonicalises $scope to that page of the topic',
     async ({ page, canonical }) => {
       const metadata = await buildTopicMetadata(MOCK_TOPIC_SLUG, page);
 

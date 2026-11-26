@@ -2,27 +2,13 @@ import { LOCALE_ISO_CODES, NEXT_NAVIGATION_ERROR } from '@shinefold/config';
 import { ARIA_CURRENT } from '@shinefold/ui/testing/aria';
 import { errorResult, okResult } from '@shinefold/utils';
 import { JSON_LD_SCRIPT_TEST_ID } from '@web/constants/json-ld';
-import {
-  getRequestContext,
-  type TRequestContext,
-} from '@web/server/request-context/request-context';
 import { screen, within } from '@web/testing/custom-render';
 import type { TAsyncSetup } from '@web/testing/shared/async-setup/async-setup';
 import { MOCK_ERROR } from '@web/testing/shared/error/fixtures';
-import { MOCK_REQUEST_CONTEXT } from '@web/testing/shared/tenant/fixtures';
+import { mockRequestContextForTest } from '@web/testing/shared/request-context/mock-request-context-for-test';
 import { logger } from '@web/utils/logger/logger';
 import { notFound } from 'next/navigation';
 import type { Mock } from 'vitest';
-
-const mockRequestContextForTest = (overrides: Partial<TRequestContext>) => {
-  vi.mocked(getRequestContext).mockResolvedValue({
-    ...MOCK_REQUEST_CONTEXT,
-    ...overrides,
-  });
-  onTestFinished(() => {
-    vi.mocked(getRequestContext).mockReset();
-  });
-};
 
 interface IBreadcrumbTrailStep {
   label: string;

@@ -1,5 +1,4 @@
 import { faker } from '@faker-js/faker';
-import { service } from '@shinefold/service';
 import { customRenderServerAsync, screen } from '@web/testing/custom-render';
 import { mockIndexPage } from '@web/testing/pages/index-page/fixtures';
 import { testPageHeading } from '@web/testing/pages/page-heading-contract/page-heading-contract';
@@ -11,12 +10,6 @@ import { TaxonomyIndexPage } from './taxonomy-index-page';
 faker.seed(5503);
 
 vi.mock('@web/server/request-context/request-context');
-
-vi.mock('@shinefold/service', () => ({
-  service: {
-    modules: { heroBlog: { v1: { getHeroBlog: vi.fn() } } },
-  },
-}));
 
 vi.mock('@web/i18n/navigation');
 
@@ -46,9 +39,6 @@ describe(`<${TaxonomyIndexPage.name}/>`, () => {
 
   testPageHeading({
     renderPage: () => setup(),
-    renderPageWithHero: (hero) =>
-      setup({ pageData: { ...MOCK_INDEX_PAGE, hero } }),
-    heroBlogMock: vi.mocked(service.modules.heroBlog.v1.getHeroBlog),
     heading: MOCK_PAGE_HEADING,
     supportingText: MOCK_SUPPORTING_TEXT,
   });

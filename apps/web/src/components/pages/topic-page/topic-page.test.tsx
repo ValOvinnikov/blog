@@ -9,8 +9,8 @@ import {
   screen,
   within,
 } from '@web/testing/custom-render';
+import { testNamesTermInEmptyPostList } from '@web/testing/pages/empty-post-list-contract/empty-post-list-contract';
 import { testLoadedPageContract } from '@web/testing/pages/loaded-page-contract/loaded-page-contract';
-import { testNamesTermInEmptyPostList } from '@web/testing/pages/taxonomy-page/empty-post-list-contract';
 import { MOCK_TENANT_SANITY_CONTEXT } from '@web/testing/shared/tenant/fixtures';
 import {
   mockTopicDetailPage,

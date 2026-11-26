@@ -64,10 +64,14 @@ describe(buildTagMetadata, () => {
   });
 
   it.each([
-    { page: undefined, canonical: routes.tag(MOCK_TAG_SLUG) },
-    { page: 2, canonical: routes.tag(MOCK_TAG_SLUG, 2) },
+    {
+      scope: 'the first page',
+      page: undefined,
+      canonical: routes.tag(MOCK_TAG_SLUG),
+    },
+    { scope: 'page 2', page: 2, canonical: routes.tag(MOCK_TAG_SLUG, 2) },
   ])(
-    'canonicalises page $page to that page of the tag with its feed',
+    'canonicalises $scope to that page of the tag with its feed',
     async ({ page, canonical }) => {
       const metadata = await buildTagMetadata(MOCK_TAG_SLUG, page);
 

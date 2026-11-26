@@ -3,8 +3,8 @@ import { SITE_MESSAGES } from '@shinefold/config';
 import { service } from '@shinefold/service';
 import { TAG_LOG } from '@web/constants/tag';
 import { customRenderServerAsync } from '@web/testing/custom-render';
+import { testNamesTermInEmptyPostList } from '@web/testing/pages/empty-post-list-contract/empty-post-list-contract';
 import { testLoadedPageContract } from '@web/testing/pages/loaded-page-contract/loaded-page-contract';
-import { testNamesTermInEmptyPostList } from '@web/testing/pages/taxonomy-page/empty-post-list-contract';
 import { mockTag, mockTagDetailPage } from '@web/testing/shared/tag/fixtures';
 import { MOCK_TENANT_SANITY_CONTEXT } from '@web/testing/shared/tenant/fixtures';
 

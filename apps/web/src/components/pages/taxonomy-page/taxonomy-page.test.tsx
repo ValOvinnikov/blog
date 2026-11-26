@@ -34,7 +34,6 @@ vi.mock('@web/server/site-config/get-voice-rich/get-voice-rich');
 vi.mock('@shinefold/service', () => ({
   service: {
     modules: {
-      heroBlog: { v1: { getHeroBlog: vi.fn() } },
       postList: { v1: { getPostList: vi.fn() } },
     },
   },
@@ -42,7 +41,6 @@ vi.mock('@shinefold/service', () => ({
 
 vi.mock('@web/i18n/navigation');
 
-const getHeroBlogMock = vi.mocked(service.modules.heroBlog.v1.getHeroBlog);
 const getPostListMock = vi.mocked(service.modules.postList.v1.getPostList);
 
 const MOCK_TERM = mockTopic({
@@ -127,9 +125,6 @@ describe(`<${TaxonomyPage.name}/>`, () => {
 
   testPageHeading({
     renderPage: () => setup(),
-    renderPageWithHero: (hero) =>
-      setup({ pageData: { ...MOCK_PAGE_DATA, hero } }),
-    heroBlogMock: getHeroBlogMock,
     heading: MOCK_PAGE_HEADING,
     supportingText: MOCK_SUPPORTING_TEXT,
   });
