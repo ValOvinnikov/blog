@@ -1273,6 +1273,10 @@ Every key/value const an agent should reuse before writing a literal. The
 
 - **TOPIC_LOG**: `PAGE_FETCH_FAILED`=`"topic_page.fetch_failed"`, `BREADCRUMBS_FETCH_FAILED`=`"topic_breadcrumbs.fetch_failed"`, `METADATA_FETCH_FAILED`=`"topic_metadata.fetch_failed"`, `LIST_FETCH_FAILED`=`"topics.fetch_failed"`
 
+### `@web/constants/translation-map` — `apps/web/src/constants/translation-map.ts`
+
+- **TRANSLATION_MAP_LOG**: `FETCH_FAILED`=`"translation_map.fetch_failed"`
+
 ## app:worker
 
 ### `@worker/constants/access-run` — `apps/worker/src/constants/access-run.ts`

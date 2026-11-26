@@ -112,35 +112,34 @@ describe(isSubscribeAttemptRefused, () => {
     });
   });
 
-  it('refuses and logs when the rate-limit store errors', async () => {
-    createRedisRateLimitStoreMock.mockReturnValue({
-      increment: vi.fn().mockRejectedValue(MOCK_ERROR),
-    });
-    const { isRefused, warnMock } = await loadGuard({
-      withKvStore: true,
-    });
+  it.each([
+    {
+      failure: 'errors',
+      arrangeStore: () =>
+        createRedisRateLimitStoreMock.mockReturnValue({
+          increment: vi.fn().mockRejectedValue(MOCK_ERROR),
+        }),
+    },
+    {
+      failure: 'cannot be configured',
+      arrangeStore: () =>
+        createRedisRateLimitStoreMock.mockImplementation(() => {
+          throw MOCK_ERROR;
+        }),
+    },
+  ])(
+    'refuses and logs when the rate-limit store $failure',
+    async ({ arrangeStore }) => {
+      arrangeStore();
+      const { isRefused, warnMock } = await loadGuard({ withKvStore: true });
 
-    await expect(isRefused(MOCK_TENANT_ID)).resolves.toBe(true);
-    expect(warnMock).toHaveBeenCalledWith(NEWSLETTER_LOG.SUBSCRIBE_BLOCKED, {
-      reason: 'rate_limit_store_unavailable',
-      error: MOCK_ERROR,
-    });
-  });
-
-  it('refuses and logs when the rate-limit store cannot be configured', async () => {
-    createRedisRateLimitStoreMock.mockImplementation(() => {
-      throw MOCK_ERROR;
-    });
-    const { isRefused, warnMock } = await loadGuard({
-      withKvStore: true,
-    });
-
-    await expect(isRefused(MOCK_TENANT_ID)).resolves.toBe(true);
-    expect(warnMock).toHaveBeenCalledWith(NEWSLETTER_LOG.SUBSCRIBE_BLOCKED, {
-      reason: 'rate_limit_store_unavailable',
-      error: MOCK_ERROR,
-    });
-  });
+      await expect(isRefused(MOCK_TENANT_ID)).resolves.toBe(true);
+      expect(warnMock).toHaveBeenCalledWith(NEWSLETTER_LOG.SUBSCRIBE_BLOCKED, {
+        reason: 'rate_limit_store_unavailable',
+        error: MOCK_ERROR,
+      });
+    },
+  );
 
   it('refuses when the store does not answer in time', async () => {
     createRedisRateLimitStoreMock.mockReturnValue({

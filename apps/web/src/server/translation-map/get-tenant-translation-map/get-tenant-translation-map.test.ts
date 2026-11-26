@@ -3,7 +3,7 @@ import { queries } from '@shinefold/db';
 import { TENANT_STATUS } from '@shinefold/db/constants';
 import { service, type TTranslationMap } from '@shinefold/service';
 import { errorResult, okResult } from '@shinefold/utils';
-import { TRANSLATION_MAP_FETCH_FAILED_EVENT } from '@web/constants/translation-map';
+import { TRANSLATION_MAP_LOG } from '@web/constants/translation-map';
 import { MOCK_ERROR } from '@web/testing/shared/error/fixtures';
 import {
   MOCK_TENANT_SANITY_CONTEXT,
@@ -81,7 +81,7 @@ describe(getTenantTranslationMap, () => {
 
     expect(result).toBeUndefined();
     expect(loggerErrorMock).toHaveBeenCalledWith(
-      TRANSLATION_MAP_FETCH_FAILED_EVENT,
+      TRANSLATION_MAP_LOG.FETCH_FAILED,
       { error: MOCK_ERROR },
     );
   });
@@ -95,7 +95,7 @@ describe(getTenantTranslationMap, () => {
 
     expect(result).toBeUndefined();
     expect(loggerErrorMock).toHaveBeenCalledWith(
-      TRANSLATION_MAP_FETCH_FAILED_EVENT,
+      TRANSLATION_MAP_LOG.FETCH_FAILED,
       { error: MOCK_ERROR },
     );
   });

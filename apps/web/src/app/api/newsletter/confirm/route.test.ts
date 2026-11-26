@@ -15,6 +15,7 @@ import { resolveWritableTenant } from '@web/server/tenant/write-gate/write-gate'
 import { MOCK_CONFIRMATION_TOKEN } from '@web/testing/server/newsletter/fixtures';
 import { mockNewsletterLinkLocale } from '@web/testing/server/newsletter/newsletter-link-locale/fixtures';
 import { MOCK_ERROR } from '@web/testing/shared/error/fixtures';
+import { CACHE_CONTROL_HEADER } from '@web/testing/shared/http/constants';
 import {
   MOCK_TENANT_BASE_URL,
   MOCK_TENANT_ID,
@@ -69,7 +70,7 @@ describe(GET, () => {
 
     expect(response.status).toBe(HTTP_STATUS.SEE_OTHER);
     expect(response.headers.get('location')).toBe(MOCK_CONFIRMED_LOCATION);
-    expect(response.headers.get('cache-control')).toBe(
+    expect(response.headers.get(CACHE_CONTROL_HEADER)).toBe(
       CACHE_CONTROL.PRIVATE_NO_STORE,
     );
     expect(confirmSubscriberMock).toHaveBeenCalledWith(

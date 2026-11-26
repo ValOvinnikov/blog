@@ -13952,6 +13952,14 @@
         "file": "apps/web/src/constants/topic.ts"
       }
     ],
+    "translation_map.fetch_failed": [
+      {
+        "ref": "TRANSLATION_MAP_LOG.FETCH_FAILED",
+        "scope": "app:web",
+        "from": "@web/constants/translation-map",
+        "file": "apps/web/src/constants/translation-map.ts"
+      }
+    ],
     "access_run.workflow_call_started": [
       {
         "ref": "ACCESS_RUN_LOG.WORKFLOW_CALL_STARTED",
