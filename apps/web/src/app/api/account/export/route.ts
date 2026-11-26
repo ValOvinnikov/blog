@@ -1,27 +1,24 @@
+import { HTTP_STATUS, MEDIA_TYPE } from '@shinefold/config/constants';
 import { queries } from '@shinefold/db';
+import { ACCOUNT_LOG } from '@web/constants/account';
 import { auth } from '@web/server/auth/auth';
 import { resolveTenantId } from '@web/server/tenant/resolve-tenant/resolve-tenant';
 import { logger } from '@web/utils/logger/logger';
 import { headers } from 'next/headers';
 import { NextResponse } from 'next/server';
 
-/**
- * `GET /api/account/export` — the `/account` "export my data" download. A
- * plain Route Handler (not a Server Action, which can't stream a
- * `Content-Disposition` response) gated by the session cookie the browser
- * already sends, so a signed-in reader's `LinkButton` can point straight at
- * this URL with a `download` attribute.
- *
- * `/api` routes are excluded from `proxy.ts`'s matcher, so the `x-tenant-id`
- * header it threads to Server Components/Actions never reaches here — this
- * route resolves the tenant directly from its own request's `Host` header.
- */
+const ACCOUNT_NOT_FOUND_MESSAGE = 'Account not found';
+
+/** `/api` routes sit outside `proxy.ts`'s matcher, so this resolves the tenant from its own `Host` header rather than `x-tenant-id`. */
 export async function GET(): Promise<NextResponse> {
   const session = await auth();
   const userId = session?.user?.id;
 
   if (!userId) {
-    return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
+    return NextResponse.json(
+      { message: 'Unauthorized' },
+      { status: HTTP_STATUS.UNAUTHORIZED },
+    );
   }
 
   try {
@@ -30,8 +27,8 @@ export async function GET(): Promise<NextResponse> {
 
     if (!tenantId) {
       return NextResponse.json(
-        { message: 'Account not found' },
-        { status: 404 },
+        { message: ACCOUNT_NOT_FOUND_MESSAGE },
+        { status: HTTP_STATUS.NOT_FOUND },
       );
     }
 
@@ -39,20 +36,23 @@ export async function GET(): Promise<NextResponse> {
 
     if (!data) {
       return NextResponse.json(
-        { message: 'Account not found' },
-        { status: 404 },
+        { message: ACCOUNT_NOT_FOUND_MESSAGE },
+        { status: HTTP_STATUS.NOT_FOUND },
       );
     }
 
     return new NextResponse(JSON.stringify(data, null, 2), {
-      status: 200,
+      status: HTTP_STATUS.OK,
       headers: {
-        'Content-Type': 'application/json',
+        'Content-Type': MEDIA_TYPE.JSON,
         'Content-Disposition': 'attachment; filename="account-data.json"',
       },
     });
   } catch (error) {
-    logger.error('account.export_failed', { error });
-    return NextResponse.json({ message: 'Export failed' }, { status: 500 });
+    logger.error(ACCOUNT_LOG.EXPORT_FAILED, { error });
+    return NextResponse.json(
+      { message: 'Export failed' },
+      { status: HTTP_STATUS.INTERNAL_SERVER_ERROR },
+    );
   }
 }

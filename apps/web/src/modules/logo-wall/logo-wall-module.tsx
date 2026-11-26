@@ -1,4 +1,5 @@
 import { service } from '@shinefold/service';
+import { LOGO_WALL_LOG } from '@web/constants/logo-wall';
 import { getRequestContext } from '@web/server/request-context/request-context';
 import { logger } from '@web/utils/logger/logger';
 
@@ -16,7 +17,7 @@ export const LogoWallModule = async ({ id }: ILogoWallModuleProps) => {
   );
 
   if (!result.ok) {
-    logger.error('logo_wall_module.fetch_failed', {
+    logger.error(LOGO_WALL_LOG.MODULE_FETCH_FAILED, {
       id,
       error: result.error,
     });

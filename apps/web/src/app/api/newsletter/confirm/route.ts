@@ -4,6 +4,7 @@ import {
   TENANT_WRITE_REFUSAL,
 } from '@shinefold/config';
 import { queries } from '@shinefold/db';
+import { NEWSLETTER_LOG } from '@web/constants/newsletter';
 import { redirectToNewsletterResult } from '@web/server/newsletter/newsletter-result-redirect/newsletter-result-redirect';
 import { resolveWritableTenant } from '@web/server/tenant/write-gate/write-gate';
 import { logger } from '@web/utils/logger/logger';
@@ -23,7 +24,7 @@ export async function GET(request: Request): Promise<NextResponse> {
     const tenant = await resolveWritableTenant('newsletter.confirm');
     if (!tenant.ok) {
       if (tenant.error === TENANT_WRITE_REFUSAL.INACTIVE) {
-        logger.warn('newsletter.confirm_tenant_not_active');
+        logger.warn(NEWSLETTER_LOG.CONFIRM_TENANT_NOT_ACTIVE);
         return redirectToNewsletterResult(
           request,
           NEWSLETTER_RESULT.CONFIRM_UNAVAILABLE,
@@ -47,7 +48,7 @@ export async function GET(request: Request): Promise<NextResponse> {
         : NEWSLETTER_RESULT.CONFIRMED,
     );
   } catch (error) {
-    logger.error('newsletter.confirm_failed', { error });
+    logger.error(NEWSLETTER_LOG.CONFIRM_FAILED, { error });
     return redirectToNewsletterResult(
       request,
       NEWSLETTER_RESULT.CONFIRM_FAILED,

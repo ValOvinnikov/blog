@@ -5,6 +5,7 @@ import {
   type TLocaleIsoCode,
 } from '@shinefold/config';
 import { errorResult, okResult } from '@shinefold/utils';
+import { TAG_INDEX_LOG } from '@web/constants/tag-index';
 import { getRequestContext } from '@web/server/request-context/request-context';
 import { NL_TAGS_INDEX_PATH } from '@web/testing/metadata/index-paths/fixtures';
 import {
@@ -78,7 +79,7 @@ describe(buildTagIndexMetadata, () => {
 
       expect(metadata).toEqual({});
       expect(vi.mocked(logger.error)).toHaveBeenCalledWith(
-        'tag_index_metadata.fetch_failed',
+        TAG_INDEX_LOG.METADATA_FETCH_FAILED,
         { error: MOCK_ERROR },
       );
     });

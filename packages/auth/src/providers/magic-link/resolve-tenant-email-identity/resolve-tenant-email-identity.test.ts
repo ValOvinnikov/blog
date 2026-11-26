@@ -8,6 +8,7 @@ import {
 } from '@shinefold/auth/testing/magic-link-fixtures';
 import { resolveTenantEmailBrand } from '@shinefold/config';
 import { LOCALE_ISO_CODES, TENANT_PLAN } from '@shinefold/config/constants';
+import { MOCK_YELLOW_HEX } from '@shinefold/config/testing/button-colors';
 import { ENTITLEMENT_KIND, PLAN_LOCALE_LIMIT } from '@shinefold/db/constants';
 import { mockEntitlementGrant } from '@shinefold/db/testing/tenant-entitlement-grants/mock-entitlement-grant';
 
@@ -64,6 +65,26 @@ describe(resolveTenantEmailIdentity, () => {
       liveLocales: [LOCALE_ISO_CODES.NL, LOCALE_ISO_CODES.FR],
     });
   });
+
+  it.each([
+    { plan: TENANT_PLAN.GROWTH, buttonColor: MOCK_YELLOW_HEX },
+    { plan: TENANT_PLAN.FREE, buttonColor: undefined },
+  ])(
+    "gives a $plan tenant's brand the button colour its Look allows",
+    async ({ plan, buttonColor }) => {
+      getTenantByDomainMock.mockResolvedValue(mockTenant({ plan }));
+      getSiteConfigMock.mockResolvedValue({
+        ...MOCK_SITE_CONFIG,
+        buttonColor: MOCK_YELLOW_HEX,
+      });
+
+      const result = await resolveTenantEmailIdentity(MOCK_TENANT_HOST);
+
+      expect(result?.brand).toEqual(
+        resolveTenantEmailBrand({ ...MOCK_SITE_CONFIG, buttonColor }),
+      );
+    },
+  );
 
   it('counts a granted language limit in the live locales', async () => {
     getTenantByDomainMock.mockResolvedValue(

@@ -59,8 +59,7 @@ Before writing code:
   (`ui-library-practices` § Purity rules).
 - From the workspace, source imports only `@shinefold/config`, plus
   `@shinefold/tailwind-config`'s `theme.css` for tokens; stories may also use
-  `objectKeys` from `@shinefold/utils/primitives` (`ui-storybook`) — the `utils` in
-  CLAUDE.md → Layer contracts' `ui → config, utils`. The graph stays acyclic.
+  `keys` from `remeda` (`ui-storybook`). The graph stays acyclic.
 - You build the library, never routes or pages — that's `web`. If a component
   needs data, expose a prop and say so.
 
