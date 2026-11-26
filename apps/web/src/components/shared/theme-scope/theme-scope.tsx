@@ -1,10 +1,10 @@
-import type { TThemeTokens } from '@shinefold/config';
 import { resolveFontVariableClassName } from '@web/config/fonts';
 import { buildThemeStyleBlock } from '@web/utils/build-theme-style-block';
+import type { TSiteThemeTokens } from '@web/utils/to-theme-tokens';
 import type { ReactNode } from 'react';
 
 type TThemeScopeProps = {
-  themeTokens: TThemeTokens;
+  themeTokens: TSiteThemeTokens;
   children: ReactNode;
 };
 
