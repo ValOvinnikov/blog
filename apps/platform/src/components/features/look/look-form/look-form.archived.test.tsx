@@ -7,7 +7,6 @@ import {
   ACCENT_HUE,
   COMPACT,
   CONSOLE,
-  DATA_DISABLED,
   EDITORIAL,
   EXTRA_LARGE,
   FOLLOW_ACCENT_HUE,
@@ -51,7 +50,7 @@ describe(`<${LookForm.name}/>`, () => {
         expectArchivedOffersNoSave();
       });
 
-      it('disables every Look control', async () => {
+      it('locks every Look control focusable, aria-disabled', async () => {
         const consolePreset = screen.getByRole('radio', { name: CONSOLE });
         const editorialPreset = screen.getByRole('radio', { name: EDITORIAL });
         await openLookRow(user, LOOK_ROW.COLOUR);
@@ -69,13 +68,13 @@ describe(`<${LookForm.name}/>`, () => {
 
         expect(consolePreset).toHaveAttribute(ARIA_DISABLED, 'true');
         expect(editorialPreset).toHaveAttribute(ARIA_DISABLED, 'true');
-        expect(hueSlider).toBeDisabled();
-        expect(followSwitch).toBeDisabled();
-        expect(uploadLogoButton).toBeDisabled();
-        expect(uploadFaviconButton).toBeDisabled();
+        expect(hueSlider).toHaveAttribute(ARIA_DISABLED, 'true');
+        expect(followSwitch).toHaveAttribute(ARIA_DISABLED, 'true');
+        expect(uploadLogoButton).toHaveAttribute(ARIA_DISABLED, 'true');
+        expect(uploadFaviconButton).toHaveAttribute(ARIA_DISABLED, 'true');
       });
 
-      it('disables the Header controls', async () => {
+      it('locks the Header controls', async () => {
         await openLookRow(user, LOOK_ROW.HEADER);
         const layoutSelect = screen.getByRole('combobox', {
           name: HEADER_LAYOUT_LABEL,
@@ -96,17 +95,17 @@ describe(`<${LookForm.name}/>`, () => {
           name: LOOK_FORM.navLinkStyleOptionLabel.UNDERLINE,
         });
 
-        expect(layoutSelect).toHaveAttribute(DATA_DISABLED);
+        expect(layoutSelect).toHaveAttribute(ARIA_DISABLED, 'true');
         expect(layoutSelect).toHaveAccessibleDescription(
           `${ARCHIVED_NOTICE_DESCRIPTION} ${LOOK_FORM.headerLayoutDescription}`,
         );
-        expect(dropdownButton).toBeDisabled();
-        expect(floatingButton).toBeDisabled();
-        expect(softButton).toBeDisabled();
-        expect(underlineButton).toBeDisabled();
+        expect(dropdownButton).toHaveAttribute(ARIA_DISABLED, 'true');
+        expect(floatingButton).toHaveAttribute(ARIA_DISABLED, 'true');
+        expect(softButton).toHaveAttribute(ARIA_DISABLED, 'true');
+        expect(underlineButton).toHaveAttribute(ARIA_DISABLED, 'true');
       });
 
-      it('disables the Type, Corners & spacing and Cards controls', async () => {
+      it('locks the Type, Corners & spacing and Cards controls', async () => {
         await openLookRow(user, LOOK_ROW.TYPE);
         const headingFont = screen.getByRole('combobox', {
           name: LOOK_FORM.headingFontLabel,
@@ -130,18 +129,18 @@ describe(`<${LookForm.name}/>`, () => {
           name: OUTLINED,
         });
 
-        expect(headingFont).toHaveAttribute(DATA_DISABLED);
+        expect(headingFont).toHaveAttribute(ARIA_DISABLED, 'true');
         expect(bodyFont).toHaveAccessibleDescription(
           ARCHIVED_NOTICE_DESCRIPTION,
         );
-        expect(smallButton).toBeDisabled();
-        expect(extraLargeButton).toBeDisabled();
-        expect(compactButton).toBeDisabled();
+        expect(smallButton).toHaveAttribute(ARIA_DISABLED, 'true');
+        expect(extraLargeButton).toHaveAttribute(ARIA_DISABLED, 'true');
+        expect(compactButton).toHaveAttribute(ARIA_DISABLED, 'true');
         expect(outlinedCardTile).toHaveAttribute(ARIA_DISABLED, 'true');
       });
     });
 
-    it('disables Reset to preset and describes it with the archived notice', () => {
+    it('locks Reset to preset and describes it with the archived notice', () => {
       setupArchived({
         initialValues: {
           ...defaultLookFormValues(),
@@ -151,7 +150,7 @@ describe(`<${LookForm.name}/>`, () => {
 
       const resetButton = screen.getByRole('button', { name: RESET_TO_PRESET });
 
-      expect(resetButton).toBeDisabled();
+      expect(resetButton).toHaveAttribute(ARIA_DISABLED, 'true');
       expect(resetButton).toHaveAccessibleDescription(
         ARCHIVED_NOTICE_DESCRIPTION,
       );

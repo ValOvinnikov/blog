@@ -1,5 +1,5 @@
 import en from '@platform/i18n/messages/en.json';
-import { ARIA_SELECTED } from '@platform/testing/aria';
+import { ARIA_DISABLED, ARIA_SELECTED } from '@platform/testing/aria';
 import { expectArchivedOffersNoSave } from '@platform/testing/assert-archived-save';
 import { screen, waitFor, within } from '@platform/testing/custom-render';
 import {
@@ -176,6 +176,6 @@ describe(`<${EmailSettings.name}/>`, () => {
     expectArchivedOffersNoSave();
     const senderNameInput = screen.getByLabelText(SENDER_NAME);
 
-    expect(senderNameInput).toBeDisabled();
+    expect(senderNameInput).toHaveAttribute(ARIA_DISABLED, 'true');
   });
 });

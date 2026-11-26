@@ -22,8 +22,7 @@ export const useLookFieldLock = (field: TLookField) => {
   };
 
   return {
-    isDisabled: isArchived,
-    isLocked: isFieldLocked,
+    isLocked: isArchived || isFieldLocked,
     aria,
     labelId,
     growthBadgeId,

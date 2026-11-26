@@ -1,47 +1,40 @@
 'use client';
 
+import type {
+  TAssetUploadControl,
+  TAssetUploadSpec,
+} from '@platform/components/shared/asset-upload-field/asset-upload-spec';
 import { Button } from '@platform/components/shared/button';
 import { Icon } from '@platform/components/shared/icon';
 import {
   ASSET_UPLOAD_INPUT_TEST_ID,
   ASSET_UPLOAD_LAYOUT,
-  type TAssetUploadLayout,
 } from '@platform/constants/asset-upload';
 import { BUTTON_VARIANT } from '@platform/constants/button';
-import type { TEmailLogoKind } from '@platform/constants/email-logo';
 import { ICON_SIZE } from '@platform/constants/icon';
-import type { TBrandAssetKind } from '@platform/utils/brand-asset-limits/brand-asset-limits';
-import { ICONS, SIZE, type TMaybeUndefined } from '@shinefold/config';
+import { ICONS, SIZE } from '@shinefold/config';
 import { useTranslations } from 'next-intl';
 import { type ChangeEvent, useRef } from 'react';
 
 import { assetUploadActionsVariants } from './asset-upload-actions-variants';
 
 type TAssetUploadActionsProps = {
-  kind: TBrandAssetKind | TEmailLogoKind;
-  size: typeof SIZE.SM | typeof SIZE.MD;
-  layout: TAssetUploadLayout;
-  acceptedMimeTypes: readonly string[];
+  asset: Required<Omit<TAssetUploadSpec, 'validateFile'>>;
   hasImage: boolean;
   onFileChange: (event: ChangeEvent<HTMLInputElement>) => void;
   onRemove: () => void;
-  id?: string;
-  isDisabled: boolean;
-  describedBy: TMaybeUndefined<string>;
+  control: TAssetUploadControl;
 };
 
 export const AssetUploadActions = ({
-  kind,
-  size,
-  layout,
-  acceptedMimeTypes,
+  asset,
   hasImage,
   onFileChange,
   onRemove,
-  id,
-  isDisabled,
-  describedBy,
+  control,
 }: TAssetUploadActionsProps) => {
+  const { kind, size, layout, acceptedMimeTypes } = asset;
+  const { id, isDisabled, isLocked, describedBy } = control;
   const t = useTranslations('assetUploadField');
   const inputRef = useRef<HTMLInputElement>(null);
   const { root, input, pickButton, pickContent, removeButton } =
@@ -71,6 +64,7 @@ export const AssetUploadActions = ({
         variant={BUTTON_VARIANT.SECONDARY}
         onClick={() => inputRef.current?.click()}
         isDisabled={isDisabled}
+        isAriaDisabled={isLocked}
         aria-describedby={describedBy}
         aria-label={isBareVerb ? pickLabel : undefined}
         className={pickButton()}
@@ -91,6 +85,7 @@ export const AssetUploadActions = ({
           variant={BUTTON_VARIANT.GHOST}
           onClick={onRemove}
           isDisabled={isDisabled}
+          isAriaDisabled={isLocked}
           aria-describedby={describedBy}
           className={removeButton()}
         >

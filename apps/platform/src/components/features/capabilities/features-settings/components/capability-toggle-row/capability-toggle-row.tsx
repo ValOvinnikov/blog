@@ -10,7 +10,7 @@ import { grantFocusId } from '@platform/utils/grant-focus-id/grant-focus-id';
 import type { TGrantAccess } from '@platform/utils/grant-target/grant-target';
 import { lowestPlanWithCapability } from '@platform/utils/lowest-plan-with-capability/lowest-plan-with-capability';
 import type { TCapabilityToggle } from '@platform/utils/settings-features-fields/settings-features-fields';
-import type { TCapability } from '@shinefold/config';
+import { CAPABILITY_PARENT, type TCapability } from '@shinefold/config';
 import { ENTITLEMENT_KIND } from '@shinefold/db/constants';
 import { isUndefined } from '@shinefold/utils/primitives';
 import { useTranslations } from 'next-intl';
@@ -44,10 +44,16 @@ export const CapabilityToggleRow = ({
   const isNested = !isUndefined(parentField);
   const label = t(`toggleLabel.${capability}`);
   const description = t(`toggleDescription.${capability}`);
-  const isRequired = !isUndefined(requiredReason);
-  const isLocked = !isEntitled || isArchived || isRequired;
+  const parent = CAPABILITY_PARENT[capability];
+  const dependencyReason =
+    requiredReason ??
+    (isParentOff && parent
+      ? t('parentOffReason', { parent: t(`toggleLabel.${parent}`) })
+      : undefined);
+  const hasDependency = !isUndefined(dependencyReason);
+  const isLocked = !isEntitled || isArchived || hasDependency;
   const lockedReason = isEntitled
-    ? requiredReason
+    ? dependencyReason
     : t('planLockedBadge', { plan: lowestPlanWithCapability(capability) });
   const granted = grants.granted[capability];
   const switchId = grantFocusId(capability);
@@ -66,7 +72,7 @@ export const CapabilityToggleRow = ({
       description={description}
       isNested={isNested}
       status={
-        granted && !isRequired ? (
+        granted && !hasDependency ? (
           <Field.Description className={grantedStatus()}>
             <GrantedBadge expiresAt={granted.expiresAt} />
           </Field.Description>
@@ -89,7 +95,7 @@ export const CapabilityToggleRow = ({
         aria={{ label, describedBy: archivedDescribedBy }}
         isChecked={isChecked}
         onCheckedChange={onCheckedChange}
-        isDisabled={!isLocked && (isPending || isParentOff)}
+        isDisabled={isPending}
         isLocked={isLocked}
         labels={{ on: t('switchOn'), off: t('switchOff') }}
       />

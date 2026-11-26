@@ -12,10 +12,12 @@ import { makeEnTranslator } from '@platform/testing/en-translator';
 import { mockRouterRefresh } from '@platform/testing/mock-router';
 import {
   ALL_CHANGES_SAVED,
+  ARCHIVED_NOTICE_DESCRIPTION,
   SAVE_CHANGES,
   UNSAVED_CHANGES,
 } from '@platform/testing/render-in-settings-form';
 import {
+  MOCK_ARCHIVED_AT,
   MOCK_TENANT_CREATED_AT,
   MOCK_TENANT_ID,
   mockGrantTarget,
@@ -181,6 +183,26 @@ describe(`<${LanguagesSettings.name}/>`, () => {
 
     expect(germanSwitch).toHaveAttribute(ARIA_DISABLED, 'true');
     expect(reasons).toHaveLength(2);
+  });
+
+  describe('for an archived tenant', () => {
+    beforeEach(() => {
+      setup({ archivedAt: MOCK_ARCHIVED_AT });
+    });
+
+    it('keeps a language reachable, aria-disabled and described by the archived notice', async () => {
+      const germanSwitch = screen.getByRole(SWITCH, {
+        name: languageNames[DE],
+      });
+      await user.click(germanSwitch);
+
+      expect(germanSwitch).toHaveFocus();
+      expect(germanSwitch).toHaveAttribute(ARIA_DISABLED, 'true');
+      expect(germanSwitch).toHaveAccessibleDescription(
+        ARCHIVED_NOTICE_DESCRIPTION,
+      );
+      expect(germanSwitch).not.toBeChecked();
+    });
   });
 
   it('shows the languages the site serves as live', () => {

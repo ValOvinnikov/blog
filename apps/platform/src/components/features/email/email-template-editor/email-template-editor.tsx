@@ -45,7 +45,7 @@ export const EmailTemplateEditor = ({
 }: TEmailTemplateEditorProps) => {
   const t = useTranslations('emailTemplateEditor');
   const { isArchived, isPending, archivedDescribedBy } = useSettingsFormState();
-  const isDisabled = isArchived || isPending;
+  const canReset = !isArchived && !isPending;
   const [bodyRevision, setBodyRevision] = useState(0);
   const bodyHintId = useId();
   const { stack, status } = emailTemplateEditorVariants();
@@ -80,14 +80,18 @@ export const EmailTemplateEditor = ({
           <FormField
             label={t('subjectLabel', { language: languageName })}
             hint={t('subjectHint')}
-            control={{ isDisabled, describedBy: archivedDescribedBy }}
+            control={{
+              isDisabled: isPending,
+              isLocked: isArchived,
+              describedBy: archivedDescribedBy,
+            }}
             actions={
               <span className={status()}>
                 <FieldStatus
                   isCustomised={isSubjectCustomised}
                   isUnsaved={draft.subject !== saved.subject}
                 />
-                {isSubjectCustomised && !isDisabled && (
+                {isSubjectCustomised && canReset && (
                   <FieldResetButton onReset={resetSubject} />
                 )}
               </span>
@@ -109,7 +113,7 @@ export const EmailTemplateEditor = ({
                   isCustomised={isBodyCustomised}
                   isUnsaved={!isSameJson(draft.body, saved.body)}
                 />
-                {isBodyCustomised && !isDisabled && (
+                {isBodyCustomised && canReset && (
                   <FieldResetButton onReset={resetBody} />
                 )}
               </span>
@@ -123,7 +127,13 @@ export const EmailTemplateEditor = ({
                 label: t('bodyLabel', { language: languageName }),
                 describedBy: joinIds(bodyHintId, archivedDescribedBy),
               }}
-              mode={isDisabled ? CONTROL_MODE.DISABLED : CONTROL_MODE.EDITABLE}
+              mode={
+                isArchived
+                  ? CONTROL_MODE.READ_ONLY
+                  : isPending
+                    ? CONTROL_MODE.DISABLED
+                    : CONTROL_MODE.EDITABLE
+              }
             />
           </FormField>
           <EmailLogoField

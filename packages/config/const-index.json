@@ -6472,6 +6472,14 @@
         "file": "apps/platform/src/constants/activity.ts"
       }
     ],
+    "aria-disabled": [
+      {
+        "ref": "ARIA_ATTRIBUTE.DISABLED",
+        "scope": "app:platform",
+        "from": "@platform/constants/aria-attribute",
+        "file": "apps/platform/src/constants/aria-attribute.ts"
+      }
+    ],
     "region": [
       {
         "ref": "ARIA_ROLE.REGION",

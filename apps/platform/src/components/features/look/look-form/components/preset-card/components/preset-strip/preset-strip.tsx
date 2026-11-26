@@ -19,7 +19,7 @@ export type TPresetStripProps<TId extends string> = {
   onChange: (value: TId) => void;
   labelledBy: string;
   describedBy?: string;
-  isDisabled?: boolean;
+  isLocked?: boolean;
 };
 
 export const PresetStrip = <TId extends string>({
@@ -28,7 +28,7 @@ export const PresetStrip = <TId extends string>({
   onChange,
   labelledBy,
   describedBy,
-  isDisabled,
+  isLocked,
 }: TPresetStripProps<TId>) => {
   const rowRef = useRef<HTMLDivElement>(null);
   const measureRef = useRef<HTMLDivElement>(null);
@@ -41,7 +41,7 @@ export const PresetStrip = <TId extends string>({
   }).flatMap((index) => presets[index] ?? []);
   const selected = presets.find(({ id }) => id === value);
   const isOverflowing = visible.length < presets.length;
-  const access = { labelledBy, describedBy, isDisabled };
+  const access = { labelledBy, describedBy, isLocked };
   const { root, row, measure } = presetStripVariants();
 
   return (
@@ -70,7 +70,7 @@ export const PresetStrip = <TId extends string>({
             hiddenCount={presets.length - visible.length}
             anchorRef={rowRef}
             describedBy={describedBy}
-            isDisabled={isDisabled}
+            isLocked={isLocked}
           />
         )}
       </div>

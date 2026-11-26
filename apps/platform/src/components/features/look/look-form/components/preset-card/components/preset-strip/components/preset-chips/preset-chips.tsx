@@ -17,7 +17,7 @@ type TPresetChipsProps<TId extends string> = {
   onChange: (value: TId) => void;
   labelledBy: string;
   describedBy?: string;
-  isDisabled?: boolean;
+  isLocked?: boolean;
 };
 
 export const PresetChips = <TId extends string>({
@@ -26,7 +26,7 @@ export const PresetChips = <TId extends string>({
   onChange,
   labelledBy,
   describedBy,
-  isDisabled,
+  isLocked = false,
 }: TPresetChipsProps<TId>) => {
   const idBase = useId();
   const { root } = presetChipsVariants();
@@ -37,7 +37,7 @@ export const PresetChips = <TId extends string>({
       aria-describedby={describedBy}
       value={value}
       onValueChange={(next) => onChange(next as TId)}
-      disabled={isDisabled}
+      readOnly={isLocked}
       className={root()}
     >
       {presets.map(({ id, name, description: text, swatch }) => {
@@ -50,6 +50,7 @@ export const PresetChips = <TId extends string>({
             <Radio.Root
               value={id}
               aria-describedby={descriptionId}
+              aria-disabled={isLocked || undefined}
               className={chip()}
             >
               <PresetSwatch swatch={swatch} size={SIZE.SM} />

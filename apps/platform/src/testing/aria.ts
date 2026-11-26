@@ -1,4 +1,6 @@
-export const ARIA_DISABLED = 'aria-disabled';
+import { ARIA_ATTRIBUTE } from '@platform/constants/aria-attribute';
+
+export const ARIA_DISABLED = ARIA_ATTRIBUTE.DISABLED;
 export const ARIA_HIDDEN = 'aria-hidden';
 export const ARIA_VALUENOW = 'aria-valuenow';
 export const ARIA_VALUEMAX = 'aria-valuemax';

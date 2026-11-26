@@ -30,7 +30,7 @@ export const PresetValueButton = ({
       variant={BUTTON_VARIANT.LINK}
       className={root()}
       onClick={() => resetFieldToPreset(field)}
-      isDisabled={isArchived}
+      isAriaDisabled={isArchived}
       aria-describedby={archivedDescribedBy}
       aria-label={t('usePresetValueAriaLabel', { field: fieldLabel })}
     >

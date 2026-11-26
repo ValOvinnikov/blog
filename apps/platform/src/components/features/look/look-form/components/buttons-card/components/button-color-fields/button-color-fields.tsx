@@ -92,7 +92,7 @@ export const ButtonColorFields = () => {
           isInvalid={isDarkInvalid}
           lock={{
             ...darkLock,
-            isDisabled: darkLock.isDisabled || isUndefined(buttonColor),
+            isDisabled: isUndefined(buttonColor),
           }}
         />
       </LookField>

@@ -63,7 +63,7 @@ export const TenantDetailsFields = ({
             label={t(labelKey)}
             hint={lockReason}
             error={fieldErrorText(fieldErrors[key])}
-            control={{ isDisabled: Boolean(lockReason) }}
+            control={{ isLocked: Boolean(lockReason) }}
           >
             <TextInput
               type={'type' in field ? field.type : undefined}
@@ -88,6 +88,7 @@ export const TenantDetailsFields = ({
         label={t('planLabel')}
         options={planOptions}
         value={values.plan}
+        // eslint-disable-next-line shinefold-touched/prefer-shared-constant -- a form field key, not BADGE_TONE.PLAN
         onChange={(plan) => onChange('plan', plan)}
         lockReason={lockReasonText(fieldLocks.plan)}
       />

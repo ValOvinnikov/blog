@@ -1,12 +1,15 @@
 import { faker } from '@faker-js/faker';
+import { ARIA_DISABLED } from '@platform/testing/aria';
 import {
   customRender,
   renderWithIntl,
   screen,
 } from '@platform/testing/custom-render';
+import { USER_EVENT_KEY } from '@platform/testing/keyboard';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
+import type { Mock } from 'vitest';
 
-import { HueSlider } from './hue-slider';
+import { HueSlider, type THueSliderProps } from './hue-slider';
 
 faker.seed(5995);
 
@@ -21,19 +24,29 @@ const setup = customRender(HueSlider, {
   onChange: vi.fn(),
 });
 
+const getSlider = () => screen.getByRole('slider', { name: MOCK_LABEL });
+
 describe(`<${HueSlider.name}/>`, () => {
   let user: UserEvent;
+  let handleChange: Mock<THueSliderProps['onChange']>;
 
   beforeEach(() => {
     user = userEvent.setup();
+    handleChange = vi.fn();
   });
 
-  it('names the slider and reports its value', () => {
-    setup();
+  describe('with its defaults', () => {
+    beforeEach(() => {
+      setup();
+    });
 
-    const slider = screen.getByRole('slider', { name: MOCK_LABEL });
+    it('names the slider and reports its value', () => {
+      expect(getSlider()).toHaveAttribute('aria-valuenow', String(MOCK_HUE));
+    });
 
-    expect(slider).toHaveAttribute('aria-valuenow', String(MOCK_HUE));
+    it('reads its value as hue text', () => {
+      expect(getSlider()).toHaveAttribute('aria-valuetext', `hue ${MOCK_HUE}°`);
+    });
   });
 
   it('is named by the visible label it points at', () => {
@@ -43,48 +56,41 @@ describe(`<${HueSlider.name}/>`, () => {
         <HueSlider
           name={{ labelledBy: MOCK_LABEL_ID }}
           value={MOCK_HUE}
-          onChange={vi.fn()}
+          onChange={handleChange}
         />
       </>,
     );
 
-    const slider = screen.getByRole('slider', { name: MOCK_LABEL });
-
-    expect(slider).not.toHaveAttribute('aria-label');
-  });
-
-  it('reads its value as hue text', () => {
-    setup();
-
-    const slider = screen.getByRole('slider', { name: MOCK_LABEL });
-
-    expect(slider).toHaveAttribute('aria-valuetext', `hue ${MOCK_HUE}°`);
+    expect(getSlider()).not.toHaveAttribute('aria-label');
   });
 
   it('reports an incremented value on ArrowRight', async () => {
-    const handleChange = vi.fn();
     setup({ onChange: handleChange });
 
-    const slider = screen.getByRole('slider', { name: MOCK_LABEL });
-    await user.click(slider);
-    await user.keyboard('{ArrowRight}');
+    await user.click(getSlider());
+    await user.keyboard(USER_EVENT_KEY.ARROW_RIGHT);
 
     expect(handleChange).toHaveBeenCalledWith(MOCK_HUE + 1);
   });
 
-  it('is disabled when the slider cannot be changed', () => {
-    setup({ isDisabled: true });
+  it('stays focusable and ignores an arrow key when locked', async () => {
+    setup({ onChange: handleChange, isLocked: true });
+    const slider = getSlider();
 
-    const slider = screen.getByRole('slider', { name: MOCK_LABEL });
+    await user.click(slider);
+    await user.keyboard(USER_EVENT_KEY.ARROW_RIGHT);
 
-    expect(slider).toBeDisabled();
+    expect(slider).toHaveFocus();
+    expect(slider).toHaveAttribute(ARIA_DISABLED, 'true');
+    expect(handleChange).not.toHaveBeenCalled();
   });
 
   it('is described by the element it is pointed at', () => {
     setup({ 'aria-describedby': MOCK_DESCRIPTION_ID });
 
-    const slider = screen.getByRole('slider', { name: MOCK_LABEL });
-
-    expect(slider).toHaveAttribute('aria-describedby', MOCK_DESCRIPTION_ID);
+    expect(getSlider()).toHaveAttribute(
+      'aria-describedby',
+      MOCK_DESCRIPTION_ID,
+    );
   });
 });

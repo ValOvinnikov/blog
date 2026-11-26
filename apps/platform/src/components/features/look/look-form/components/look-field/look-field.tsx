@@ -34,7 +34,7 @@ export const LookField = ({
   children,
 }: TLookFieldProps) => {
   const { hasFieldChanged } = useLookForm();
-  const { labelId, growthBadgeId, isDisabled = false } = lock ?? {};
+  const { labelId, growthBadgeId } = lock ?? {};
   const t = useTranslations('lookForm');
   const hintId = useId();
   const {
@@ -80,11 +80,7 @@ export const LookField = ({
   );
 
   return (
-    <Field.Root
-      invalid={Boolean(error)}
-      disabled={isDisabled}
-      className={fieldSlot()}
-    >
+    <Field.Root invalid={Boolean(error)} className={fieldSlot()}>
       {isGroup ? (
         // ToggleGroup ignores Field's description ids, so the group carries the hint.
         <Fieldset.Root

@@ -41,7 +41,7 @@ export const Switch = ({
         onCheckedChange={(checked) => {
           if (!isLocked) onCheckedChange(checked);
         }}
-        disabled={isDisabled}
+        disabled={isDisabled && !isLocked}
         aria-label={label}
         aria-labelledby={labelledBy}
         aria-describedby={describedBy}

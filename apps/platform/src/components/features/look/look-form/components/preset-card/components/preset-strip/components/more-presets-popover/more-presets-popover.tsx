@@ -29,7 +29,7 @@ type TMorePresetsPopoverProps<TId extends string> = {
   hiddenCount: number;
   anchorRef: RefObject<TMaybeNull<HTMLElement>>;
   describedBy?: string;
-  isDisabled?: boolean;
+  isLocked?: boolean;
 };
 
 export const MorePresetsPopover = <TId extends string>({
@@ -39,7 +39,7 @@ export const MorePresetsPopover = <TId extends string>({
   hiddenCount,
   anchorRef,
   describedBy,
-  isDisabled,
+  isLocked = false,
 }: TMorePresetsPopoverProps<TId>) => {
   const t = useTranslations('presetPicker');
   const [isOpen, setIsOpen] = useState(false);
@@ -75,9 +75,14 @@ export const MorePresetsPopover = <TId extends string>({
   };
 
   return (
-    <Popover.Root open={isOpen} onOpenChange={setIsOpen}>
+    <Popover.Root
+      open={isOpen}
+      onOpenChange={(open) => {
+        if (!isLocked || !open) setIsOpen(open);
+      }}
+    >
       <Popover.Trigger
-        disabled={isDisabled}
+        aria-disabled={isLocked || undefined}
         aria-label={t('morePresetsAriaLabel', { count: hiddenCount })}
         aria-describedby={describedBy}
         aria-haspopup="dialog"

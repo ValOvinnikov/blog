@@ -106,7 +106,7 @@ from `useSettingsFormState()`:
     isChecked={values[field]}
     onCheckedChange={(checked) => handleToggle(field, checked)}
     isLocked={!isUndefined(lockReason) || isArchived}
-    isDisabled={isPending && isUndefined(lockReason) && !isArchived}
+    isDisabled={isPending}
     labels={{ on: t('switchOn'), off: t('switchOff') }}
   />
 </SettingRow>
@@ -115,13 +115,15 @@ from `useSettingsFormState()`:
 - A lock with a reason goes to the control's `isLocked`, which keeps it in
   the Tab order as `aria-disabled`; `isDisabled` is for a state with nothing
   to explain (→ `react-component-practices` § Accessible by construction).
-  A `Button` blocked for a reason takes `isAriaDisabled`.
+  A `Button` blocked for a reason takes `isAriaDisabled`. `Switch` lets a
+  lock win over `isDisabled` itself, so a caller never guards one with the
+  other.
 - A locked choice control (segmented control, tile group, select) greys its
   text as well as its ground: the picked option or closed value in
   `text-platform-muted`, the rest and a select's chevron in
-  `text-platform-faint`. Only `lock.isLocked` greys; an archived site passes
-  `isDisabled` and keeps the disabled fade, so a caller never folds archived
-  into `isLocked`.
+  `text-platform-faint`. An archived site is a lock with a reason — the
+  archived notice, joined into `describedBy` — so it passes `isLocked`, never
+  `isDisabled`.
 - `lockReason` is `undefined` or the translated reason the switch can't be
   used, set for every cause other than saving or archiving (not on the plan, the
   plan's limit reached, another setting off), each with its own key: no row is

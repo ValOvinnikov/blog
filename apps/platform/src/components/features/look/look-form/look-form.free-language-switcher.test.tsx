@@ -93,7 +93,7 @@ describe(`<${LookForm.name}/>`, () => {
     });
   });
 
-  it('keeps the Free message and a disabled style, unbadged, on an archived Free site', async () => {
+  it('keeps the Free message and a locked style, unbadged, on an archived Free site', async () => {
     setupArchived({
       ...withLookPlan(TENANT_PLAN.FREE),
       liveLocales: [LOCALE_ISO_CODES.EN],
@@ -113,7 +113,7 @@ describe(`<${LookForm.name}/>`, () => {
 
     expect(freeLine).toBeVisible();
     expect(singleLanguageNote).not.toBeInTheDocument();
-    expect(codesButton).toBeDisabled();
+    expect(codesButton).toHaveAttribute(ARIA_DISABLED, 'true');
     expect(badges).toHaveLength(0);
   });
 });

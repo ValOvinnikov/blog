@@ -57,7 +57,7 @@ export const PresetCard = () => {
             onChange={changePreset}
             labelledBy={titleId}
             describedBy={archivedDescribedBy}
-            isDisabled={isArchived}
+            isLocked={isArchived}
           />
         </div>
         {canResetToPreset && (
@@ -66,7 +66,7 @@ export const PresetCard = () => {
             variant={BUTTON_VARIANT.SECONDARY}
             size={SIZE.MD}
             onClick={resetToPreset}
-            isDisabled={isArchived}
+            isAriaDisabled={isArchived}
             aria-describedby={archivedDescribedBy}
             className={reset()}
           >

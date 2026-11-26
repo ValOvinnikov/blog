@@ -25,7 +25,8 @@ import { SIZE } from '@shinefold/config';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
 import type { Mock } from 'vitest';
 
-import { AssetUploadField, type TAssetUploadSpec } from './asset-upload-field';
+import { AssetUploadField } from './asset-upload-field';
+import type { TAssetUploadSpec } from './asset-upload-spec';
 
 faker.seed(5995);
 

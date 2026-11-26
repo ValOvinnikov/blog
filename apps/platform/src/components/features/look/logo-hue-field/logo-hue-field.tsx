@@ -15,7 +15,6 @@ export type TLogoHueFieldProps = {
   accentHue: number;
   logoHue: TMaybeUndefined<number>;
   onChange: (logoHue: TMaybeUndefined<number>) => void;
-  isDisabled?: boolean;
   isLocked?: boolean;
   growthBadgeId?: string;
   'aria-describedby'?: AriaAttributes['aria-describedby'];
@@ -25,7 +24,6 @@ export const LogoHueField = ({
   accentHue,
   logoHue,
   onChange,
-  isDisabled = false,
   isLocked = false,
   growthBadgeId,
   'aria-describedby': ariaDescribedBy,
@@ -50,7 +48,6 @@ export const LogoHueField = ({
         isFollowing={follows}
         onFollowChange={(checked) => onChange(checked ? undefined : accentHue)}
         lock={{
-          isDisabled,
           isLocked,
           growthBadgeId,
           describedBy: ariaDescribedBy,
@@ -84,7 +81,7 @@ export const LogoHueField = ({
             name={{ ariaLabel: t('logoHueAriaLabel') }}
             value={resolvedHue}
             onChange={onChange}
-            isDisabled={isDisabled || isLocked}
+            isLocked={isLocked}
             aria-describedby={ariaDescribedBy}
           />
           <span className={hueValue()}>

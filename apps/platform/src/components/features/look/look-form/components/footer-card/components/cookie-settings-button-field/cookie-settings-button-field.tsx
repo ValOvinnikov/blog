@@ -55,7 +55,7 @@ export const CookieSettingsButtonField = ({
         options={options}
         value={cookieSettingsButton}
         onChange={(reach) => updateField('cookieSettingsButton', reach)}
-        lock={{ isDisabled: isArchived || !hasCookieBanner }}
+        lock={{ isLocked: isArchived || !hasCookieBanner }}
       />
       {!hasCookieBanner && (
         <p id={bannerOffNoteId} className={textVariants({ variant: 'hint' })}>

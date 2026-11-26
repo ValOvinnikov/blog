@@ -1,36 +1,20 @@
 'use client';
 
-import {
-  ASSET_UPLOAD_LAYOUT,
-  type TAssetUploadLayout,
-} from '@platform/constants/asset-upload';
-import type { TEmailLogoKind } from '@platform/constants/email-logo';
-import type { TBrandAssetKind } from '@platform/utils/brand-asset-limits/brand-asset-limits';
+import { ASSET_UPLOAD_LAYOUT } from '@platform/constants/asset-upload';
 import { joinIds } from '@platform/utils/join-ids/join-ids';
 import type { TStagedImage } from '@platform/utils/staged-image/staged-image';
-import type { SIZE, TMaybeUndefined } from '@shinefold/config';
 import { useTranslations } from 'next-intl';
 import { useId } from 'react';
 
 import { assetUploadFieldVariants } from './asset-upload-field-variants';
+import type {
+  TAssetUploadControl,
+  TAssetUploadSpec,
+} from './asset-upload-spec';
 import { AssetUploadActions } from './components/asset-upload-actions';
 import { AssetUploadDetails } from './components/asset-upload-details';
 import { AssetUploadThumb } from './components/asset-upload-thumb';
 import { useAssetFileChoice } from './use-asset-file-choice';
-
-export type TAssetUploadSpec = {
-  kind: TBrandAssetKind | TEmailLogoKind;
-  size: typeof SIZE.SM | typeof SIZE.MD;
-  acceptedMimeTypes: readonly string[];
-  validateFile: (file: File) => TMaybeUndefined<string>;
-  layout?: TAssetUploadLayout;
-};
-
-export type TAssetUploadControl = {
-  id?: string;
-  isDisabled?: boolean;
-  describedBy?: string;
-};
 
 export type TAssetUploadFieldProps = {
   label: string;
@@ -59,7 +43,12 @@ export const AssetUploadField = ({
     validateFile,
     layout = ASSET_UPLOAD_LAYOUT.FRAMED,
   } = asset;
-  const { id, isDisabled = false, describedBy: ariaDescribedBy } = control;
+  const {
+    id,
+    isDisabled = false,
+    isLocked = false,
+    describedBy: ariaDescribedBy,
+  } = control;
   const { url } = image;
   const t = useTranslations('assetUploadField');
   const { validationError, handleFileChange, handleRemove } =
@@ -84,7 +73,7 @@ export const AssetUploadField = ({
   } = assetUploadFieldVariants({
     size,
     isInvalid: Boolean(shownError),
-    isDisabled,
+    isDisabled: isDisabled || isLocked,
   });
 
   const thumb = (
@@ -97,16 +86,11 @@ export const AssetUploadField = ({
   );
   const actions = (
     <AssetUploadActions
-      kind={kind}
-      size={size}
-      layout={layout}
-      acceptedMimeTypes={acceptedMimeTypes}
+      asset={{ kind, size, layout, acceptedMimeTypes }}
       hasImage={Boolean(url)}
       onFileChange={handleFileChange}
       onRemove={handleRemove}
-      id={id}
-      isDisabled={isDisabled}
-      describedBy={describedBy}
+      control={{ id, isDisabled, isLocked, describedBy }}
     />
   );
   const errorLine = shownError && (

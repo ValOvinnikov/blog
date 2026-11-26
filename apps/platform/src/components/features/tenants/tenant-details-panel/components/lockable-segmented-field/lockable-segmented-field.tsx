@@ -43,7 +43,7 @@ export const LockableSegmentedField = <TValue extends string>({
         value={value}
         onChange={onChange}
         className={control()}
-        lock={{ isDisabled: Boolean(lockReason) }}
+        lock={{ isLocked: Boolean(lockReason) }}
       />
     </FormField>
   );

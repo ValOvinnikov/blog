@@ -22,7 +22,7 @@ export type TButtonColorFieldProps = {
   followLabel: string;
   inputId: string;
   isInvalid: boolean;
-  lock: TLookFieldLock;
+  lock: TLookFieldLock & { isDisabled?: boolean };
 };
 
 export const ButtonColorField = ({
@@ -36,7 +36,7 @@ export const ButtonColorField = ({
 }: TButtonColorFieldProps) => {
   const t = useTranslations('buttonColorField');
   const pickerLabelId = useId();
-  const { isDisabled, isLocked, growthBadgeId, aria } = lock;
+  const { isDisabled = false, isLocked, growthBadgeId, aria } = lock;
   const follows = isUndefined(color);
   const pick = (value: string) => {
     if (!isLocked) onChange(value);

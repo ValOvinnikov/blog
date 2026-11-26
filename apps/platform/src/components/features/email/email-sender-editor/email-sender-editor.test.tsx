@@ -1,6 +1,7 @@
 import { faker } from '@faker-js/faker';
 import { EMAIL_SENDER_FIELD_ERROR } from '@platform/constants/email-sender';
 import en from '@platform/i18n/messages/en.json';
+import { ARIA_DISABLED } from '@platform/testing/aria';
 import { screen } from '@platform/testing/custom-render';
 import {
   mockEmailSender,
@@ -126,11 +127,8 @@ describe(`<${EmailSenderEditor.name}/>`, () => {
     expect(contactRecipientInput).not.toBeInTheDocument();
   });
 
-  it.each([
-    { state: 'archived', formState: { isArchived: true } },
-    { state: 'pending', formState: { isPending: true } },
-  ])('locks every field while $state', ({ formState }) => {
-    setup({}, formState);
+  it('disables every field while saving', () => {
+    setup({}, { isPending: true });
 
     const senderNameInput = screen.getByLabelText(senderNameLabel);
     const footerAddressInput = screen.getByLabelText(footerAddressLabel);
@@ -143,28 +141,45 @@ describe(`<${EmailSenderEditor.name}/>`, () => {
     expect(uploadButton).toBeDisabled();
   });
 
-  it.each([
-    { label: senderNameLabel, hint: senderNameHint },
-    { label: footerAddressLabel, hint: footerAddressHint },
-  ])('describes $label with the notice while archived', ({ label, hint }) => {
-    setup({}, { isArchived: true });
-
-    const input = screen.getByLabelText(label);
-
-    expect(input).toHaveAccessibleDescription(
-      `${ARCHIVED_NOTICE_TEXT} ${hint}`,
-    );
-  });
-
-  it('describes the logo upload with the notice while archived', () => {
-    setup({}, { isArchived: true });
-
-    const uploadButton = screen.getByRole('button', {
-      name: UPLOAD_EMAIL_LOGO,
+  describe('while archived', () => {
+    beforeEach(() => {
+      setup({}, { isArchived: true });
     });
 
-    expect(uploadButton).toHaveAccessibleDescription(
-      `${logoHint} ${ARCHIVED_NOTICE_TEXT}`,
-    );
+    it('locks every field focusable and read-only', async () => {
+      const senderNameInput = screen.getByLabelText(senderNameLabel);
+      const footerAddressInput = screen.getByLabelText(footerAddressLabel);
+      const uploadButton = screen.getByRole('button', {
+        name: UPLOAD_EMAIL_LOGO,
+      });
+      await user.type(senderNameInput, senderNameLabel);
+
+      expect(senderNameInput).toHaveFocus();
+      expect(senderNameInput).toHaveAttribute(ARIA_DISABLED, 'true');
+      expect(footerAddressInput).toHaveAttribute(ARIA_DISABLED, 'true');
+      expect(uploadButton).toHaveAttribute(ARIA_DISABLED, 'true');
+      expect(onSenderChange).not.toHaveBeenCalled();
+    });
+
+    it.each([
+      { label: senderNameLabel, hint: senderNameHint },
+      { label: footerAddressLabel, hint: footerAddressHint },
+    ])('describes $label with the notice', ({ label, hint }) => {
+      const input = screen.getByLabelText(label);
+
+      expect(input).toHaveAccessibleDescription(
+        `${ARCHIVED_NOTICE_TEXT} ${hint}`,
+      );
+    });
+
+    it('describes the logo upload with the notice', () => {
+      const uploadButton = screen.getByRole('button', {
+        name: UPLOAD_EMAIL_LOGO,
+      });
+
+      expect(uploadButton).toHaveAccessibleDescription(
+        `${logoHint} ${ARCHIVED_NOTICE_TEXT}`,
+      );
+    });
   });
 });

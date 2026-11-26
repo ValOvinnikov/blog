@@ -53,7 +53,8 @@ export const EmailLogoField = ({
       onStage={onStage}
       asset={asset}
       control={{
-        isDisabled: isArchived || isPending,
+        isDisabled: isPending,
+        isLocked: isArchived,
         describedBy: archivedDescribedBy,
       }}
     />

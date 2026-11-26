@@ -6,7 +6,7 @@ import { useId } from 'react';
 import { lookFollowSwitchVariants } from './look-follow-switch-variants';
 
 type TLookFollowLock = {
-  isDisabled: boolean;
+  isDisabled?: boolean;
   isLocked: boolean;
   growthBadgeId?: string;
   describedBy?: string;

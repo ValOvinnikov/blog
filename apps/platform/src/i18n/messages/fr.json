@@ -1841,6 +1841,7 @@
     "planLockedBadge": "{plan, select, FREE {Formule Free} STARTER {Formule Starter} other {Formule Growth}}",
     "consentBannerRequiredNote": "Requis pour Google Analytics, qui demande le consentement des visiteurs.",
     "consentBannerRequiredError": "Google Analytics est configuré, la bannière de consentement doit donc rester active. Effacez d’abord l’ID de mesure ou passez à Plausible.",
+    "parentOffReason": "Activez d’abord {parent}.",
     "comingSoonBadge": "Bientôt",
     "switchOn": "Activé",
     "switchOff": "Désactivé",

@@ -1841,6 +1841,7 @@
     "planLockedBadge": "{plan, select, FREE {Free plan} STARTER {Starter plan} other {Growth plan}}",
     "consentBannerRequiredNote": "Needed for Google Analytics, which asks visitors for consent.",
     "consentBannerRequiredError": "Google Analytics is set up, so the consent banner has to stay on. Clear the Measurement ID or switch to Plausible first.",
+    "parentOffReason": "Turn on {parent} first.",
     "comingSoonBadge": "Coming soon",
     "switchOn": "On",
     "switchOff": "Off",
