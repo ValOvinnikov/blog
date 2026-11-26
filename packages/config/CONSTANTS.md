@@ -278,6 +278,10 @@ Every key/value const an agent should reuse before writing a literal. The
 
 - **OPERATOR_ALERT_KIND**: `OWNER_ELEVATION`, `DOCUMENT_VALIDATION`
 
+### `@shinefold/config/constants` — `packages/config/src/constants/pagination-ellipsis.ts`
+
+- **PAGINATION_ELLIPSIS**: `START`, `END`
+
 ### `@shinefold/config/constants` — `packages/config/src/constants/platform-plan-interval.ts`
 
 - **PLATFORM_PLAN_INTERVAL**: `MONTH_AND_YEAR`

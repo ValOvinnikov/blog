@@ -3900,6 +3900,40 @@
         "file": "packages/db/src/constants/tenant-provisioning.ts"
       }
     ],
+    "START": [
+      {
+        "ref": "PAGINATION_ELLIPSIS.START",
+        "scope": "config",
+        "from": "@shinefold/config/constants",
+        "file": "packages/config/src/constants/pagination-ellipsis.ts"
+      },
+      {
+        "ref": "BILLING_GRACE.START",
+        "scope": "app:platform",
+        "from": "@platform/constants/billing-grace",
+        "file": "apps/platform/src/constants/billing-grace.ts"
+      }
+    ],
+    "END": [
+      {
+        "ref": "PAGINATION_ELLIPSIS.END",
+        "scope": "config",
+        "from": "@shinefold/config/constants",
+        "file": "packages/config/src/constants/pagination-ellipsis.ts"
+      },
+      {
+        "ref": "BILLING_GRACE.END",
+        "scope": "app:platform",
+        "from": "@platform/constants/billing-grace",
+        "file": "apps/platform/src/constants/billing-grace.ts"
+      },
+      {
+        "ref": "DEVICE_FRAME_SCROLL_TARGET.END",
+        "scope": "app:platform",
+        "from": "@platform/constants/device-frame",
+        "file": "apps/platform/src/constants/device-frame.ts"
+      }
+    ],
     "MONTH_AND_YEAR": [
       {
         "ref": "PLATFORM_PLAN_INTERVAL.MONTH_AND_YEAR",
@@ -6612,28 +6646,6 @@
         "scope": "app:platform",
         "from": "@platform/constants/badge-tone",
         "file": "apps/platform/src/constants/badge-tone.ts"
-      }
-    ],
-    "START": [
-      {
-        "ref": "BILLING_GRACE.START",
-        "scope": "app:platform",
-        "from": "@platform/constants/billing-grace",
-        "file": "apps/platform/src/constants/billing-grace.ts"
-      }
-    ],
-    "END": [
-      {
-        "ref": "BILLING_GRACE.END",
-        "scope": "app:platform",
-        "from": "@platform/constants/billing-grace",
-        "file": "apps/platform/src/constants/billing-grace.ts"
-      },
-      {
-        "ref": "DEVICE_FRAME_SCROLL_TARGET.END",
-        "scope": "app:platform",
-        "from": "@platform/constants/device-frame",
-        "file": "apps/platform/src/constants/device-frame.ts"
       }
     ],
     "KEEP": [

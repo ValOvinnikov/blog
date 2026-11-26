@@ -45,14 +45,24 @@ describe(`<${PopoverMenu.name}/>`, () => {
     user = userEvent.setup();
   });
 
-  it('renders a trigger with the menu-button ARIA attributes', () => {
-    renderMenu({ isOpen: false });
+  describe('while closed', () => {
+    beforeEach(() => {
+      renderMenu({ isOpen: false });
+    });
 
-    const trigger = screen.getByRole('button', { name: MOCK_TRIGGER_LABEL });
+    it('renders a trigger with the menu-button ARIA attributes', () => {
+      const trigger = screen.getByRole('button', { name: MOCK_TRIGGER_LABEL });
 
-    expect(trigger).toHaveAttribute('aria-haspopup', 'menu');
-    expect(trigger).toHaveAttribute('aria-expanded', 'false');
-    expect(trigger).toHaveAttribute('aria-controls', MOCK_PANEL_ID);
+      expect(trigger).toHaveAttribute('aria-haspopup', 'menu');
+      expect(trigger).toHaveAttribute('aria-expanded', 'false');
+      expect(trigger).toHaveAttribute('aria-controls', MOCK_PANEL_ID);
+    });
+
+    it('hides the panel', () => {
+      const menu = screen.queryByRole('menu');
+
+      expect(menu).not.toBeInTheDocument();
+    });
   });
 
   it('forwards a ref on the trigger to the underlying button', () => {
@@ -64,14 +74,6 @@ describe(`<${PopoverMenu.name}/>`, () => {
     expect(triggerRef.current).toBe(trigger);
   });
 
-  it('hides the panel while closed', () => {
-    renderMenu({ isOpen: false });
-
-    const menu = screen.queryByRole('menu');
-
-    expect(menu).not.toBeInTheDocument();
-  });
-
   it('shows the panel while open', () => {
     renderMenu({ isOpen: true });
 
@@ -80,7 +82,7 @@ describe(`<${PopoverMenu.name}/>`, () => {
     expect(menu).toBeVisible();
   });
 
-  it('renders each Item as a menu item, an anchor when given href', () => {
+  it('renders each item as a menu item, and a link item as an anchor', () => {
     renderMenu({
       items: (
         <>
@@ -101,7 +103,7 @@ describe(`<${PopoverMenu.name}/>`, () => {
     expect(linkItem).toHaveAttribute('href', MOCK_HREF);
   });
 
-  it('calls onClick when a button Item is clicked', async () => {
+  it('reports a press on a button item', async () => {
     const onClick = vi.fn();
     renderMenu({
       items: (
@@ -115,7 +117,7 @@ describe(`<${PopoverMenu.name}/>`, () => {
     expect(onClick).toHaveBeenCalledOnce();
   });
 
-  it('renders a Separator between Items', () => {
+  it('renders a separator between items', () => {
     renderMenu({
       items: (
         <>

@@ -1,6 +1,7 @@
 import { faker } from '@faker-js/faker';
 import { customRender, screen } from '@shinefold/ui/testing/custom-render';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
+import type { Mock } from 'vitest';
 
 import { BookmarkToggle } from './bookmark-toggle';
 
@@ -18,25 +19,26 @@ const setup = customRender(BookmarkToggle, {
 
 describe(`<${BookmarkToggle.name}/>`, () => {
   let user: UserEvent;
+  let onToggle: Mock<() => void>;
 
   beforeEach(() => {
     user = userEvent.setup();
+    onToggle = vi.fn();
   });
 
   describe('with the default props', () => {
+    let button: HTMLElement;
+
     beforeEach(() => {
-      setup();
+      setup({ onToggle });
+      button = screen.getByRole('button', { name: MOCK_ARIA_LABEL });
     });
 
     it('renders a button with the given accessible name', () => {
-      const button = screen.getByRole('button', { name: MOCK_ARIA_LABEL });
-
       expect(button).toBeVisible();
     });
 
     it('uses the accessible name as the title', () => {
-      const button = screen.getByRole('button', { name: MOCK_ARIA_LABEL });
-
       expect(button).toHaveAttribute('title', MOCK_ARIA_LABEL);
     });
 
@@ -45,10 +47,16 @@ describe(`<${BookmarkToggle.name}/>`, () => {
 
       expect(label).toBeVisible();
     });
+
+    it('reports a press', async () => {
+      await user.click(button);
+
+      expect(onToggle).toHaveBeenCalledTimes(1);
+    });
   });
 
   it.each([true, false])(
-    'reflects aria-pressed when isBookmarked is %s',
+    'reflects a bookmarked state of %s',
     (isBookmarked) => {
       setup({ isBookmarked });
 
@@ -58,31 +66,22 @@ describe(`<${BookmarkToggle.name}/>`, () => {
     },
   );
 
-  it('calls onToggle when clicked', async () => {
-    const onToggle = vi.fn();
-    setup({ onToggle });
+  describe('when disabled', () => {
+    let button: HTMLElement;
 
-    const button = screen.getByRole('button', { name: MOCK_ARIA_LABEL });
-    await user.click(button);
+    beforeEach(() => {
+      setup({ isDisabled: true, onToggle });
+      button = screen.getByRole('button', { name: MOCK_ARIA_LABEL });
+    });
 
-    expect(onToggle).toHaveBeenCalledTimes(1);
-  });
+    it('is disabled', () => {
+      expect(button).toBeDisabled();
+    });
 
-  it('is disabled when isDisabled is set', () => {
-    setup({ isDisabled: true });
+    it('ignores a press', async () => {
+      await user.click(button);
 
-    const button = screen.getByRole('button', { name: MOCK_ARIA_LABEL });
-
-    expect(button).toBeDisabled();
-  });
-
-  it('does not call onToggle when disabled', async () => {
-    const onToggle = vi.fn();
-    setup({ isDisabled: true, onToggle });
-
-    const button = screen.getByRole('button', { name: MOCK_ARIA_LABEL });
-    await user.click(button);
-
-    expect(onToggle).not.toHaveBeenCalled();
+      expect(onToggle).not.toHaveBeenCalled();
+    });
   });
 });

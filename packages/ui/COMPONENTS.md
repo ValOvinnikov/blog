@@ -78,7 +78,7 @@ Variants: variant: bordered|avatar|control|circle
 
 ### InlineCode — `components/atoms/inline-code/inline-code.tsx`
 
-A single `<code>` token styled for inline use within running text (e.g. Portable Text `code` marks).
+A code token set inside running text.
 Props: children?: ReactNode _(extends IWithClassName, IWithDataTestId)_
 
 ### MediaFrame — `components/atoms/media-frame/media-frame.tsx`
@@ -191,7 +191,7 @@ Props: src?: string · darkSrc?: string · siteName?: string · size?: TBrandMar
 
 ### Breadcrumbs — `components/molecules/breadcrumbs/breadcrumbs.tsx`
 
-Page-chrome navigation trail (e.g. `Home › Topic › Post title`).
+The trail of links from the home page to the current page.
 Props: items: IBreadcrumbItem[] · ariaLabel: string · linkAs?: TAnchorElementType _(extends IWithClassName, IWithDataTestId)_
 Variants: isCurrent: (boolean)
 
@@ -430,7 +430,7 @@ Compound component:
 - **CtaModule.Text** — The copy slot under a `CtaModule` heading: a plain supporting line, then rich content set as prose. Props: supportingText?: string · children?: ReactNode _(extends IWithClassName)_
 - **CtaModule.Actions** — The row a `CtaModule` lays its buttons and links out in. Props: children?: ReactNode _(extends IWithClassName, IWithDataTestId)_
 - **CtaModule.Footnote** — The fine-print line an organism sets under its actions. Props: children?: ReactNode _(extends IWithClassName, IWithDataTestId)_
-- **CtaModule.Media** — The image slot of a `CtaModule`; framed at 16:9 in a card, unframed behind a banner's copy. Props: isFramed?: boolean · children?: ReactNode _(extends IWithClassName, IWithDataTestId)_
+- **CtaModule.Media** — The image slot of a `CtaModule`. Props: isFramed?: boolean · children?: ReactNode _(extends IWithClassName, IWithDataTestId)_
 
 ### Dialog — `components/organisms/dialog/dialog.tsx`
 
@@ -479,7 +479,7 @@ Variants: variant: HERO_VARIANT.SPLIT|HERO_VARIANT.STACKED|HERO_VARIANT.BANNER �
 Slots:
 
 - **Hero.Avatar** — The portrait slot of a `Hero`, rendered before the eyebrow; a styled `<div>` for the caller's own `Avatar` or image. Props: contentAlignment?: THeroAvatarVariants['contentAlignment'] · children?: ReactNode _(extends IWithClassName, IWithDataTestId)_ · Variants: contentAlignment: CONTENT_ALIGNMENT.LEFT|CONTENT_ALIGNMENT.CENTER|CONTENT_ALIGNMENT.RIGHT
-- **Hero.Media** — The media slot of a `Hero`; frames its content via `MediaFrame`, at a configurable ratio (16:9 by default). Props: isFramed?: boolean · ratio?: TMediaFrameRatio · variant?: THeroVariant · contentAlignment?: TContentAlignment · children?: ReactNode _(extends IWithClassName, IWithDataTestId)_ · Variants: ratio: video|square|portrait|classic|vertical · variant: HERO_VARIANT.SPLIT|HERO_VARIANT.STACKED|HERO_VARIANT.BANNER · contentAlignment: CONTENT_ALIGNMENT.LEFT|CONTENT_ALIGNMENT.CENTER|CONTENT_ALIGNMENT.RIGHT
+- **Hero.Media** — The media slot of a `Hero`. Props: isFramed?: boolean · ratio?: TMediaFrameRatio · variant?: THeroVariant · contentAlignment?: TContentAlignment · children?: ReactNode _(extends IWithClassName, IWithDataTestId)_ · Variants: ratio: video|square|portrait|classic|vertical · variant: HERO_VARIANT.SPLIT|HERO_VARIANT.STACKED|HERO_VARIANT.BANNER · contentAlignment: CONTENT_ALIGNMENT.LEFT|CONTENT_ALIGNMENT.CENTER|CONTENT_ALIGNMENT.RIGHT
 - **Hero.Body** — The rich body-copy slot of a `Hero`, rendered after the excerpt and before `Hero.Cta`. Props: contentAlignment?: THeroBodyVariants['contentAlignment'] · children?: ReactNode _(extends IWithClassName, IWithDataTestId)_ · Variants: contentAlignment: CONTENT_ALIGNMENT.LEFT|CONTENT_ALIGNMENT.CENTER|CONTENT_ALIGNMENT.RIGHT
 - **Hero.Cta** — The call-to-action slot of a Hero. Props: contentAlignment?: THeroCtaVariants['contentAlignment'] · children?: ReactNode _(extends IWithClassName, IWithDataTestId)_ · Variants: contentAlignment: CONTENT_ALIGNMENT.LEFT|CONTENT_ALIGNMENT.CENTER|CONTENT_ALIGNMENT.RIGHT
 - **Hero.Footnote** — The fine-print line an organism sets under its actions. Props: children?: ReactNode _(extends IWithClassName, IWithDataTestId)_
@@ -500,7 +500,7 @@ Compound component:
 
 ### Pagination — `components/organisms/pagination/pagination.tsx`
 
-Prev/next + numbered links for paginated listings, route-agnostic (`createHref`) and polymorphic (`linkAs`); renders nothing when there is a single page.
+Previous, next and numbered page links for a paginated listing.
 Props: currentPage: number · totalPages: number · createHref: (page: number) => string · ariaLabel: string · previousLabel: string · nextLabel: string · linkAs?: TAnchorElementType _(extends IWithClassName, IWithDataTestId)_
 Variants: current: (boolean)
 

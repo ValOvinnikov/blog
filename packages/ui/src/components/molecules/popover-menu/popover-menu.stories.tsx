@@ -1,4 +1,5 @@
 import { ICONS, SIZE } from '@shinefold/config';
+import type { IWithChildren } from '@shinefold/config/react';
 import { Avatar } from '@shinefold/ui/components/atoms/avatar';
 import { Icon } from '@shinefold/ui/components/atoms/icon';
 import type { Meta, StoryObj } from '@storybook/react-vite';
@@ -23,23 +24,51 @@ const meta = {
 export default meta;
 type TStory = StoryObj<typeof meta>;
 
+const MOCK_SHARE_URL = 'https://example.com';
+
+type TShareMenuProps = IWithChildren & {
+  isOpen: boolean;
+  panelId: string;
+  shouldOpenFromStartOnPhone?: boolean;
+  onTriggerClick?: () => void;
+};
+
+const ShareMenu = ({
+  isOpen,
+  panelId,
+  shouldOpenFromStartOnPhone,
+  onTriggerClick,
+  children,
+}: TShareMenuProps) => (
+  <>
+    <PopoverMenu.Trigger
+      ariaLabel="Open menu"
+      isOpen={isOpen}
+      panelId={panelId}
+      onClick={onTriggerClick}
+    >
+      <Icon name={ICONS.SHARE} size={SIZE.SM} />
+    </PopoverMenu.Trigger>
+    <PopoverMenu.Panel
+      id={panelId}
+      isOpen={isOpen}
+      ariaLabel="Menu"
+      shouldOpenFromStartOnPhone={shouldOpenFromStartOnPhone}
+    >
+      {children}
+    </PopoverMenu.Panel>
+  </>
+);
+
 const InteractiveDemo = () => {
   const [isOpen, setIsOpen] = useState(false);
 
   return (
     <PopoverMenu>
-      <PopoverMenu.Trigger
-        ariaLabel="Open menu"
+      <ShareMenu
         isOpen={isOpen}
         panelId="popover-menu-panel"
-        onClick={() => setIsOpen((current) => !current)}
-      >
-        <Icon name={ICONS.SHARE} size={SIZE.SM} />
-      </PopoverMenu.Trigger>
-      <PopoverMenu.Panel
-        id="popover-menu-panel"
-        isOpen={isOpen}
-        ariaLabel="Menu"
+        onTriggerClick={() => setIsOpen((current) => !current)}
       >
         <PopoverMenu.Item
           icon={<Icon name={ICONS.EXTERNAL_LINK} size={SIZE.SM} />}
@@ -47,13 +76,13 @@ const InteractiveDemo = () => {
           Copy link
         </PopoverMenu.Item>
         <PopoverMenu.Separator />
-        <PopoverMenu.Item as="a" href="https://example.com">
+        <PopoverMenu.Item as="a" href={MOCK_SHARE_URL}>
           Share on X
         </PopoverMenu.Item>
-        <PopoverMenu.Item as="a" href="https://example.com">
+        <PopoverMenu.Item as="a" href={MOCK_SHARE_URL}>
           Share on LinkedIn
         </PopoverMenu.Item>
-      </PopoverMenu.Panel>
+      </ShareMenu>
     </PopoverMenu>
   );
 };
@@ -65,31 +94,18 @@ export const Interactive: TStory = {
 export const Copied: TStory = {
   args: {
     children: (
-      <>
-        <PopoverMenu.Trigger
-          ariaLabel="Open menu"
-          isOpen={true}
-          panelId="popover-menu-panel"
-        >
-          <Icon name={ICONS.SHARE} size={SIZE.SM} />
-        </PopoverMenu.Trigger>
-        <PopoverMenu.Panel
-          id="popover-menu-panel"
-          isOpen={true}
-          ariaLabel="Menu"
-        >
-          <PopoverMenu.Item icon={<Icon name={ICONS.CHECK} size={SIZE.SM} />}>
-            Copied
-          </PopoverMenu.Item>
-          <PopoverMenu.Separator />
-          <PopoverMenu.Item as="a" href="https://example.com">
-            Share on X
-          </PopoverMenu.Item>
-          <PopoverMenu.Item as="a" href="https://example.com">
-            Share on LinkedIn
-          </PopoverMenu.Item>
-        </PopoverMenu.Panel>
-      </>
+      <ShareMenu isOpen={true} panelId="popover-menu-panel">
+        <PopoverMenu.Item icon={<Icon name={ICONS.CHECK} size={SIZE.SM} />}>
+          Copied
+        </PopoverMenu.Item>
+        <PopoverMenu.Separator />
+        <PopoverMenu.Item as="a" href={MOCK_SHARE_URL}>
+          Share on X
+        </PopoverMenu.Item>
+        <PopoverMenu.Item as="a" href={MOCK_SHARE_URL}>
+          Share on LinkedIn
+        </PopoverMenu.Item>
+      </ShareMenu>
     ),
   },
 };
@@ -133,26 +149,13 @@ export const CurrentItem: TStory = {
 export const Closed: TStory = {
   args: {
     children: (
-      <>
-        <PopoverMenu.Trigger
-          ariaLabel="Open menu"
-          isOpen={false}
-          panelId="popover-menu-panel"
+      <ShareMenu isOpen={false} panelId="popover-menu-panel">
+        <PopoverMenu.Item
+          icon={<Icon name={ICONS.EXTERNAL_LINK} size={SIZE.SM} />}
         >
-          <Icon name={ICONS.SHARE} size={SIZE.SM} />
-        </PopoverMenu.Trigger>
-        <PopoverMenu.Panel
-          id="popover-menu-panel"
-          isOpen={false}
-          ariaLabel="Menu"
-        >
-          <PopoverMenu.Item
-            icon={<Icon name={ICONS.EXTERNAL_LINK} size={SIZE.SM} />}
-          >
-            Copy link
-          </PopoverMenu.Item>
-        </PopoverMenu.Panel>
-      </>
+          Copy link
+        </PopoverMenu.Item>
+      </ShareMenu>
     ),
   },
 };
@@ -160,33 +163,20 @@ export const Closed: TStory = {
 export const BorderedItems: TStory = {
   args: {
     children: (
-      <>
-        <PopoverMenu.Trigger
-          ariaLabel="Open menu"
-          isOpen={true}
-          panelId="popover-menu-panel-bordered"
+      <ShareMenu isOpen={true} panelId="popover-menu-panel-bordered">
+        <PopoverMenu.Item
+          variant="bordered"
+          icon={<Icon name={ICONS.GITHUB} size={SIZE.SM} />}
         >
-          <Icon name={ICONS.SHARE} size={SIZE.SM} />
-        </PopoverMenu.Trigger>
-        <PopoverMenu.Panel
-          id="popover-menu-panel-bordered"
-          isOpen={true}
-          ariaLabel="Menu"
+          Continue with GitHub
+        </PopoverMenu.Item>
+        <PopoverMenu.Item
+          variant="bordered"
+          icon={<Icon name={ICONS.GOOGLE} size={SIZE.SM} />}
         >
-          <PopoverMenu.Item
-            variant="bordered"
-            icon={<Icon name={ICONS.GITHUB} size={SIZE.SM} />}
-          >
-            Continue with GitHub
-          </PopoverMenu.Item>
-          <PopoverMenu.Item
-            variant="bordered"
-            icon={<Icon name={ICONS.GOOGLE} size={SIZE.SM} />}
-          >
-            Continue with Google
-          </PopoverMenu.Item>
-        </PopoverMenu.Panel>
-      </>
+          Continue with Google
+        </PopoverMenu.Item>
+      </ShareMenu>
     ),
   },
 };
@@ -221,31 +211,21 @@ export const OpenFromStartOnPhone: TStory = {
   globals: { viewport: 'phone' },
   args: {
     children: (
-      <>
-        <PopoverMenu.Trigger
-          ariaLabel="Open menu"
-          isOpen={true}
-          panelId="popover-menu-panel-start"
+      <ShareMenu
+        isOpen={true}
+        panelId="popover-menu-panel-start"
+        shouldOpenFromStartOnPhone={true}
+      >
+        <PopoverMenu.Item
+          icon={<Icon name={ICONS.EXTERNAL_LINK} size={SIZE.SM} />}
         >
-          <Icon name={ICONS.SHARE} size={SIZE.SM} />
-        </PopoverMenu.Trigger>
-        <PopoverMenu.Panel
-          id="popover-menu-panel-start"
-          isOpen={true}
-          ariaLabel="Menu"
-          shouldOpenFromStartOnPhone={true}
-        >
-          <PopoverMenu.Item
-            icon={<Icon name={ICONS.EXTERNAL_LINK} size={SIZE.SM} />}
-          >
-            Copy link
-          </PopoverMenu.Item>
-          <PopoverMenu.Separator />
-          <PopoverMenu.Item as="a" href="https://example.com">
-            Share on X
-          </PopoverMenu.Item>
-        </PopoverMenu.Panel>
-      </>
+          Copy link
+        </PopoverMenu.Item>
+        <PopoverMenu.Separator />
+        <PopoverMenu.Item as="a" href={MOCK_SHARE_URL}>
+          Share on X
+        </PopoverMenu.Item>
+      </ShareMenu>
     ),
   },
 };

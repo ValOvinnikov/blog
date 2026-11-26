@@ -16,16 +16,16 @@ const meta = {
 export default meta;
 type TStory = StoryObj<typeof meta>;
 
-// The first trail item always renders a decorative House icon in place of
-// its visible label — the label stays as visually-hidden text, so its
-// `label` value (e.g. "Home") only affects the accessible name, not what's
-// shown on screen.
+const MOCK_HOME_ITEM = { label: 'Home', href: '/' };
+const MOCK_TOPIC_HREF = '/topics/engineering';
+const MOCK_POST_HREF = '/blog/example-post';
+
 export const Default: TStory = {
   args: {
     items: [
-      { label: 'Home', href: '/' },
-      { label: faker.commerce.department(), href: '/topics/engineering' },
-      { label: faker.lorem.sentence(4), href: '/blog/example-post' },
+      MOCK_HOME_ITEM,
+      { label: faker.commerce.department(), href: MOCK_TOPIC_HREF },
+      { label: faker.lorem.sentence(4), href: MOCK_POST_HREF },
     ],
   },
 };
@@ -33,7 +33,7 @@ export const Default: TStory = {
 export const TwoLevels: TStory = {
   args: {
     items: [
-      { label: 'Home', href: '/' },
+      MOCK_HOME_ITEM,
       { label: faker.commerce.department(), href: '/topics/design' },
     ],
   },
@@ -42,7 +42,7 @@ export const TwoLevels: TStory = {
 export const LongTrail: TStory = {
   args: {
     items: [
-      { label: 'Home', href: '/' },
+      MOCK_HOME_ITEM,
       { label: 'Blog', href: '/blog' },
       { label: faker.commerce.department(), href: '/topics/architecture' },
       { label: faker.lorem.words(3), href: '/tag/systems' },
@@ -51,19 +51,14 @@ export const LongTrail: TStory = {
   },
 };
 
-// Truncation is driven by available width, not a viewport breakpoint — a
-// constrained container reproduces it at any canvas size, so this pins a
-// `className` width instead of the `ui-storybook` narrow-viewport exception
-// (that exception is reserved for real `md:`/`sm:`-style behavior forks).
-// The trail stays on one line; only the last segment truncates with an
-// ellipsis, while the House icon and earlier segments stay fully visible.
+// Truncation follows the container's width, not a viewport breakpoint.
 export const Truncated: TStory = {
   args: {
     className: 'max-w-[280px]',
     items: [
-      { label: 'Home', href: '/' },
-      { label: faker.commerce.department(), href: '/topics/engineering' },
-      { label: faker.lorem.sentence(8), href: '/blog/example-post' },
+      MOCK_HOME_ITEM,
+      { label: faker.commerce.department(), href: MOCK_TOPIC_HREF },
+      { label: faker.lorem.sentence(8), href: MOCK_POST_HREF },
     ],
   },
 };

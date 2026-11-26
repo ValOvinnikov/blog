@@ -8,7 +8,7 @@ export type TInlineCodeProps = IWithClassName &
     children?: ReactNode;
   };
 
-/** A single `<code>` token styled for inline use within running text (e.g. Portable Text `code` marks). */
+/** A code token set inside running text. */
 export const InlineCode = ({
   className,
   children,
