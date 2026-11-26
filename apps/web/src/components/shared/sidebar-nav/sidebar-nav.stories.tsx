@@ -2,6 +2,8 @@ import type { Meta, StoryObj } from '@storybook/nextjs-vite';
 import {
   MOCK_SIDEBAR_NAV_BACK_LINK,
   MOCK_SIDEBAR_NAV_CONTENTS_ITEMS,
+  MOCK_SIDEBAR_NAV_GROUP_CURRENT_ITEM,
+  MOCK_SIDEBAR_NAV_GROUPED_ITEMS,
   MOCK_SIDEBAR_NAV_ITEMS,
   MOCK_SIDEBAR_NAV_LABEL,
   MOCK_SIDEBAR_NAV_TRIGGER_NAME,
@@ -29,6 +31,13 @@ const meta = {
 export default meta;
 type TStory = StoryObj<typeof meta>;
 
+const openMobileSelector =
+  (name: RegExp | string): TStory['play'] =>
+  async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    await userEvent.click(canvas.getByRole('button', { name }));
+  };
+
 export const Desktop: TStory = {};
 
 export const DesktopRootActive: TStory = {
@@ -41,6 +50,13 @@ export const DesktopNestedSection: TStory = {
     activeKey: '/modules/blog-hero/split-left',
     label: 'Blog hero layouts',
     backLink: MOCK_SIDEBAR_NAV_BACK_LINK,
+  },
+};
+
+export const DesktopGrouped: TStory = {
+  args: {
+    items: MOCK_SIDEBAR_NAV_GROUPED_ITEMS,
+    activeKey: MOCK_SIDEBAR_NAV_GROUP_CURRENT_ITEM.href,
   },
 };
 
@@ -84,58 +100,50 @@ export const MobileClosed: TStory = {
 
 export const MobileOpen: TStory = {
   globals: { viewport: 'mobile' },
-  play: async ({ canvasElement }) => {
-    const canvas = within(canvasElement);
-    await userEvent.click(
-      canvas.getByRole('button', { name: MOCK_SIDEBAR_NAV_TRIGGER_NAME }),
-    );
-  },
+  play: openMobileSelector(MOCK_SIDEBAR_NAV_TRIGGER_NAME),
 };
 
 export const MobileOpenNestedSection: TStory = {
   globals: { viewport: 'mobile' },
   args: DesktopNestedSection.args,
-  play: async ({ canvasElement }) => {
-    const canvas = within(canvasElement);
-    await userEvent.click(
-      canvas.getByRole('button', { name: /Blog hero layouts/ }),
-    );
-  },
+  play: openMobileSelector(/Blog hero layouts/),
+};
+
+export const MobileOpenGrouped: TStory = {
+  globals: { viewport: 'mobile' },
+  args: DesktopGrouped.args,
+  play: openMobileSelector(
+    new RegExp(MOCK_SIDEBAR_NAV_GROUP_CURRENT_ITEM.label),
+  ),
 };
 
 export const MobileOpenPostContents: TStory = {
   globals: { viewport: 'mobile' },
   args: DesktopPostContents.args,
-  play: async ({ canvasElement }) => {
-    const canvas = within(canvasElement);
-    await userEvent.click(canvas.getByRole('button', { name: /Contents/ }));
-  },
+  play: openMobileSelector(/Contents/),
+};
+
+const openFirstPanelLink = async (canvasElement: HTMLElement) => {
+  const canvas = within(canvasElement);
+  await userEvent.click(
+    canvas.getByRole('button', { name: MOCK_SIDEBAR_NAV_TRIGGER_NAME }),
+  );
+
+  return canvas
+    .getAllByRole('link', { name: MOCK_SIDEBAR_NAV_ITEMS.at(0)?.label })
+    .at(-1)!;
 };
 
 export const MobileOpenItemHover: TStory = {
   globals: { viewport: 'mobile' },
   play: async ({ canvasElement }) => {
-    const canvas = within(canvasElement);
-    await userEvent.click(
-      canvas.getByRole('button', { name: MOCK_SIDEBAR_NAV_TRIGGER_NAME }),
-    );
-    const links = canvas.getAllByRole('link', {
-      name: MOCK_SIDEBAR_NAV_ITEMS.at(0)?.label,
-    });
-    await userEvent.hover(links.at(-1)!);
+    await userEvent.hover(await openFirstPanelLink(canvasElement));
   },
 };
 
 export const MobileOpenItemFocus: TStory = {
   globals: { viewport: 'mobile' },
   play: async ({ canvasElement }) => {
-    const canvas = within(canvasElement);
-    await userEvent.click(
-      canvas.getByRole('button', { name: MOCK_SIDEBAR_NAV_TRIGGER_NAME }),
-    );
-    const links = canvas.getAllByRole('link', {
-      name: MOCK_SIDEBAR_NAV_ITEMS.at(0)?.label,
-    });
-    links.at(-1)!.focus();
+    (await openFirstPanelLink(canvasElement)).focus();
   },
 };

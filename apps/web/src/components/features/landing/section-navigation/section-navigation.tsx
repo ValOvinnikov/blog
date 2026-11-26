@@ -1,5 +1,8 @@
 import { routes } from '@shinefold/config';
-import type { TLandingSectionNavigation } from '@shinefold/service';
+import type {
+  TLandingBreadcrumb,
+  TLandingSectionNavigation,
+} from '@shinefold/service';
 import {
   SidebarNav,
   type TSidebarNavItem,
@@ -17,18 +20,23 @@ export const SectionNavigation = ({
 }: TSectionNavigationProps) => {
   const t = useTranslations('sectionNavigation');
   const { title: sectionTitle, root, pages, parentSection } = sectionNavigation;
-  const sectionPages = [
-    { ...root, level: 1 as const },
-    ...pages.map((page) => ({ ...page, level: 2 as const })),
+  const toLink = ({ title, path }: TLandingBreadcrumb) => ({
+    label: title,
+    href: routes.landingPage(path),
+  });
+  const items: TSidebarNavItem[] = [
+    { ...toLink(root), level: 1 },
+    ...pages.map((page) => ({
+      ...toLink(page),
+      level: 2 as const,
+      subItems: page.pages?.map(toLink),
+    })),
   ];
-  const items: TSidebarNavItem[] = sectionPages.map(
-    ({ title, path, level }) => ({
-      label: title,
-      href: routes.landingPage(path),
-      level,
-    }),
-  );
-  const currentPage = sectionPages.find(({ isCurrent }) => isCurrent);
+  // A group is marked current when the current page sits inside it, so the last match is the page itself.
+  const currentPage = [
+    root,
+    ...pages.flatMap((page) => [page, ...(page.pages ?? [])]),
+  ].findLast(({ isCurrent }) => isCurrent);
   const backLink = parentSection && {
     label: parentSection.title,
     href: routes.landingPage(parentSection.path),

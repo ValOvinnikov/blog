@@ -1,5 +1,9 @@
 import type { Meta, StoryObj } from '@storybook/nextjs-vite';
-import { mockLandingSectionNavigation } from '@web/testing/pages/landing-page/fixtures';
+import {
+  mockGroupedLandingSectionNavigation,
+  mockLandingSectionNavigation,
+  MOCK_SECTION_PRICING_PLANS_TITLE,
+} from '@web/testing/pages/landing-page/fixtures';
 import { userEvent, within } from 'storybook/test';
 
 import { SectionNavigation } from './section-navigation';
@@ -60,6 +64,23 @@ export const NestedSectionMobileOpen: TStory = {
     const canvas = within(canvasElement);
     await userEvent.click(
       canvas.getByRole('button', { name: /Profile hero layouts/ }),
+    );
+  },
+};
+
+export const Grouped: TStory = {
+  args: { sectionNavigation: mockGroupedLandingSectionNavigation() },
+};
+
+export const GroupedMobileOpen: TStory = {
+  ...Grouped,
+  globals: { viewport: 'mobile' },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    await userEvent.click(
+      canvas.getByRole('button', {
+        name: new RegExp(MOCK_SECTION_PRICING_PLANS_TITLE),
+      }),
     );
   },
 };

@@ -1,1 +1,2 @@
-export { SidebarNav, type TSidebarNavItem } from './sidebar-nav';
+export { SidebarNav } from './sidebar-nav';
+export type { TSidebarNavItem } from './types';

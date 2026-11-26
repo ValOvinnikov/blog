@@ -37,3 +37,33 @@ export const MOCK_SIDEBAR_NAV_CONTENTS_ITEMS: TSidebarNavItem[] = [
   { label: 'Configuration', href: '#configuration', level: 1 },
   { label: 'Deployment', href: '#deployment', level: 1 },
 ];
+
+export const MOCK_SIDEBAR_NAV_GROUP_CURRENT_ITEM = {
+  label: 'Install',
+  href: '/guides/setup/install',
+};
+
+export const MOCK_SIDEBAR_NAV_GROUP_ITEM: TSidebarNavItem = {
+  label: 'Setup',
+  href: '/guides/setup',
+  level: 2,
+  subItems: [
+    MOCK_SIDEBAR_NAV_GROUP_CURRENT_ITEM,
+    { label: 'Configure', href: '/guides/setup/configure' },
+  ],
+};
+
+export const MOCK_SIDEBAR_NAV_GROUPED_ITEMS: TSidebarNavItem[] = [
+  { label: 'Guides', href: '/guides', level: 1 },
+  MOCK_SIDEBAR_NAV_GROUP_ITEM,
+  {
+    label: 'Publishing',
+    href: '/guides/publishing',
+    level: 2,
+    subItems: [
+      { label: 'Drafts', href: '/guides/publishing/drafts' },
+      { label: 'Releases', href: '/guides/publishing/releases' },
+    ],
+  },
+  { label: 'Glossary', href: '/guides/glossary', level: 2 },
+];

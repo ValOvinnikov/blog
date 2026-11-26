@@ -1,8 +1,16 @@
 import { ARIA_CURRENT } from '@shinefold/ui/testing/aria';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
-import { customRender, fireEvent, screen } from '@web/testing/custom-render';
+import {
+  customRender,
+  fireEvent,
+  screen,
+  within,
+} from '@web/testing/custom-render';
 import { ARIA_EXPANDED } from '@web/testing/shared/aria/constants';
 import {
+  MOCK_SIDEBAR_NAV_GROUP_CURRENT_ITEM,
+  MOCK_SIDEBAR_NAV_GROUP_ITEM,
+  MOCK_SIDEBAR_NAV_GROUPED_ITEMS,
   MOCK_SIDEBAR_NAV_ITEMS,
   MOCK_SIDEBAR_NAV_LABEL,
   MOCK_SIDEBAR_NAV_PRICING_ITEM,
@@ -86,74 +94,71 @@ describe(`<${SidebarNav.name}/>`, () => {
       expect(links).toHaveLength(ITEM_COUNT);
     });
 
-    it('opens the mobile disclosure on trigger click, exposing plain links', async () => {
-      await user.click(trigger);
+    describe('with the mobile disclosure open', () => {
+      beforeEach(async () => {
+        await user.click(trigger);
+      });
 
-      const links = screen.getAllByRole('link');
+      it('marks the trigger expanded and exposes plain links', () => {
+        const links = screen.getAllByRole('link');
 
-      expect(trigger).toHaveAttribute(ARIA_EXPANDED, 'true');
-      expect(links).toHaveLength(ITEM_COUNT * 2);
-    });
+        expect(trigger).toHaveAttribute(ARIA_EXPANDED, 'true');
+        expect(links).toHaveLength(ITEM_COUNT * 2);
+      });
 
-    it('never puts WAI-ARIA menu roles on either copy of the list', async () => {
-      await user.click(trigger);
+      it('never puts WAI-ARIA menu roles on either copy of the list', () => {
+        const menu = screen.queryByRole('menu');
+        const menuItem = screen.queryByRole('menuitem');
 
-      const menu = screen.queryByRole('menu');
-      const menuItem = screen.queryByRole('menuitem');
+        expect(menu).not.toBeInTheDocument();
+        expect(menuItem).not.toBeInTheDocument();
+      });
 
-      expect(menu).not.toBeInTheDocument();
-      expect(menuItem).not.toBeInTheDocument();
-    });
+      it('lets Tab leave the open mobile disclosure without trapping focus', async () => {
+        const lastLinkInPanel = screen
+          .getAllByRole('link', { name: MOCK_SIDEBAR_NAV_ITEMS.at(-1)?.label })
+          .at(-1);
+        for (let tabs = 0; tabs < ITEM_COUNT - 1; tabs += 1) {
+          await user.tab();
+        }
 
-    it('lets Tab leave the open mobile disclosure without trapping focus', async () => {
-      await user.click(trigger);
+        expect(lastLinkInPanel).toHaveFocus();
 
-      const lastLinkInPanel = screen
-        .getAllByRole('link', { name: MOCK_SIDEBAR_NAV_ITEMS.at(-1)?.label })
-        .at(-1);
-      for (let tabs = 0; tabs < ITEM_COUNT - 1; tabs += 1) {
         await user.tab();
-      }
 
-      expect(lastLinkInPanel).toHaveFocus();
+        expect(lastLinkInPanel).not.toHaveFocus();
+        expect(document.body).toHaveFocus();
+      });
 
-      await user.tab();
+      it('closes the mobile disclosure on Escape', async () => {
+        await user.keyboard('{Escape}');
 
-      expect(lastLinkInPanel).not.toHaveFocus();
-      expect(document.body).toHaveFocus();
-    });
+        const links = screen.getAllByRole('link');
 
-    it('closes the mobile disclosure on Escape', async () => {
-      await user.click(trigger);
-      await user.keyboard('{Escape}');
+        expect(trigger).toHaveAttribute(ARIA_EXPANDED, 'false');
+        expect(links).toHaveLength(ITEM_COUNT);
+      });
 
-      const links = screen.getAllByRole('link');
+      it('closes the mobile disclosure on an outside click', async () => {
+        fireEvent.mouseDown(document.body);
 
-      expect(trigger).toHaveAttribute(ARIA_EXPANDED, 'false');
-      expect(links).toHaveLength(ITEM_COUNT);
-    });
+        const links = screen.getAllByRole('link');
 
-    it('closes the mobile disclosure on an outside click', async () => {
-      await user.click(trigger);
-      fireEvent.mouseDown(document.body);
+        expect(trigger).toHaveAttribute(ARIA_EXPANDED, 'false');
+        expect(links).toHaveLength(ITEM_COUNT);
+      });
 
-      const links = screen.getAllByRole('link');
+      it('closes the mobile disclosure when one of its links is clicked', async () => {
+        const panelLink = screen
+          .getAllByRole('link', { name: MOCK_SIDEBAR_NAV_ITEMS.at(0)?.label })
+          .at(-1)!;
+        await user.click(panelLink);
 
-      expect(trigger).toHaveAttribute(ARIA_EXPANDED, 'false');
-      expect(links).toHaveLength(ITEM_COUNT);
-    });
+        const panelList = screen.getAllByRole('list', { hidden: true }).at(-1);
 
-    it('closes the mobile disclosure when one of its links is clicked', async () => {
-      await user.click(trigger);
-      const panelLink = screen
-        .getAllByRole('link', { name: MOCK_SIDEBAR_NAV_ITEMS.at(0)?.label })
-        .at(-1)!;
-      await user.click(panelLink);
-
-      const panelList = screen.getAllByRole('list', { hidden: true }).at(-1);
-
-      expect(trigger).toHaveAttribute(ARIA_EXPANDED, 'false');
-      expect(panelList).not.toBeVisible();
+        expect(trigger).toHaveAttribute(ARIA_EXPANDED, 'false');
+        expect(panelList).not.toBeVisible();
+      });
     });
   });
 
@@ -180,6 +185,63 @@ describe(`<${SidebarNav.name}/>`, () => {
         .filter((link) => link.hasAttribute(ARIA_CURRENT));
 
       expect(currentLinks).toHaveLength(0);
+    });
+  });
+
+  describe('with grouped items and the active item inside a group', () => {
+    beforeEach(() => {
+      setup({
+        items: MOCK_SIDEBAR_NAV_GROUPED_ITEMS,
+        activeKey: MOCK_SIDEBAR_NAV_GROUP_CURRENT_ITEM.href,
+      });
+    });
+
+    it('renders every item followed by its sub-items, in order', () => {
+      const hrefs = screen
+        .getAllByRole('link')
+        .map((link) => link.getAttribute('href'));
+
+      expect(hrefs).toEqual(
+        MOCK_SIDEBAR_NAV_GROUPED_ITEMS.flatMap(({ href, subItems = [] }) => [
+          href,
+          ...subItems.map((subItem) => subItem.href),
+        ]),
+      );
+    });
+
+    it("nests each group's sub-items in a list inside the group's item", () => {
+      const nestedLists = screen
+        .getAllByRole('listitem')
+        .flatMap((item) => within(item).queryAllByRole('list'));
+
+      expect(nestedLists).toHaveLength(
+        MOCK_SIDEBAR_NAV_GROUPED_ITEMS.filter(({ subItems }) => subItems)
+          .length,
+      );
+    });
+
+    it('marks only the active sub-item current, not its group', () => {
+      const currentLinks = screen
+        .getAllByRole('link')
+        .filter((link) => link.hasAttribute(ARIA_CURRENT));
+      const groupLink = screen.getByRole('link', {
+        name: MOCK_SIDEBAR_NAV_GROUP_ITEM.label,
+      });
+
+      expect(currentLinks).toEqual([
+        screen.getByRole('link', {
+          name: MOCK_SIDEBAR_NAV_GROUP_CURRENT_ITEM.label,
+        }),
+      ]);
+      expect(groupLink).not.toHaveAttribute(ARIA_CURRENT);
+    });
+
+    it('names the active sub-item on the mobile selector', () => {
+      const trigger = screen.getByRole('button', {
+        name: `${MOCK_SIDEBAR_NAV_LABEL} ${MOCK_SIDEBAR_NAV_GROUP_CURRENT_ITEM.label}`,
+      });
+
+      expect(trigger).toBeVisible();
     });
   });
 });
