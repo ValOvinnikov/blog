@@ -27,6 +27,7 @@ vi.mock('@platform/server/auth/sign-out-action');
 vi.mock('@platform/server/onboarding/check-site-address-action');
 
 const PHONE_TIER_TITLE = 'on a phone';
+const CREATE_SETTLE_TIMEOUT = { timeout: 3_000 };
 
 describe.each([
   [FULL_TIER_TITLE, FULL_TIER],
@@ -45,7 +46,7 @@ describe.each([
     renderInTier(queries);
     await reachReview(user);
     await acceptAndCreate(user);
-    await screen.findByRole('button', MOCK_CREATE);
+    await screen.findByRole('button', MOCK_CREATE, CREATE_SETTLE_TIMEOUT);
   });
 
   afterEach(() => {
