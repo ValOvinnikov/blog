@@ -8,6 +8,8 @@ import { SORT_DIRECTION, TENANT_SORT_COLUMN } from '@shinefold/config';
 
 import { adminRoutes, STUDIO_SEGMENT } from './routes';
 
+const MOCK_TENANTS_PAGE = 3;
+
 describe('adminRoutes', () => {
   it('keeps the locale out of the Studio basePaths', () => {
     expect(routing.localePrefix).toBe('never');
@@ -53,6 +55,24 @@ describe('adminRoutes', () => {
 
       expect(href).toBe(
         `/tenants?archived=1&sort=CREATED&direction=ascending&q=${MOCK_TENANT_SLUG}`,
+      );
+    });
+
+    it('leaves the first page out of the URL', () => {
+      const href = adminRoutes.tenants({ page: 1 });
+
+      expect(href).toBe('/tenants');
+    });
+
+    it('carries a later page after the other parameters', () => {
+      const href = adminRoutes.tenants({
+        shouldShowArchived: true,
+        search: MOCK_TENANT_SLUG,
+        page: MOCK_TENANTS_PAGE,
+      });
+
+      expect(href).toBe(
+        `/tenants?archived=1&q=${MOCK_TENANT_SLUG}&page=${MOCK_TENANTS_PAGE}`,
       );
     });
   });

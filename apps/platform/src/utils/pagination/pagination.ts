@@ -15,6 +15,29 @@ export const parsePage = (raw: unknown): number => {
 export const countPages = (total: number, pageSize: number): number =>
   Math.max(1, Math.ceil(total / pageSize));
 
+export type TPageRange = {
+  from: number;
+  to: number;
+  count: number;
+};
+
+export type TPageRangeInput = {
+  page: number;
+  pageSize: number;
+  rowCount: number;
+  total: number;
+};
+
+export const toPageRange = ({
+  page,
+  pageSize,
+  rowCount,
+  total,
+}: TPageRangeInput): TPageRange => {
+  const from = (page - 1) * pageSize + 1;
+  return { from, to: from + rowCount - 1, count: total };
+};
+
 export const resolveTotalPages = ({
   page,
   total,

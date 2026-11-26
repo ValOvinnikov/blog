@@ -312,7 +312,9 @@
     },
     "manage": "Gérer",
     "manageAriaLabel": "Gérer {tenantName}",
-    "matchedDomain": "Correspond à {domain}"
+    "matchedDomain": "Correspond à {domain}",
+    "showing": "{from, number}–{to, number} sur {count, number} {count, plural, one {locataire} other {locataires}}",
+    "count": "{count, plural, one {# locataire} other {# locataires}}"
   },
   "tenantsSearch": {
     "label": "Rechercher des locataires",
