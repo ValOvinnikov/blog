@@ -16,6 +16,7 @@ export * as memberships from './memberships';
 export * as migrations from './migrations';
 export * as newsletterPostSends from './newsletter-post-sends';
 export * as personalData from './personal-data';
+export * as pinnedTenants from './pinned-tenants';
 export * as readerData from './reader-data';
 export * as retention from './retention';
 export * as settingsFeatures from './settings-features';

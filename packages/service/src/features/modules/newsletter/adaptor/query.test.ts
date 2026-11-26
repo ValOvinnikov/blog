@@ -8,7 +8,7 @@ import {
   MOCK_NEWSLETTER_MODULE_ID,
   mockRawNewsletterModule,
 } from '@shinefold/service/testing/modules/fixtures';
-import { evaluateGroqExpression } from '@shinefold/service/testing/shared/groq';
+import { evaluateModuleQuery } from '@shinefold/service/testing/shared/groq';
 import {
   mockLocalizedHeadingBlock,
   mockLocalizedStrings,
@@ -73,18 +73,11 @@ const MOCK_NEWSLETTER_DOCUMENT = {
   ],
 };
 
-async function runNewsletter(
-  document: Record<string, unknown>,
-  locale: string,
-) {
-  const raw = await evaluateGroqExpression(
-    newsletterModuleQuery.query,
-    [document],
-    undefined,
-    { id: MOCK_NEWSLETTER_MODULE_ID, locale, defaultLocale: EN },
-  );
-
-  return newsletterModuleQuery.parse(raw);
+function runNewsletter(document: Record<string, unknown>, locale: string) {
+  return evaluateModuleQuery(newsletterModuleQuery, [document], {
+    id: MOCK_NEWSLETTER_MODULE_ID,
+    locale,
+  });
 }
 
 type TNewsletter = Awaited<ReturnType<typeof runNewsletter>>;

@@ -9,7 +9,7 @@ type TPresetSiteConfig = { preset: TPresetId } & Pick<
   TThemeTokens,
   'accentHue' | 'headingFont' | 'bodyFont' | 'radiusScale' | 'density'
 > &
-  Omit<TPresetBundle, 'themeTokens' | 'featureDefaults'>;
+  Omit<TPresetBundle, 'themeTokens' | 'featureDefaults' | 'buttonColor'>;
 
 export function presetSiteConfig(preset: TPresetId): TPresetSiteConfig {
   const {

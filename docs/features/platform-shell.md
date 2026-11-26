@@ -69,10 +69,17 @@ URLs carry no locale prefix (next-intl `localePrefix: 'never'`).
   its own clear button in place of the browser's native one. Each applied
   search is a fresh server query that replaces the history entry rather than
   adding one, and a late response for an older search never overwrites newer
-  typing. Visibility, sort and search live in the URL
-  (`?archived=1&sort=<column>&direction=<ascending|descending>&q=`), so a
+  typing. Visibility, sort, search and page live in the URL
+  (`?archived=1&sort=<column>&direction=<ascending|descending>&q=&page=`), so a
   reload or shared link keeps them; `listTenants`' own default order stays by
-  name, which the dashboard tenant picker relies on. Below `md` the table
+  name, which the dashboard tenant picker relies on. The table shows 25
+  tenants a page, read through `listTenantsPage`: `page` is left out of the
+  URL on page 1, changing the sort, search or visibility returns to page 1, a
+  page past the end redirects to the last page, and a page that is not a
+  positive whole number shows page 1. A footer under the rows gives the range
+  and total ("1–25 of 168 tenants") with Previous, "Page 1 of 7" and Next; a
+  list that fits one page shows only the count, and an empty list has no
+  footer; on a phone the footer stacks, the count above the controls. Below `md` the table
   uses `DataTableShell`'s stacked layout (`isStacked`): no column headers and
   no sideways scroll, each tenant one block of lines — avatar with the name
   over its domain (and the matched domain, when there is one), then plan,

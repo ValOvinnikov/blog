@@ -15,7 +15,11 @@ import {
   type IPreviewTokenClaims,
   signPreviewToken,
 } from '@shinefold/utils/preview-token';
-import { CACHE_CONTROL, ROBOTS_DIRECTIVE } from '@web/constants/http';
+import {
+  CACHE_CONTROL,
+  CACHE_CONTROL_HEADER,
+  ROBOTS_DIRECTIVE,
+} from '@web/constants/http';
 import { PROXY_LOG } from '@web/constants/proxy';
 import {
   DRAFT_PREVIEW_MARKER,
@@ -28,7 +32,6 @@ import {
 } from '@web/server/tenant/constants/constants';
 import type { TTenantRouting } from '@web/server/tenant/resolve-tenant/resolve-tenant';
 import { MOCK_ERROR } from '@web/testing/shared/error/fixtures';
-import { CACHE_CONTROL_HEADER } from '@web/testing/shared/http/constants';
 import { MOCK_TAG_SLUG } from '@web/testing/shared/tag/fixtures';
 import {
   MOCK_TENANT_BASE_URL,

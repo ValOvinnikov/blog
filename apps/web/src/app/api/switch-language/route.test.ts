@@ -4,7 +4,7 @@ import {
   LOCALE_ISO_CODES,
   type TLocaleIsoCode,
 } from '@shinefold/config';
-import { CACHE_CONTROL } from '@web/constants/http';
+import { CACHE_CONTROL, CACHE_CONTROL_HEADER } from '@web/constants/http';
 import {
   isRequestHostPlatformFallback,
   resolveRequestTenant,
@@ -95,7 +95,7 @@ describe(GET, () => {
 
     it('forbids any cache from storing the redirect', () => {
       expect(response.status).toBe(HTTP_STATUS.TEMPORARY_REDIRECT);
-      expect(response.headers.get('cache-control')).toBe(
+      expect(response.headers.get(CACHE_CONTROL_HEADER)).toBe(
         CACHE_CONTROL.PRIVATE_NO_STORE,
       );
     });

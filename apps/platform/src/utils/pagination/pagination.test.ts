@@ -1,9 +1,16 @@
 import { NEXT_NAVIGATION_ERROR } from '@shinefold/config';
 import { redirect } from 'next/navigation';
 
-import { countPages, parsePage, resolveTotalPages } from './pagination';
+import {
+  countPages,
+  parsePage,
+  resolveTotalPages,
+  toPageRange,
+} from './pagination';
 
 const MOCK_PAGE_SIZE = 10;
+const MOCK_SHORT_PAGE_ROWS = 5;
+const MOCK_TOTAL = MOCK_PAGE_SIZE * 2 + MOCK_SHORT_PAGE_ROWS;
 const pageHref = (page: number) => `/items?page=${page}`;
 
 describe(parsePage, () => {
@@ -33,6 +40,41 @@ describe(countPages, () => {
     },
   ])('$name', ({ total, pages }) => {
     expect(countPages(total, MOCK_PAGE_SIZE)).toBe(pages);
+  });
+});
+
+describe(toPageRange, () => {
+  it.each([
+    {
+      name: 'starts the first page at the first item',
+      page: 1,
+      rowCount: MOCK_PAGE_SIZE,
+      from: 1,
+      to: MOCK_PAGE_SIZE,
+    },
+    {
+      name: 'starts a middle page after the earlier pages',
+      page: 2,
+      rowCount: MOCK_PAGE_SIZE,
+      from: MOCK_PAGE_SIZE + 1,
+      to: MOCK_PAGE_SIZE * 2,
+    },
+    {
+      name: 'ends a short last page at the total',
+      page: 3,
+      rowCount: MOCK_SHORT_PAGE_ROWS,
+      from: MOCK_PAGE_SIZE * 2 + 1,
+      to: MOCK_TOTAL,
+    },
+  ])('$name', ({ page, rowCount, from, to }) => {
+    const pageRange = toPageRange({
+      page,
+      pageSize: MOCK_PAGE_SIZE,
+      rowCount,
+      total: MOCK_TOTAL,
+    });
+
+    expect(pageRange).toEqual({ from, to, count: MOCK_TOTAL });
   });
 });
 

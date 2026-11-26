@@ -1,3 +1,4 @@
+import { parsePage } from '@platform/utils/pagination/pagination';
 import { SORT_DIRECTION, TENANT_SORT_COLUMN } from '@shinefold/config';
 import type { TMaybeUndefined, TSearchParam } from '@shinefold/config/types';
 import type { TTenantSort } from '@shinefold/db/queries/tenants/list-tenants';
@@ -7,6 +8,7 @@ export type TTenantsListQuery = {
   shouldShowArchived: boolean;
   sort: TTenantSort;
   search: string;
+  page: number;
 };
 
 export type TTenantsListSearchParams = {
@@ -14,6 +16,7 @@ export type TTenantsListSearchParams = {
   sort?: TSearchParam;
   direction?: TSearchParam;
   q?: TSearchParam;
+  page?: TSearchParam;
 };
 
 export const ARCHIVED_PARAM_ON = '1';
@@ -46,6 +49,7 @@ export const parseTenantsListQuery = ({
   sort,
   direction,
   q,
+  page,
 }: TTenantsListSearchParams): TTenantsListQuery => ({
   shouldShowArchived: firstValue(archived) === ARCHIVED_PARAM_ON,
   sort: sortSchema.parse({
@@ -53,4 +57,5 @@ export const parseTenantsListQuery = ({
     direction: firstValue(direction),
   }),
   search: searchSchema.parse(firstValue(q)),
+  page: parsePage(firstValue(page)),
 });

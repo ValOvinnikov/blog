@@ -1,6 +1,6 @@
-import type { TMaybeUndefined } from '@shinefold/config';
+import { REQUEST_HEADER, type TMaybeUndefined } from '@shinefold/config';
 import { toInitial } from '@shinefold/utils/primitives';
-import { CACHE_CONTROL } from '@web/constants/http';
+import { CACHE_CONTROL, CACHE_CONTROL_HEADER } from '@web/constants/http';
 import { ICON_LOG } from '@web/constants/icon';
 import { getBrandName } from '@web/server/site-config/get-brand-name/get-brand-name';
 import { getSiteConfig } from '@web/server/site-config/get-site-config/get-site-config';
@@ -18,15 +18,15 @@ const FETCH_TIMEOUT_MS = 5000;
 
 const buildSvgResponse = (svg: string): Response => {
   return new Response(svg, {
-    headers: { 'Content-Type': contentType },
+    headers: { [REQUEST_HEADER.CONTENT_TYPE]: contentType },
   });
 };
 
 const buildUncachedNeutralTileResponse = (): Response => {
   return new Response(buildNeutralTileSvg(), {
     headers: {
-      'Content-Type': contentType,
-      'Cache-Control': CACHE_CONTROL.PRIVATE_NO_STORE,
+      [REQUEST_HEADER.CONTENT_TYPE]: contentType,
+      [CACHE_CONTROL_HEADER]: CACHE_CONTROL.PRIVATE_NO_STORE,
     },
   });
 };
@@ -82,8 +82,9 @@ export default async function Icon() {
 
       return new Response(bytes, {
         headers: {
-          'Content-Type':
-            faviconResponse.headers.get('content-type') ?? contentType,
+          [REQUEST_HEADER.CONTENT_TYPE]:
+            faviconResponse.headers.get(REQUEST_HEADER.CONTENT_TYPE) ??
+            contentType,
         },
       });
     }

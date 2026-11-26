@@ -28,4 +28,8 @@ export const headingVariants = tv({
   },
 });
 
+export const headingHighlightVariants = tv({
+  base: ['text-heading-highlight'],
+});
+
 export type THeadingVariants = VariantProps<typeof headingVariants>;

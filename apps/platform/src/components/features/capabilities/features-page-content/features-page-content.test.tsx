@@ -4,21 +4,20 @@ import { expectArchivedOffersNoSave } from '@platform/testing/assert-archived-sa
 import { customRenderAsync, screen } from '@platform/testing/custom-render';
 import { makeEnTranslator } from '@platform/testing/en-translator';
 import { mockDbConstants } from '@platform/testing/mock-db-constants';
-import { mockSettingsFeaturesValues } from '@platform/testing/settings-features/fixtures';
+import {
+  mockSettingsFeaturesValues,
+  mockUnsavedSettingsFeaturesAndPreset,
+} from '@platform/testing/settings-features/fixtures';
 import {
   mockReadyTenant,
   MOCK_ARCHIVED_AT,
   MOCK_TENANT_ID,
   mockTenant,
 } from '@platform/testing/tenants/fixtures';
-import type { TSettingsFeaturesValues } from '@platform/utils/settings-features-fields/settings-features-fields';
-import {
-  CAPABILITY,
-  type TMaybeUndefined,
-  type TPresetId,
-} from '@shinefold/config';
+import { CAPABILITY } from '@shinefold/config';
 import { ANALYTICS_PROVIDER, TENANT_PLAN } from '@shinefold/config/constants';
-import type { TTenantAnalytics } from '@shinefold/db/queries/tenant-analytics';
+import type { getSettingsFeaturesAndPreset } from '@shinefold/db/queries/settings-features';
+import type { getStoredTenantAnalytics } from '@shinefold/db/queries/tenant-analytics';
 import { MOCK_GOOGLE_ANALYTICS } from '@shinefold/db/testing/tenant-analytics/fixtures';
 import { mockEntitlementGrant } from '@shinefold/db/testing/tenant-entitlement-grants/mock-entitlement-grant';
 
@@ -26,14 +25,9 @@ import { FeaturesPageContent } from './features-page-content';
 
 const { getSettingsFeaturesAndPresetMock, getStoredTenantAnalyticsMock } =
   vi.hoisted(() => ({
-    getSettingsFeaturesAndPresetMock: vi.fn<
-      (
-        tenantId: string,
-      ) => Promise<{ features?: TSettingsFeaturesValues; preset?: TPresetId }>
-    >(async () => ({})),
-    getStoredTenantAnalyticsMock: vi.fn<
-      (tenantId: string) => Promise<TMaybeUndefined<TTenantAnalytics>>
-    >(async () => undefined),
+    getSettingsFeaturesAndPresetMock:
+      vi.fn<typeof getSettingsFeaturesAndPreset>(),
+    getStoredTenantAnalyticsMock: vi.fn<typeof getStoredTenantAnalytics>(),
   }));
 
 vi.mock('@shinefold/db', async () => ({
@@ -59,8 +53,16 @@ const setup = customRenderAsync(FeaturesPageContent, {
 });
 
 describe(`<${FeaturesPageContent.name}/>`, () => {
+  beforeEach(() => {
+    getSettingsFeaturesAndPresetMock.mockResolvedValue(
+      mockUnsavedSettingsFeaturesAndPreset(),
+    );
+    getStoredTenantAnalyticsMock.mockResolvedValue(undefined);
+  });
+
   it("shows the tenant's saved feature toggles", async () => {
     getSettingsFeaturesAndPresetMock.mockResolvedValueOnce({
+      ...mockUnsavedSettingsFeaturesAndPreset(),
       features: mockSettingsFeaturesValues({ contactFormEnabled: true }),
     });
 
@@ -111,6 +113,7 @@ describe(`<${FeaturesPageContent.name}/>`, () => {
 
     it('unchecks a Growth-only toggle left on by a plan downgrade', async () => {
       getSettingsFeaturesAndPresetMock.mockResolvedValueOnce({
+        ...mockUnsavedSettingsFeaturesAndPreset(),
         features: mockSettingsFeaturesValues({ bookmarksEnabled: true }),
       });
 

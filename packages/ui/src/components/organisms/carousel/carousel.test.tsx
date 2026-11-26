@@ -1,4 +1,5 @@
 import { faker } from '@faker-js/faker';
+import { CONTENT_ALIGNMENT } from '@shinefold/config';
 import {
   act,
   customRender,
@@ -12,6 +13,7 @@ import { Carousel } from './carousel';
 faker.seed(123);
 
 const ARIA_DISABLED = 'aria-disabled';
+const DATA_ALIGNMENT = 'data-alignment';
 
 type TListener = () => void;
 
@@ -107,24 +109,26 @@ describe(`<${Carousel.name}/>`, () => {
     expect(region).toHaveAttribute('aria-roledescription', 'carousel');
   });
 
-  it('renders one list item per item, keeping every slide in the DOM', () => {
-    setup({ items: MOCK_SLIDES });
+  describe('with several slides', () => {
+    beforeEach(() => {
+      setup({ items: MOCK_SLIDES });
+    });
 
-    const slides = screen.getAllByRole('listitem');
+    it('renders one list item per item, keeping every slide in the DOM', () => {
+      const slides = screen.getAllByRole('listitem');
 
-    expect(slides).toHaveLength(MOCK_SLIDES.length);
-    for (const slide of slides) {
-      expect(slide).not.toHaveAttribute('aria-hidden');
-      expect(slide).not.toHaveAttribute('inert');
-    }
-  });
+      expect(slides).toHaveLength(MOCK_SLIDES.length);
+      for (const slide of slides) {
+        expect(slide).not.toHaveAttribute('aria-hidden');
+        expect(slide).not.toHaveAttribute('inert');
+      }
+    });
 
-  it('renders no "n of m" text on any slide', () => {
-    setup({ items: MOCK_SLIDES });
+    it('renders no "n of m" text on any slide', () => {
+      const slideCount = screen.queryByText(/\d+ of \d+/i);
 
-    const slideCount = screen.queryByText(/\d+ of \d+/i);
-
-    expect(slideCount).not.toBeInTheDocument();
+      expect(slideCount).not.toBeInTheDocument();
+    });
   });
 
   it('renders every item as a slide, in order', () => {
@@ -175,6 +179,24 @@ describe(`<${Carousel.name}/>`, () => {
     expect(next).not.toBeInTheDocument();
   });
 
+  it('aligns a scrollable track to the left whatever the content alignment', () => {
+    setup({ contentAlignment: CONTENT_ALIGNMENT.CENTER });
+
+    const region = screen.getByRole('region', { name: MOCK_ARIA_LABEL });
+
+    expect(region).toHaveAttribute(DATA_ALIGNMENT, CONTENT_ALIGNMENT.LEFT);
+  });
+
+  it('aligns a track with nothing to scroll by its content alignment', () => {
+    emblaApi.canScrollPrev.mockReturnValue(false);
+    emblaApi.canScrollNext.mockReturnValue(false);
+    setup({ contentAlignment: CONTENT_ALIGNMENT.CENTER });
+
+    const region = screen.getByRole('region', { name: MOCK_ARIA_LABEL });
+
+    expect(region).toHaveAttribute(DATA_ALIGNMENT, CONTENT_ALIGNMENT.CENTER);
+  });
+
   describe('with nothing scrollable', () => {
     beforeEach(() => {
       emblaApi.canScrollPrev.mockReturnValue(false);
@@ -201,19 +223,20 @@ describe(`<${Carousel.name}/>`, () => {
   });
 
   describe('with both directions scrollable', () => {
+    let previous: HTMLElement;
+    let next: HTMLElement;
+
     beforeEach(() => {
       setup();
+      ({ previous, next } = getNavButtons());
     });
 
     it('renders both nav buttons titled with their labels', () => {
-      const { previous, next } = getNavButtons();
-
       expect(previous).toHaveAttribute('title', MOCK_PREVIOUS_LABEL);
       expect(next).toHaveAttribute('title', MOCK_NEXT_LABEL);
     });
 
     it('scrolls the track when a nav button is clicked', async () => {
-      const { previous, next } = getNavButtons();
       await user.click(previous);
       await user.click(next);
 
@@ -225,14 +248,11 @@ describe(`<${Carousel.name}/>`, () => {
       emblaApi.canScrollNext.mockReturnValue(false);
       emitEvent('reInit');
 
-      const { next } = getNavButtons();
-
       expect(next).toHaveAttribute(ARIA_DISABLED, 'true');
     });
 
     it('keeps focus on a nav button once it becomes aria-disabled', async () => {
       await user.tab();
-      const { previous } = getNavButtons();
       expect(previous).toHaveFocus();
 
       emblaApi.canScrollPrev.mockReturnValue(false);

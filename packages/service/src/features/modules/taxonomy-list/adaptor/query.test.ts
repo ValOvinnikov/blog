@@ -12,7 +12,10 @@ import {
   mockModuleDocument,
   mockRawTaxonomyListModule,
 } from '@shinefold/service/testing/modules/fixtures';
-import { evaluateGroqExpression } from '@shinefold/service/testing/shared/groq';
+import {
+  evaluateGroqExpression,
+  evaluateModuleQuery,
+} from '@shinefold/service/testing/shared/groq';
 import {
   mockLocalizedStrings,
   mockParagraphBlocks,
@@ -59,21 +62,18 @@ const MOCK_TAXONOMY_TERM_DOCUMENTS = [
   },
 ];
 
-async function runTaxonomyList(
+function runTaxonomyList(
   locale: string,
   overrides: Record<string, unknown> = {},
 ) {
-  const raw = await evaluateGroqExpression(
-    taxonomyListModuleQuery.query,
+  return evaluateModuleQuery(
+    taxonomyListModuleQuery,
     [
       { ...MOCK_MODULE_DOCUMENT, ...overrides },
       ...MOCK_TAXONOMY_TERM_DOCUMENTS,
     ],
-    undefined,
-    { id: MOCK_MODULE_ID, locale, defaultLocale: EN },
+    { id: MOCK_MODULE_ID, locale },
   );
-
-  return taxonomyListModuleQuery.parse(raw);
 }
 
 describe('taxonomyListModuleQuery', () => {

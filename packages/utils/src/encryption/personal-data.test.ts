@@ -4,6 +4,7 @@ import { KEY_ENCODING } from './crypto-encoding';
 import {
   MOCK_OTHER_ENCRYPTION_KEY as MOCK_KEY_V2,
   MOCK_ENCRYPTION_KEY as MOCK_KEY_V1,
+  MOCK_SHORT_KEY,
 } from './encryption-fixtures';
 import {
   accountEmailIndex,
@@ -28,7 +29,6 @@ const MOCK_KEYRING_V1 = parsePersonalDataKeyring(`v1:${MOCK_KEY_V1}`);
 const MOCK_KEYRING_V2 = parsePersonalDataKeyring(
   `v2:${MOCK_KEY_V2},v1:${MOCK_KEY_V1}`,
 );
-const MOCK_SHORT_KEY = Buffer.alloc(16).toString(KEY_ENCODING);
 const MOCK_LONG_KEY = Buffer.alloc(33).toString(KEY_ENCODING);
 const MOCK_NON_BASE64_KEY = `${MOCK_KEY_V1.slice(0, -2)}!=`;
 const MOCK_BAD_KEYS: [string, string][] = [
@@ -95,16 +95,22 @@ describe(isPersonalDataKey, () => {
 });
 
 describe(encryptPersonalData, () => {
-  it('round-trips a value', () => {
-    const encrypted = encryptPersonalData(MOCK_ADDRESS, MOCK_KEYRING_V1);
+  describe('with a single-key keyring', () => {
+    let encrypted: string;
 
-    expect(decryptPersonalData(encrypted, MOCK_KEYRING_V1)).toBe(MOCK_ADDRESS);
-  });
+    beforeEach(() => {
+      encrypted = encryptPersonalData(MOCK_ADDRESS, MOCK_KEYRING_V1);
+    });
 
-  it('never stores the value readably', () => {
-    const encrypted = encryptPersonalData(MOCK_ADDRESS, MOCK_KEYRING_V1);
+    it('round-trips a value', () => {
+      expect(decryptPersonalData(encrypted, MOCK_KEYRING_V1)).toBe(
+        MOCK_ADDRESS,
+      );
+    });
 
-    expect(encrypted).not.toContain(MOCK_ADDRESS);
+    it('never stores the value readably', () => {
+      expect(encrypted).not.toContain(MOCK_ADDRESS);
+    });
   });
 
   it('prefixes the stored form with the current key version', () => {
