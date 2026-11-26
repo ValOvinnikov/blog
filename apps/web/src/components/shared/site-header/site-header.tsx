@@ -17,6 +17,7 @@ import {
 import { getAccountControl } from '@web/server/site-config/get-account-control/get-account-control';
 import { getBrandLogos } from '@web/server/site-config/get-brand-logos/get-brand-logos';
 import { getBrandName } from '@web/server/site-config/get-brand-name/get-brand-name';
+import { getHeaderActionLook } from '@web/server/site-config/get-header-action-look/get-header-action-look';
 import { getHeaderStyle } from '@web/server/site-config/get-header-style/get-header-style';
 import { getLanguageSwitcherStyle } from '@web/server/site-config/get-language-switcher-style/get-language-switcher-style';
 import { getLockedColorScheme } from '@web/server/site-config/get-locked-color-scheme/get-locked-color-scheme';
@@ -45,6 +46,7 @@ export const SiteHeader = async () => {
     brandName,
     accountControl,
     headerStyle,
+    headerActionLook,
     siteOAuthCredentials,
     lockedColorScheme,
   ] = await Promise.all([
@@ -56,6 +58,7 @@ export const SiteHeader = async () => {
     getBrandName({ tenantId, tenantName }),
     getAccountControl(siteConfigTenant),
     getHeaderStyle(siteConfigTenant),
+    getHeaderActionLook(siteConfigTenant),
     getSiteOAuthCredentials(tenantId),
     getLockedColorScheme(siteConfigTenant),
   ]);
@@ -68,6 +71,7 @@ export const SiteHeader = async () => {
 
   const navItems = navResult.ok ? navResult.data.items : [];
   const tagline = navResult.ok ? navResult.data.tagline : undefined;
+  const headerAction = navResult.ok ? navResult.data.headerAction : undefined;
   const { layout, submenuStyle, barStyle, background } = headerStyle;
   const hasLanguageSwitcher =
     navResult.ok && navResult.data.showLanguageSwitcher === true;
@@ -89,6 +93,14 @@ export const SiteHeader = async () => {
         </Header.Brand>
         <SiteNavigation
           links={navItems}
+          action={
+            headerAction && {
+              label: headerAction.label,
+              href: headerAction.href,
+              target: headerAction.target,
+              ...headerActionLook,
+            }
+          }
           layout={layout}
           submenuStyle={submenuStyle}
           panelActions={

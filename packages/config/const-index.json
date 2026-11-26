@@ -12602,6 +12602,14 @@
         "file": "apps/web/src/constants/generate-skim.ts"
       }
     ],
+    "header_action.site_config_fetch_failed": [
+      {
+        "ref": "HEADER_ACTION_LOG.SITE_CONFIG_FETCH_FAILED",
+        "scope": "app:web",
+        "from": "@web/constants/header-action",
+        "file": "apps/web/src/constants/header-action.ts"
+      }
+    ],
     "header_style.site_config_fetch_failed": [
       {
         "ref": "HEADER_STYLE_LOG.SITE_CONFIG_FETCH_FAILED",

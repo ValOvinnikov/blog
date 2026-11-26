@@ -21,6 +21,7 @@ import {
 import { getAccountControl } from '@web/server/site-config/get-account-control/get-account-control';
 import { getBrandLogos } from '@web/server/site-config/get-brand-logos/get-brand-logos';
 import { getBrandName } from '@web/server/site-config/get-brand-name/get-brand-name';
+import { getHeaderActionLook } from '@web/server/site-config/get-header-action-look/get-header-action-look';
 import { getHeaderStyle } from '@web/server/site-config/get-header-style/get-header-style';
 import { getLockedColorScheme } from '@web/server/site-config/get-locked-color-scheme/get-locked-color-scheme';
 import { customRenderAsync, screen, within } from '@web/testing/custom-render';
@@ -28,6 +29,10 @@ import { MOCK_SITE_OAUTH_CREDENTIALS } from '@web/testing/server/auth/site-oauth
 import { MOCK_ACCOUNT_CONTROL } from '@web/testing/shared/account-control/fixtures';
 import { ARIA_EXPANDED } from '@web/testing/shared/aria/constants';
 import { MOCK_ERROR } from '@web/testing/shared/error/fixtures';
+import {
+  MOCK_EXTERNAL_HEADER_ACTION_LINK,
+  MOCK_HEADER_ACTION_LINK,
+} from '@web/testing/shared/header-action/fixtures';
 import { MOCK_HEADER_STYLE } from '@web/testing/shared/header-style/fixtures';
 import {
   KEY_ARROW_DOWN,
@@ -76,6 +81,10 @@ vi.mock('@web/server/site-config/get-brand-logos/get-brand-logos');
 vi.mock('@web/server/site-config/get-brand-name/get-brand-name');
 
 vi.mock('@web/server/site-config/get-header-style/get-header-style');
+
+vi.mock(
+  '@web/server/site-config/get-header-action-look/get-header-action-look',
+);
 
 vi.mock(
   '@web/server/site-config/get-locked-color-scheme/get-locked-color-scheme',
@@ -270,6 +279,64 @@ describe(`<${SiteHeader.name}/>`, () => {
       const tagline = screen.queryByText(MOCK_HEADER_TAGLINE);
 
       expect(tagline).not.toBeInTheDocument();
+    });
+  });
+
+  describe('the header action', () => {
+    const queryActionLink = () =>
+      within(screen.getByRole('banner')).queryByRole('link', {
+        name: MOCK_HEADER_ACTION_LINK.label,
+      });
+
+    it('shows the header action from the navigation settings', async () => {
+      getNavigationMock.mockResolvedValue(
+        okResult({ items: [], headerAction: MOCK_HEADER_ACTION_LINK }),
+      );
+
+      await setup();
+
+      expect(queryActionLink()).toBeVisible();
+    });
+
+    it("reads the action's style and phone placement from the tenant's Look", async () => {
+      await setup();
+
+      expect(vi.mocked(getHeaderActionLook)).toHaveBeenCalledWith(
+        MOCK_REQUEST_CONTEXT.tenantId,
+      );
+    });
+
+    it('opens an external action in a new tab', async () => {
+      getNavigationMock.mockResolvedValue(
+        okResult({
+          items: [],
+          headerAction: MOCK_EXTERNAL_HEADER_ACTION_LINK,
+        }),
+      );
+
+      await setup();
+
+      expect(queryActionLink()).toHaveAttribute(
+        'target',
+        MOCK_EXTERNAL_HEADER_ACTION_LINK.target,
+      );
+    });
+
+    it.each([
+      {
+        case: 'a site with no header action',
+        result: okResult({ items: [], headerAction: undefined }),
+      },
+      {
+        case: 'a failed navigation read',
+        result: errorResult(MOCK_ERROR),
+      },
+    ])('shows no action for $case', async ({ result }) => {
+      getNavigationMock.mockResolvedValue(result);
+
+      await setup();
+
+      expect(queryActionLink()).not.toBeInTheDocument();
     });
   });
 
