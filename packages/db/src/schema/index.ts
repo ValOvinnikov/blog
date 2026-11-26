@@ -14,6 +14,7 @@ export * from './magic-link-send-counters';
 export * from './membership-invites';
 export * from './memberships';
 export * from './newsletter-post-sends';
+export * from './pinned-tenants';
 export * from './settings-features';
 export * from './site-config';
 export * from './site-config-enums';

@@ -1,4 +1,5 @@
 export type {
+  TLandingAdjacentPages,
   TLandingBreadcrumb,
   TLandingSectionNavigation,
   TLandingSectionPage,

@@ -1,33 +1,24 @@
 'use client';
 
-import { Avatar } from '@platform/components/shared/avatar';
 import {
   DataTableShell,
   nextSort,
 } from '@platform/components/shared/data-table-shell';
-import { LinkButton } from '@platform/components/shared/link-button';
-import { StatusBadge } from '@platform/components/shared/status-badge';
-import { AVATAR_VARIANT } from '@platform/constants/avatar';
-import { BADGE_TONE } from '@platform/constants/badge-tone';
-import { BUTTON_VARIANT } from '@platform/constants/button';
+import { Pagination } from '@platform/components/shared/pagination';
 import { DATA_TABLE_COLUMN } from '@platform/constants/data-table';
-import type { TClientTenant } from '@platform/server/tenants/to-client-tenant';
-import { formatDate } from '@platform/utils/format-date/format-date';
+import { TENANTS_PAGE_SIZE } from '@platform/constants/tenant';
+import { toPageRange } from '@platform/utils/pagination/pagination';
 import { adminRoutes } from '@platform/utils/routes/routes';
-import { tenantStatusTone } from '@platform/utils/status-tone/status-tone';
 import type { TTenantsListQuery } from '@platform/utils/tenants-list-query/tenants-list-query';
 import { useTenantsListNavigation } from '@platform/utils/use-tenants-list-navigation/use-tenants-list-navigation';
-import {
-  SIZE,
-  TENANT_SORT_COLUMN,
-  type TTenantSortColumn,
-} from '@shinefold/config';
-import { TENANT_PROVISIONING_STATUS } from '@shinefold/db/constants';
-import type { TListedTenant } from '@shinefold/db/queries/tenants/list-tenants';
-import { useLocale, useTranslations } from 'next-intl';
+import { TENANT_SORT_COLUMN, type TTenantSortColumn } from '@shinefold/config';
+import { useTranslations } from 'next-intl';
 import { useOptimistic, type ReactNode } from 'react';
 
-import { tenantsTableVariants } from './tenants-table-variants';
+import {
+  TenantsTableRow,
+  type TTenantsTableTenant,
+} from './components/row/tenants-table-row';
 
 const COLUMN_LABEL_KEYS = {
   [TENANT_SORT_COLUMN.NAME]: 'columnTenant',
@@ -36,32 +27,32 @@ const COLUMN_LABEL_KEYS = {
   [TENANT_SORT_COLUMN.CREATED]: 'columnCreated',
 } as const satisfies Record<TTenantSortColumn, string>;
 
-export type TTenantsTableTenant = TClientTenant &
-  Pick<TListedTenant, 'matchedDomain'>;
-
 export type TTenantsTableProps = {
   tenants: TTenantsTableTenant[];
+  total: number;
+  totalPages: number;
   listQuery: TTenantsListQuery;
   toolbar: ReactNode;
 };
 
-const manageHrefFor = (tenant: TClientTenant): string =>
-  tenant.provisioningStatus === TENANT_PROVISIONING_STATUS.READY
-    ? adminRoutes.tenantOverview(tenant.id)
-    : adminRoutes.tenantProvisioning(tenant.id);
-
 export const TenantsTable = ({
   tenants,
+  total,
+  totalPages,
   listQuery,
   toolbar,
 }: TTenantsTableProps) => {
   const t = useTranslations('tenantsTable');
   const tView = useTranslations('tenantsView');
-  const tPlan = useTranslations('planNames');
-  const locale = useLocale();
   const { navigate } = useTenantsListNavigation(listQuery);
   const [sort, setOptimisticSort] = useOptimistic(listQuery.sort);
-  const { tname, lines, name, domain } = tenantsTableVariants();
+  const { page } = listQuery;
+  const range = toPageRange({
+    page,
+    pageSize: TENANTS_PAGE_SIZE,
+    rowCount: tenants.length,
+    total,
+  });
 
   const sortBy = (column: TTenantSortColumn) => {
     const next = nextSort(sort, column);
@@ -94,51 +85,22 @@ export const TenantsTable = ({
         },
       ]}
       renderRow={(tenant) => (
-        <DataTableShell.Row key={tenant.id}>
-          <DataTableShell.Cell column={TENANT_SORT_COLUMN.NAME}>
-            <div className={tname()}>
-              <Avatar name={tenant.name} variant={AVATAR_VARIANT.TABLE} />
-              <div className={lines()}>
-                <div className={name()}>{tenant.name}</div>
-                <div className={domain()}>{tenant.primaryDomain}</div>
-                {tenant.matchedDomain && (
-                  <div className={domain()}>
-                    {t('matchedDomain', { domain: tenant.matchedDomain })}
-                  </div>
-                )}
-              </div>
-            </div>
-          </DataTableShell.Cell>
-          <DataTableShell.Cell column={TENANT_SORT_COLUMN.PLAN}>
-            <StatusBadge tone={BADGE_TONE.PLAN} hasDot={false}>
-              {tPlan(tenant.plan)}
-            </StatusBadge>
-          </DataTableShell.Cell>
-          <DataTableShell.Cell column={TENANT_SORT_COLUMN.STATUS}>
-            <StatusBadge tone={tenantStatusTone(tenant.status)}>
-              {t(`status.${tenant.status}`)}
-            </StatusBadge>
-          </DataTableShell.Cell>
-          <DataTableShell.Cell column={TENANT_SORT_COLUMN.CREATED}>
-            <time dateTime={tenant.createdAt.toISOString()}>
-              {formatDate(tenant.createdAt, locale)}
-            </time>
-          </DataTableShell.Cell>
-          <DataTableShell.Cell column={DATA_TABLE_COLUMN.ACTIONS}>
-            <LinkButton
-              href={manageHrefFor(tenant)}
-              variant={BUTTON_VARIANT.SECONDARY}
-              size={SIZE.SM}
-              ariaLabel={t('manageAriaLabel', { tenantName: tenant.name })}
-              hasArrow={true}
-            >
-              {t('manage')}
-            </LinkButton>
-          </DataTableShell.Cell>
-        </DataTableShell.Row>
+        <TenantsTableRow key={tenant.id} tenant={tenant} />
       )}
     >
       <DataTableShell.Toolbar>{toolbar}</DataTableShell.Toolbar>
+      {total > 0 && (
+        <DataTableShell.Footer>
+          <span>{t(totalPages > 1 ? 'showing' : 'count', range)}</span>
+          <Pagination
+            page={page}
+            totalPages={totalPages}
+            pageHref={(target) =>
+              adminRoutes.tenants({ ...listQuery, page: target })
+            }
+          />
+        </DataTableShell.Footer>
+      )}
     </DataTableShell>
   );
 };

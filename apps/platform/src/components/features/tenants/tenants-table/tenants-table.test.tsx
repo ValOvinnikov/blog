@@ -1,8 +1,11 @@
+import { TENANTS_PAGE_SIZE } from '@platform/constants/tenant';
+import messages from '@platform/i18n/messages/en.json';
 import { customRender, screen } from '@platform/testing/custom-render';
+import { makeEnTranslator } from '@platform/testing/en-translator';
 import { mockLocaleRouterPush } from '@platform/testing/mock-locale-router';
 import {
-  mockReadyClientTenant,
   mockTenantsListQuery,
+  mockTenantsPageRow,
   MOCK_CUSTOM_DOMAIN,
   MOCK_OTHER_TENANT_DOMAIN,
   MOCK_OTHER_TENANT_ID,
@@ -13,13 +16,14 @@ import {
   MOCK_TENANT_ID,
   MOCK_TENANT_SLUG,
 } from '@platform/testing/tenants/fixtures';
+import { adminRoutes } from '@platform/utils/routes/routes';
 import { SORT_DIRECTION, TENANT_SORT_COLUMN } from '@shinefold/config';
 import { TENANT_PLAN } from '@shinefold/config/constants';
 import {
   TENANT_PROVISIONING_STATUS,
   TENANT_STATUS,
 } from '@shinefold/db/constants';
-import type { TTenant } from '@shinefold/db/schema/tenants';
+import type { TTenantsPageRow } from '@shinefold/db/queries/tenants/tenants-page-row';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
 
 import { TenantsTable } from './tenants-table';
@@ -27,13 +31,15 @@ import { TenantsTable } from './tenants-table';
 vi.mock('@platform/i18n/navigation');
 
 const setup = customRender(TenantsTable, {
-  tenants: [mockReadyClientTenant()],
+  tenants: [mockTenantsPageRow()],
+  total: 1,
+  totalPages: 1,
   listQuery: mockTenantsListQuery(),
   toolbar: null,
 });
 
-const otherTenant = (overrides: Partial<TTenant> = {}) =>
-  mockReadyClientTenant({
+const otherTenant = (overrides: Partial<TTenantsPageRow> = {}) =>
+  mockTenantsPageRow({
     id: MOCK_OTHER_TENANT_ID,
     name: MOCK_OTHER_TENANT_NAME,
     primaryDomain: MOCK_OTHER_TENANT_DOMAIN,
@@ -48,12 +54,27 @@ const CREATED_COLUMN = 'Created';
 const PLAN_COLUMN = 'Plan';
 const MATCHED_HINT = `Matched on ${MOCK_CUSTOM_DOMAIN}`;
 const MATCHED_LABEL = /^Matched on /;
+const MOCK_NO_TENANTS = { tenants: [], total: 0 };
+const MOCK_TOTAL = 168;
+const MOCK_TOTAL_PAGES = 7;
+const MOCK_MIDDLE_PAGE = 2;
+const MOCK_FILTERED_QUERY = mockTenantsListQuery({
+  shouldShowArchived: true,
+  sort: {
+    column: TENANT_SORT_COLUMN.NAME,
+    direction: SORT_DIRECTION.ASCENDING,
+  },
+  search: MOCK_TENANT_SLUG,
+  page: MOCK_MIDDLE_PAGE,
+});
+const tTable = makeEnTranslator('tenantsTable');
+const tPagination = makeEnTranslator('pagination');
 
 describe(`<${TenantsTable.name}/>`, () => {
   it("shows each tenant's name, domain, plan and status", () => {
     setup({
       tenants: [
-        mockReadyClientTenant(),
+        mockTenantsPageRow(),
         otherTenant({
           plan: TENANT_PLAN.GROWTH,
           status: TENANT_STATUS.SUSPENDED,
@@ -79,7 +100,7 @@ describe(`<${TenantsTable.name}/>`, () => {
   });
 
   it('links a ready tenant to its overview page', () => {
-    setup({ tenants: [mockReadyClientTenant(), otherTenant()] });
+    setup({ tenants: [mockTenantsPageRow(), otherTenant()] });
 
     const tenantLink = screen.getByRole('link', { name: MANAGE_TENANT });
     const otherLink = screen.getByRole('link', { name: MANAGE_OTHER_TENANT });
@@ -94,7 +115,7 @@ describe(`<${TenantsTable.name}/>`, () => {
   it('links a not-yet-ready tenant to its provisioning page', () => {
     setup({
       tenants: [
-        mockReadyClientTenant({
+        mockTenantsPageRow({
           provisioningStatus: TENANT_PROVISIONING_STATUS.PROVISIONING,
         }),
         otherTenant({
@@ -157,7 +178,7 @@ describe(`<${TenantsTable.name}/>`, () => {
   it('labels only the row a search matched through an extra address', () => {
     setup({
       tenants: [
-        { ...mockReadyClientTenant(), matchedDomain: MOCK_CUSTOM_DOMAIN },
+        mockTenantsPageRow({ matchedDomain: MOCK_CUSTOM_DOMAIN }),
         otherTenant(),
       ],
       listQuery: mockTenantsListQuery({ search: MOCK_CUSTOM_DOMAIN }),
@@ -171,7 +192,7 @@ describe(`<${TenantsTable.name}/>`, () => {
   });
 
   it('shows an empty state when there are no tenants', () => {
-    setup({ tenants: [] });
+    setup(MOCK_NO_TENANTS);
 
     const emptyMessage = screen.getByText('No tenants yet.');
     const table = screen.queryByRole('table');
@@ -182,7 +203,7 @@ describe(`<${TenantsTable.name}/>`, () => {
 
   it('names the search when no tenant matches it', () => {
     setup({
-      tenants: [],
+      ...MOCK_NO_TENANTS,
       listQuery: mockTenantsListQuery({ search: MOCK_TENANT_SLUG }),
     });
 
@@ -191,6 +212,128 @@ describe(`<${TenantsTable.name}/>`, () => {
     );
 
     expect(emptyMessage).toBeVisible();
+  });
+
+  describe('range and page controls under the rows', () => {
+    describe('on a middle page of a long list', () => {
+      beforeEach(() => {
+        setup({
+          tenants: [mockTenantsPageRow(), otherTenant()],
+          total: MOCK_TOTAL,
+          totalPages: MOCK_TOTAL_PAGES,
+          listQuery: MOCK_FILTERED_QUERY,
+        });
+      });
+
+      it('shows the range and the total', () => {
+        const range = screen.getByText(
+          tTable('showing', {
+            from: TENANTS_PAGE_SIZE + 1,
+            to: TENANTS_PAGE_SIZE + 2,
+            count: MOCK_TOTAL,
+          }),
+        );
+
+        expect(range).toBeVisible();
+      });
+
+      it('shows the current page out of the page count', () => {
+        const position = screen.getByText(
+          tPagination('status', {
+            page: MOCK_MIDDLE_PAGE,
+            totalPages: MOCK_TOTAL_PAGES,
+          }),
+        );
+
+        expect(position).toBeVisible();
+      });
+
+      it('links Next to the next page, keeping sort, search and visibility', () => {
+        const next = screen.getByRole('link', {
+          name: messages.pagination.next,
+        });
+
+        expect(next).toHaveAttribute(
+          'href',
+          adminRoutes.tenants({
+            ...MOCK_FILTERED_QUERY,
+            page: MOCK_MIDDLE_PAGE + 1,
+          }),
+        );
+      });
+
+      it('links Previous to the page before', () => {
+        const previous = screen.getByRole('link', {
+          name: messages.pagination.previous,
+        });
+
+        expect(previous).toHaveAttribute(
+          'href',
+          adminRoutes.tenants({
+            ...MOCK_FILTERED_QUERY,
+            page: MOCK_MIDDLE_PAGE - 1,
+          }),
+        );
+      });
+    });
+
+    it.each([
+      {
+        edge: 'first',
+        page: 1,
+        disabled: messages.pagination.previous,
+        linked: messages.pagination.next,
+      },
+      {
+        edge: 'last',
+        page: MOCK_TOTAL_PAGES,
+        disabled: messages.pagination.next,
+        linked: messages.pagination.previous,
+      },
+    ])(
+      'disables the unavailable step on the $edge page',
+      ({ page, disabled, linked }) => {
+        setup({
+          total: MOCK_TOTAL,
+          totalPages: MOCK_TOTAL_PAGES,
+          listQuery: mockTenantsListQuery({ page }),
+        });
+
+        const disabledStep = screen.getByRole('button', { name: disabled });
+        const linkedStep = screen.getByRole('link', { name: linked });
+
+        expect(disabledStep).toBeDisabled();
+        expect(linkedStep).toBeVisible();
+      },
+    );
+
+    describe('with everything on one page', () => {
+      beforeEach(() => {
+        setup({ tenants: [mockTenantsPageRow(), otherTenant()], total: 2 });
+      });
+
+      it('shows only the count', () => {
+        const count = screen.getByText(tTable('count', { count: 2 }));
+
+        expect(count).toBeVisible();
+      });
+
+      it('offers no pagination controls', () => {
+        const navigation = screen.queryByRole('navigation', {
+          name: messages.pagination.ariaLabel,
+        });
+
+        expect(navigation).not.toBeInTheDocument();
+      });
+    });
+
+    it('is absent when there are no tenants', () => {
+      setup(MOCK_NO_TENANTS);
+
+      const count = screen.queryByText(tTable('count', { count: 0 }));
+
+      expect(count).not.toBeInTheDocument();
+    });
   });
 
   describe('sorting', () => {
