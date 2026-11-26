@@ -82,7 +82,8 @@
   },
   "sectionNavigation": {
     "label": "In this section",
-    "backTo": "Back to {title}"
+    "backTo": "Back to {title}",
+    "adjacentPages": "Previous and next pages"
   },
   "topicPage": {
     "empty": "No posts in {name} yet.",

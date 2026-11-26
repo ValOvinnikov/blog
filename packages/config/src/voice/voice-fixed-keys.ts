@@ -3,7 +3,9 @@ import { ASIDE_VOICE_FIXED_KEYS } from './voice-fixed-keys-aside';
 import { AUTH_MENU_VOICE_FIXED_KEYS } from './voice-fixed-keys-auth-menu';
 import { CONSENT_VOICE_FIXED_KEYS } from './voice-fixed-keys-consent';
 import { COOKIE_LIST_VOICE_FIXED_KEYS } from './voice-fixed-keys-cookie-list';
+import { PAGINATION_VOICE_FIXED_KEYS } from './voice-fixed-keys-pagination';
 import { PRICING_VOICE_FIXED_KEYS } from './voice-fixed-keys-pricing';
+import { SECTION_NAVIGATION_VOICE_FIXED_KEYS } from './voice-fixed-keys-section-navigation';
 import { TOAST_VOICE_FIXED_KEYS } from './voice-fixed-keys-toast';
 
 /**
@@ -17,7 +19,9 @@ export const VOICE_FIXED_KEYS = [
   ...AUTH_MENU_VOICE_FIXED_KEYS,
   ...CONSENT_VOICE_FIXED_KEYS,
   ...COOKIE_LIST_VOICE_FIXED_KEYS,
+  ...PAGINATION_VOICE_FIXED_KEYS,
   ...PRICING_VOICE_FIXED_KEYS,
+  ...SECTION_NAVIGATION_VOICE_FIXED_KEYS,
   ...TOAST_VOICE_FIXED_KEYS,
   'breadcrumbs.ariaLabel',
   'localeErrorPage.announcement',
@@ -72,7 +76,6 @@ export const VOICE_FIXED_KEYS = [
   'accountPage.newsletter.resendError',
   'accountPage.newsletter.resendUnavailable',
 
-  'pagination.pageSuffix',
   'taxonomyListModule.topics.postsCount',
   'taxonomyListModule.tags.postsCount',
   'bookmarksPage.hint',
@@ -126,16 +129,12 @@ export const VOICE_FIXED_KEYS = [
   'newsletterUnsubscribe.errorMessage',
   'newsletterUnsubscribe.returnHome',
 
-  'pagination.previous',
-  'pagination.next',
   'topicChipList.all',
   'blogPostPage.postSummary.button',
   'blogPostPage.postSummary.title',
   'blogPostPage.postSummary.readTime',
   'blogPostPage.postSummary.readFullArticle',
   'contentsRail.label',
-  'sectionNavigation.label',
-  'sectionNavigation.backTo',
   'postShare.copyLink',
   'postShare.copied',
   'postShare.linkCopied',

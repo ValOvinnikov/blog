@@ -18,5 +18,6 @@ export const landingPageLayoutVariants = tv({
       'lg:[&_.w-screen]:w-[calc(100%+2*var(--spacing-gutter))]',
       'lg:[&_.w-screen]:translate-x-0',
     ],
+    adjacentPages: ['px-gutter pb-band-md'],
   },
 });
