@@ -20,12 +20,16 @@ import { tenantsViewVariants } from './tenants-view-variants';
 
 export type TTenantsViewProps = {
   tenants: TTenantsTableTenant[];
+  total: number;
+  totalPages: number;
   listQuery: TTenantsListQuery;
   isEmailAlertingConfigured: boolean;
 };
 
 export const TenantsView = ({
   tenants,
+  total,
+  totalPages,
   listQuery,
   isEmailAlertingConfigured,
 }: TTenantsViewProps) => {
@@ -51,6 +55,8 @@ export const TenantsView = ({
       {!isEmailAlertingConfigured && <EmailAlertsBanner />}
       <TenantsTable
         tenants={tenants}
+        total={total}
+        totalPages={totalPages}
         listQuery={listQuery}
         toolbar={
           <>
