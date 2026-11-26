@@ -1,4 +1,4 @@
-import type { TTenantsPageRow } from '@shinefold/db/queries/tenants/list-tenants-page/list-tenants-page';
+import type { TTenantsPageRow } from '@shinefold/db/queries/tenants/tenants-page-row';
 
 import { mockReadyTenant } from './mock-tenant';
 
