@@ -1,9 +1,11 @@
 import { type ITenantLocalizedParams, routes } from '@shinefold/config';
+import { HTTP_STATUS } from '@shinefold/config/constants';
 import {
   service,
   type TFeedPost,
   type TTenantSanityContext,
 } from '@shinefold/service';
+import { RSS_LOG } from '@web/constants/rss';
 import { getFeedContext } from '@web/server/feed/get-feed-context/get-feed-context';
 import { buildRssFeed } from '@web/utils/build-rss-feed';
 import { logger } from '@web/utils/logger/logger';
@@ -28,7 +30,7 @@ const getAllTagPosts = async (
 ): Promise<TTagFeed | null> => {
   const tagResult = await service.pages.tag.v1.getTagPage(slug, tenant);
   if (!tagResult.ok) {
-    logger.error('tag_rss.tag_fetch_failed', {
+    logger.error(RSS_LOG.TAG_FETCH_FAILED, {
       slug,
       error: tagResult.error,
     });
@@ -47,7 +49,7 @@ const getAllTagPosts = async (
     tenant,
   );
   if (!postsResult.ok) {
-    logger.error('tag_rss.posts_fetch_failed', {
+    logger.error(RSS_LOG.TAG_POSTS_FETCH_FAILED, {
       slug,
       error: postsResult.error,
     });
@@ -65,7 +67,7 @@ export async function GET(
   const { slug, locale } = await params;
   const feed = await getFeedContext(locale);
   if (!feed) {
-    return new NextResponse(null, { status: 404 });
+    return new NextResponse(null, { status: HTTP_STATUS.NOT_FOUND });
   }
   const { tenant, language, toLocalizedUrl, toRssItem } = feed;
 

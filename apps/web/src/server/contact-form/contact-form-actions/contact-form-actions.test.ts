@@ -5,6 +5,7 @@ import { queries } from '@shinefold/db';
 import { sendEmail } from '@shinefold/email';
 import type * as TEmail from '@shinefold/email';
 import { FORWARDED_FOR_HEADER } from '@shinefold/utils/client-key';
+import { CONTACT_FORM_LOG } from '@web/constants/contact-form';
 import { FIELD_ERROR } from '@web/constants/field-error';
 import { resolveRequestTenant } from '@web/server/tenant/request-tenant/request-tenant';
 import { isTenantActive } from '@web/server/tenant/write-gate/write-gate';
@@ -73,7 +74,6 @@ faker.seed(6010);
 
 const MOCK_LEAD_ID = faker.string.uuid();
 const MOCK_RECIPIENT = faker.internet.email();
-const NOTIFICATION_SEND_FAILED_EVENT = 'contact_form.notification_send_failed';
 const ATTEMPTS_BEFORE_REFUSAL = 5;
 
 const mockInput = (
@@ -269,10 +269,13 @@ describe(submitContactMessage, () => {
 
     expect(result).toEqual({ outcome: ACTION_OUTCOME.SUCCESS });
     expect(logger.error).toHaveBeenCalledOnce();
-    expect(logger.error).toHaveBeenCalledWith(NOTIFICATION_SEND_FAILED_EVENT, {
-      leadId: MOCK_LEAD_ID,
-      error: MOCK_ERROR,
-    });
+    expect(logger.error).toHaveBeenCalledWith(
+      CONTACT_FORM_LOG.NOTIFICATION_SEND_FAILED,
+      {
+        leadId: MOCK_LEAD_ID,
+        error: MOCK_ERROR,
+      },
+    );
   });
 
   it('answers server-error without emailing when the lead cannot be stored', async () => {

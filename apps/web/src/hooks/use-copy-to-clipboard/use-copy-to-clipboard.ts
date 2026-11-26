@@ -1,5 +1,6 @@
 'use client';
 
+import { CLIPBOARD_LOG } from '@web/constants/clipboard';
 import { logger } from '@web/utils/logger/logger';
 import { reportClientError } from '@web/utils/report-client-error';
 import { useEffect, useState } from 'react';
@@ -22,8 +23,8 @@ export const useCopyToClipboard = (resetMs = DEFAULT_RESET_DELAY_MS) => {
       .writeText(text)
       .then(() => setIsCopied(true))
       .catch((error: unknown) => {
-        logger.error('copy_to_clipboard.write_failed', { error });
-        reportClientError('copy_to_clipboard.write_failed', error);
+        logger.error(CLIPBOARD_LOG.WRITE_FAILED, { error });
+        reportClientError(CLIPBOARD_LOG.WRITE_FAILED, error);
       });
   };
 

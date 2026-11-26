@@ -1,7 +1,9 @@
 import { routes } from '@shinefold/config';
 import { queries } from '@shinefold/db';
 import { service } from '@shinefold/service';
+import { hasLength, isUndefined } from '@shinefold/utils/primitives';
 import { VoiceRichText } from '@web/components/shared/voice-rich-text';
+import { BOOKMARK_LOG } from '@web/constants/bookmark';
 import { routing } from '@web/i18n/routing';
 import { auth } from '@web/server/auth/auth';
 import { getRequestContext } from '@web/server/request-context/request-context';
@@ -45,7 +47,7 @@ export const BookmarksPage = async () => {
   );
 
   if (!result.ok) {
-    logger.error('bookmarks_page.posts_resolve_failed', {
+    logger.error(BOOKMARK_LOG.PAGE_POSTS_RESOLVE_FAILED, {
       error: result.error,
     });
     return null;
@@ -54,7 +56,7 @@ export const BookmarksPage = async () => {
   const postsById = new Map(result.data.map((post) => [post.id, post]));
   const orderedPosts = bookmarkOrder
     .map((postId) => postsById.get(postId))
-    .filter((post) => post !== undefined);
+    .filter((post) => !isUndefined(post));
 
   const posts: IBookmarkedPost[] = orderedPosts.map((post) => ({
     id: post.id,
@@ -79,7 +81,7 @@ export const BookmarksPage = async () => {
       listHeading={t('listHeading')}
       posts={posts}
       emptyMessage={<VoiceRichText value={emptyRich} />}
-      hint={posts.length > 0 ? t('hint', { count: posts.length }) : undefined}
+      hint={hasLength(posts) ? t('hint', { count: posts.length }) : undefined}
     />
   );
 };

@@ -1,8 +1,9 @@
+import { NEWSLETTER_LOG } from '@web/constants/newsletter';
 import { createPublicWriteGuard } from '@web/server/rate-limit/public-write-guard/public-write-guard';
 
 const { isBotOrUnverified, isRateLimited } = createPublicWriteGuard({
   name: 'newsletter-subscribe',
-  blockedEvent: 'newsletter.subscribe_blocked',
+  blockedEvent: NEWSLETTER_LOG.SUBSCRIBE_BLOCKED,
   windowMs: 10 * 60_000,
   maxRequests: 5,
 });

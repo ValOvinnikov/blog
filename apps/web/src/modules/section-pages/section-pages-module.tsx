@@ -1,4 +1,6 @@
 import { service } from '@shinefold/service';
+import { hasLength } from '@shinefold/utils/primitives';
+import { SECTION_PAGES_LOG } from '@web/constants/section-pages';
 import type { TModuleComponentProps } from '@web/modules/module-renderer';
 import { getRequestContext } from '@web/server/request-context/request-context';
 import { logger } from '@web/utils/logger/logger';
@@ -13,7 +15,7 @@ export const SectionPagesModule = async ({
 }: TSectionPagesModuleProps) => {
   const landingPage = context?.landingPage;
   if (!landingPage) {
-    logger.warn('section_pages_module.missing_landing_page_context', { id });
+    logger.warn(SECTION_PAGES_LOG.MISSING_LANDING_PAGE_CONTEXT, { id });
     return null;
   }
 
@@ -26,7 +28,7 @@ export const SectionPagesModule = async ({
   );
 
   if (!result.ok) {
-    logger.error('section_pages_module.fetch_failed', {
+    logger.error(SECTION_PAGES_LOG.MODULE_FETCH_FAILED, {
       id,
       parentId: landingPage.id,
       error: result.error,
@@ -34,7 +36,7 @@ export const SectionPagesModule = async ({
     return null;
   }
 
-  if (result.data.pages.length === 0) return null;
+  if (!hasLength(result.data.pages)) return null;
 
   return (
     <SectionPagesModuleView

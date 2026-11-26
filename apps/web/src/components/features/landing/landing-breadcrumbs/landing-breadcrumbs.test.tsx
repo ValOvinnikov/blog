@@ -1,5 +1,6 @@
 import { faker } from '@faker-js/faker';
 import { routes } from '@shinefold/config';
+import { LANDING_PAGE_LOG } from '@web/constants/landing-page';
 import { customRenderServerAsync } from '@web/testing/custom-render';
 import {
   mockLandingSectionNavigation,
@@ -54,7 +55,7 @@ describe(`<${LandingBreadcrumbs.name}/>`, () => {
   testThrowsOnFetchFailure({
     pageLoaderMock: getLandingPageMock,
     setup,
-    eventFragment: 'landing_breadcrumbs.fetch_failed',
+    eventFragment: LANDING_PAGE_LOG.BREADCRUMBS_FETCH_FAILED,
     logContext: { path: MOCK_LANDING_PATH },
   });
   testBreadcrumbsTrail({

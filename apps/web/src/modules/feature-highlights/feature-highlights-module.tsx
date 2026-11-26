@@ -1,4 +1,5 @@
 import { service } from '@shinefold/service';
+import { FEATURE_HIGHLIGHTS_LOG } from '@web/constants/feature-highlights';
 import { getRequestContext } from '@web/server/request-context/request-context';
 import { logger } from '@web/utils/logger/logger';
 
@@ -19,7 +20,7 @@ export const FeatureHighlightsModule = async ({
     );
 
   if (!result.ok) {
-    logger.error('feature_highlights_module.fetch_failed', {
+    logger.error(FEATURE_HIGHLIGHTS_LOG.MODULE_FETCH_FAILED, {
       id,
       error: result.error,
     });

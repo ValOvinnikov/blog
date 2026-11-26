@@ -1,6 +1,7 @@
 import { faker } from '@faker-js/faker';
 import { service } from '@shinefold/service';
 import { errorResult, okResult } from '@shinefold/utils';
+import { TOPIC_LOG } from '@web/constants/topic';
 import { MOCK_TENANT_SANITY_CONTEXT } from '@web/testing/shared/tenant/fixtures';
 import { mockTopicWithPostCount } from '@web/testing/shared/topic/fixtures';
 import { logger } from '@web/utils/logger/logger';
@@ -9,7 +10,6 @@ import { getTopicsSafely } from './get-topics-safely';
 
 faker.seed(114);
 
-const TOPICS_FETCH_FAILED_EVENT = 'topics.fetch_failed';
 const MOCK_TOPICS = [mockTopicWithPostCount({ postCount: 3 })];
 const MOCK_ERROR = new Error(faker.lorem.sentence());
 
@@ -40,7 +40,7 @@ describe(getTopicsSafely, () => {
     const topics = await getTopicsSafely(MOCK_TENANT_SANITY_CONTEXT);
 
     expect(topics).toEqual([]);
-    expect(logger.error).toHaveBeenCalledWith(TOPICS_FETCH_FAILED_EVENT, {
+    expect(logger.error).toHaveBeenCalledWith(TOPIC_LOG.LIST_FETCH_FAILED, {
       error: MOCK_ERROR,
     });
   });
