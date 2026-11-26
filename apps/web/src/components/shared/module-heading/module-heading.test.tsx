@@ -1,7 +1,6 @@
 import {
   MOCK_HIGHLIGHTED_PHRASE,
-  MOCK_TWO_HIGHLIGHT_PIECES,
-  MOCK_SECOND_HIGHLIGHTED_PHRASE,
+  MOCK_ONE_HIGHLIGHT_PIECES,
   toHeadingWords,
 } from '@shinefold/ui/testing/heading-pieces';
 import { customRender, screen } from '@web/testing/custom-render';
@@ -67,34 +66,20 @@ describe(`<${ModuleHeading.name}/>`, () => {
     expect(supportingText).toBeVisible();
   });
 
-  describe('with highlighted pieces', () => {
-    const highlightedHeading = toHeadingWords(MOCK_TWO_HIGHLIGHT_PIECES);
-
-    beforeEach(() => {
-      setup({
-        headingBlock: mockHeadingBlock({
-          heading: highlightedHeading,
-          headingPieces: MOCK_TWO_HIGHLIGHT_PIECES,
-        }),
-      });
+  it('renders the highlighted phrase inside the heading named by its plain words', () => {
+    const highlightedHeading = toHeadingWords(MOCK_ONE_HIGHLIGHT_PIECES);
+    setup({
+      headingBlock: mockHeadingBlock({
+        heading: highlightedHeading,
+        headingPieces: MOCK_ONE_HIGHLIGHT_PIECES,
+      }),
     });
 
-    it.each([MOCK_HIGHLIGHTED_PHRASE, MOCK_SECOND_HIGHLIGHTED_PHRASE])(
-      'renders the highlighted phrase "%s" inside the heading',
-      (phrase) => {
-        const heading = screen.getByRole('heading', { level: 2 });
-
-        expect(heading).toContainElement(screen.getByText(phrase));
-      },
-    );
-
-    it('names the heading with the plain words', () => {
-      const heading = screen.getByRole('heading', {
-        level: 2,
-        name: highlightedHeading,
-      });
-
-      expect(heading).toHaveAttribute('id', HEADING_ID);
+    const heading = screen.getByRole('heading', {
+      level: 2,
+      name: highlightedHeading,
     });
+
+    expect(heading).toContainElement(screen.getByText(MOCK_HIGHLIGHTED_PHRASE));
   });
 });

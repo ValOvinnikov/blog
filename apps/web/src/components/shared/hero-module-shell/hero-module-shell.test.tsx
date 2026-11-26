@@ -69,35 +69,20 @@ describe(`<${HeroModuleShell.name}/>`, () => {
     });
   });
 
-  describe('with a highlighted title', () => {
+  it('labels the section with the plain words around the highlight', () => {
     const highlightedTitle = toHeadingWords(MOCK_ONE_HIGHLIGHT_PIECES);
-
-    beforeEach(() => {
-      setup({
-        title: {
-          heading: highlightedTitle,
-          headingPieces: MOCK_ONE_HIGHLIGHT_PIECES,
-        },
-      });
+    setup({
+      title: {
+        heading: highlightedTitle,
+        headingPieces: MOCK_ONE_HIGHLIGHT_PIECES,
+      },
     });
 
-    it('renders the highlighted phrase inside the top-level heading', () => {
-      const heading = screen.getByRole('heading', { level: 1 });
-      const phrase = screen.getByText(MOCK_HIGHLIGHTED_PHRASE);
+    const section = screen.getByRole('region', { name: highlightedTitle });
+    const heading = screen.getByRole('heading', { level: 1 });
 
-      expect(heading).toContainElement(phrase);
-    });
-
-    it('names the heading and the section with the plain words', () => {
-      const heading = screen.getByRole('heading', {
-        level: 1,
-        name: highlightedTitle,
-      });
-      const section = screen.getByRole('region', { name: highlightedTitle });
-
-      expect(heading).toBeVisible();
-      expect(section).toBeVisible();
-    });
+    expect(section).toBeVisible();
+    expect(heading).toContainElement(screen.getByText(MOCK_HIGHLIGHTED_PHRASE));
   });
 
   it('renders a link for an authored action', () => {

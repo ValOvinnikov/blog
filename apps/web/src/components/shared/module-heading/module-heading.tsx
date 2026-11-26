@@ -24,7 +24,7 @@ export const ModuleHeading = ({
 }: IModuleHeadingProps) => {
   const { heading, headingPieces, supportingText } = headingBlock;
   const s = moduleHeadingVariants({ align });
-  const headingContent = headingPieces
+  const headingContent = headingPieces?.length
     ? { pieces: headingPieces }
     : { children: heading };
 
