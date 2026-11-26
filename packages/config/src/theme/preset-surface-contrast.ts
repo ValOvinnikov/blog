@@ -1,5 +1,5 @@
 import { hexToOklch, isHexColor } from '@shinefold/utils/color';
-import { objectKeys } from '@shinefold/utils/primitives';
+import { keys } from 'remeda';
 
 import {
   COLOR_SCHEME,
@@ -83,7 +83,7 @@ export const findPresetSurfaceFailures = (
     ),
   ).filter((failure) => !isKnownFailure(failure));
 
-  const bandFailures = objectKeys(surfaces.bands).flatMap((band) =>
+  const bandFailures = keys(surfaces.bands).flatMap((band) =>
     COLOR_SCHEMES.flatMap((scheme) => {
       const { base, colors } = surfaces.bands[band][scheme];
       const generic = skinScopeOf(

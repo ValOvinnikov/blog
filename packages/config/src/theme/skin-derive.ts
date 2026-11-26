@@ -1,4 +1,5 @@
-import { hasLength, isOneOf, objectKeys } from '@shinefold/utils/primitives';
+import { hasLength, isOneOf } from '@shinefold/utils/primitives';
+import { keys } from 'remeda';
 
 import type { TColorScheme } from '@shinefold/config/constants';
 
@@ -34,7 +35,7 @@ export type TSkinDerivation = {
 
 type TMaybeGround = TPaletteStop | false;
 
-const PALETTE_STOPS = objectKeys(PALETTE);
+const PALETTE_STOPS = keys(PALETTE);
 
 const BRAND_FAMILY = '--palette-brand';
 
