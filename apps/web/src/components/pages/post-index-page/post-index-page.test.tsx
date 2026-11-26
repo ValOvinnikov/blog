@@ -1,28 +1,24 @@
 import { faker } from '@faker-js/faker';
-import { LOCALE_ISO_CODES, routes, SITE_MESSAGES } from '@shinefold/config';
-import { NEXT_NAVIGATION_ERROR } from '@shinefold/config/constants';
+import { routes, SITE_MESSAGES } from '@shinefold/config';
 import { service } from '@shinefold/service';
 import { errorResult, okResult } from '@shinefold/utils';
 import { POST_INDEX_LOG } from '@web/constants/post-index';
-import { getRequestContext } from '@web/server/request-context/request-context';
 import {
   customRenderServerAsync,
   screen,
   within,
 } from '@web/testing/custom-render';
-import { mockHeroBlogData } from '@web/testing/modules/hero-blog/fixtures';
 import { mockIndexPage } from '@web/testing/pages/index-page/fixtures';
+import {
+  testLoadedPageContract,
+  testRedirectsMissingLanguagePage,
+} from '@web/testing/pages/loaded-page-contract/loaded-page-contract';
+import { testPageHeading } from '@web/testing/pages/page-heading-contract/page-heading-contract';
 import { MOCK_ERROR } from '@web/testing/shared/error/fixtures';
 import { mockHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
 import { MOCK_POST_LIST_ID } from '@web/testing/shared/module-renderer-contract/fixtures';
-import {
-  MOCK_REQUEST_CONTEXT,
-  MOCK_TENANT_NAME,
-  MOCK_TENANT_SANITY_CONTEXT,
-} from '@web/testing/shared/tenant/fixtures';
+import { MOCK_TENANT_SANITY_CONTEXT } from '@web/testing/shared/tenant/fixtures';
 import { mockTopicWithPostCount } from '@web/testing/shared/topic/fixtures';
-import { logger } from '@web/utils/logger/logger';
-import { notFound, redirect } from 'next/navigation';
 
 import { PostIndexPage } from './post-index-page';
 
@@ -50,11 +46,7 @@ vi.mock('@web/i18n/navigation');
 
 const getIndexPageMock = vi.mocked(service.pages.blog.v1.getIndexPage);
 const getTopicsMock = vi.mocked(service.entities.topics.v1.getTopics);
-const getHeroBlogMock = vi.mocked(service.modules.heroBlog.v1.getHeroBlog);
-const getPostListMock = vi.mocked(service.modules.postList.v1.getPostList);
 
-const MOCK_HERO_ID = faker.string.uuid();
-const MOCK_HERO_HEADING = faker.lorem.words(3);
 const MOCK_PAGE_HEADING = faker.lorem.words(2);
 const MOCK_SUPPORTING_TEXT = faker.lorem.sentence();
 const MOCK_INDEX_PAGE = mockIndexPage({
@@ -70,55 +62,46 @@ const MOCK_TOPIC = mockTopicWithPostCount({
 });
 const MOCK_PAGE_NUMBER = faker.number.int({ min: 2, max: 9 });
 
-const setup = customRenderServerAsync(PostIndexPage, {
-  page: 1,
-});
+const setup = customRenderServerAsync(PostIndexPage, { page: 1 });
 
 describe(`<${PostIndexPage.name}/>`, () => {
   beforeEach(() => {
-    vi.mocked(getRequestContext).mockReset();
-    getIndexPageMock.mockResolvedValue(okResult(MOCK_INDEX_PAGE));
     getTopicsMock.mockResolvedValue(okResult([MOCK_TOPIC]));
   });
 
+  testLoadedPageContract({
+    pageLoaderMock: getIndexPageMock,
+    setup,
+    successData: MOCK_INDEX_PAGE,
+    loaderArgs: [MOCK_TENANT_SANITY_CONTEXT],
+    logEvent: POST_INDEX_LOG.PAGE_FETCH_FAILED,
+    currentCrumb: MOCK_PAGE_HEADING,
+  });
+  testRedirectsMissingLanguagePage({ pageLoaderMock: getIndexPageMock, setup });
+  testPageHeading({
+    renderPage: () => {
+      getIndexPageMock.mockResolvedValue(okResult(MOCK_INDEX_PAGE));
+      return setup();
+    },
+    renderPageWithHero: (hero) => {
+      getIndexPageMock.mockResolvedValue(
+        okResult({ ...MOCK_INDEX_PAGE, hero }),
+      );
+      return setup();
+    },
+    heroBlogMock: vi.mocked(service.modules.heroBlog.v1.getHeroBlog),
+    heading: MOCK_PAGE_HEADING,
+    supportingText: MOCK_SUPPORTING_TEXT,
+  });
+
   describe('with the default index page', () => {
-    let main: HTMLElement;
-
     beforeEach(async () => {
+      getIndexPageMock.mockResolvedValue(okResult(MOCK_INDEX_PAGE));
       await setup();
-      main = screen.getByRole('main');
-    });
-
-    it('fetches the index page with the tenant context', () => {
-      expect(getIndexPageMock).toHaveBeenCalledWith(MOCK_TENANT_SANITY_CONTEXT);
-    });
-
-    it('renders the page heading and supporting text inside main', () => {
-      const heading = within(main).getByRole('heading', {
-        level: 1,
-        name: MOCK_PAGE_HEADING,
-      });
-      const supportingText = within(main).getByText(MOCK_SUPPORTING_TEXT);
-
-      expect(heading).toBeVisible();
-      expect(supportingText).toBeVisible();
-    });
-
-    it('renders the breadcrumb trail outside main', () => {
-      const breadcrumbs = screen.getByRole('navigation', {
-        name: SITE_MESSAGES.breadcrumbs.ariaLabel,
-      });
-      const homeLink = within(breadcrumbs).getByRole('link', {
-        name: MOCK_TENANT_NAME,
-      });
-      const currentCrumb = within(breadcrumbs).getByText(MOCK_PAGE_HEADING);
-
-      expect(homeLink).toBeVisible();
-      expect(currentCrumb).toBeVisible();
-      expect(main).not.toContainElement(breadcrumbs);
     });
 
     it('renders the tenant topic chips inside main', () => {
+      const main = screen.getByRole('main');
       const chips = within(main).getByRole('navigation', {
         name: SITE_MESSAGES.topicChipList.ariaLabel,
       });
@@ -134,75 +117,24 @@ describe(`<${PostIndexPage.name}/>`, () => {
     });
   });
 
-  it('logs and throws to the error boundary when the fetch fails', async () => {
-    getIndexPageMock.mockResolvedValueOnce(errorResult(MOCK_ERROR));
-
-    await expect(setup()).rejects.toBe(MOCK_ERROR);
-
-    expect(logger.error).toHaveBeenCalledWith(
-      POST_INDEX_LOG.PAGE_FETCH_FAILED,
-      {
-        error: MOCK_ERROR,
-      },
-    );
-  });
-
-  it('redirects to / when this language has no post index page', async () => {
-    getIndexPageMock.mockResolvedValueOnce(okResult());
-    vi.mocked(getRequestContext).mockResolvedValue({
-      ...MOCK_REQUEST_CONTEXT,
-      locale: LOCALE_ISO_CODES.NL,
-      liveLocales: [LOCALE_ISO_CODES.EN, LOCALE_ISO_CODES.NL],
-    });
-
-    await expect(setup()).rejects.toThrow(NEXT_NAVIGATION_ERROR.NEXT_REDIRECT);
-
-    expect(vi.mocked(redirect)).toHaveBeenCalledWith('/');
-    expect(vi.mocked(notFound)).not.toHaveBeenCalled();
-  });
-
   it('loads post lists for the current page with no archive scope', async () => {
-    getIndexPageMock.mockResolvedValueOnce(
+    getIndexPageMock.mockResolvedValue(
       okResult({
-        ...mockIndexPage(),
+        ...MOCK_INDEX_PAGE,
         modules: [{ id: MOCK_POST_LIST_ID, type: 'module_postList' }],
       }),
     );
-    getPostListMock.mockResolvedValueOnce(errorResult(MOCK_ERROR));
+    vi.mocked(service.modules.postList.v1.getPostList).mockResolvedValueOnce(
+      errorResult(MOCK_ERROR),
+    );
 
     await expect(setup({ page: MOCK_PAGE_NUMBER })).rejects.toBe(MOCK_ERROR);
 
-    expect(getPostListMock).toHaveBeenCalledWith(
+    expect(service.modules.postList.v1.getPostList).toHaveBeenCalledWith(
       MOCK_POST_LIST_ID,
       MOCK_TENANT_SANITY_CONTEXT,
       MOCK_PAGE_NUMBER,
       undefined,
     );
-  });
-
-  it('renders the hero in place of the heading when one is set', async () => {
-    getIndexPageMock.mockResolvedValueOnce(
-      okResult({
-        ...mockIndexPage(),
-        hero: { id: MOCK_HERO_ID, type: 'module_heroBlog' },
-      }),
-    );
-    getHeroBlogMock.mockResolvedValueOnce(
-      okResult(mockHeroBlogData({ heading: MOCK_HERO_HEADING })),
-    );
-
-    await setup();
-
-    const heroHeading = screen.getByRole('heading', {
-      level: 1,
-      name: MOCK_HERO_HEADING,
-    });
-    const pageHeading = screen.queryByRole('heading', {
-      level: 1,
-      name: MOCK_PAGE_HEADING,
-    });
-
-    expect(heroHeading).toBeVisible();
-    expect(pageHeading).not.toBeInTheDocument();
   });
 });

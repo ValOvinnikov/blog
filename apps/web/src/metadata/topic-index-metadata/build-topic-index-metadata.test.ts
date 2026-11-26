@@ -4,18 +4,16 @@ import {
   routes,
   type TLocaleIsoCode,
 } from '@shinefold/config';
-import { errorResult, okResult } from '@shinefold/utils';
+import { okResult } from '@shinefold/utils';
 import { TOPIC_INDEX_LOG } from '@web/constants/topic-index';
 import { getRequestContext } from '@web/server/request-context/request-context';
 import { NL_TOPICS_INDEX_PATH } from '@web/testing/metadata/index-paths/fixtures';
+import { testMetadataLoaderFailures } from '@web/testing/metadata/metadata-loader-contract/metadata-loader-contract';
 import {
   MOCK_DUTCH_REQUEST_CONTEXT,
   mockMetadataSeo,
 } from '@web/testing/metadata/to-metadata/fixtures';
-import { MOCK_ERROR } from '@web/testing/shared/error/fixtures';
-import { mockHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
-import { MOCK_OG_IMAGE_URL } from '@web/testing/shared/seo/og-image-fixtures';
-import { logger } from '@web/utils/logger/logger';
+import { mockIndexPage } from '@web/testing/pages/index-page/fixtures';
 
 import { buildTopicIndexMetadata } from './build-topic-index-metadata';
 
@@ -38,22 +36,14 @@ const { EN, NL, DE } = LOCALE_ISO_CODES;
 const INDEX_PATH = routes.topics();
 
 const MOCK_SEO = mockMetadataSeo();
-const { title, description, ogTitle, ogDescription } = MOCK_SEO;
 
 const resolveIndexPageWith = (translations: TLocaleIsoCode[] = [EN]) =>
   getTopicIndexPageMock.mockResolvedValue(
-    okResult({
-      headingBlock: mockHeadingBlock({ heading: title }),
-      seo: MOCK_SEO,
-      modules: [],
-      translations,
-    }),
+    okResult(mockIndexPage({ seo: MOCK_SEO, translations })),
   );
 
 describe(buildTopicIndexMetadata, () => {
   beforeEach(() => {
-    getTopicIndexPageMock.mockReset();
-    vi.mocked(getRequestContext).mockReset();
     resolveIndexPageWith();
   });
 
@@ -66,35 +56,14 @@ describe(buildTopicIndexMetadata, () => {
   it('builds metadata from the resolved seo, self-canonical to the topic index', async () => {
     const metadata = await buildTopicIndexMetadata();
 
-    expect(metadata.title).toBe(title);
-    expect(metadata.description).toBe(description);
+    expect(metadata.title).toBe(MOCK_SEO.title);
     expect(metadata.alternates?.canonical).toBe(INDEX_PATH);
-    expect(metadata.openGraph?.title).toBe(ogTitle);
-    expect(metadata.openGraph?.description).toBe(ogDescription);
-    expect(metadata.openGraph?.images).toEqual([{ url: MOCK_OG_IMAGE_URL }]);
   });
 
-  describe('when no metadata can be built', () => {
-    it('returns empty metadata and logs when the index page fetch fails', async () => {
-      getTopicIndexPageMock.mockResolvedValue(errorResult(MOCK_ERROR));
-
-      const metadata = await buildTopicIndexMetadata();
-
-      expect(metadata).toEqual({});
-      expect(vi.mocked(logger.error)).toHaveBeenCalledWith(
-        TOPIC_INDEX_LOG.METADATA_FETCH_FAILED,
-        { error: MOCK_ERROR },
-      );
-    });
-
-    it('returns empty metadata without logging when there is no index page', async () => {
-      getTopicIndexPageMock.mockResolvedValue(okResult());
-
-      const metadata = await buildTopicIndexMetadata();
-
-      expect(metadata).toEqual({});
-      expect(vi.mocked(logger.error)).not.toHaveBeenCalled();
-    });
+  testMetadataLoaderFailures({
+    pageLoaderMock: getTopicIndexPageMock,
+    buildMetadata: buildTopicIndexMetadata,
+    logEvent: TOPIC_INDEX_LOG.METADATA_FETCH_FAILED,
   });
 
   it('lists each live translated language as hreflang, canonical to its prefix', async () => {
