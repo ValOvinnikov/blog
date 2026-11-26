@@ -6,6 +6,7 @@ export const MOCK_BRAND_PRIMARY = 'oklch(0.53 0.17 28)';
 export const MOCK_SITE_PREVIEW_THEME: TSitePreviewTheme = {
   tokenStyle: { '--brand-primary': MOCK_BRAND_PRIMARY } as CSSProperties,
   skinScopeTokens: undefined,
+  buttonStyleBlock: undefined,
   isDark: false,
   headingFontFamily: 'mock-heading-font',
   bodyFontFamily: 'mock-body-font',

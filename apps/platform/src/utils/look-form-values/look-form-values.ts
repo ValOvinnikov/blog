@@ -37,7 +37,13 @@ export const CARD_FIELDS = {
     'accountPanelStyle',
     'accountPhonePlacement',
   ],
-  [LOOK_ROW.BUTTONS]: ['buttonShape', 'busyButtonStyle', 'spinnerStyle'],
+  [LOOK_ROW.BUTTONS]: [
+    'buttonShape',
+    'buttonColor',
+    'buttonColorDark',
+    'busyButtonStyle',
+    'spinnerStyle',
+  ],
   [LOOK_ROW.FOOTER]: [
     'footerLayout',
     'footerBackground',

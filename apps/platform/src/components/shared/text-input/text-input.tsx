@@ -28,7 +28,8 @@ export const TextInput = ({
   className,
   ref,
 }: TTextInputProps) => {
-  const { id, describedBy, appearance } = useFormFieldControl();
+  const { id, describedBy, appearance, isLocked } = useFormFieldControl();
+  const isInert = Boolean(isReadOnly || isLocked);
 
   return (
     <Input
@@ -36,15 +37,16 @@ export const TextInput = ({
       id={id}
       type={type}
       placeholder={placeholder}
-      readOnly={Boolean(isReadOnly)}
+      readOnly={isInert}
       value={value}
       onValueChange={(nextValue) => onChange(nextValue)}
       aria-describedby={describedBy}
+      aria-disabled={isLocked || undefined}
       className={({ disabled }) =>
         textInputVariants({
           appearance,
           isDisabled: disabled,
-          isReadOnly,
+          isReadOnly: isInert,
           class: className,
         })
       }

@@ -12,6 +12,18 @@ export const useButtonsDraftFields = () => {
         t(`buttonShapeOptionLabel.${buttonShape}`),
     },
     {
+      id: 'buttonColor',
+      label: t('buttonColorLabel'),
+      display: ({ buttonColor }: TLookFormValues) =>
+        buttonColor ?? t('buttonColorFollowAccent'),
+    },
+    {
+      id: 'buttonColorDark',
+      label: t('buttonColorDarkLabel'),
+      display: ({ buttonColorDark }: TLookFormValues) =>
+        buttonColorDark ?? t('buttonColorDarkFollow'),
+    },
+    {
       id: 'busyButtonStyle',
       label: t('busyButtonStyleLabel'),
       display: ({ busyButtonStyle }: TLookFormValues) =>

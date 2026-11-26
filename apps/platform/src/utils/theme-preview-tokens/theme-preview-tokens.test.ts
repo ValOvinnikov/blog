@@ -9,8 +9,10 @@ import {
   BUTTON_SHAPE_DECLARATIONS,
   CARD_STYLE,
   DENSITY,
+  deriveButtonColors,
   DIVIDER_WIDTH,
   DIVIDER_WIDTH_DECLARATIONS,
+  formatButtonStyleBlock,
   formatOklchRamp,
   HEADER_CONTROL_SHAPE,
   HEADER_CONTROL_SHAPE_DECLARATIONS,
@@ -31,6 +33,11 @@ import {
   NAV_LINK_STYLE_DECLARATIONS,
   RADIUS_SCALE,
 } from '@shinefold/config';
+import {
+  MOCK_PARTIAL_HEX,
+  MOCK_PINK_HEX,
+  MOCK_YELLOW_HEX,
+} from '@shinefold/config/testing/button-colors';
 
 import {
   accentHueGradient,
@@ -198,9 +205,38 @@ describe(buildSitePreviewTheme, () => {
     expect(buildSitePreviewTheme(values, true)).toEqual({
       tokenStyle: buildThemePreviewStyle(values, true),
       skinScopeTokens: undefined,
+      buttonStyleBlock: undefined,
       isDark: true,
       headingFontFamily: FONT_OPTIONS[values.headingFont].fontFamily,
       bodyFontFamily: FONT_OPTIONS[values.bodyFont].fontFamily,
     });
+  });
+
+  it('declares the picked button colours for every ground', () => {
+    const values = {
+      ...defaultLookFormValues(),
+      buttonColor: MOCK_YELLOW_HEX,
+      buttonColorDark: MOCK_PINK_HEX,
+    };
+
+    expect(buildSitePreviewTheme(values, false).buttonStyleBlock).toBe(
+      formatButtonStyleBlock(
+        deriveButtonColors({
+          color: MOCK_YELLOW_HEX,
+          darkGroundColor: MOCK_PINK_HEX,
+        }),
+      ),
+    );
+  });
+
+  it('leaves the buttons on the accent while the button colour is not a hex colour yet', () => {
+    const values = {
+      ...defaultLookFormValues(),
+      buttonColor: MOCK_PARTIAL_HEX,
+    };
+
+    expect(
+      buildSitePreviewTheme(values, false).buttonStyleBlock,
+    ).toBeUndefined();
   });
 });

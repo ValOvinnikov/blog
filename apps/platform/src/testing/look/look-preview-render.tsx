@@ -64,6 +64,10 @@ export const lookPreview = ({
     accentHueFieldId: 'accent-hue',
     isBrandNameTooLong: false,
     brandNameFieldId: 'brand-name',
+    buttonColorFieldIds: {
+      buttonColor: 'button-color',
+      buttonColorDark: 'button-color-dark',
+    },
     shownBrandName: MOCK_TENANT_NAME,
     repickKinds: [],
     brandAssetFieldIds: {

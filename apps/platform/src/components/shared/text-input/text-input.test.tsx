@@ -1,8 +1,13 @@
+import { Field } from '@base-ui/react/field';
 import { faker } from '@faker-js/faker';
-import { FormField } from '@platform/components/shared/form-field';
+import { FieldLabel } from '@platform/components/shared/field-label';
+import {
+  FormField,
+  FormFieldControlProvider,
+} from '@platform/components/shared/form-field';
+import { ARIA_DISABLED } from '@platform/testing/aria';
 import { renderWithIntl, screen } from '@platform/testing/custom-render';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
-import type { Mock } from 'vitest';
 
 import { TextInput, type TTextInputProps } from './text-input';
 
@@ -11,13 +16,15 @@ faker.seed(5995);
 const MOCK_LABEL = faker.lorem.words(2);
 const MOCK_VALUE = faker.lorem.word();
 
+const handleChange = vi.fn();
+
 const renderInField = (
   props: Partial<TTextInputProps> = {},
   isDisabled = false,
 ) =>
   renderWithIntl(
     <FormField label={MOCK_LABEL} control={{ isDisabled }}>
-      <TextInput value={MOCK_VALUE} onChange={vi.fn()} {...props} />
+      <TextInput value={MOCK_VALUE} onChange={handleChange} {...props} />
     </FormField>,
   );
 
@@ -26,6 +33,7 @@ describe(`<${TextInput.name}/>`, () => {
 
   beforeEach(() => {
     user = userEvent.setup();
+    handleChange.mockReset();
   });
 
   it('renders the given value', () => {
@@ -37,8 +45,7 @@ describe(`<${TextInput.name}/>`, () => {
   });
 
   it('calls onChange with the typed value', async () => {
-    const handleChange = vi.fn();
-    renderInField({ value: '', onChange: handleChange });
+    renderInField({ value: '' });
 
     const input = screen.getByRole('textbox', { name: MOCK_LABEL });
     await user.type(input, 'a');
@@ -54,23 +61,38 @@ describe(`<${TextInput.name}/>`, () => {
     expect(input).toBeDisabled();
   });
 
+  it('stays focusable but unchangeable when its control is locked', async () => {
+    renderWithIntl(
+      <Field.Root>
+        <FieldLabel>{MOCK_LABEL}</FieldLabel>
+        <FormFieldControlProvider isLocked={true}>
+          <TextInput value={MOCK_VALUE} onChange={handleChange} />
+        </FormFieldControlProvider>
+      </Field.Root>,
+    );
+    const input = screen.getByRole('textbox', { name: MOCK_LABEL });
+
+    await user.type(input, MOCK_VALUE);
+
+    expect(input).toBeEnabled();
+    expect(input).toHaveAttribute(ARIA_DISABLED, 'true');
+    expect(handleChange).not.toHaveBeenCalled();
+  });
+
   describe('when read-only', () => {
-    let handleChange: Mock<(value: string) => void>;
+    let input: HTMLElement;
 
     beforeEach(() => {
-      handleChange = vi.fn();
-      renderInField({ onChange: handleChange, isReadOnly: true });
+      renderInField({ isReadOnly: true });
+      input = screen.getByRole('textbox', { name: MOCK_LABEL });
     });
 
     it('stays enabled but read-only', () => {
-      const input = screen.getByRole('textbox', { name: MOCK_LABEL });
-
       expect(input).toHaveAttribute('readonly');
       expect(input).toBeEnabled();
     });
 
     it('ignores typing', async () => {
-      const input = screen.getByRole('textbox', { name: MOCK_LABEL });
       await user.type(input, 'x');
 
       expect(handleChange).not.toHaveBeenCalled();

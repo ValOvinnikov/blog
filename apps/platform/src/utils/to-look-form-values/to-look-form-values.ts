@@ -36,6 +36,8 @@ export const toLookFormValues = (
     busyButtonStyle: siteConfig.busyButtonStyle,
     spinnerStyle: siteConfig.spinnerStyle,
     buttonShape: siteConfig.buttonShape,
+    buttonColor: siteConfig.buttonColor,
+    buttonColorDark: siteConfig.buttonColorDark,
     footerLayout: siteConfig.footerLayout,
     footerBackground: siteConfig.footerBackground,
     footerSurface: siteConfig.footerSurface,
