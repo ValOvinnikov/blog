@@ -1,11 +1,16 @@
-import { COLOR_SCHEME, deriveButtonColors } from '@shinefold/config';
+import { COLOR_SCHEME, deriveButtonColors, PRESET_ID } from '@shinefold/config';
 import {
   MOCK_PARTIAL_HEX,
   MOCK_PINK_HEX,
   MOCK_YELLOW_HEX,
 } from '@shinefold/config/testing/button-colors';
+import { SHINEFOLD_LOGO_COLOR } from '@shinefold/utils/shinefold-logo';
 
-import { isButtonColorInvalid, toButtonColors } from './button-colors';
+import {
+  isButtonColorInvalid,
+  toButtonColors,
+  withPresetButtonColor,
+} from './button-colors';
 
 describe(toButtonColors, () => {
   it('derives no colours while the button follows the accent', () => {
@@ -39,5 +44,32 @@ describe(isButtonColorInvalid, () => {
     ['an emptied field', '', true],
   ])('reports %s as invalid: %s', (_, value, isInvalid) => {
     expect(isButtonColorInvalid(value)).toBe(isInvalid);
+  });
+});
+
+describe(withPresetButtonColor, () => {
+  it.each([
+    [
+      'the preset colour while none is saved',
+      PRESET_ID.SHINEFOLD,
+      undefined,
+      SHINEFOLD_LOGO_COLOR.YELLOW,
+    ],
+    [
+      'a saved colour over the preset one',
+      PRESET_ID.SHINEFOLD,
+      MOCK_PINK_HEX,
+      MOCK_PINK_HEX,
+    ],
+    [
+      'no colour under a preset without one',
+      PRESET_ID.CONSOLE,
+      undefined,
+      undefined,
+    ],
+  ])('takes %s', (_, preset, buttonColor, expected) => {
+    expect(withPresetButtonColor({ preset, buttonColor }).buttonColor).toBe(
+      expected,
+    );
   });
 });

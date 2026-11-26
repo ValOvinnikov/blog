@@ -3,8 +3,10 @@ import { useLookFieldLock } from '@platform/components/features/look/look-form/u
 import { useLookForm } from '@platform/components/features/look/look-form-provider';
 import { LockedReason } from '@platform/components/shared/locked-reason';
 import {
+  buttonColorFollowKey,
   isButtonColorInvalid,
   toButtonColors,
+  toPresetButtonColor,
 } from '@platform/utils/button-colors/button-colors';
 import {
   ACCENT_RAMP_LIGHT,
@@ -20,7 +22,7 @@ import { ButtonColorField } from './components/button-color-field/button-color-f
 
 export const ButtonColorFields = () => {
   const {
-    values: { accentHue, buttonColor, buttonColorDark },
+    values: { preset, accentHue, buttonColor, buttonColorDark },
     updateField,
     buttonColorFieldIds,
   } = useLookForm();
@@ -36,6 +38,7 @@ export const ButtonColorFields = () => {
     ACCENT_RAMP_LIGHT['--brand-primary-solid'],
     accentHue,
   );
+  const followedFill = toPresetButtonColor(preset) ?? accentFill;
 
   return (
     <>
@@ -49,12 +52,12 @@ export const ButtonColorFields = () => {
       >
         <ButtonColorField
           color={buttonColor}
-          seedColor={accentFill}
+          seedColor={followedFill}
           onChange={(color) => {
             updateField('buttonColor', color);
             if (isUndefined(color)) updateField('buttonColorDark', undefined);
           }}
-          followLabel={t('buttonColorFollowAccent')}
+          followLabel={t(buttonColorFollowKey(preset))}
           inputId={buttonColorFieldIds.buttonColor}
           isInvalid={isColorInvalid}
           lock={colorLock}
@@ -85,7 +88,7 @@ export const ButtonColorFields = () => {
       >
         <ButtonColorField
           color={buttonColorDark}
-          seedColor={colors?.[COLOR_SCHEME.DARK].fill ?? accentFill}
+          seedColor={colors?.[COLOR_SCHEME.DARK].fill ?? followedFill}
           onChange={(color) => updateField('buttonColorDark', color)}
           followLabel={t('buttonColorDarkFollow')}
           inputId={buttonColorFieldIds.buttonColorDark}

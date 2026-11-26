@@ -72,12 +72,12 @@ URLs carry no locale prefix (next-intl `localePrefix: 'never'`).
   typing. Visibility, sort, search and page live in the URL
   (`?archived=1&sort=<column>&direction=<ascending|descending>&q=&page=`), so a
   reload or shared link keeps them; `listTenants`' own default order stays by
-  name, which the dashboard tenant picker relies on. The table shows 25
+  name, which the dashboard tenant picker relies on. The table shows 10
   tenants a page, read through `listTenantsPage`: `page` is left out of the
   URL on page 1, changing the sort, search or visibility returns to page 1, a
   page past the end redirects to the last page, and a page that is not a
   positive whole number shows page 1. A footer under the rows gives the range
-  and total ("1–25 of 168 tenants") with Previous, "Page 1 of 7" and Next; a
+  and total ("1–10 of 168 tenants") with Previous, "Page 1 of 17" and Next; a
   list that fits one page shows only the count, and an empty list has no
   footer; on a phone the footer stacks, the count above the controls. Below `md` the table
   uses `DataTableShell`'s stacked layout (`isStacked`): no column headers and

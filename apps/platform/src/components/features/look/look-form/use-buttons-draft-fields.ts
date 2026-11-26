@@ -1,3 +1,4 @@
+import { buttonColorFollowKey } from '@platform/utils/button-colors/button-colors';
 import type { TLookFormValues } from '@platform/utils/default-look-values/default-look-values';
 import { useTranslations } from 'next-intl';
 
@@ -14,8 +15,8 @@ export const useButtonsDraftFields = () => {
     {
       id: 'buttonColor',
       label: t('buttonColorLabel'),
-      display: ({ buttonColor }: TLookFormValues) =>
-        buttonColor ?? t('buttonColorFollowAccent'),
+      display: ({ preset, buttonColor }: TLookFormValues) =>
+        buttonColor ?? t(buttonColorFollowKey(preset)),
     },
     {
       id: 'buttonColorDark',

@@ -5,6 +5,7 @@ import type { UserEvent } from '@testing-library/user-event';
 const { lookForm: LOOK_FORM, buttonColorField: BUTTON_COLOR_FIELD } = messages;
 
 export const BUTTON_COLOR_FOLLOWS_ACCENT = LOOK_FORM.buttonColorFollowAccent;
+export const BUTTON_COLOR_FOLLOWS_PRESET = LOOK_FORM.buttonColorFollowPreset;
 export const BUTTON_COLOR_DARK_FOLLOWS = LOOK_FORM.buttonColorDarkFollow;
 
 export const followSwitch = (name: string) =>

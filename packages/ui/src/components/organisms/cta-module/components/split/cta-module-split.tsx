@@ -8,15 +8,16 @@ import {
   type TContentAlignment,
   type TMediaOrder,
 } from '@shinefold/config';
+import type { THeadingText } from '@shinefold/ui/components/atoms/heading';
 import { CtaModuleLayout } from '@shinefold/ui/components/organisms/cta-module/components/layout/cta-module-layout';
 import type { CtaModuleSlotParts } from '@shinefold/ui/components/organisms/cta-module/cta-module-slot-parts';
 import { ctaModuleVariants } from '@shinefold/ui/components/organisms/cta-module/cta-module-variants';
 import type { TCompoundChildren } from '@shinefold/ui/lib/react';
 
 export type TCtaModuleSplitProps = IWithClassName &
-  IWithDataTestId & {
+  IWithDataTestId &
+  THeadingText & {
     tone: TBrandVariant;
-    heading: string;
     headingId?: string;
     contentPosition?: TContentAlignment;
     contentAlignment?: TContentAlignment;
@@ -28,6 +29,7 @@ export type TCtaModuleSplitProps = IWithClassName &
 export const CtaModuleSplit = ({
   tone,
   heading,
+  headingPieces,
   headingId,
   contentPosition = CONTENT_ALIGNMENT.LEFT,
   contentAlignment,
@@ -45,6 +47,7 @@ export const CtaModuleSplit = ({
       mobileMediaOrder,
     })}
     heading={heading}
+    headingPieces={headingPieces}
     headingId={headingId}
     className={className}
     dataTestId={dataTestId}
