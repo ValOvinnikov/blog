@@ -55,7 +55,6 @@ export const TypeCard = ({ summary }: TTypeCardProps) => {
           aria={headingFontLock.aria}
           value={headingFont}
           onChange={(font) => updateField('headingFont', font)}
-          isDisabled={headingFontLock.isDisabled}
           isLocked={headingFontLock.isLocked}
         />
         <PresetValueButton field="headingFont" fieldLabel={headingFontLabel} />
@@ -66,7 +65,6 @@ export const TypeCard = ({ summary }: TTypeCardProps) => {
           aria={bodyFontLock.aria}
           value={bodyFont}
           onChange={(font) => updateField('bodyFont', font)}
-          isDisabled={bodyFontLock.isDisabled}
           isLocked={bodyFontLock.isLocked}
         />
         <PresetValueButton field="bodyFont" fieldLabel={bodyFontLabel} />

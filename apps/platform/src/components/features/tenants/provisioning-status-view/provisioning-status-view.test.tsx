@@ -1,6 +1,7 @@
 import { TENANT_REFUSAL } from '@platform/constants/tenant';
 import { getTenantProvisioningStatusAction } from '@platform/server/provisioning/get-tenant-provisioning-status-action';
 import { retryProvisioningStepAction } from '@platform/server/provisioning/retry-provisioning-step-action';
+import { ARIA_DISABLED } from '@platform/testing/aria';
 import {
   act,
   customRender,
@@ -568,8 +569,8 @@ describe(`<${ProvisioningStatusView.name}/>`, () => {
         button = screen.getByRole('button', { name: action });
       });
 
-      it('is disabled and never dispatches on click', async () => {
-        expect(button).toBeDisabled();
+      it('is aria-disabled and never dispatches on click', async () => {
+        expect(button).toHaveAttribute(ARIA_DISABLED, 'true');
 
         await user.click(button);
 

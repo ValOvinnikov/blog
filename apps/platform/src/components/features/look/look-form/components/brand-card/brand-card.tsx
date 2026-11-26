@@ -41,7 +41,7 @@ export const BrandCard = ({ summary }: TBrandCardProps) => {
     isRepickNeeded: repickKinds.includes(kind),
     control: {
       id: brandAssetFieldIds[kind],
-      isDisabled: isArchived,
+      isLocked: isArchived,
       describedBy,
     },
     error: brandImageError?.kind === kind ? brandImageError.message : undefined,
@@ -69,6 +69,7 @@ export const BrandCard = ({ summary }: TBrandCardProps) => {
           describedBy={archivedDescribedBy}
         >
           <TextInput
+            isLocked={isArchived}
             placeholder={tenantName}
             value={brandName}
             onChange={(value) => updateField('brandName', value)}

@@ -1,4 +1,5 @@
 import { LOOK_ROW } from '@platform/constants/look-row';
+import { ARIA_DISABLED } from '@platform/testing/aria';
 import {
   brandNameInput,
   MOCK_BRAND_NAME,
@@ -29,13 +30,16 @@ describe(`<${LookForm.name}/>`, () => {
     user = userEvent.setup();
   });
 
-  it('disables the brand name on an archived site', async () => {
+  it('locks the brand name read-only on an archived site', async () => {
     setupArchived();
     await openLookRow(user, LOOK_ROW.BRAND);
 
     const input = brandNameInput();
+    await user.type(input, MOCK_BRAND_NAME);
 
-    expect(input).toBeDisabled();
+    expect(input).toHaveFocus();
+    expect(input).toHaveAttribute(ARIA_DISABLED, 'true');
+    expect(input).toHaveValue('');
   });
 
   describe('with a saved brand name', () => {

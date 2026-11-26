@@ -1815,6 +1815,7 @@
     "planLockedBadge": "{plan, select, FREE {Free-Tarif} STARTER {Starter-Tarif} other {Growth-Tarif}}",
     "consentBannerRequiredNote": "Für Google Analytics nötig, das Besucher um Zustimmung bittet.",
     "consentBannerRequiredError": "Google Analytics ist eingerichtet, daher muss das Cookie-Einwilligungsbanner aktiv bleiben. Entfernen Sie zuerst die Mess-ID oder wechseln Sie zu Plausible.",
+    "parentOffReason": "Schalten Sie zuerst {parent} ein.",
     "comingSoonBadge": "Demnächst",
     "switchOn": "An",
     "switchOff": "Aus",

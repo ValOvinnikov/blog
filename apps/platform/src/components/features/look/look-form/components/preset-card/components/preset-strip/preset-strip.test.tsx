@@ -1,4 +1,5 @@
 import messages from '@platform/i18n/messages/en.json';
+import { ARIA_DISABLED } from '@platform/testing/aria';
 import {
   customRender,
   screen,
@@ -79,14 +80,14 @@ type TPresetStripHarnessProps = {
   presets: TPresetOption<string>[];
   initialValue: string;
   onChange: (value: string) => void;
-  isDisabled?: boolean;
+  isLocked?: boolean;
 };
 
 const PresetStripHarness = ({
   presets,
   initialValue,
   onChange,
-  isDisabled,
+  isLocked,
 }: TPresetStripHarnessProps) => {
   const [value, setValue] = useState(initialValue);
   const labelId = useId();
@@ -104,8 +105,8 @@ const PresetStripHarness = ({
           onChange(next);
         }}
         labelledBy={labelId}
-        describedBy={isDisabled ? noticeId : undefined}
-        isDisabled={isDisabled}
+        describedBy={isLocked ? noticeId : undefined}
+        isLocked={isLocked}
       />
     </>
   );
@@ -382,13 +383,14 @@ describe(`<${PresetStrip.name}/>`, () => {
       });
     });
 
-    it('describes a disabled More presets with the archived notice', () => {
-      setup(MOCK_EDIT_COLUMN_1440, { isDisabled: true });
+    it('keeps a locked More presets aria-disabled and described', () => {
+      setup(MOCK_EDIT_COLUMN_1440, { isLocked: true });
 
       const morePresets = screen.getByRole('button', {
         name: morePresetsName(3),
       });
 
+      expect(morePresets).toHaveAttribute(ARIA_DISABLED, 'true');
       expect(morePresets).toHaveAccessibleDescription(MOCK_ARCHIVED_NOTICE);
     });
   });
@@ -520,13 +522,14 @@ describe(`<${PresetStrip.name}/>`, () => {
       });
     });
 
-    it('describes a disabled Preset button with the archived notice', () => {
-      setup(MOCK_EDIT_COLUMN_1280, { isDisabled: true });
+    it('keeps a locked Preset button aria-disabled and described', () => {
+      setup(MOCK_EDIT_COLUMN_1280, { isLocked: true });
 
       const presetButton = screen.getByRole('button', {
         name: `${PRESET_LABEL} ${EDITORIAL}`,
       });
 
+      expect(presetButton).toHaveAttribute(ARIA_DISABLED, 'true');
       expect(presetButton).toHaveAccessibleDescription(MOCK_ARCHIVED_NOTICE);
     });
   });

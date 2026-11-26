@@ -1,10 +1,12 @@
 import messages from '@platform/i18n/messages/en.json';
+import { ARIA_DISABLED } from '@platform/testing/aria';
 import { customRender, screen, waitFor } from '@platform/testing/custom-render';
 import { makeEnTranslator } from '@platform/testing/en-translator';
 import { ARCHIVED_NOTICE_ID } from '@platform/testing/render-in-settings-form';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
+import type { Mock } from 'vitest';
 
-import { LogoHueField } from './logo-hue-field';
+import { LogoHueField, type TLogoHueFieldProps } from './logo-hue-field';
 
 const { followAccentHue: FOLLOW_ACCENT_HUE, logoHueAriaLabel: LOGO_HUE } =
   messages.logoHueField;
@@ -21,9 +23,11 @@ const setup = customRender(LogoHueField, {
 
 describe(`<${LogoHueField.name}/>`, () => {
   let user: UserEvent;
+  let onChange: Mock<TLogoHueFieldProps['onChange']>;
 
   beforeEach(() => {
     user = userEvent.setup();
+    onChange = vi.fn();
   });
 
   it('shows only the switch, on, while the logo follows the accent', () => {
@@ -53,7 +57,6 @@ describe(`<${LogoHueField.name}/>`, () => {
   });
 
   it("seeds the explicit hue from the accent's when following is switched off", async () => {
-    const onChange = vi.fn();
     setup({ onChange });
 
     const followSwitch = screen.getByRole('switch', {
@@ -67,7 +70,6 @@ describe(`<${LogoHueField.name}/>`, () => {
   });
 
   it('clears the explicit hue when following is switched back on', async () => {
-    const onChange = vi.fn();
     setup({ logoHue: MOCK_LOGO_HUE, onChange });
 
     const followSwitch = screen.getByRole('switch', {
@@ -80,10 +82,11 @@ describe(`<${LogoHueField.name}/>`, () => {
     });
   });
 
-  it('disables and describes both controls when disabled, even with a hue set', () => {
+  it('keeps both controls focusable and unchangeable when locked, with a hue set', async () => {
     setup({
       logoHue: MOCK_LOGO_HUE,
-      isDisabled: true,
+      onChange,
+      isLocked: true,
       'aria-describedby': ARCHIVED_NOTICE_ID,
     });
 
@@ -91,12 +94,16 @@ describe(`<${LogoHueField.name}/>`, () => {
       name: FOLLOW_ACCENT_HUE,
     });
     const hueSlider = screen.getByRole('slider', { name: LOGO_HUE });
+    await user.click(followSwitch);
 
-    expect(followSwitch).toBeDisabled();
+    expect(followSwitch).toBeEnabled();
+    expect(followSwitch).toHaveAttribute(ARIA_DISABLED, 'true');
     expect(followSwitch).toHaveAttribute(
       'aria-describedby',
       ARCHIVED_NOTICE_ID,
     );
-    expect(hueSlider).toBeDisabled();
+    expect(hueSlider).toBeEnabled();
+    expect(hueSlider).toHaveAttribute(ARIA_DISABLED, 'true');
+    expect(onChange).not.toHaveBeenCalled();
   });
 });

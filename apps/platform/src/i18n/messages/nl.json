@@ -1815,6 +1815,7 @@
     "planLockedBadge": "{plan, select, FREE {Free-abonnement} STARTER {Starter-abonnement} other {Growth-abonnement}}",
     "consentBannerRequiredNote": "Nodig voor Google Analytics, dat bezoekers om toestemming vraagt.",
     "consentBannerRequiredError": "Google Analytics is ingesteld, dus de cookiemelding moet aan blijven. Wis eerst de metings-ID of stap over op Plausible.",
+    "parentOffReason": "Zet eerst {parent} aan.",
     "comingSoonBadge": "Binnenkort",
     "switchOn": "Aan",
     "switchOff": "Uit",

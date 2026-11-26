@@ -3,6 +3,7 @@ import { DOMAIN_VERIFICATION_STATUS } from '@platform/constants/domain';
 import en from '@platform/i18n/messages/en.json';
 import { getTenantProvisioningStatusAction } from '@platform/server/provisioning/get-tenant-provisioning-status-action';
 import { resolveIsPlatformTenant } from '@platform/server/tenants/resolve-is-platform-tenant';
+import { ARIA_DISABLED } from '@platform/testing/aria';
 import {
   mockAuditEvent,
   MOCK_AUDIT_ACTOR_EMAIL,
@@ -350,7 +351,7 @@ describe(`<${TenantOverviewView.name}/>`, () => {
     const nameInput = screen.getByRole('textbox', NAME_FIELD);
     const saveButton = screen.getByRole('button', { name: SAVE_CHANGES });
 
-    expect(nameInput).toBeDisabled();
+    expect(nameInput).toHaveAttribute(ARIA_DISABLED, 'true');
     expect(nameInput).toHaveAccessibleDescription(
       LOCKED_WHILE_PROVISIONING_IS_RUNNING,
     );
@@ -386,7 +387,7 @@ describe(`<${TenantOverviewView.name}/>`, () => {
     });
     const nameInput = screen.getByRole('textbox', NAME_FIELD);
 
-    expect(domainInput).toBeDisabled();
+    expect(domainInput).toHaveAttribute(ARIA_DISABLED, 'true');
     expect(domainInput).toHaveAccessibleDescription(reason);
     expect(nameInput).not.toBeDisabled();
   });
@@ -404,8 +405,8 @@ describe(`<${TenantOverviewView.name}/>`, () => {
       name: PRIMARY_DOMAIN_LABEL,
     });
 
-    expect(nameInput).toBeDisabled();
-    expect(domainInput).toBeDisabled();
+    expect(nameInput).toHaveAttribute(ARIA_DISABLED, 'true');
+    expect(domainInput).toHaveAttribute(ARIA_DISABLED, 'true');
   });
 
   it('keeps the provisioning banner and details panel in sync on each poll', async () => {

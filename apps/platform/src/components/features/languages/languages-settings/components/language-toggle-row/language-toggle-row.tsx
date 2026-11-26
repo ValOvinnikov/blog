@@ -35,7 +35,7 @@ export const LanguageToggleRow = ({
         aria={aria}
         isChecked={isChecked}
         onCheckedChange={onCheckedChange}
-        isDisabled={!isLocked && isDisabled}
+        isDisabled={isDisabled}
         isLocked={isLocked}
         labels={{ on: t('switchOn'), off: t('switchOff') }}
       />

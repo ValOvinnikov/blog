@@ -73,7 +73,7 @@ export const ProvisioningStatusView = ({
       size={SIZE.SM}
       focusGround={FOCUS_RING_GROUND.SURFACE_HEAD}
       onClick={handleDispatch}
-      isDisabled={isArchived}
+      isAriaDisabled={isArchived}
       aria-describedby={isArchived ? archivedNoticeId : undefined}
     >
       {t('retryButton')}
@@ -87,7 +87,7 @@ export const ProvisioningStatusView = ({
         variant={BUTTON_VARIANT.PRIMARY}
         focusGround={FOCUS_RING_GROUND.BG}
         onClick={handleDispatch}
-        isDisabled={isArchived}
+        isAriaDisabled={isArchived}
         aria-describedby={isArchived ? archivedNoticeId : undefined}
       >
         {t('startButton')}

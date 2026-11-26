@@ -20,7 +20,7 @@ type TPresetSheetProps<TId extends string> = {
   onChange: (value: TId) => void;
   labelledBy: string;
   describedBy?: string;
-  isDisabled?: boolean;
+  isLocked?: boolean;
 };
 
 export const PresetSheet = <TId extends string>({
@@ -29,7 +29,7 @@ export const PresetSheet = <TId extends string>({
   onChange,
   labelledBy,
   describedBy,
-  isDisabled,
+  isLocked = false,
 }: TPresetSheetProps<TId>) => {
   const t = useTranslations('presetPicker');
   const [isOpen, setIsOpen] = useState(false);
@@ -45,9 +45,14 @@ export const PresetSheet = <TId extends string>({
   };
 
   return (
-    <Drawer.Root open={isOpen} onOpenChange={setIsOpen}>
+    <Drawer.Root
+      open={isOpen}
+      onOpenChange={(open) => {
+        if (!isLocked) setIsOpen(open);
+      }}
+    >
       <Drawer.Trigger
-        disabled={isDisabled}
+        aria-disabled={isLocked || undefined}
         aria-labelledby={`${labelledBy} ${nameId}`}
         aria-describedby={describedBy}
         aria-haspopup="dialog"

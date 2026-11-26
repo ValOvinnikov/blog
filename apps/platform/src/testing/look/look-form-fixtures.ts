@@ -29,7 +29,6 @@ export const OUTLINED = LOOK_FORM.cardStyleOptionLabel.OUTLINED;
 export const HEADER_LAYOUT_LABEL = LOOK_FORM.headerLayoutLabel;
 export const SPINNER_LABEL = LOOK_FORM.spinnerStyleLabel;
 export const FOOTER_LAYOUT_LABEL = LOOK_FORM.footerLayoutLabel;
-export const DATA_DISABLED = 'data-disabled';
 export const GROWTH = messages.growthBadge.label;
 export const GROWTH_BADGE_TEXT = `${GROWTH} ${messages.growthBadge.planNote}`;
 export const EDITORIAL = messages.presetPicker.editorial;

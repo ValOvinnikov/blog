@@ -7,7 +7,7 @@ import {
 import { useRouter as useGuardRouter } from '@platform/i18n/base-navigation';
 import messages from '@platform/i18n/messages/en.json';
 import type { TClientTenant } from '@platform/server/tenants/to-client-tenant';
-import { ARIA_DESCRIBEDBY } from '@platform/testing/aria';
+import { ARIA_DISABLED, ARIA_DESCRIBEDBY } from '@platform/testing/aria';
 import {
   customRender,
   renderWithIntl,
@@ -301,7 +301,7 @@ describe(`<${TenantDetailsPanel.name}/>`, () => {
     const fieldsGroup = screen.getByRole('group', { name: FIELDS_GROUP_LABEL });
 
     expect(domainInput).toHaveValue(MOCK_TENANT_DOMAIN);
-    expect(domainInput).toBeDisabled();
+    expect(domainInput).toHaveAttribute(ARIA_DISABLED, 'true');
     expect(liveRegion).toHaveTextContent(tenantDetailsPanel.lockedAnnouncement);
     expect(fieldsGroup).toHaveFocus();
   });
@@ -361,7 +361,7 @@ describe(`<${TenantDetailsPanel.name}/>`, () => {
         setup({ tenant: ARCHIVED_TENANT });
       });
 
-      it('disables every field and Save, and never calls the action', async () => {
+      it('locks every field and Save, and never calls the action', async () => {
         const controls = [
           getNameInput(),
           getDomainInput(),
@@ -372,8 +372,10 @@ describe(`<${TenantDetailsPanel.name}/>`, () => {
         const saveButton = getSaveButton();
         await user.click(saveButton);
 
-        controls.forEach((control) => expect(control).toBeDisabled());
-        expect(saveButton).toBeDisabled();
+        controls.forEach((control) =>
+          expect(control).toHaveAttribute(ARIA_DISABLED, 'true'),
+        );
+        expect(saveButton).toHaveAttribute(ARIA_DISABLED, 'true');
         expect(updateTenantDetailsActionMock).not.toHaveBeenCalled();
       });
 

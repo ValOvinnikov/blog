@@ -15,6 +15,7 @@ export type TTextInputProps = {
   type?: string;
   placeholder?: string;
   isReadOnly?: TTextInputVariants['isReadOnly'];
+  isLocked?: boolean;
   className?: string;
   ref?: Ref<HTMLInputElement>;
 };
@@ -25,6 +26,7 @@ export const TextInput = ({
   type,
   placeholder,
   isReadOnly,
+  isLocked = false,
   className,
   ref,
 }: TTextInputProps) => {
@@ -36,14 +38,15 @@ export const TextInput = ({
       id={id}
       type={type}
       placeholder={placeholder}
-      readOnly={Boolean(isReadOnly)}
+      readOnly={Boolean(isReadOnly) || isLocked}
+      aria-disabled={isLocked || undefined}
       value={value}
       onValueChange={(nextValue) => onChange(nextValue)}
       aria-describedby={describedBy}
       className={({ disabled }) =>
         textInputVariants({
           appearance,
-          isDisabled: disabled,
+          isDisabled: disabled || isLocked,
           isReadOnly,
           class: className,
         })

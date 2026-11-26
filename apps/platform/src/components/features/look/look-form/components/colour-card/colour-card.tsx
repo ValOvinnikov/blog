@@ -61,7 +61,7 @@ export const ColourCard = ({ summary }: TColourCardProps) => {
             name={{ ariaLabel: accentHueLabel }}
             value={accentHue}
             onChange={(value) => updateField('accentHue', value)}
-            isDisabled={isArchived}
+            isLocked={isArchived}
             aria-describedby={archivedDescribedBy}
           />
           <span className={hueValue()}>
@@ -82,7 +82,6 @@ export const ColourCard = ({ summary }: TColourCardProps) => {
           accentHue={accentHue}
           logoHue={logoHue}
           onChange={(hue) => updateField('logoHue', hue)}
-          isDisabled={logoHueLock.isDisabled}
           isLocked={logoHueLock.isLocked}
           growthBadgeId={logoHueLock.growthBadgeId}
           aria-describedby={logoHueLock.aria.describedBy}

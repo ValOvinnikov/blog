@@ -15,22 +15,16 @@ export type TLogoHueFieldProps = {
   accentHue: number;
   logoHue: TMaybeUndefined<number>;
   onChange: (logoHue: TMaybeUndefined<number>) => void;
-  isDisabled?: boolean;
   isLocked?: boolean;
   growthBadgeId?: string;
   'aria-describedby'?: AriaAttributes['aria-describedby'];
 };
 
-/**
- * The logo hue's distinct "follows accent" state — a real slider pre-set to
- * the accent value would be indistinguishable from a tenant who deliberately
- * chose that same hue, so this toggles the field itself rather than a value.
- */
+// A slider pre-set to the accent hue could not tell "follows accent" from a deliberate match, so following is a state of its own.
 export const LogoHueField = ({
   accentHue,
   logoHue,
   onChange,
-  isDisabled = false,
   isLocked = false,
   growthBadgeId,
   'aria-describedby': ariaDescribedBy,
@@ -69,7 +63,6 @@ export const LogoHueField = ({
             onChange(checked ? undefined : accentHue)
           }
           labels={{ caption: followAccentHue, captionId }}
-          isDisabled={isDisabled}
           isLocked={isLocked}
         />
         {isLocked && follows && (
@@ -103,7 +96,7 @@ export const LogoHueField = ({
             name={{ ariaLabel: t('logoHueAriaLabel') }}
             value={resolvedHue}
             onChange={onChange}
-            isDisabled={isDisabled || isLocked}
+            isLocked={isLocked}
             aria-describedby={ariaDescribedBy}
           />
           <span className={hueValue()}>

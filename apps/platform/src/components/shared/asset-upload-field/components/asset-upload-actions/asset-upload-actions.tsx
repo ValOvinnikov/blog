@@ -11,7 +11,12 @@ import { BUTTON_VARIANT } from '@platform/constants/button';
 import type { TEmailLogoKind } from '@platform/constants/email-logo';
 import { ICON_SIZE } from '@platform/constants/icon';
 import type { TBrandAssetKind } from '@platform/utils/brand-asset-limits/brand-asset-limits';
-import { ICONS, SIZE, type TMaybeUndefined } from '@shinefold/config';
+import {
+  ICONS,
+  SIZE,
+  type TControlLock,
+  type TMaybeUndefined,
+} from '@shinefold/config';
 import { useTranslations } from 'next-intl';
 import { type ChangeEvent, useRef } from 'react';
 
@@ -26,7 +31,7 @@ type TAssetUploadActionsProps = {
   onFileChange: (event: ChangeEvent<HTMLInputElement>) => void;
   onRemove: () => void;
   id?: string;
-  isDisabled: boolean;
+  lock: Required<TControlLock>;
   describedBy: TMaybeUndefined<string>;
 };
 
@@ -39,7 +44,7 @@ export const AssetUploadActions = ({
   onFileChange,
   onRemove,
   id,
-  isDisabled,
+  lock,
   describedBy,
 }: TAssetUploadActionsProps) => {
   const t = useTranslations('assetUploadField');
@@ -70,7 +75,8 @@ export const AssetUploadActions = ({
         size={SIZE.SM}
         variant={BUTTON_VARIANT.SECONDARY}
         onClick={() => inputRef.current?.click()}
-        isDisabled={isDisabled}
+        isDisabled={lock.isDisabled}
+        isAriaDisabled={lock.isLocked}
         aria-describedby={describedBy}
         aria-label={isBareVerb ? pickLabel : undefined}
         className={pickButton()}
@@ -90,7 +96,8 @@ export const AssetUploadActions = ({
           size={SIZE.SM}
           variant={BUTTON_VARIANT.GHOST}
           onClick={onRemove}
-          isDisabled={isDisabled}
+          isDisabled={lock.isDisabled}
+          isAriaDisabled={lock.isLocked}
           aria-describedby={describedBy}
           className={removeButton()}
         >

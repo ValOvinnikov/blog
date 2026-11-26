@@ -29,6 +29,7 @@ export type TAssetUploadSpec = {
 export type TAssetUploadControl = {
   id?: string;
   isDisabled?: boolean;
+  isLocked?: boolean;
   describedBy?: string;
 };
 
@@ -59,7 +60,12 @@ export const AssetUploadField = ({
     validateFile,
     layout = ASSET_UPLOAD_LAYOUT.FRAMED,
   } = asset;
-  const { id, isDisabled = false, describedBy: ariaDescribedBy } = control;
+  const {
+    id,
+    isDisabled = false,
+    isLocked = false,
+    describedBy: ariaDescribedBy,
+  } = control;
   const { url } = image;
   const t = useTranslations('assetUploadField');
   const { validationError, handleFileChange, handleRemove } =
@@ -84,7 +90,7 @@ export const AssetUploadField = ({
   } = assetUploadFieldVariants({
     size,
     isInvalid: Boolean(shownError),
-    isDisabled,
+    isDisabled: isDisabled || isLocked,
   });
 
   const thumb = (
@@ -105,7 +111,7 @@ export const AssetUploadField = ({
       onFileChange={handleFileChange}
       onRemove={handleRemove}
       id={id}
-      isDisabled={isDisabled}
+      lock={{ isDisabled, isLocked }}
       describedBy={describedBy}
     />
   );

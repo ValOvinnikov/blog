@@ -78,6 +78,12 @@ const {
 
 const READER_ACCOUNTS_LABEL = toggleLabel[CAPABILITY.READER_ACCOUNTS];
 const BOOKMARKS_LABEL = toggleLabel[CAPABILITY.BOOKMARKS];
+const PARENT_OFF_REASON = makeEnTranslator('featuresSettings')(
+  'parentOffReason',
+  {
+    parent: READER_ACCOUNTS_LABEL,
+  },
+);
 const { saveBar, grantedBadge } = messages;
 const tGrant = makeEnTranslator('grantEntitlement');
 const tGrantedBadge = makeEnTranslator('grantedBadge');
@@ -401,12 +407,17 @@ describe(`<${FeaturesSettings.name}/>`, () => {
       expect(note).toBeVisible();
     });
 
-    it('disables Bookmarks and keeps its stored value', () => {
+    it('locks Bookmarks for Reader accounts, keeping its stored value', async () => {
       const bookmarksSwitch = screen.getByRole('switch', {
         name: BOOKMARKS_LABEL,
       });
+      await user.click(bookmarksSwitch);
 
-      expect(bookmarksSwitch).toBeDisabled();
+      expect(bookmarksSwitch).toHaveFocus();
+      expect(bookmarksSwitch).toHaveAttribute(ARIA_DISABLED, 'true');
+      expect(bookmarksSwitch).toHaveAccessibleDescription(
+        `${toggleDescription[CAPABILITY.BOOKMARKS]} ${PARENT_OFF_REASON}`,
+      );
       expect(bookmarksSwitch).toBeChecked();
     });
 

@@ -1,6 +1,7 @@
 import { LOOK_EDIT_PANEL_TEST_ID } from '@platform/constants/look-form';
 import { LOOK_ROW } from '@platform/constants/look-row';
 import messages from '@platform/i18n/messages/en.json';
+import { ARIA_DISABLED } from '@platform/testing/aria';
 import { screen, within } from '@platform/testing/custom-render';
 import {
   ACCENT_HUE,
@@ -136,11 +137,11 @@ describe(`<${LookForm.name}/>`, () => {
       expect(note).not.toBeInTheDocument();
     });
 
-    it('is disabled with a note saying why while the cookie banner is off', async () => {
+    it('is locked with a note saying why while the cookie banner is off', async () => {
       const bothButton = await cookieChoice(false);
       const note = screen.getByText(COOKIE_BANNER_OFF_NOTE);
 
-      expect(bothButton).toBeDisabled();
+      expect(bothButton).toHaveAttribute(ARIA_DISABLED, 'true');
       expect(note).toBeVisible();
     });
   });

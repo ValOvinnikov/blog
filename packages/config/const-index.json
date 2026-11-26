@@ -6566,6 +6566,12 @@
         "scope": "app:platform",
         "from": "@platform/constants/badge-tone",
         "file": "apps/platform/src/constants/badge-tone.ts"
+      },
+      {
+        "ref": "TENANT_DETAILS_FIELD.PLAN",
+        "scope": "app:platform",
+        "from": "@platform/constants/tenant-details-field",
+        "file": "apps/platform/src/constants/tenant-details-field.ts"
       }
     ],
     "START": [
@@ -10814,6 +10820,14 @@
         "scope": "app:platform",
         "from": "@platform/constants/team-access",
         "file": "apps/platform/src/constants/team-access.ts"
+      }
+    ],
+    "locale": [
+      {
+        "ref": "TENANT_DETAILS_FIELD.LOCALE",
+        "scope": "app:platform",
+        "from": "@platform/constants/tenant-details-field",
+        "file": "apps/platform/src/constants/tenant-details-field.ts"
       }
     ],
     "CONFIRM_REQUIRED": [

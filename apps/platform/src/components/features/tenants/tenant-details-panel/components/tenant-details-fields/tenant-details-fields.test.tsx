@@ -4,6 +4,7 @@ import {
   TENANT_FIELD_LOCK_KIND,
 } from '@platform/constants/tenant';
 import messages from '@platform/i18n/messages/en.json';
+import { ARIA_DISABLED } from '@platform/testing/aria';
 import { customRender, screen } from '@platform/testing/custom-render';
 import { makeEnTranslator } from '@platform/testing/en-translator';
 import {
@@ -137,7 +138,7 @@ describe(`<${TenantDetailsFields.name}/>`, () => {
     });
   });
 
-  it('disables a locked text field and states why, leaving the others editable', () => {
+  it('locks a text field and states why, leaving the others editable', () => {
     setup({
       fieldLocks: {
         primaryDomain: {
@@ -150,12 +151,12 @@ describe(`<${TenantDetailsFields.name}/>`, () => {
     const domainInput = getTextbox(PRIMARY_DOMAIN_LABEL);
     const nameInput = getTextbox(NAME_LABEL);
 
-    expect(domainInput).toBeDisabled();
+    expect(domainInput).toHaveAttribute(ARIA_DISABLED, 'true');
     expect(domainInput).toHaveAccessibleDescription(MOCK_DOMAIN_LOCKED_HINT);
     expect(nameInput).toBeEnabled();
   });
 
-  it('disables the domain of a custom main address and points to the Domain page', () => {
+  it('locks the domain of a custom main address and points to the Domain page', () => {
     setup({
       fieldLocks: {
         primaryDomain: { kind: TENANT_FIELD_LOCK_KIND.CUSTOM_MAIN_DOMAIN },
@@ -164,13 +165,13 @@ describe(`<${TenantDetailsFields.name}/>`, () => {
 
     const domainInput = getTextbox(PRIMARY_DOMAIN_LABEL);
 
-    expect(domainInput).toBeDisabled();
+    expect(domainInput).toHaveAttribute(ARIA_DISABLED, 'true');
     expect(domainInput).toHaveAccessibleDescription(
       tenantDetailsPanel.fieldLockedReasonCustomMainDomain,
     );
   });
 
-  it('disables a locked choice and states why, keeping its value shown', () => {
+  it('locks a choice and states why, keeping its value shown', () => {
     setup({
       values: tenantDetailsValuesOf(
         mockClientTenant({ plan: TENANT_PLAN.GROWTH }),
@@ -186,7 +187,7 @@ describe(`<${TenantDetailsFields.name}/>`, () => {
     expect(planGroup).toHaveAccessibleDescription(
       tenantDetailsPanel.fieldLockedReasonSucceeded,
     );
-    expect(growthButton).toBeDisabled();
+    expect(growthButton).toHaveAttribute(ARIA_DISABLED, 'true');
     expect(growthButton).toHaveAttribute(ARIA_PRESSED, 'true');
     expect(englishButton).toBeEnabled();
   });
