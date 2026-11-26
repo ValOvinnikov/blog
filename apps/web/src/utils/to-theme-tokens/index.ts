@@ -1,1 +1,1 @@
-export { toThemeTokens } from './to-theme-tokens';
+export { type TSiteThemeTokens, toThemeTokens } from './to-theme-tokens';

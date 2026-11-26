@@ -7,8 +7,10 @@ import {
   CARD_STYLE,
   CARD_STYLE_DECLARATIONS,
   DENSITY_DECLARATIONS,
+  deriveButtonColors,
   DIVIDER_WIDTH,
   DIVIDER_WIDTH_DECLARATIONS,
+  formatButtonStyleBlock,
   formatOklchRamp,
   HEADER_CONTROL_SHAPE,
   HEADER_CONTROL_SHAPE_DECLARATIONS,
@@ -27,8 +29,8 @@ import {
   NAV_LINK_STYLE_DECLARATIONS,
   RADIUS_DECLARATIONS,
   type TThemeDeclarations,
-  type TThemeTokens,
 } from '@shinefold/config';
+import type { TSiteThemeTokens } from '@web/utils/to-theme-tokens';
 
 const formatDeclarations = (declarations: TThemeDeclarations): string => {
   return Object.entries(declarations)
@@ -55,8 +57,18 @@ export const buildThemeStyleBlock = ({
   headingCase = HEADING_CASE.AS_WRITTEN,
   imageProportion = IMAGE_PROPORTION.AS_DESIGNED,
   dividerWidth = DIVIDER_WIDTH.HAIRLINE,
-}: TThemeTokens): string => {
+  buttonColor,
+  buttonColorDark,
+}: TSiteThemeTokens): string => {
   const resolvedLogoHue = logoHue ?? accentHue;
+  const buttonStyleBlock = buttonColor
+    ? `\n${formatButtonStyleBlock(
+        deriveButtonColors({
+          color: buttonColor,
+          darkGroundColor: buttonColorDark,
+        }),
+      )}`
+    : '';
 
   return `:root {
     ${formatDeclarations({
@@ -87,5 +99,5 @@ export const buildThemeStyleBlock = ({
       ...formatOklchRamp(ACCENT_RAMP_DARK, accentHue),
       ...formatOklchRamp(LOGO_RAMP_DARK, resolvedLogoHue),
     })}
-}`;
+}${buttonStyleBlock}`;
 };
