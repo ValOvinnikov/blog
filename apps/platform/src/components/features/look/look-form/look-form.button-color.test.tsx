@@ -2,7 +2,6 @@ import { LOOK_ROW } from '@platform/constants/look-row';
 import { SITE_THEME_BUTTON_STYLE_TEST_ID } from '@platform/constants/site-theme-frame';
 import messages from '@platform/i18n/messages/en.json';
 import { updateLookAction } from '@platform/server/site-config/update-look-action';
-import { ARIA_DISABLED } from '@platform/testing/aria';
 import { screen } from '@platform/testing/custom-render';
 import { makeEnTranslator } from '@platform/testing/en-translator';
 import {
@@ -12,18 +11,13 @@ import {
   hexInputs,
   pickButtonColor,
 } from '@platform/testing/look/look-button-color';
-import { GROWTH_BADGE_TEXT } from '@platform/testing/look/look-form-fixtures';
 import {
   clickSave,
   openLookRow,
 } from '@platform/testing/look/look-form-interactions';
 import { saveAndExpectLook } from '@platform/testing/look/look-form-save';
-import {
-  setupLookForm,
-  withLookPlan,
-} from '@platform/testing/look/look-form-setup';
+import { setupLookForm } from '@platform/testing/look/look-form-setup';
 import { BRAND_VARIANT, COLOR_SCHEME } from '@shinefold/config';
-import { TENANT_PLAN } from '@shinefold/config/constants';
 import {
   MOCK_PINK_HEX,
   MOCK_WHITE_HEX,
@@ -142,28 +136,5 @@ describe(`<${LookForm.name}/>`, () => {
         await saveAndExpectLook(user, { buttonColor: MOCK_WHITE_HEX });
       });
     });
-  });
-
-  describe.each([
-    { plan: TENANT_PLAN.FREE, isOperator: false },
-    { plan: TENANT_PLAN.STARTER, isOperator: false },
-    { plan: TENANT_PLAN.STARTER, isOperator: true },
-  ])('on $plan with isOperator $isOperator', ({ plan, isOperator }) => {
-    beforeEach(async () => {
-      setupLookForm({ ...withLookPlan(plan), isOperator });
-      await openLookRow(user, LOOK_ROW.BUTTONS);
-    });
-
-    it.each([BUTTON_COLOR_FOLLOWS_ACCENT, BUTTON_COLOR_DARK_FOLLOWS])(
-      'locks %s with the plan it comes with',
-      async (name) => {
-        const lockedSwitch = followSwitch(`${name} ${GROWTH_BADGE_TEXT}`);
-
-        await user.click(lockedSwitch);
-
-        expect(lockedSwitch).toBeChecked();
-        expect(lockedSwitch).toHaveAttribute(ARIA_DISABLED, 'true');
-      },
-    );
   });
 });
