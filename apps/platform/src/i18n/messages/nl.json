@@ -312,7 +312,9 @@
     },
     "manage": "Beheren",
     "manageAriaLabel": "{tenantName} beheren",
-    "matchedDomain": "Gevonden via {domain}"
+    "matchedDomain": "Gevonden via {domain}",
+    "showing": "{from, number}–{to, number} van {count, number} {count, plural, one {tenant} other {tenants}}",
+    "count": "{count, plural, one {# tenant} other {# tenants}}"
   },
   "tenantsSearch": {
     "label": "Tenants zoeken",

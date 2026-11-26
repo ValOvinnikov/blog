@@ -42,6 +42,19 @@
   --button-fill: var(--brand-primary-solid);
   --button-fill-hover: var(--brand-primary-solid-hover);
   --button-label: var(--brand-primary-contrast);
+  --heading: var(--text);
+  --link-text: var(--brand-primary);
+  --link-underline: var(--brand-primary);
+  --eyebrow-text: var(--brand-primary);
+  --feature-icon-glyph: var(--brand-primary);
+  --tier-highlight-border: var(--brand-primary);
+  --tier-badge-fill: var(--brand-primary-solid);
+  --tier-badge-label: var(--brand-primary-contrast);
+  --timeline-marker-fill: var(--brand-primary-solid);
+  --timeline-marker-numeral: var(--brand-primary-contrast);
+  --aside-bar: var(--brand-primary-muted);
+  --sidenav-current-bar: var(--brand-primary);
+  --sidenav-current-text: var(--brand-primary);
   --logo-tile: var(--logo-tile-inverse);
   --logo-tile-contrast: var(--logo-tile-inverse-contrast);
 }
@@ -86,4 +99,17 @@
   --button-fill: var(--brand-primary-solid);
   --button-fill-hover: var(--brand-primary-solid-hover);
   --button-label: var(--brand-primary-contrast);
+  --heading: var(--text);
+  --link-text: var(--brand-primary);
+  --link-underline: var(--brand-primary);
+  --eyebrow-text: var(--brand-primary);
+  --feature-icon-glyph: var(--brand-primary);
+  --tier-highlight-border: var(--brand-primary);
+  --tier-badge-fill: var(--brand-primary-solid);
+  --tier-badge-label: var(--brand-primary-contrast);
+  --timeline-marker-fill: var(--brand-primary-solid);
+  --timeline-marker-numeral: var(--brand-primary-contrast);
+  --aside-bar: var(--brand-primary-muted);
+  --sidenav-current-bar: var(--brand-primary);
+  --sidenav-current-text: var(--brand-primary);
 }

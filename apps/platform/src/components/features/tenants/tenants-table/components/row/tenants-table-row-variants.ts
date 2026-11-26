@@ -1,6 +1,6 @@
 import { tv } from '@platform/utils/tv/tv';
 
-export const tenantsTableVariants = tv({
+export const tenantsTableRowVariants = tv({
   slots: {
     tname: ['flex min-w-0 items-center gap-2.5'],
     lines: ['min-w-0'],

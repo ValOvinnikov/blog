@@ -12,6 +12,7 @@ export * from './heading-declarations';
 export * from './image-proportion-declarations';
 export * from './nav-link-declarations';
 export * from './palette-ramps';
+export * from './preset-surface-css';
 export * from './radius-declarations';
 export * from './resolve-tenant-email-brand';
 export * from './skins';

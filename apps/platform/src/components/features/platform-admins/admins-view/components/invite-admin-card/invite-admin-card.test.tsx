@@ -53,7 +53,7 @@ describe(`<${InviteAdminCard.name}/>`, () => {
     });
     await user.click(roleSelect);
 
-    const options = screen.getAllByRole('option');
+    const options = await screen.findAllByRole('option');
     const superAdmin = screen.getByRole('option', {
       name: roleLabel.SUPERADMIN,
     });

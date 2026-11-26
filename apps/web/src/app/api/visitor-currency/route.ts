@@ -4,7 +4,7 @@ import {
   type TBillingCurrency,
 } from '@shinefold/db/constants';
 import { COUNTRY_CODE } from '@web/constants/country';
-import { CACHE_CONTROL } from '@web/constants/http';
+import { CACHE_CONTROL, CACHE_CONTROL_HEADER } from '@web/constants/http';
 import {
   VISITOR_COUNTRY_HEADER,
   type TVisitorCurrency,
@@ -68,6 +68,6 @@ export function GET(request: Request): NextResponse<TVisitorCurrency> {
   );
   return NextResponse.json(
     { currency },
-    { headers: { 'Cache-Control': CACHE_CONTROL.PRIVATE_NO_STORE } },
+    { headers: { [CACHE_CONTROL_HEADER]: CACHE_CONTROL.PRIVATE_NO_STORE } },
   );
 }

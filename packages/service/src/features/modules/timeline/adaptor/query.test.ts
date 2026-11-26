@@ -11,7 +11,7 @@ import {
   mockRawTimelineItem,
   mockRawTimelineModule,
 } from '@shinefold/service/testing/modules/fixtures';
-import { evaluateGroqExpression } from '@shinefold/service/testing/shared/groq';
+import { evaluateModuleQuery } from '@shinefold/service/testing/shared/groq';
 import {
   mockLocalizedHeadingBlock,
   mockLocalizedParagraphText,
@@ -74,15 +74,11 @@ const MOCK_TIMELINE_DOCUMENT = {
   itemAlignment: CONTENT_ALIGNMENT.LEFT,
 };
 
-async function runTimeline(document: Record<string, unknown>, locale: string) {
-  const raw = await evaluateGroqExpression(
-    timelineModuleQuery.query,
-    [document],
-    undefined,
-    { id: MOCK_TIMELINE_MODULE_ID, locale, defaultLocale: EN },
-  );
-
-  return timelineModuleQuery.parse(raw);
+function runTimeline(document: Record<string, unknown>, locale: string) {
+  return evaluateModuleQuery(timelineModuleQuery, [document], {
+    id: MOCK_TIMELINE_MODULE_ID,
+    locale,
+  });
 }
 
 describe('timelineModuleQuery', () => {

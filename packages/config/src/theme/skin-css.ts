@@ -44,7 +44,7 @@ const SKIN_ROLE_ALIASES = Object.entries(TOKEN_ALIASES).filter(
     !isOneOf(SKIN_ROLES, alias) && isOneOf(SKIN_ROLES, target),
 );
 
-const roleDeclarations = (roles: TSkinRoles): string[] =>
+export const roleDeclarations = (roles: TSkinRoles): string[] =>
   [...SKIN_ROLES.map((role) => [role, roles[role]]), ...SKIN_ROLE_ALIASES].map(
     ([property, token]) => `${property}: var(${token})`,
   );

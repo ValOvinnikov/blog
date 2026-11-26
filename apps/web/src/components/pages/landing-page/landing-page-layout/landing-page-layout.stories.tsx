@@ -4,7 +4,10 @@ import { PageHeading } from '@web/components/shared/page-heading';
 import { HeroBlogModuleView } from '@web/modules/hero-blog/hero-blog-module-view';
 import { mockSanityImage } from '@web/testing/modules/hero/fixtures';
 import { mockHeroBlogData } from '@web/testing/modules/hero-blog/fixtures';
-import { mockLandingSectionNavigation } from '@web/testing/pages/landing-page/fixtures';
+import {
+  mockLandingAdjacentPages,
+  mockLandingSectionNavigation,
+} from '@web/testing/pages/landing-page/fixtures';
 import { mockHeroPresentation } from '@web/testing/shared/hero-presentation/fixtures';
 
 import { LandingPageLayout } from './landing-page-layout';
@@ -37,7 +40,10 @@ const meta = {
         }}
       />
     ),
-    sectionNavigation: mockLandingSectionNavigation(),
+    navigation: {
+      sectionNavigation: mockLandingSectionNavigation(),
+      adjacentPages: mockLandingAdjacentPages(),
+    },
     children: (
       <div className="py-section text-muted text-center">
         Page modules render here
@@ -64,7 +70,7 @@ export const SectionedWithBannerHero: TStory = {
 };
 
 export const WithoutSection: TStory = {
-  args: { sectionNavigation: undefined },
+  args: { navigation: undefined },
 };
 
 export const MobileWithHero: TStory = {

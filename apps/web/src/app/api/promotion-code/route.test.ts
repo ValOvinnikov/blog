@@ -5,11 +5,10 @@ import {
   MOCK_PROMOTION_CODE,
 } from '@shinefold/db/testing/stripe-catalogue/fixtures';
 import { isUndefined } from '@shinefold/utils/primitives';
-import { CACHE_CONTROL } from '@web/constants/http';
+import { CACHE_CONTROL, CACHE_CONTROL_HEADER } from '@web/constants/http';
 import { PRICING_LOG, PRICING_SEARCH_PARAM } from '@web/constants/pricing';
 import { mockPromotionDiscount } from '@web/testing/modules/pricing/live-price-fixtures';
 import { MOCK_ERROR } from '@web/testing/shared/error/fixtures';
-import { CACHE_CONTROL_HEADER } from '@web/testing/shared/http/constants';
 import { logger } from '@web/utils/logger/logger';
 import { PROMOTION_CODE_PATH } from '@web/utils/promotion-discount';
 

@@ -13,13 +13,15 @@ export const useTenantsListNavigation = (listQuery: TTenantsListQuery) => {
   ) => {
     startTransition(() => {
       onStart?.();
-      router.push(adminRoutes.tenants({ ...listQuery, ...changes }));
+      router.push(adminRoutes.tenants({ ...listQuery, page: 1, ...changes }));
     });
   };
 
   const navigateInPlace = (changes: Partial<TTenantsListQuery>) => {
     startTransition(() => {
-      router.replace(adminRoutes.tenants({ ...listQuery, ...changes }));
+      router.replace(
+        adminRoutes.tenants({ ...listQuery, page: 1, ...changes }),
+      );
     });
   };
 

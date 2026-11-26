@@ -1,11 +1,9 @@
 import { CONTRAST_ROLE } from '@shinefold/config/constants';
 
 import type { TContrastPair, TThemeToken } from './contrast-pairs';
+import { BRAND_PRIMARY, BRAND_PRIMARY_HOVER, TEXT } from './contrast-surfaces';
 
-const TEXT = '--text' satisfies TThemeToken;
-const BRAND_PRIMARY = '--brand-primary' satisfies TThemeToken;
 const HEADER_CONTROL_FILL = '--header-control-fill' satisfies TThemeToken;
-const BRAND_PRIMARY_HOVER = '--brand-primary-hover' satisfies TThemeToken;
 const NAV_LINK_FILL = '--nav-link-fill' satisfies TThemeToken;
 
 export const HEADER_CONTRAST_PAIRS = {
