@@ -6,6 +6,7 @@ import {
   TENANTS_LIST_ROUTE,
 } from '@platform/constants/tenant';
 import { requireAdmin } from '@platform/server/auth/require-admin';
+import { toLoggableError } from '@platform/utils/loggable-error/loggable-error';
 import { logger } from '@platform/utils/logger/logger';
 import { tenantIdSchema } from '@platform/utils/tenant-id-schema/tenant-id-schema';
 import { ACTION_OUTCOME, type TActionResult } from '@shinefold/config';
@@ -34,7 +35,17 @@ export const pinTenantAction = async (
     };
   }
 
-  const result = await queries.pinnedTenants.pinTenant(adminId, parsed.data);
+  let result: Awaited<ReturnType<typeof queries.pinnedTenants.pinTenant>>;
+  try {
+    result = await queries.pinnedTenants.pinTenant(adminId, parsed.data);
+  } catch (error) {
+    logger.error(TENANT_LOG.PIN_FAILED, {
+      tenantId,
+      ...toLoggableError(error),
+    });
+    return toOutcome(ACTION_OUTCOME.SERVER_ERROR);
+  }
+
   if (!result.ok) {
     if (result.error === ERROR_CODE.DB_NOT_FOUND) {
       return {

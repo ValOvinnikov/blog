@@ -1,8 +1,9 @@
 import { TENANTS_PAGE_SIZE } from '@platform/constants/tenant';
 import messages from '@platform/i18n/messages/en.json';
-import { customRender, screen } from '@platform/testing/custom-render';
+import { screen } from '@platform/testing/custom-render';
 import { makeEnTranslator } from '@platform/testing/en-translator';
 import { mockLocaleRouterPush } from '@platform/testing/mock-locale-router';
+import { customRenderInPinnedTenants } from '@platform/testing/pinned-tenants/render-in-pinned-tenants';
 import {
   mockTenantsListQuery,
   mockTenantsPageRow,
@@ -16,21 +17,21 @@ import {
   MOCK_TENANT_ID,
   MOCK_TENANT_SLUG,
 } from '@platform/testing/tenants/fixtures';
+import { mockOtherPinnedTenant } from '@platform/testing/tenants/pinned-tenant';
 import { adminRoutes } from '@platform/utils/routes/routes';
 import { SORT_DIRECTION, TENANT_SORT_COLUMN } from '@shinefold/config';
 import { TENANT_PLAN } from '@shinefold/config/constants';
-import {
-  TENANT_PROVISIONING_STATUS,
-  TENANT_STATUS,
-} from '@shinefold/db/constants';
+import { TENANT_STATUS } from '@shinefold/db/constants';
 import type { TTenantsPageRow } from '@shinefold/db/queries/tenants/tenants-page-row';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
 
 import { TenantsTable } from './tenants-table';
 
 vi.mock('@platform/i18n/navigation');
+vi.mock('@platform/server/tenants/pin-tenant-action');
+vi.mock('@platform/server/tenants/unpin-tenant-action');
 
-const setup = customRender(TenantsTable, {
+const setup = customRenderInPinnedTenants(TenantsTable, {
   tenants: [mockTenantsPageRow()],
   total: 1,
   totalPages: 1,
@@ -67,6 +68,8 @@ const MOCK_FILTERED_QUERY = mockTenantsListQuery({
   search: MOCK_TENANT_SLUG,
   page: MOCK_MIDDLE_PAGE,
 });
+const ARIA_PRESSED = 'aria-pressed';
+const tPinned = makeEnTranslator('pinnedTenants');
 const tTable = makeEnTranslator('tenantsTable');
 const tPagination = makeEnTranslator('pagination');
 
@@ -99,42 +102,37 @@ describe(`<${TenantsTable.name}/>`, () => {
     expect(suspendedStatus).toBeVisible();
   });
 
-  it('links a ready tenant to its overview page', () => {
+  it("links each tenant's Manage button to its manage page", () => {
     setup({ tenants: [mockTenantsPageRow(), otherTenant()] });
-
-    const tenantLink = screen.getByRole('link', { name: MANAGE_TENANT });
-    const otherLink = screen.getByRole('link', { name: MANAGE_OTHER_TENANT });
-
-    expect(tenantLink).toHaveAttribute('href', `/tenants/${MOCK_TENANT_ID}`);
-    expect(otherLink).toHaveAttribute(
-      'href',
-      `/tenants/${MOCK_OTHER_TENANT_ID}`,
-    );
-  });
-
-  it('links a not-yet-ready tenant to its provisioning page', () => {
-    setup({
-      tenants: [
-        mockTenantsPageRow({
-          provisioningStatus: TENANT_PROVISIONING_STATUS.PROVISIONING,
-        }),
-        otherTenant({
-          provisioningStatus: TENANT_PROVISIONING_STATUS.FAILED,
-        }),
-      ],
-    });
 
     const tenantLink = screen.getByRole('link', { name: MANAGE_TENANT });
     const otherLink = screen.getByRole('link', { name: MANAGE_OTHER_TENANT });
 
     expect(tenantLink).toHaveAttribute(
       'href',
-      `/tenants/${MOCK_TENANT_ID}/provisioning`,
+      adminRoutes.tenantOverview(MOCK_TENANT_ID),
     );
     expect(otherLink).toHaveAttribute(
       'href',
-      `/tenants/${MOCK_OTHER_TENANT_ID}/provisioning`,
+      adminRoutes.tenantOverview(MOCK_OTHER_TENANT_ID),
     );
+  });
+
+  it('gives each row a pin toggle named for its tenant', () => {
+    setup(
+      { tenants: [mockTenantsPageRow(), otherTenant()] },
+      { pinnedTenants: [mockOtherPinnedTenant()] },
+    );
+
+    const pinToggle = screen.getByRole('button', {
+      name: tPinned('pinAriaLabel', { name: MOCK_TENANT_NAME }),
+    });
+    const unpinToggle = screen.getByRole('button', {
+      name: tPinned('unpinAriaLabel', { name: MOCK_OTHER_TENANT_NAME }),
+    });
+
+    expect(pinToggle).toHaveAttribute(ARIA_PRESSED, 'false');
+    expect(unpinToggle).toHaveAttribute(ARIA_PRESSED, 'true');
   });
 
   describe('with one ready tenant', () => {

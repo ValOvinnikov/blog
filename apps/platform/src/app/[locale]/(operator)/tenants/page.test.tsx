@@ -1,9 +1,12 @@
 import { TENANTS_PAGE_SIZE } from '@platform/constants/tenant';
 import messages from '@platform/i18n/messages/en.json';
+import { mockAdmin } from '@platform/testing/admins/fixtures';
 import { customRenderAsync, screen } from '@platform/testing/custom-render';
 import { mockDbConstants } from '@platform/testing/mock-db-constants';
 import {
   MOCK_CUSTOM_DOMAIN,
+  MOCK_OTHER_TENANT_ID,
+  MOCK_OTHER_TENANT_NAME,
   MOCK_TENANT_NAME,
   MOCK_TENANT_SLUG,
   mockTenantsPageRow,
@@ -15,15 +18,21 @@ import { isEmailAccountConfigured } from '@shinefold/email';
 
 import TenantsPage from './page';
 
-const { listTenantsPageMock } = vi.hoisted(() => ({
+const { listTenantsPageMock, listPinnedTenantsMock } = vi.hoisted(() => ({
   listTenantsPageMock: vi.fn(),
+  listPinnedTenantsMock: vi.fn(),
 }));
 
 vi.mock('@platform/server/auth/require-admin');
+vi.mock('@platform/server/tenants/pin-tenant-action');
+vi.mock('@platform/server/tenants/unpin-tenant-action');
 
 vi.mock('@shinefold/db', async () => ({
   ...(await mockDbConstants()),
-  queries: { tenants: { listTenantsPage: listTenantsPageMock } },
+  queries: {
+    tenants: { listTenantsPage: listTenantsPageMock },
+    pinnedTenants: { listPinnedTenants: listPinnedTenantsMock },
+  },
 }));
 
 vi.mock('@shinefold/email', async (importOriginal) => ({
@@ -40,7 +49,26 @@ const setup = customRenderAsync(TenantsPage, {
 describe(`<${TenantsPage.name}/>`, () => {
   beforeEach(() => {
     listTenantsPageMock.mockResolvedValue({ rows: [], total: 0 });
+    listPinnedTenantsMock.mockResolvedValue([]);
     vi.mocked(isEmailAccountConfigured).mockReturnValue(true);
+  });
+
+  it("lists the signed-in admin's pins, read by their admin row", async () => {
+    listPinnedTenantsMock.mockResolvedValueOnce([
+      mockTenantsPageRow({
+        id: MOCK_OTHER_TENANT_ID,
+        name: MOCK_OTHER_TENANT_NAME,
+      }),
+    ]);
+
+    await setup();
+
+    const heading = screen.getByRole('heading', {
+      name: new RegExp(messages.pinnedTenants.title),
+    });
+
+    expect(heading).toBeVisible();
+    expect(listPinnedTenantsMock).toHaveBeenCalledWith(mockAdmin().id);
   });
 
   it('lists the tenants it reads', async () => {

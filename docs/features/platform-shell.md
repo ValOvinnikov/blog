@@ -87,8 +87,9 @@ URLs carry no locale prefix (next-intl `localePrefix: 'never'`).
   with an ellipsis. Sorting is offered from `md` up only, where the table
   keeps its columns.
 - **Pinned tenants**, on `/tenants`: each operator keeps their own pins, and
-  nobody else sees them. Every table row has a pin toggle left of Manage
-  ("Pin <name>" / "Unpin <name>", exposing its pressed state). The operator's
+  nobody else sees them. Every row of a tenant that is not archived has a pin
+  toggle left of Manage ("Pin <name>" / "Unpin <name>", exposing its pressed
+  state); an archived tenant's row has none. The operator's
   pins show as tiles in a "Pinned" section between the page header and the
   table, absent when there are none: avatar, name, primary domain, plan and
   status, in name order, whatever the table's page, sort or search. A tile
@@ -99,7 +100,8 @@ URLs carry no locale prefix (next-intl `localePrefix: 'never'`).
   one row that swipes sideways, with no "Show all". Pinning and unpinning
   update the toggle and the tiles at once and keep the page, sort and search;
   a save that fails is undone on screen with a toast. A pinned tenant keeps
-  its normal place in the table, and an archived one has no tile.
+  its normal place in the table. An archived one has no tile; its pin is
+  kept, so the tile returns if the tenant is restored.
 - **Operator tenant view**: `/tenants/{id}` and its Look, Voice, Features,
   Languages, Domain, Email, Studio, Provisioning, Danger zone and Help pages.
   The sidebar shows the Platform section plus the tenant's own sections, ending

@@ -1,12 +1,26 @@
+import { pinTenantAction } from '@platform/server/tenants/pin-tenant-action';
 import { customRender, screen } from '@platform/testing/custom-render';
+import { makeEnTranslator } from '@platform/testing/en-translator';
+import { holdSave } from '@platform/testing/pinned-tenants/held-save';
 import {
   mockTenantsListQuery,
   mockTenantsPageRow,
   MOCK_TENANT_NAME,
 } from '@platform/testing/tenants/fixtures';
+import { mockPinnedTenant } from '@platform/testing/tenants/pinned-tenant';
 import { adminRoutes } from '@platform/utils/routes/routes';
+import userEvent, { type UserEvent } from '@testing-library/user-event';
 
 import { TenantsView } from './tenants-view';
+
+vi.mock('@platform/server/tenants/pin-tenant-action');
+vi.mock('@platform/server/tenants/unpin-tenant-action');
+
+const tPinned = makeEnTranslator('pinnedTenants');
+const NAMED = { name: MOCK_TENANT_NAME };
+const PINNED_HEADING = new RegExp(tPinned('title'));
+const PIN_LABEL = tPinned('pinAriaLabel', NAMED);
+const UNPIN_LABEL = tPinned('unpinAriaLabel', NAMED);
 
 const setup = customRender(TenantsView, {
   tenants: [mockTenantsPageRow()],
@@ -22,6 +36,12 @@ const PRESSED = 'true';
 const EMAIL_ALERTS_NOT_CONFIGURED = 'Email alerts not configured';
 
 describe(`<${TenantsView.name}/>`, () => {
+  let user: UserEvent;
+
+  beforeEach(() => {
+    user = userEvent.setup();
+  });
+
   describe('with email alerting configured', () => {
     beforeEach(() => {
       setup();
@@ -66,5 +86,35 @@ describe(`<${TenantsView.name}/>`, () => {
     const banner = screen.getByText(EMAIL_ALERTS_NOT_CONFIGURED);
 
     expect(banner).toBeVisible();
+  });
+
+  it("shows the operator's pins in a section of their own", () => {
+    setup({ pinnedTenants: [mockPinnedTenant()] });
+
+    const heading = screen.getByRole('heading', { name: PINNED_HEADING });
+
+    expect(heading).toBeVisible();
+  });
+
+  it('adds a tenant to the pinned section when its row toggle is pressed', async () => {
+    const save = holdSave();
+    vi.mocked(pinTenantAction).mockReturnValueOnce(save.promise);
+    setup();
+
+    const rowToggle = screen.getByRole('button', { name: PIN_LABEL });
+    await user.click(rowToggle);
+
+    const heading = screen.getByRole('heading', { name: PINNED_HEADING });
+    const unpinButtons = screen.getAllByRole('button', { name: UNPIN_LABEL });
+
+    expect(heading).toBeVisible();
+    expect(unpinButtons).toHaveLength(2);
+
+    save.settle();
+    const settledToggle = await screen.findByRole('button', {
+      name: PIN_LABEL,
+    });
+
+    expect(settledToggle).toBeVisible();
   });
 });
