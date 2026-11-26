@@ -1,7 +1,7 @@
 import { service, type TPostCard } from '@shinefold/service';
 import { hasLength } from '@shinefold/utils/primitives';
 import { POST_FEATURED_LOG } from '@web/constants/post-featured';
-import { getPostCardsSection } from '@web/server/post-cards/get-post-cards-section/get-post-cards-section';
+import { getPostCardsViewProps } from '@web/server/post-cards/get-post-cards-view-props/get-post-cards-view-props';
 import { getRequestContext } from '@web/server/request-context/request-context';
 import { logger } from '@web/utils/logger/logger';
 import { renderPostCardImage } from '@web/utils/render-post-card-image';
@@ -28,40 +28,30 @@ export const PostFeaturedModule = async ({ id }: IPostFeaturedModuleProps) => {
     return null;
   }
 
-  const {
-    brandVariant,
-    headingBlock,
-    posts,
-    layout,
-    contentAlignment,
-    showImages,
-    displayMode,
-  } = result.data;
-
+  const { posts, showImages, displayMode } = result.data;
   const leadPostId = posts[0]?.id;
   const renderImage = (post: TPostCard) =>
     post.id === leadPostId
       ? renderPostLeadImage(post)
       : renderPostCardImage(post);
 
-  const { items, appearance } = await getPostCardsSection(
+  const viewProps = await getPostCardsViewProps(
     tenantId,
     result.data,
+    {
+      titleId: `featured-posts-${id}`,
+      dataTestId: `post-featured-module-${id}`,
+    },
     renderImage,
   );
 
-  if (!hasLength(items)) return null;
+  if (!hasLength(viewProps.items)) return null;
 
   return (
     <PostFeaturedModuleView
-      section={{ brandVariant, layout, appearance }}
-      headingBlock={headingBlock}
-      items={items}
-      contentAlignment={contentAlignment}
+      {...viewProps}
       hasImages={showImages}
       displayMode={displayMode}
-      titleId={`featured-posts-${id}`}
-      dataTestId={`post-featured-module-${id}`}
     />
   );
 };

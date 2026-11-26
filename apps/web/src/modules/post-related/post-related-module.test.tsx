@@ -2,7 +2,7 @@ import { faker } from '@faker-js/faker';
 import { errorResult, okResult } from '@shinefold/utils';
 import { POST_RELATED_LOG } from '@web/constants/post-related';
 import { customRenderAsync, screen } from '@web/testing/custom-render';
-import { mockSanityImage } from '@web/testing/modules/hero/fixtures';
+import { testPostCardsImagesContract } from '@web/testing/modules/post-cards/post-cards-images-contract';
 import { mockPostRelatedModuleData } from '@web/testing/modules/post-related/fixtures';
 import { MOCK_ERROR } from '@web/testing/shared/error/fixtures';
 import { mockPostCard } from '@web/testing/shared/post/fixtures';
@@ -120,38 +120,13 @@ describe(`<${PostRelatedModule.name}/>`, () => {
     expect(pagination).not.toBeInTheDocument();
   });
 
-  it('renders each post image when showImages is true', async () => {
-    const sanityImage = mockSanityImage();
-    getPostRelatedMock.mockResolvedValue(
-      okResult(
-        mockPostRelatedModuleData({
-          posts: [mockPostCard({ heroImage: sanityImage })],
-          showImages: true,
-        }),
-      ),
-    );
-
-    await setup();
-
-    const image = screen.getByRole('img', { name: sanityImage.alt });
-
-    expect(image).toBeVisible();
-  });
-
-  it('renders no post images when showImages is false', async () => {
-    getPostRelatedMock.mockResolvedValue(
-      okResult(
-        mockPostRelatedModuleData({
-          posts: [mockPostCard({ heroImage: mockSanityImage() })],
-        }),
-      ),
-    );
-
-    await setup();
-
-    const image = screen.queryByRole('img');
-
-    expect(image).not.toBeInTheDocument();
+  testPostCardsImagesContract({
+    setup,
+    resolvePosts: (source) => {
+      getPostRelatedMock.mockResolvedValue(
+        okResult(mockPostRelatedModuleData(source)),
+      );
+    },
   });
 
   it('renders a related post that has no excerpt', async () => {

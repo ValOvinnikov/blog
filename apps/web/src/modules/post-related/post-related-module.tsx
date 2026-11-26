@@ -2,7 +2,7 @@ import { service } from '@shinefold/service';
 import { hasLength } from '@shinefold/utils/primitives';
 import { POST_RELATED_LOG } from '@web/constants/post-related';
 import type { TModuleComponentProps } from '@web/modules/module-renderer';
-import { getPostCardsSection } from '@web/server/post-cards/get-post-cards-section/get-post-cards-section';
+import { getPostCardsViewProps } from '@web/server/post-cards/get-post-cards-view-props/get-post-cards-view-props';
 import { getRequestContext } from '@web/server/request-context/request-context';
 import { logger } from '@web/utils/logger/logger';
 
@@ -36,34 +36,20 @@ export const PostRelatedModule = async ({
     return null;
   }
 
-  const {
-    brandVariant,
-    headingBlock,
-    layout,
-    contentAlignment,
-    showImages,
-    displayMode,
-    columns,
-  } = result.data;
+  const { showImages, displayMode, columns } = result.data;
+  const viewProps = await getPostCardsViewProps(tenantId, result.data, {
+    titleId: `related-posts-${id}`,
+    dataTestId: `post-related-module-${id}`,
+  });
 
-  const { items, appearance } = await getPostCardsSection(
-    tenantId,
-    result.data,
-  );
-
-  if (!hasLength(items)) return null;
+  if (!hasLength(viewProps.items)) return null;
 
   return (
     <PostRelatedModuleView
-      section={{ brandVariant, layout, appearance }}
-      headingBlock={headingBlock}
-      items={items}
+      {...viewProps}
       columns={columns}
-      contentAlignment={contentAlignment}
       hasImages={showImages}
       displayMode={displayMode}
-      titleId={`related-posts-${id}`}
-      dataTestId={`post-related-module-${id}`}
     />
   );
 };
