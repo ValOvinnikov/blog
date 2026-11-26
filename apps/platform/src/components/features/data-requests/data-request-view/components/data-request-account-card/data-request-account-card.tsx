@@ -1,8 +1,9 @@
 import { Card } from '@platform/components/shared/card';
 import { DetailList } from '@platform/components/shared/detail-list';
 import type { TPersonalDataReaderAccount } from '@shinefold/db/queries/personal-data/reader-account-personal-data';
-import { objectKeys } from '@shinefold/utils/primitives';
+import { hasLength } from '@shinefold/utils/primitives';
 import { useFormatter, useTranslations } from 'next-intl';
+import { keys } from 'remeda';
 
 export type TDataRequestAccountCardProps = {
   readerAccount: TPersonalDataReaderAccount;
@@ -16,7 +17,7 @@ export const DataRequestAccountCard = ({
   const format = useFormatter();
   const { name, email, linkedProviders, activeSessionCount, bookmarks } =
     readerAccount;
-  const providerNames = objectKeys(linkedProviders)
+  const providerNames = keys(linkedProviders)
     .filter((provider) => linkedProviders[provider])
     .map((provider) => tProvider(provider));
 
@@ -30,7 +31,7 @@ export const DataRequestAccountCard = ({
           </DetailList.Row>
           <DetailList.Row label={t('email')}>{email}</DetailList.Row>
           <DetailList.Row label={t('providers')}>
-            {providerNames.length > 0
+            {hasLength(providerNames)
               ? format.list(providerNames)
               : t('noProviders')}
           </DetailList.Row>

@@ -10,7 +10,7 @@ import {
 import type { TTenantOwnerMembership } from '@shinefold/db/queries/memberships';
 import type { TTenantProvisioningState } from '@shinefold/db/schema/tenants';
 import { deriveProvisioningState } from '@shinefold/db/utils/derive-provisioning-state/derive-provisioning-state';
-import { objectKeys } from '@shinefold/utils/primitives';
+import { fromKeys, keys } from 'remeda';
 
 const IS_EDITABLE_AFTER_PROVISIONING = {
   name: false,
@@ -22,7 +22,7 @@ const IS_EDITABLE_AFTER_PROVISIONING = {
 
 export type TTenantFieldKey = keyof typeof IS_EDITABLE_AFTER_PROVISIONING;
 
-export const ALL_FIELD_KEYS: readonly TTenantFieldKey[] = objectKeys(
+export const ALL_FIELD_KEYS: readonly TTenantFieldKey[] = keys(
   IS_EDITABLE_AFTER_PROVISIONING,
 );
 
@@ -40,13 +40,9 @@ export type TTenantFieldLocks = Partial<
 >;
 
 const lockFields = (
-  keys: readonly TTenantFieldKey[],
+  fieldKeys: readonly TTenantFieldKey[],
   reason: TTenantFieldLockReason,
-): TTenantFieldLocks => {
-  return Object.fromEntries(
-    keys.map((key) => [key, reason]),
-  ) as TTenantFieldLocks;
-};
+): TTenantFieldLocks => fromKeys(fieldKeys, () => reason);
 
 export const lockAllFields = (
   reason: TTenantFieldLockReason,

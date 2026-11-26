@@ -8,7 +8,8 @@ import {
 } from '@shinefold/config';
 import type { TAuthoredEmailTemplateCopy } from '@shinefold/db/queries/email-templates';
 import type { TEmailTemplateBlock } from '@shinefold/db/schema/email-templates';
-import { isUndefined, mapKeysToRecord } from '@shinefold/utils/primitives';
+import { isUndefined } from '@shinefold/utils/primitives';
+import { mapToObj, mapValues } from 'remeda';
 
 export const EMAIL_SENDER_ITEM = EMAIL_LOGO_KIND.SENDER;
 
@@ -68,23 +69,16 @@ export const buildEmailDraft = ({
 }: TBuildEmailDraftInput): TEmailDraft => ({
   sender,
   senderLogo: { url: senderLogoUrl },
-  copies: mapKeysToRecord(
-    EMAIL_TEMPLATE_TYPES,
-    (templateType) =>
-      Object.fromEntries(
-        liveLocales.map((locale) => {
-          const row = authored.find(
-            (entry) =>
-              entry.templateType === templateType && entry.locale === locale,
-          );
-          return [
-            locale,
-            { subject: row?.subject ?? '', body: row?.body ?? null },
-          ];
-        }),
-      ) as Record<TLocaleIsoCode, TEmailCopyDraft>,
+  copies: mapValues(EMAIL_TEMPLATE_TYPE, (templateType) =>
+    mapToObj(liveLocales, (locale) => {
+      const row = authored.find(
+        (entry) =>
+          entry.templateType === templateType && entry.locale === locale,
+      );
+      return [locale, { subject: row?.subject ?? '', body: row?.body ?? null }];
+    }),
   ),
-  templateLogos: mapKeysToRecord(EMAIL_TEMPLATE_TYPES, (templateType) => ({
+  templateLogos: mapValues(EMAIL_TEMPLATE_TYPE, (templateType) => ({
     url: templateLogoUrls[templateType],
   })),
 });

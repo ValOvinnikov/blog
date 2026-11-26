@@ -5,7 +5,8 @@ import {
 import type { TMaybeUndefined } from '@shinefold/config';
 import type { TUpdateTenantDetailsInput } from '@shinefold/db/queries/tenants/update-tenant-details/update-tenant-details';
 import type { TTenant } from '@shinefold/db/schema/tenants';
-import { isUndefined, objectKeys } from '@shinefold/utils/primitives';
+import { isUndefined } from '@shinefold/utils/primitives';
+import { keys } from 'remeda';
 
 type TComparedDetails = Omit<TUpdateTenantDetailsInput, 'ownerEmail'>;
 
@@ -21,7 +22,7 @@ export const changedTenantDetailsFields = (
   previous: TTenant,
   previousOwnerEmail: TMaybeUndefined<string>,
 ): TTenantDetailsField[] => [
-  ...objectKeys(COMPARED_FIELD)
+  ...keys(COMPARED_FIELD)
     .filter((key) => saved[key] !== previous[key])
     .map((key) => COMPARED_FIELD[key]),
   ...(isUndefined(previousOwnerEmail)

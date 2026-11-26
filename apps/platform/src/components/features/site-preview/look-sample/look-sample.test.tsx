@@ -60,9 +60,9 @@ import {
   SPINNER_STYLE,
   type IBusyStyle,
 } from '@shinefold/config';
-import { objectKeys } from '@shinefold/utils/primitives';
 import { SHINEFOLD_LOGO_NAME } from '@shinefold/utils/shinefold-logo';
 import type { CSSProperties } from 'react';
+import { keys } from 'remeda';
 
 import {
   LookSample,
@@ -82,7 +82,7 @@ const MOCK_LOGO_URL = faker.image.url();
 const CURRENT_LANGUAGE_TEST_ID = 'sample-language-code-current';
 const HARBOUR_NOTES = 'harbour notes';
 const HARBOUR_NOTES_INITIAL = 'H';
-const SKINS = objectKeys(SKIN_REGISTRY);
+const SKINS = keys(SKIN_REGISTRY);
 const SUBSCRIBE_BUTTONS_OUTSIDE_BANDS = 3;
 
 const {

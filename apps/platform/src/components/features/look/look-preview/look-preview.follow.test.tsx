@@ -21,13 +21,13 @@ import {
   RADIUS_SCALE,
   SKIN_REGISTRY,
 } from '@shinefold/config';
-import { objectKeys } from '@shinefold/utils/primitives';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
+import { keys } from 'remeda';
 
 import { LookPreview } from './look-preview';
 
 const LOOK_FOLLOW = messages.lookFollow;
-const BAND_COUNT = objectKeys(SKIN_REGISTRY).length;
+const BAND_COUNT = keys(SKIN_REGISTRY).length;
 const CARDS_PER_BAND = 1;
 const BUTTONS_PER_BAND = 2;
 const XL_CARD_RADIUS = RADIUS_DECLARATIONS[RADIUS_SCALE.XL][CARD_RADIUS_TOKEN];
