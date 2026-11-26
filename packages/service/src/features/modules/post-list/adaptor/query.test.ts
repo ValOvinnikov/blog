@@ -13,7 +13,7 @@ import {
   mockModuleDocument,
 } from '@shinefold/service/testing/modules/fixtures';
 import { mockRawPostListModule } from '@shinefold/service/testing/modules/post-list/fixtures';
-import { evaluateGroqExpression } from '@shinefold/service/testing/shared/groq';
+import { evaluateModuleQuery } from '@shinefold/service/testing/shared/groq';
 import { mockParagraphBlocks } from '@shinefold/service/testing/shared/localized';
 
 import { postListModuleQuery } from './query';
@@ -25,15 +25,11 @@ const MOCK_MODULE_DOCUMENT = mockModuleDocument({
   pageSize: MOCK_POST_LIST_PAGE_SIZE,
 });
 
-async function runPostList(locale: string, document = MOCK_MODULE_DOCUMENT) {
-  const raw = await evaluateGroqExpression(
-    postListModuleQuery.query,
-    [document],
-    undefined,
-    { id: MOCK_MODULE_ID, locale, defaultLocale: EN },
-  );
-
-  return postListModuleQuery.parse(raw);
+function runPostList(locale: string, document = MOCK_MODULE_DOCUMENT) {
+  return evaluateModuleQuery(postListModuleQuery, [document], {
+    id: MOCK_MODULE_ID,
+    locale,
+  });
 }
 
 describe('postListModuleQuery', () => {

@@ -15,7 +15,10 @@ import {
 } from '@shinefold/service/testing/modules/fixtures';
 import { mockRawPostFeaturedModule } from '@shinefold/service/testing/modules/post-featured/fixtures';
 import { mockReference } from '@shinefold/service/testing/shared/fixtures';
-import { evaluateGroqExpression } from '@shinefold/service/testing/shared/groq';
+import {
+  evaluateGroqExpression,
+  evaluateModuleQuery,
+} from '@shinefold/service/testing/shared/groq';
 import {
   mockLocalizedStrings,
   mockParagraphBlocks,
@@ -52,18 +55,14 @@ const MOCK_MODULE_DOCUMENT = mockModuleDocument({
   posts: [],
 });
 
-async function runPostFeatured(
+function runPostFeatured(
   locale: string,
   document: Record<string, unknown> = MOCK_MODULE_DOCUMENT,
 ) {
-  const raw = await evaluateGroqExpression(
-    postFeaturedModuleQuery.query,
-    [document],
-    undefined,
-    { id: MOCK_POST_FEATURED_ID, locale, defaultLocale: EN },
-  );
-
-  return postFeaturedModuleQuery.parse(raw);
+  return evaluateModuleQuery(postFeaturedModuleQuery, [document], {
+    id: MOCK_POST_FEATURED_ID,
+    locale,
+  });
 }
 
 describe('postFeaturedModuleQuery', () => {
@@ -236,8 +235,8 @@ describe('postFeaturedModuleQuery', () => {
     }
 
     async function runParsedPosts(module: Record<string, unknown>) {
-      const raw = await evaluateGroqExpression(
-        postFeaturedModuleQuery.query,
+      const { posts } = await evaluateModuleQuery(
+        postFeaturedModuleQuery,
         [
           { ...MOCK_MODULE_DOCUMENT, ...module },
           topic,
@@ -246,13 +245,10 @@ describe('postFeaturedModuleQuery', () => {
           postDocument(MOCK_NEWER_EN_ID, EN, '2026-01-02T00:00:00Z'),
           postDocument(MOCK_NEWER_NL_ID, NL, '2026-01-03T00:00:00Z'),
         ],
-        undefined,
-        { id: MOCK_POST_FEATURED_ID, locale: EN, defaultLocale: EN },
+        { id: MOCK_POST_FEATURED_ID, locale: EN },
       );
 
-      return postFeaturedModuleQuery
-        .parse(raw)
-        .posts?.map(({ post }) => post?._id);
+      return posts?.map(({ post }) => post?._id);
     }
 
     it('keeps the newest featured posts through parsing', async () => {

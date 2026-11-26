@@ -9,7 +9,7 @@ import {
   mockRawLogoWallModule,
 } from '@shinefold/service/testing/modules/fixtures';
 import { mockReference } from '@shinefold/service/testing/shared/fixtures';
-import { evaluateGroqExpression } from '@shinefold/service/testing/shared/groq';
+import { evaluateModuleQuery } from '@shinefold/service/testing/shared/groq';
 import {
   MOCK_IMAGE_ASSET_DOCUMENT,
   MOCK_IMAGE_ASSET_DOCUMENT_ID,
@@ -48,15 +48,12 @@ const MOCK_LOGO_WALL_DOCUMENT = {
   ],
 };
 
-async function runLogoWall(locale: string) {
-  const raw = await evaluateGroqExpression(
-    logoWallModuleQuery.query,
+function runLogoWall(locale: string) {
+  return evaluateModuleQuery(
+    logoWallModuleQuery,
     [MOCK_LOGO_WALL_DOCUMENT, MOCK_IMAGE_ASSET_DOCUMENT],
-    undefined,
-    { id: MOCK_LOGO_WALL_ID, locale, defaultLocale: EN },
+    { id: MOCK_LOGO_WALL_ID, locale },
   );
-
-  return logoWallModuleQuery.parse(raw);
 }
 
 describe('logoWallModuleQuery', () => {

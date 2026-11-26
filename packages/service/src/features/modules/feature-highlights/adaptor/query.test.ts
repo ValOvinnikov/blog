@@ -8,7 +8,7 @@ import {
   mockRawFeatureHighlightItem,
   mockRawFeatureHighlightsModule,
 } from '@shinefold/service/testing/modules/fixtures';
-import { evaluateGroqExpression } from '@shinefold/service/testing/shared/groq';
+import { evaluateModuleQuery } from '@shinefold/service/testing/shared/groq';
 import {
   MOCK_IMAGE_ASSET_DOCUMENT,
   mockLocalizedHeadingBlock,
@@ -86,18 +86,15 @@ const MOCK_FEATURE_HIGHLIGHTS_DOCUMENT = {
   ],
 };
 
-async function runFeatureHighlights(
+function runFeatureHighlights(
   document: Record<string, unknown>,
   locale: string,
 ) {
-  const raw = await evaluateGroqExpression(
-    featureHighlightsModuleQuery.query,
+  return evaluateModuleQuery(
+    featureHighlightsModuleQuery,
     [document, MOCK_IMAGE_ASSET_DOCUMENT],
-    undefined,
-    { id: MOCK_FEATURE_HIGHLIGHTS_ID, locale, defaultLocale: EN },
+    { id: MOCK_FEATURE_HIGHLIGHTS_ID, locale },
   );
-
-  return featureHighlightsModuleQuery.parse(raw);
 }
 
 function rowText(module: Awaited<ReturnType<typeof runFeatureHighlights>>) {

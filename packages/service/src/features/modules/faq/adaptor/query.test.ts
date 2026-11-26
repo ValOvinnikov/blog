@@ -3,7 +3,7 @@ import { BRAND_VARIANT, LOCALE_ISO_CODES } from '@shinefold/config/constants';
 import { mockRawFaqModule } from '@shinefold/service/testing/modules/faq/fixtures';
 import { MOCK_FAQ_MODULE_ID } from '@shinefold/service/testing/modules/fixtures';
 import { mockReference } from '@shinefold/service/testing/shared/fixtures';
-import { evaluateGroqExpression } from '@shinefold/service/testing/shared/groq';
+import { evaluateModuleQuery } from '@shinefold/service/testing/shared/groq';
 import {
   mockLocalizedHeadingBlock,
   mockLocalizedListedText,
@@ -78,15 +78,11 @@ const MOCK_FAQ_DATASET = [
   MOCK_UNTRANSLATED_QUESTION_DOCUMENT,
 ];
 
-async function runFaq(dataset: Record<string, unknown>[], locale: string) {
-  const raw = await evaluateGroqExpression(
-    faqModuleQuery.query,
-    dataset,
-    undefined,
-    { id: MOCK_FAQ_MODULE_ID, locale, defaultLocale: EN },
-  );
-
-  return faqModuleQuery.parse(raw);
+function runFaq(dataset: Record<string, unknown>[], locale: string) {
+  return evaluateModuleQuery(faqModuleQuery, dataset, {
+    id: MOCK_FAQ_MODULE_ID,
+    locale,
+  });
 }
 
 function questionText(module: Awaited<ReturnType<typeof runFaq>>) {
