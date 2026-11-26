@@ -15,8 +15,8 @@ import {
   PLAN_REGISTRY,
   SUBSCRIBER_BAND_CEILINGS,
 } from '@shinefold/db/constants';
-import { mapKeysToRecord } from '@shinefold/utils/primitives';
 import { PLAN_COMPARISON_ROW } from '@web/constants/pricing';
+import { mapValues } from 'remeda';
 
 type TPlanComparisonRow = TValueOf<typeof PLAN_COMPARISON_ROW>;
 
@@ -85,8 +85,5 @@ const PLAN_COMPARISON_READERS: Record<
 export const toPlanComparisonRows = (): IPlanComparisonRow[] =>
   Object.values(PLAN_COMPARISON_ROW).map((row) => ({
     row,
-    values: mapKeysToRecord(
-      PLAN_COMPARISON_PLANS,
-      PLAN_COMPARISON_READERS[row],
-    ),
+    values: mapValues(TENANT_PLAN, PLAN_COMPARISON_READERS[row]),
   }));
