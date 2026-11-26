@@ -13,10 +13,13 @@ import { isKnownFailure } from './contrast-known-failures';
 import { CONTRAST_PAIRS, type TContrastPair } from './contrast-pairs';
 import { SCHEME_RAMPS } from './contrast-scheme-ramps';
 import type { TContrastScope } from './contrast-tokens';
-import { PRESET_FILL_CONTRAST_PAIRS } from './preset-role-contrast-pairs';
+import {
+  PRESET_FILL_CONTRAST_PAIRS,
+  PRESET_ROLE_CONTRAST_PAIRS,
+} from './preset-role-contrast-pairs';
 import type { TPresetSurfaceColors } from './preset-surface-types';
 import { PRESET_SURFACES } from './preset-surfaces';
-import { SKIN_CONTRAST_PAIRS, skinScopeOf } from './skin-contrast';
+import { SKIN_CONTRAST_PAIRS, skinScopeOf, toSkinPairs } from './skin-contrast';
 import { SKIN_REGISTRY } from './skins';
 import type { TOklchRamp } from './theme-declarations';
 
@@ -25,6 +28,13 @@ export type TPresetSurfaceFailure = TContrastFailure & {
 };
 
 const COLOR_SCHEMES = Object.values(COLOR_SCHEME);
+
+const PAGE_PAIRS = { ...CONTRAST_PAIRS, ...PRESET_ROLE_CONTRAST_PAIRS };
+
+const BAND_PAIRS = {
+  ...SKIN_CONTRAST_PAIRS,
+  ...toSkinPairs(PRESET_ROLE_CONTRAST_PAIRS),
+};
 
 const rampOf = (colors: TPresetSurfaceColors): TOklchRamp =>
   Object.fromEntries(
@@ -64,7 +74,7 @@ export const findPresetSurfaceFailures = (
 
   const pageFailures = COLOR_SCHEMES.flatMap((scheme) =>
     failuresIn(
-      CONTRAST_PAIRS,
+      PAGE_PAIRS,
       {
         scheme,
         ramp: { ...SCHEME_RAMPS[scheme], ...rampOf(surfaces.page[scheme]) },
@@ -82,7 +92,7 @@ export const findPresetSurfaceFailures = (
         base,
       );
       return failuresIn(
-        SKIN_CONTRAST_PAIRS,
+        BAND_PAIRS,
         { scheme, ramp: { ...generic.ramp, ...rampOf(colors) } },
         hue,
       ).map((failure) => ({ ...failure, band }));

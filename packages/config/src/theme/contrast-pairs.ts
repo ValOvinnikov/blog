@@ -17,7 +17,6 @@ import {
 } from './contrast-surfaces';
 import { HEADER_CONTRAST_PAIRS } from './header-contrast-pairs';
 import { ITEM_CONTRAST_PAIRS } from './item-contrast-pairs';
-import { PRESET_ROLE_CONTRAST_PAIRS } from './preset-role-contrast-pairs';
 import { STATUS_CONTRAST_PAIRS } from './status-contrast-pairs';
 
 export type TThemeToken = `--${string}`;
@@ -113,7 +112,6 @@ export const CONTRAST_PAIRS = {
     followsAccentHue: true,
   },
   ...CODE_CONTRAST_PAIRS,
-  ...PRESET_ROLE_CONTRAST_PAIRS,
 } as const satisfies Record<string, TContrastPair>;
 
 export type TContrastPairId = keyof typeof CONTRAST_PAIRS;
