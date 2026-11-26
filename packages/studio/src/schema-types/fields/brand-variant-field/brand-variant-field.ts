@@ -1,10 +1,10 @@
 import { SKIN_REGISTRY } from '@shinefold/config';
 import { BRAND_VARIANT, type TBrandVariant } from '@shinefold/config/constants';
 import type { TMaybeUndefined } from '@shinefold/config/types';
-import { objectKeys } from '@shinefold/utils/primitives';
+import { keys } from 'remeda';
 import { defineField, type StringDefinition } from 'sanity';
 
-const brandVariantOptions = objectKeys(SKIN_REGISTRY).map((value) => ({
+const brandVariantOptions = keys(SKIN_REGISTRY).map((value) => ({
   title: SKIN_REGISTRY[value].title,
   value,
 }));
@@ -28,7 +28,7 @@ export const brandVariantField = ({
   title = 'Background',
   description = 'The background this section sits on.',
   descriptionSuffix = '',
-  list = objectKeys(SKIN_REGISTRY),
+  list = keys(SKIN_REGISTRY),
   initialValue = BRAND_VARIANT.PRIMARY,
   hidden,
   validation = (rule) => rule.required(),

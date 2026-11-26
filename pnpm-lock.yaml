@@ -969,6 +969,9 @@ importers:
       react-dom:
         specifier: 'catalog:'
         version: 19.3.1(react@19.3.1)
+      remeda:
+        specifier: 'catalog:'
+        version: 2.62.4
       sanity:
         specifier: ^6.24.0
         version: 6.24.0(d8bec2505e46aa91251f6fd1d77218b8)
