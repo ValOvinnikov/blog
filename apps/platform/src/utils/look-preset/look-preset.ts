@@ -10,6 +10,8 @@ export type TPresetSeededField =
   | 'cardStyle'
   | 'headerControlStyle'
   | 'headerControlShape'
+  | 'headerActionStyle'
+  | 'headerActionPhonePlacement'
   | 'navLinkStyle'
   | 'headingWeight'
   | 'headingCase'
@@ -26,6 +28,8 @@ const presetSeededValues = (preset: TPresetId): TPresetSeededValues => {
     cardStyle,
     headerControlStyle,
     headerControlShape,
+    headerActionStyle,
+    headerActionPhonePlacement,
     navLinkStyle,
     headingWeight,
     headingCase,
@@ -44,6 +48,8 @@ const presetSeededValues = (preset: TPresetId): TPresetSeededValues => {
     cardStyle,
     headerControlStyle,
     headerControlShape,
+    headerActionStyle,
+    headerActionPhonePlacement,
     navLinkStyle,
     headingWeight,
     headingCase,
@@ -94,6 +100,8 @@ export const switchPreset = (
     cardStyle: keepCustomised('cardStyle'),
     headerControlStyle: keepCustomised('headerControlStyle'),
     headerControlShape: keepCustomised('headerControlShape'),
+    headerActionStyle: keepCustomised('headerActionStyle'),
+    headerActionPhonePlacement: keepCustomised('headerActionPhonePlacement'),
     navLinkStyle: keepCustomised('navLinkStyle'),
     headingWeight: keepCustomised('headingWeight'),
     headingCase: keepCustomised('headingCase'),

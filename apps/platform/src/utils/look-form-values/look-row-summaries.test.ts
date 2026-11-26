@@ -17,6 +17,7 @@ import {
   FONT_CHOICE,
   FOOTER_LAYOUT,
   FOOTER_SURFACE,
+  HEADER_ACTION_STYLE,
   HEADER_BAR_STYLE,
   HEADER_CONTROL_STYLE,
   HEADER_LAYOUT,
@@ -48,6 +49,7 @@ const seedValues = () => ({
   density: DENSITY.DEFAULT,
   cardStyle: CARD_STYLE.ACCENT_BAR,
   headerControlStyle: HEADER_CONTROL_STYLE.OUTLINED,
+  headerActionStyle: HEADER_ACTION_STYLE.FILLED,
   buttonShape: BUTTON_SHAPE.ROUNDED,
   busyButtonStyle: BUSY_BUTTON_STYLE.LABEL,
   spinnerStyle: SPINNER_STYLE.BRAILLE,
@@ -73,7 +75,7 @@ describe(buildLookRowSummaries, () => {
       [LOOK_ROW.CARDS]: 'Accent bar',
       [LOOK_ROW.BUTTONS]: 'Rounded · Busy label · Braille',
       [LOOK_ROW.HEADER]:
-        'Classic · Full width · Dropdown · Plain · Outlined · Pill with label',
+        'Classic · Full width · Dropdown · Plain · Outlined · Filled action · Pill with label',
       [LOOK_ROW.FOOTER]:
         'Columns · Brand tint · Full width · Cookie link and button',
       [LOOK_ROW.LANGUAGE_SWITCHER]: 'Globe',
@@ -142,7 +144,20 @@ describe(buildLookRowSummaries, () => {
     const summaries = buildLookRowSummaries(values, t, MULTIPLE_LANGUAGES);
 
     expect(summaries[LOOK_ROW.HEADER]).toBe(
-      'Classic · Full width · Dropdown · Underline · Outlined · Pill with label',
+      'Classic · Full width · Dropdown · Underline · Outlined · Filled action · Pill with label',
+    );
+  });
+
+  it.each([
+    [HEADER_ACTION_STYLE.OUTLINED, 'Outlined action'],
+    [HEADER_ACTION_STYLE.PLAIN, 'Action as link'],
+  ])('reads the %s header action style', (headerActionStyle, reads) => {
+    const values = { ...seedValues(), headerActionStyle };
+
+    const summaries = buildLookRowSummaries(values, t, MULTIPLE_LANGUAGES);
+
+    expect(summaries[LOOK_ROW.HEADER]).toBe(
+      `Classic · Full width · Dropdown · Plain · Outlined · ${reads} · Pill with label`,
     );
   });
 

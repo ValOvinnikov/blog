@@ -931,6 +931,19 @@
       "ROUNDED": "Les coins suivent le réglage Coins du site",
       "SQUARE": "Coins carrés"
     },
+    "headerActionStyleLabel": "Style de l'action d'en-tête",
+    "headerActionStyleDescription": "La façon dont le lien d'action de l'en-tête est dessiné. Plein et À contour reprennent la couleur et la forme des boutons.",
+    "headerActionStyleOptionLabel": {
+      "FILLED": "Plein",
+      "OUTLINED": "À contour",
+      "PLAIN": "Lien simple"
+    },
+    "headerActionPhonePlacementLabel": "Sur téléphone",
+    "headerActionPhonePlacementDescription": "Où se trouve l'action d'en-tête sur téléphone : dans la barre à côté du bouton de menu, ou tout en haut du menu.",
+    "headerActionPhonePlacementOptionLabel": {
+      "BAR": "Dans la barre",
+      "MENU": "En haut du menu"
+    },
     "languageSwitcherLabel": "Sélecteur de langue",
     "languageSwitcherStyleLabel": "Style",
     "languageSwitcherDescription": "L'apparence du sélecteur de langue sur ordinateur, dans l'en-tête et le pied de page.",
@@ -1110,6 +1123,11 @@
       "ONLY": "Bouton des cookies flottant",
       "SHOWN": "Lien et bouton des cookies"
     },
+    "headerActionStyleSummary": {
+      "FILLED": "Action pleine",
+      "OUTLINED": "Action à contour",
+      "PLAIN": "Action en lien"
+    },
     "summaryOneLanguage": "Une seule langue"
   },
   "previewModeControl": {
@@ -1170,6 +1188,7 @@
     "themeToggleDark": "Passer au thème sombre",
     "themeToggleLight": "Passer au thème clair",
     "menuButton": "Menu",
+    "headerAction": "Nous contacter",
     "readerStateAriaLabel": "Lecteur",
     "readerSignedOut": "Déconnecté",
     "readerSignedIn": "Connecté",
@@ -2739,6 +2758,8 @@
       "cardStyle": "Style de carte",
       "headerControlStyle": "Boutons d'en-tête",
       "headerControlShape": "Forme des boutons d'en-tête",
+      "headerActionStyle": "Style de l'action d'en-tête",
+      "headerActionPhonePlacement": "Position de l'action d'en-tête sur téléphone",
       "accountButtonStyle": "Bouton du compte",
       "accountPanelStyle": "Panneau du compte",
       "accountPhonePlacement": "Position du compte sur téléphone",

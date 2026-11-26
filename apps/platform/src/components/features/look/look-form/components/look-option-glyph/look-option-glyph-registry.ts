@@ -22,6 +22,11 @@ import FooterLayoutColumns from '@platform/assets/look-glyphs/footer-layout-colu
 import FooterLayoutCompact from '@platform/assets/look-glyphs/footer-layout-compact.svg';
 import FooterSurfaceCard from '@platform/assets/look-glyphs/footer-surface-card.svg';
 import FooterSurfaceFullWidth from '@platform/assets/look-glyphs/footer-surface-full-width.svg';
+import HeaderActionPhonePlacementBar from '@platform/assets/look-glyphs/header-action-phone-placement-bar.svg';
+import HeaderActionPhonePlacementMenu from '@platform/assets/look-glyphs/header-action-phone-placement-menu.svg';
+import HeaderActionStyleFilled from '@platform/assets/look-glyphs/header-action-style-filled.svg';
+import HeaderActionStyleOutlined from '@platform/assets/look-glyphs/header-action-style-outlined.svg';
+import HeaderActionStylePlain from '@platform/assets/look-glyphs/header-action-style-plain.svg';
 import HeaderBarStyleFloating from '@platform/assets/look-glyphs/header-bar-style-floating.svg';
 import HeaderBarStyleFullWidth from '@platform/assets/look-glyphs/header-bar-style-full-width.svg';
 import HeaderControlShapeRound from '@platform/assets/look-glyphs/header-control-shape-round.svg';
@@ -57,6 +62,8 @@ import {
   DENSITY,
   FOOTER_LAYOUT,
   FOOTER_SURFACE,
+  HEADER_ACTION_PHONE_PLACEMENT,
+  HEADER_ACTION_STYLE,
   HEADER_BAR_STYLE,
   HEADER_CONTROL_SHAPE,
   HEADER_CONTROL_STYLE,
@@ -73,6 +80,8 @@ import {
   type TDensity,
   type TFooterLayout,
   type TFooterSurface,
+  type THeaderActionPhonePlacement,
+  type THeaderActionStyle,
   type THeaderBarStyle,
   type THeaderControlShape,
   type THeaderControlStyle,
@@ -90,6 +99,8 @@ type TLookOptionGlyphValues = {
   headerBarStyle: THeaderBarStyle;
   headerControlStyle: THeaderControlStyle;
   headerControlShape: THeaderControlShape;
+  headerActionStyle: THeaderActionStyle;
+  headerActionPhonePlacement: THeaderActionPhonePlacement;
   buttonShape: TButtonShape;
   busyButtonStyle: TBusyButtonStyle;
   accountButtonStyle: TAccountButtonStyle;
@@ -145,6 +156,15 @@ export const LOOK_OPTION_GLYPH_REGISTRY: TLookOptionGlyphRegistry = {
     [HEADER_CONTROL_SHAPE.ROUND]: HeaderControlShapeRound,
     [HEADER_CONTROL_SHAPE.ROUNDED]: HeaderControlShapeRounded,
     [HEADER_CONTROL_SHAPE.SQUARE]: HeaderControlShapeSquare,
+  },
+  headerActionStyle: {
+    [HEADER_ACTION_STYLE.FILLED]: HeaderActionStyleFilled,
+    [HEADER_ACTION_STYLE.OUTLINED]: HeaderActionStyleOutlined,
+    [HEADER_ACTION_STYLE.PLAIN]: HeaderActionStylePlain,
+  },
+  headerActionPhonePlacement: {
+    [HEADER_ACTION_PHONE_PLACEMENT.BAR]: HeaderActionPhonePlacementBar,
+    [HEADER_ACTION_PHONE_PLACEMENT.MENU]: HeaderActionPhonePlacementMenu,
   },
   buttonShape: {
     [BUTTON_SHAPE.SQUARE]: ButtonShapeSquare,

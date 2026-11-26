@@ -931,6 +931,19 @@
       "ROUNDED": "Ecken folgen der Ecken-Einstellung der Website",
       "SQUARE": "Eckige Ecken"
     },
+    "headerActionStyleLabel": "Stil der Header-Aktion",
+    "headerActionStyleDescription": "Wie der Aktionslink im Header gezeichnet wird. Gefüllt und Umrandet übernehmen Farbe und Form der Schaltflächen.",
+    "headerActionStyleOptionLabel": {
+      "FILLED": "Gefüllt",
+      "OUTLINED": "Umrandet",
+      "PLAIN": "Einfacher Link"
+    },
+    "headerActionPhonePlacementLabel": "Auf Telefonen",
+    "headerActionPhonePlacementDescription": "Wo die Header-Aktion auf Telefonen sitzt: in der Leiste neben der Menü-Schaltfläche oder ganz oben im Menü.",
+    "headerActionPhonePlacementOptionLabel": {
+      "BAR": "In der Leiste",
+      "MENU": "Oben im Menü"
+    },
     "languageSwitcherLabel": "Sprachauswahl",
     "languageSwitcherStyleLabel": "Stil",
     "languageSwitcherDescription": "Wie die Sprachauswahl auf dem Desktop in Kopf- und Fußzeile aussieht.",
@@ -1110,6 +1123,11 @@
       "ONLY": "Schwebende Cookie-Schaltfläche",
       "SHOWN": "Cookie-Link und -Schaltfläche"
     },
+    "headerActionStyleSummary": {
+      "FILLED": "Gefüllte Aktion",
+      "OUTLINED": "Umrandete Aktion",
+      "PLAIN": "Aktion als Link"
+    },
     "summaryOneLanguage": "Eine Sprache"
   },
   "previewModeControl": {
@@ -1170,6 +1188,7 @@
     "themeToggleDark": "Zum dunklen Design wechseln",
     "themeToggleLight": "Zum hellen Design wechseln",
     "menuButton": "Menü",
+    "headerAction": "Kontakt aufnehmen",
     "readerStateAriaLabel": "Leser",
     "readerSignedOut": "Abgemeldet",
     "readerSignedIn": "Angemeldet",
@@ -2739,6 +2758,8 @@
       "cardStyle": "Kartenstil",
       "headerControlStyle": "Header-Schaltflächen",
       "headerControlShape": "Form der Header-Schaltflächen",
+      "headerActionStyle": "Stil der Header-Aktion",
+      "headerActionPhonePlacement": "Position der Header-Aktion auf Telefonen",
       "accountButtonStyle": "Konto-Schaltfläche",
       "accountPanelStyle": "Konto-Bereich",
       "accountPhonePlacement": "Position des Kontos auf Telefonen",

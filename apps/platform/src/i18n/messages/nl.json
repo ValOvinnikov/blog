@@ -931,6 +931,19 @@
       "ROUNDED": "Hoeken volgen de instelling Hoeken van de site",
       "SQUARE": "Vierkante hoeken"
     },
+    "headerActionStyleLabel": "Stijl van de headeractie",
+    "headerActionStyleDescription": "Hoe de actielink in de header wordt getekend. Gevuld en Omlijnd nemen de kleur en vorm van de knoppen over.",
+    "headerActionStyleOptionLabel": {
+      "FILLED": "Gevuld",
+      "OUTLINED": "Omlijnd",
+      "PLAIN": "Gewone link"
+    },
+    "headerActionPhonePlacementLabel": "Op telefoons",
+    "headerActionPhonePlacementDescription": "Waar de headeractie op telefoons staat: in de balk naast de menuknop, of bovenaan in het menu.",
+    "headerActionPhonePlacementOptionLabel": {
+      "BAR": "In de balk",
+      "MENU": "Bovenaan in het menu"
+    },
     "languageSwitcherLabel": "Taalkeuze",
     "languageSwitcherStyleLabel": "Stijl",
     "languageSwitcherDescription": "Hoe de taalkeuze er op desktop uitziet, in de header en footer.",
@@ -1110,6 +1123,11 @@
       "ONLY": "Zwevende cookieknop",
       "SHOWN": "Cookielink en -knop"
     },
+    "headerActionStyleSummary": {
+      "FILLED": "Gevulde actie",
+      "OUTLINED": "Omlijnde actie",
+      "PLAIN": "Actie als link"
+    },
     "summaryOneLanguage": "Eén taal"
   },
   "previewModeControl": {
@@ -1170,6 +1188,7 @@
     "themeToggleDark": "Overschakelen naar donker thema",
     "themeToggleLight": "Overschakelen naar licht thema",
     "menuButton": "Menu",
+    "headerAction": "Neem contact op",
     "readerStateAriaLabel": "Lezer",
     "readerSignedOut": "Uitgelogd",
     "readerSignedIn": "Ingelogd",
@@ -2739,6 +2758,8 @@
       "cardStyle": "Kaartstijl",
       "headerControlStyle": "Headerknoppen",
       "headerControlShape": "Vorm van headerknoppen",
+      "headerActionStyle": "Stijl van de headeractie",
+      "headerActionPhonePlacement": "Positie van de headeractie op telefoons",
       "accountButtonStyle": "Accountknop",
       "accountPanelStyle": "Accountpaneel",
       "accountPhonePlacement": "Positie van het account op telefoons",

@@ -56,6 +56,18 @@ describe(`<${LookForm.name}/> Use preset value`, () => {
       chosen: LOOK_FORM.headerControlShapeOptionLabel.ROUNDED,
       preset: LOOK_FORM.headerControlShapeOptionLabel.ROUND,
     },
+    {
+      row: LOOK_ROW.HEADER,
+      label: LOOK_FORM.headerActionStyleLabel,
+      chosen: LOOK_FORM.headerActionStyleOptionLabel.OUTLINED,
+      preset: LOOK_FORM.headerActionStyleOptionLabel.FILLED,
+    },
+    {
+      row: LOOK_ROW.HEADER,
+      label: LOOK_FORM.headerActionPhonePlacementLabel,
+      chosen: LOOK_FORM.headerActionPhonePlacementOptionLabel.BAR,
+      preset: LOOK_FORM.headerActionPhonePlacementOptionLabel.MENU,
+    },
   ])(
     'puts $label back to the preset value',
     async ({ row, label, chosen, preset }) => {

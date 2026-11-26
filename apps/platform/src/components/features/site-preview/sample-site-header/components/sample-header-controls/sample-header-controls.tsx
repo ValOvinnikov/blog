@@ -1,3 +1,4 @@
+import { SampleHeaderAction } from '@platform/components/features/site-preview/sample-site-header/components/sample-header-action/sample-header-action';
 import { SampleAccountControl } from '@platform/components/features/site-preview/sample-site-header/components/sample-header-controls/components/sample-account-control/sample-account-control';
 import { SampleLanguageSwitcher } from '@platform/components/features/site-preview/sample-site-header/components/sample-header-controls/components/sample-language-switcher/sample-language-switcher';
 import type { TSampleReader } from '@platform/components/features/site-preview/sample-site-header/sample-reader';
@@ -26,7 +27,7 @@ export type TSampleHeaderControlsProps = IWithClassName & {
 
 export const SampleHeaderControls = ({
   liveLocales,
-  header: { layout, languageSwitcherStyle, account, hasThemeToggle },
+  header: { layout, languageSwitcherStyle, account, action, hasThemeToggle },
   reader,
   isDark,
   shouldAlwaysShowLanguageSwitcher,
@@ -59,6 +60,7 @@ export const SampleHeaderControls = ({
           reader={reader}
         />
       )}
+      <SampleHeaderAction actionStyle={action.style} />
       {layout === HEADER_LAYOUT.MENU_BUTTON && (
         <IconButton variant="circle" ariaLabel={menuLabel} title={menuLabel}>
           <Icon name={ICONS.MENU} size={SIZE.MD} />

@@ -17,6 +17,8 @@ import {
   type TFontChoice,
   type TFooterLayout,
   type TFooterSurface,
+  type THeaderActionPhonePlacement,
+  type THeaderActionStyle,
   type THeaderBarStyle,
   type THeaderControlShape,
   type THeaderControlStyle,
@@ -45,6 +47,8 @@ export type TLookFormValues = {
   cardStyle: TCardStyle;
   headerControlStyle: THeaderControlStyle;
   headerControlShape: THeaderControlShape;
+  headerActionStyle: THeaderActionStyle;
+  headerActionPhonePlacement: THeaderActionPhonePlacement;
   headerLayout: THeaderLayout;
   headerSubmenuStyle: THeaderSubmenuStyle;
   headerBarStyle: THeaderBarStyle;

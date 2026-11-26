@@ -19,6 +19,8 @@ export const toLookFormValues = (
     cardStyle: siteConfig.cardStyle,
     headerControlStyle: siteConfig.headerControlStyle,
     headerControlShape: siteConfig.headerControlShape,
+    headerActionStyle: siteConfig.headerActionStyle,
+    headerActionPhonePlacement: siteConfig.headerActionPhonePlacement,
     headerLayout: siteConfig.headerLayout,
     headerSubmenuStyle: siteConfig.headerSubmenuStyle,
     headerBarStyle: siteConfig.headerBarStyle,

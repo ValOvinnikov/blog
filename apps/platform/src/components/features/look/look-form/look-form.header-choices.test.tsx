@@ -15,6 +15,8 @@ import {
 import { setupLookForm } from '@platform/testing/look/look-form-setup';
 import { UNSAVED_CHANGES } from '@platform/testing/render-in-settings-form';
 import {
+  HEADER_ACTION_PHONE_PLACEMENT,
+  HEADER_ACTION_STYLE,
   HEADER_BAR_STYLE,
   HEADER_CONTROL_STYLE,
   HEADER_LAYOUT,
@@ -69,6 +71,20 @@ describe(`<${LookForm.name}/>`, () => {
         group: LOOK_FORM.navLinkStyleLabel,
         option: LOOK_FORM.navLinkStyleOptionLabel.SOFT,
         saved: { navLinkStyle: NAV_LINK_STYLE.SOFT },
+      },
+      {
+        row: LOOK_ROW.HEADER,
+        group: LOOK_FORM.headerActionStyleLabel,
+        option: LOOK_FORM.headerActionStyleOptionLabel.OUTLINED,
+        saved: { headerActionStyle: HEADER_ACTION_STYLE.OUTLINED },
+      },
+      {
+        row: LOOK_ROW.HEADER,
+        group: LOOK_FORM.headerActionPhonePlacementLabel,
+        option: LOOK_FORM.headerActionPhonePlacementOptionLabel.BAR,
+        saved: {
+          headerActionPhonePlacement: HEADER_ACTION_PHONE_PLACEMENT.BAR,
+        },
       },
     ])('saves the chosen $group style', (style) =>
       saveChosenStyle(user, style),

@@ -25,6 +25,7 @@ export const buildLookRowSummaries = (
     density,
     cardStyle,
     headerControlStyle,
+    headerActionStyle,
     buttonShape,
     busyButtonStyle,
     spinnerStyle,
@@ -81,6 +82,7 @@ export const buildLookRowSummaries = (
       t(`headerSubmenuStyleOptionLabel.${headerSubmenuStyle}`),
       t(`navLinkStyleOptionLabel.${navLinkStyle}`),
       t(`headerControlStyleOptionLabel.${headerControlStyle}`),
+      t(`headerActionStyleSummary.${headerActionStyle}`),
       t(`accountButtonStyleOptionLabel.${accountButtonStyle}`),
     ]),
     [LOOK_ROW.FOOTER]: join([

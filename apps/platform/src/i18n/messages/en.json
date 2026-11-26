@@ -931,6 +931,19 @@
       "ROUNDED": "Corners follow the site's Corners setting",
       "SQUARE": "Square corners"
     },
+    "headerActionStyleLabel": "Header action style",
+    "headerActionStyleDescription": "How the header's action link is drawn. Filled and Outlined take the button colour and shape.",
+    "headerActionStyleOptionLabel": {
+      "FILLED": "Filled",
+      "OUTLINED": "Outlined",
+      "PLAIN": "Plain link"
+    },
+    "headerActionPhonePlacementLabel": "On phones",
+    "headerActionPhonePlacementDescription": "Where the header action sits on phones: in the bar beside the menu button, or at the top of the menu.",
+    "headerActionPhonePlacementOptionLabel": {
+      "BAR": "In the bar",
+      "MENU": "At the top of the menu"
+    },
     "languageSwitcherLabel": "Language switcher",
     "languageSwitcherStyleLabel": "Style",
     "languageSwitcherDescription": "How the language switcher looks on desktop, in the header and footer.",
@@ -1110,6 +1123,11 @@
       "ONLY": "Floating cookie button",
       "SHOWN": "Cookie link and button"
     },
+    "headerActionStyleSummary": {
+      "FILLED": "Filled action",
+      "OUTLINED": "Outlined action",
+      "PLAIN": "Action as link"
+    },
     "summaryOneLanguage": "One language"
   },
   "previewModeControl": {
@@ -1170,6 +1188,7 @@
     "themeToggleDark": "Switch to dark theme",
     "themeToggleLight": "Switch to light theme",
     "menuButton": "Menu",
+    "headerAction": "Get in touch",
     "readerStateAriaLabel": "Reader",
     "readerSignedOut": "Signed out",
     "readerSignedIn": "Signed in",
@@ -2739,6 +2758,8 @@
       "cardStyle": "Card style",
       "headerControlStyle": "Header buttons",
       "headerControlShape": "Header buttons shape",
+      "headerActionStyle": "Header action style",
+      "headerActionPhonePlacement": "Header action position on phones",
       "accountButtonStyle": "Account button",
       "accountPanelStyle": "Account panel",
       "accountPhonePlacement": "Account position on phones",

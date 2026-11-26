@@ -6,6 +6,7 @@ import {
 } from '@platform/constants/sample-footer';
 import {
   SAMPLE_HEADER_BAR_STYLE_ATTRIBUTE,
+  SAMPLE_HEADER_BAR_TEST_ID,
   SAMPLE_HEADER_FULL_TEST_ID,
   SAMPLE_HEADER_LAYOUT_ATTRIBUTE,
   SAMPLE_HEADER_TEST_ID,
@@ -125,6 +126,34 @@ describe(`<${LookForm.name}/>`, () => {
         expect(sampleTokens).toHaveStyle({
           '--nav-link-decoration': 'underline',
         });
+      });
+
+      it('previews the header action in the full header and keeps it out of the phone bar', () => {
+        const fullHeader = screen.getByTestId(SAMPLE_HEADER_FULL_TEST_ID);
+        const bar = screen.getByTestId(SAMPLE_HEADER_BAR_TEST_ID);
+        const fullHeaderAction = within(fullHeader).queryByRole('link', {
+          name: LOOK_PREVIEW.headerAction,
+        });
+        const barAction = within(bar).queryByRole('link', {
+          name: LOOK_PREVIEW.headerAction,
+        });
+
+        expect(fullHeaderAction).toBeInTheDocument();
+        expect(barAction).not.toBeInTheDocument();
+      });
+
+      it('previews the header action in the phone bar once it sits in the bar', async () => {
+        await chooseSegment(
+          user,
+          LOOK_FORM.headerActionPhonePlacementLabel,
+          LOOK_FORM.headerActionPhonePlacementOptionLabel.BAR,
+        );
+
+        const bar = screen.getByTestId(SAMPLE_HEADER_BAR_TEST_ID);
+        const barAction = within(bar).queryByRole('link', {
+          name: LOOK_PREVIEW.headerAction,
+        });
+        expect(barAction).toBeInTheDocument();
       });
 
       it('previews the chosen header buttons shape before saving', async () => {

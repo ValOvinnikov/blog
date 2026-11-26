@@ -44,7 +44,8 @@ export const SampleSiteHeader = ({
   isSubmenuOpen,
   shouldAlwaysShowLanguageSwitcher = false,
 }: TSampleSiteHeaderProps) => {
-  const { layout, submenuStyle, barStyle, background, account } = header;
+  const { layout, submenuStyle, barStyle, background, account, action } =
+    header;
   const { root, full, bar, group, links, controls } = sampleSiteHeaderVariants({
     barStyle,
     layout,
@@ -86,6 +87,7 @@ export const SampleSiteHeader = ({
       <SampleHeaderBar
         brand={{ name, logoSrc }}
         account={account}
+        action={action}
         reader={reader}
         className={bar()}
       />

@@ -1,10 +1,13 @@
+import { SampleHeaderAction } from '@platform/components/features/site-preview/sample-site-header/components/sample-header-action/sample-header-action';
 import { SampleHeaderBrand } from '@platform/components/features/site-preview/sample-site-header/components/sample-header-brand/sample-header-brand';
 import { SampleAccountControl } from '@platform/components/features/site-preview/sample-site-header/components/sample-header-controls/components/sample-account-control/sample-account-control';
 import type { TSampleReader } from '@platform/components/features/site-preview/sample-site-header/sample-reader';
 import { SAMPLE_HEADER_BAR_TEST_ID } from '@platform/constants/sample-header';
+import type { TSampleHeaderStyle } from '@platform/utils/sample-header-style/sample-header-style';
 import {
   ACCOUNT_BUTTON_STYLE,
   ACCOUNT_PHONE_PLACEMENT,
+  HEADER_ACTION_PHONE_PLACEMENT,
   ICONS,
   SIZE,
   type IAccountControl,
@@ -20,12 +23,14 @@ import { sampleHeaderBarVariants } from './sample-header-bar-variants';
 export type TSampleHeaderBarProps = IWithClassName & {
   brand: { name: string; logoSrc: TMaybeUndefined<string> };
   account: IAccountControl;
+  action: TSampleHeaderStyle['action'];
   reader: TSampleReader;
 };
 
 export const SampleHeaderBar = ({
   brand: { name, logoSrc },
   account,
+  action,
   reader,
   className,
 }: TSampleHeaderBarProps) => {
@@ -35,6 +40,7 @@ export const SampleHeaderBar = ({
   const hasAccount =
     reader.hasAccounts &&
     account.phonePlacement !== ACCOUNT_PHONE_PLACEMENT.MENU;
+  const hasAction = action.phonePlacement === HEADER_ACTION_PHONE_PLACEMENT.BAR;
 
   return (
     <div
@@ -50,6 +56,7 @@ export const SampleHeaderBar = ({
             reader={reader}
           />
         )}
+        {hasAction && <SampleHeaderAction actionStyle={action.style} />}
         <IconButton
           variant="circle"
           ariaLabel={menuLabel}

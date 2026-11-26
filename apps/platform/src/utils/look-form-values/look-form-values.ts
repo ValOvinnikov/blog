@@ -34,6 +34,8 @@ export const CARD_FIELDS = {
     'navLinkStyle',
     'headerControlStyle',
     'headerControlShape',
+    'headerActionStyle',
+    'headerActionPhonePlacement',
     'accountButtonStyle',
     'accountPanelStyle',
     'accountPhonePlacement',

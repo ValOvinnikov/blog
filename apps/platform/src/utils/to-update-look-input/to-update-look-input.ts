@@ -14,6 +14,8 @@ export const toUpdateLookInput = (
   cardStyle: values.cardStyle,
   headerControlStyle: values.headerControlStyle,
   headerControlShape: values.headerControlShape,
+  headerActionStyle: values.headerActionStyle,
+  headerActionPhonePlacement: values.headerActionPhonePlacement,
   headerLayout: values.headerLayout,
   headerSubmenuStyle: values.headerSubmenuStyle,
   headerBarStyle: values.headerBarStyle,
