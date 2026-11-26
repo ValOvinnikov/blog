@@ -149,3 +149,8 @@ export const QuietShinefoldPreset: TStory = {
   ...Quiet,
   ...SHINEFOLD_PRESET_STORY,
 };
+
+export const NavShinefoldPreset: TStory = {
+  ...Nav,
+  ...SHINEFOLD_PRESET_STORY,
+};

@@ -3,6 +3,7 @@ import {
   FOCUS_RING,
   LINK_UNDERLINE_AT_REST,
   LINK_UNDERLINE_EMPHASIS,
+  STANDALONE_LINK_HOVER_UNDERLINE,
   TRANSITION_COLORS,
   tv,
   TYPOGRAPHY,
@@ -105,6 +106,12 @@ export const textLinkVariants = tv({
       isCurrent: true,
       hasHref: true,
       class: { root: ['hover:text-brand-primary-hover'] },
+    },
+    {
+      appearance: ['nav', 'quiet'],
+      isCurrent: false,
+      hasHref: true,
+      class: { root: STANDALONE_LINK_HOVER_UNDERLINE },
     },
     {
       appearance: 'nav',

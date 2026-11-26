@@ -12,6 +12,7 @@ export { CARD_CONTAINER, INTERACTIVE_ITEM_CARD } from './item-card';
 export {
   LINK_UNDERLINE,
   LINK_UNDERLINE_AT_REST,
+  STANDALONE_LINK_HOVER_UNDERLINE,
   LINK_UNDERLINE_EMPHASIS,
 } from './link-underline';
 export { MENU_ROW } from './menu-row';
