@@ -6,13 +6,11 @@ import {
 } from '@shinefold/config';
 import { TENANT_PLAN } from '@shinefold/config/constants';
 import { MOCK_YELLOW_HEX } from '@shinefold/config/testing/button-colors';
-import {
-  getSiteConfig,
-  type TSiteConfigResult,
-} from '@shinefold/db/queries/site-config';
+import { getSiteConfig } from '@shinefold/db/queries/site-config';
 import { getTenantEntitlements } from '@shinefold/db/queries/tenant-entitlement-grants';
 import { getTenantById } from '@shinefold/db/queries/tenants';
 import { MOCK_ACCENT_HUE } from '@shinefold/db/testing/site-config/fixtures';
+import { mockSiteConfigResult } from '@shinefold/db/testing/site-config/mock-site-config-result';
 import { resolveTenantEntitlements } from '@shinefold/db/utils/resolve-tenant-entitlements/resolve-tenant-entitlements';
 import { MOCK_UNSUBSCRIBE_KEY } from '@worker/testing/newsletter-send/fixtures';
 import { MOCK_TENANT_ID, mockTenant } from '@worker/testing/tenant/fixtures';
@@ -53,7 +51,7 @@ describe(loadNewsletterSendContext, () => {
   beforeEach(() => {
     mockEnv.NEWSLETTER_UNSUBSCRIBE_KEY = MOCK_UNSUBSCRIBE_KEY;
     vi.mocked(getSiteConfig).mockResolvedValue(
-      MOCK_STORED_LOOK as TSiteConfigResult,
+      mockSiteConfigResult(MOCK_STORED_LOOK),
     );
   });
 
