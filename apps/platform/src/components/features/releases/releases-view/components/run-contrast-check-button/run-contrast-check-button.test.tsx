@@ -19,9 +19,11 @@ const RUN_CONTRAST_CHECK = { name: 'Run contrast check' };
 const STARTED = 'Contrast check started.';
 const START_FAILED = 'The contrast check could not be started.';
 
+const onStarted = vi.fn();
+
 const setup = customRender(RunContrastCheckButton, {
   isRunning: false,
-  onStarted: vi.fn(),
+  onStarted,
 });
 
 describe(`<${RunContrastCheckButton.name}/>`, () => {
@@ -41,27 +43,6 @@ describe(`<${RunContrastCheckButton.name}/>`, () => {
       .mockResolvedValue({ outcome: ACTION_OUTCOME.SUCCESS });
   });
 
-  it('starts the check, confirms it and refreshes the page', async () => {
-    setup();
-
-    await run();
-
-    const confirmation = await screen.findByText(STARTED);
-
-    expect(startContrastCheckActionMock).toHaveBeenCalledOnce();
-    expect(confirmation).toBeVisible();
-    expect(refresh).toHaveBeenCalledOnce();
-  });
-
-  it('tells its parent once the check has started', async () => {
-    const onStarted = vi.fn();
-    setup({ onStarted });
-
-    await run();
-
-    await waitFor(() => expect(onStarted).toHaveBeenCalledOnce());
-  });
-
   it('cannot be started while a run is in progress', () => {
     setup({ isRunning: true });
 
@@ -70,56 +51,78 @@ describe(`<${RunContrastCheckButton.name}/>`, () => {
     expect(runButton).toBeDisabled();
   });
 
-  it('says a check is already running and starts nothing when refused', async () => {
-    startContrastCheckActionMock.mockResolvedValue({
-      outcome: ACTION_OUTCOME.REFUSED,
-      reason: RELEASE_REFUSAL.CONTRAST_CHECK_RUNNING,
+  describe('when idle', () => {
+    beforeEach(() => {
+      setup();
     });
-    const onStarted = vi.fn();
-    setup({ onStarted });
 
-    await run();
+    describe('once started', () => {
+      beforeEach(async () => {
+        await run();
+      });
 
-    const refusal = await screen.findByText(
-      'A contrast check is already running.',
-    );
+      it('confirms the check and refreshes the page', async () => {
+        const confirmation = await screen.findByText(STARTED);
 
-    expect(refusal).toBeVisible();
-    expect(refresh).not.toHaveBeenCalled();
-    expect(onStarted).not.toHaveBeenCalled();
-  });
+        expect(startContrastCheckActionMock).toHaveBeenCalledOnce();
+        expect(confirmation).toBeVisible();
+        expect(refresh).toHaveBeenCalledOnce();
+      });
 
-  it.each([
-    [
-      ACTION_OUTCOME.UNAVAILABLE,
-      'GitHub could not be reached. Try again in a moment.',
-    ],
-    [ACTION_OUTCOME.SERVER_ERROR, START_FAILED],
-  ])('explains a %s answer', async (outcome, message) => {
-    startContrastCheckActionMock.mockResolvedValue({ outcome });
-    setup();
+      it('tells its parent', async () => {
+        await waitFor(() => expect(onStarted).toHaveBeenCalledOnce());
+      });
+    });
 
-    await run();
+    it('says a check is already running and starts nothing when refused', async () => {
+      startContrastCheckActionMock.mockResolvedValue({
+        outcome: ACTION_OUTCOME.REFUSED,
+        reason: RELEASE_REFUSAL.CONTRAST_CHECK_RUNNING,
+      });
 
-    const explanation = await screen.findByText(message);
+      await run();
 
-    expect(explanation).toBeVisible();
-  });
+      const refusal = await screen.findByText(
+        'A contrast check is already running.',
+      );
 
-  it('says the check could not start when the request never reaches the server, and starts it on retry', async () => {
-    startContrastCheckActionMock.mockRejectedValueOnce(MOCK_UNREACHED_REQUEST);
-    setup();
+      expect(refusal).toBeVisible();
+      expect(refresh).not.toHaveBeenCalled();
+      expect(onStarted).not.toHaveBeenCalled();
+    });
 
-    await run();
+    it.each([
+      [
+        ACTION_OUTCOME.UNAVAILABLE,
+        'GitHub could not be reached. Try again in a moment.',
+      ],
+      [ACTION_OUTCOME.SERVER_ERROR, START_FAILED],
+    ])('explains a %s answer', async (outcome, message) => {
+      startContrastCheckActionMock.mockResolvedValue({ outcome });
 
-    const failure = await screen.findByText(START_FAILED);
+      await run();
 
-    expect(failure).toBeVisible();
+      const explanation = await screen.findByText(message);
 
-    await run();
+      expect(explanation).toBeVisible();
+    });
 
-    const confirmation = await screen.findByText(STARTED);
+    it('reports an unreached request and starts the check on retry', async () => {
+      startContrastCheckActionMock.mockRejectedValueOnce(
+        MOCK_UNREACHED_REQUEST,
+      );
 
-    expect(confirmation).toBeVisible();
+      await run();
+
+      const failure = await screen.findByText(START_FAILED);
+
+      expect(failure).toBeVisible();
+
+      await run();
+
+      const confirmation = await screen.findByText(STARTED);
+
+      expect(confirmation).toBeVisible();
+    });
   });
 });

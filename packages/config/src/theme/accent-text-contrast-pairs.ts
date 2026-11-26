@@ -1,7 +1,7 @@
 import { CONTRAST_ROLE } from '@shinefold/config/constants';
 
 import type { TContrastPair } from './contrast-pairs';
-import { BANDS } from './contrast-surfaces';
+import { BANDS, HEADING_HIGHLIGHT } from './contrast-surfaces';
 
 export const ACCENT_TEXT_CONTRAST_PAIRS = {
   INFO: {
@@ -11,7 +11,7 @@ export const ACCENT_TEXT_CONTRAST_PAIRS = {
     followsAccentHue: true,
   },
   HEADING_HIGHLIGHT: {
-    foreground: '--heading-highlight',
+    foreground: HEADING_HIGHLIGHT,
     surfaces: BANDS,
     role: CONTRAST_ROLE.TEXT,
     followsAccentHue: true,

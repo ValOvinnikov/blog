@@ -65,9 +65,11 @@ export const partsOf = (surface: TThemeToken): TThemeToken[] => {
 const isSkinSurface = (surface: TThemeToken): boolean =>
   partsOf(surface).every(isSkinRole);
 
-export const SKIN_CONTRAST_PAIRS: Record<string, TContrastPair> =
+export const toSkinPairs = (
+  pairs: Record<string, TContrastPair>,
+): Record<string, TContrastPair> =>
   Object.fromEntries(
-    Object.entries(CONTRAST_PAIRS).flatMap(([id, pair]) => {
+    Object.entries(pairs).flatMap(([id, pair]) => {
       if (KNOWN_FAILING_PAIRS.has(id)) return [];
       const surfaces = [
         ...new Set(
@@ -84,12 +86,14 @@ export const SKIN_CONTRAST_PAIRS: Record<string, TContrastPair> =
     }),
   );
 
+export const SKIN_CONTRAST_PAIRS = toSkinPairs(CONTRAST_PAIRS);
+
 export const effectiveSchemeOf = (
   mode: TSkinMode,
   scheme: TColorScheme,
 ): TColorScheme => (mode === SKIN_MODE.INVERSE ? COLOR_SCHEME.DARK : scheme);
 
-const skinScopeOf = (
+export const skinScopeOf = (
   roles: TSkinRoles,
   scheme: TColorScheme,
   effectiveScheme: TColorScheme,

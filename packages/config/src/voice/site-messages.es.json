@@ -82,7 +82,8 @@
   },
   "sectionNavigation": {
     "label": "En esta sección",
-    "backTo": "Volver a {title}"
+    "backTo": "Volver a {title}",
+    "adjacentPages": "Páginas anterior y siguiente"
   },
   "topicPage": {
     "empty": "Todavía no hay artículos sobre {name}.",

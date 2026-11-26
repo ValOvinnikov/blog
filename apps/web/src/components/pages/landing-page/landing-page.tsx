@@ -15,15 +15,7 @@ export const LandingPage = async ({ path }: TLandingPageProps) => {
   const page = guardPageLoaderResult(result, 'landing_page.fetch_failed', {
     path,
   });
-  const {
-    id,
-    headingBlock,
-    headingAlignment,
-    hero,
-    modules,
-    faqs,
-    sectionNavigation,
-  } = page;
+  const { id, headingBlock, headingAlignment, hero, modules, faqs } = page;
 
   return (
     <PageShell>
@@ -37,7 +29,7 @@ export const LandingPage = async ({ path }: TLandingPageProps) => {
         headingAlignment={headingAlignment}
         modules={modules}
         landingPage={{ id, path }}
-        sectionNavigation={sectionNavigation}
+        navigation={page}
       />
     </PageShell>
   );

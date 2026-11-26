@@ -8,7 +8,10 @@ import {
 } from '@shinefold/config/constants';
 import { MOCK_HERO_MODULE_ID } from '@shinefold/service/testing/pages/fixtures';
 import { mockReference } from '@shinefold/service/testing/shared/fixtures';
-import { evaluateGroqExpression } from '@shinefold/service/testing/shared/groq';
+import {
+  evaluateGroqExpression,
+  evaluateModuleQuery,
+} from '@shinefold/service/testing/shared/groq';
 import {
   MOCK_IMAGE_ASSET_DOCUMENT,
   mockLocalizedImage,
@@ -60,25 +63,19 @@ const MOCK_HERO_DOCUMENT = {
   image: mockLocalizedImage({ [EN]: MOCK_EN_COPY.alt, [NL]: MOCK_NL_COPY.alt }),
 };
 
-async function evaluateHero(
-  module: Record<string, unknown>,
-  locale: string,
-  dataset: unknown[] = [],
-) {
-  return evaluateGroqExpression(
-    heroBlogModuleQuery.query,
-    [
-      { ...MOCK_HERO_DOCUMENT, ...module },
-      MOCK_IMAGE_ASSET_DOCUMENT,
-      ...dataset,
-    ],
-    undefined,
-    { id: MOCK_HERO_MODULE_ID, locale, defaultLocale: EN },
-  );
+function heroDataset(module: Record<string, unknown>, dataset: unknown[] = []) {
+  return [
+    { ...MOCK_HERO_DOCUMENT, ...module },
+    MOCK_IMAGE_ASSET_DOCUMENT,
+    ...dataset,
+  ];
 }
 
-async function runHero(module: Record<string, unknown>, locale: string) {
-  return heroBlogModuleQuery.parse(await evaluateHero(module, locale));
+function runHero(module: Record<string, unknown>, locale: string) {
+  return evaluateModuleQuery(heroBlogModuleQuery, heroDataset(module), {
+    id: MOCK_HERO_MODULE_ID,
+    locale,
+  });
 }
 
 describe('heroBlogModuleQuery', () => {
@@ -117,10 +114,11 @@ describe('heroBlogModuleQuery', () => {
 
   describe('language scoping', () => {
     async function runRaw(module: Record<string, unknown>, locale: string) {
-      return (await evaluateHero(
-        module,
-        locale,
-        MOCK_PINNED_POST_DOCUMENTS,
+      return (await evaluateGroqExpression(
+        heroBlogModuleQuery.query,
+        heroDataset(module, MOCK_PINNED_POST_DOCUMENTS),
+        undefined,
+        { id: MOCK_HERO_MODULE_ID, locale, defaultLocale: EN },
       )) as {
         post: { _id: string } | null;
         hasPinnedPost: boolean;

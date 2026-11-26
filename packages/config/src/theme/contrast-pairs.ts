@@ -6,6 +6,7 @@ import {
   BANDS,
   BRAND_PRIMARY,
   BRAND_PRIMARY_CONTRAST,
+  BRAND_PRIMARY_HOVER,
   BRAND_PRIMARY_MUTED,
   FIELD_SURFACES,
   FILLED_ITEM_SURFACES,
@@ -47,7 +48,7 @@ export const CONTRAST_PAIRS = {
     followsAccentHue: true,
   },
   BRAND_PRIMARY_HOVER: {
-    foreground: '--brand-primary-hover',
+    foreground: BRAND_PRIMARY_HOVER,
     surfaces: FILLED_ITEM_SURFACES,
     role: CONTRAST_ROLE.TEXT,
     followsAccentHue: true,

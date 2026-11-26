@@ -17,7 +17,7 @@ import {
   mockRawPortableTextMarkDef,
   mockReference,
 } from '@shinefold/service/testing/shared/fixtures';
-import { evaluateGroqExpression } from '@shinefold/service/testing/shared/groq';
+import { evaluateModuleQuery } from '@shinefold/service/testing/shared/groq';
 import {
   MOCK_IMAGE_ASSET_DOCUMENT,
   mockLocalizedHeadingBlock,
@@ -85,23 +85,20 @@ const MOCK_UNTRANSLATED_TESTIMONIAL = {
   role: mockLocalizedStrings({ [EN]: MOCK_UNTRANSLATED_ROLE }),
 };
 
-async function runTestimonial(
+function runTestimonial(
   locale: string,
   moduleDocument: Record<string, unknown> = MOCK_TESTIMONIAL_MODULE_DOCUMENT,
 ) {
-  const raw = await evaluateGroqExpression(
-    testimonialModuleQuery.query,
+  return evaluateModuleQuery(
+    testimonialModuleQuery,
     [
       moduleDocument,
       MOCK_TRANSLATED_TESTIMONIAL,
       MOCK_UNTRANSLATED_TESTIMONIAL,
       MOCK_IMAGE_ASSET_DOCUMENT,
     ],
-    undefined,
-    { id: MOCK_TESTIMONIAL_MODULE_ID, locale, defaultLocale: EN },
+    { id: MOCK_TESTIMONIAL_MODULE_ID, locale },
   );
-
-  return testimonialModuleQuery.parse(raw);
 }
 
 function testimonialText(module: Awaited<ReturnType<typeof runTestimonial>>) {
