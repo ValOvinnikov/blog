@@ -82,7 +82,8 @@
   },
   "sectionNavigation": {
     "label": "In deze sectie",
-    "backTo": "Terug naar {title}"
+    "backTo": "Terug naar {title}",
+    "adjacentPages": "Vorige en volgende pagina"
   },
   "topicPage": {
     "empty": "Nog geen berichten over {name}.",

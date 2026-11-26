@@ -3,25 +3,18 @@ import {
   buildTenantListCriteria,
   type TTenantListFilters,
 } from '@shinefold/db/queries/tenants/tenant-list-criteria';
-import { tenants, type TTenant } from '@shinefold/db/schema/tenants';
+import {
+  tenantsPageRowColumns,
+  toTenantsPageRow,
+  type TTenantsPageRow,
+} from '@shinefold/db/queries/tenants/tenants-page-row';
+import { tenants } from '@shinefold/db/schema/tenants';
 import { count, sql } from 'drizzle-orm';
 
 export type TTenantsPageRequest = TTenantListFilters & {
   page: number;
   pageSize: number;
 };
-
-export type TTenantsPageRow = Pick<
-  TTenant,
-  | 'id'
-  | 'name'
-  | 'primaryDomain'
-  | 'plan'
-  | 'status'
-  | 'provisioningStatus'
-  | 'deprovisionedAt'
-  | 'createdAt'
-> & { matchedDomain?: string };
 
 export type TTenantsPage = {
   rows: TTenantsPageRow[];
@@ -50,14 +43,7 @@ export async function listTenantsPage({
 
   const pageRows = await db
     .select({
-      id: tenants.id,
-      name: tenants.name,
-      primaryDomain: tenants.primaryDomain,
-      plan: tenants.plan,
-      status: tenants.status,
-      provisioningStatus: tenants.provisioningStatus,
-      deprovisionedAt: tenants.deprovisionedAt,
-      createdAt: tenants.createdAt,
+      ...tenantsPageRowColumns,
       matchedDomain,
       total: sql<number>`count(*) over ()`.mapWith(Number),
     })
@@ -75,17 +61,7 @@ export async function listTenantsPage({
       : 0;
 
   return {
-    rows: pageRows.map((row) => ({
-      id: row.id,
-      name: row.name,
-      primaryDomain: row.primaryDomain,
-      plan: row.plan,
-      status: row.status,
-      provisioningStatus: row.provisioningStatus,
-      deprovisionedAt: row.deprovisionedAt,
-      createdAt: row.createdAt,
-      matchedDomain: row.matchedDomain ?? undefined,
-    })),
+    rows: pageRows.map(toTenantsPageRow),
     total,
   };
 }

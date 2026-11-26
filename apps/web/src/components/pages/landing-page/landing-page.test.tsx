@@ -8,6 +8,7 @@ import { LANDING_PAGE_LOG } from '@web/constants/landing-page';
 import { permanentRedirect } from '@web/i18n/navigation';
 import { customRenderServerAsync } from '@web/testing/custom-render';
 import {
+  mockLandingAdjacentPages,
   mockLandingSectionNavigation,
   MOCK_LANDING_PAGE,
 } from '@web/testing/pages/landing-page/fixtures';
@@ -124,9 +125,14 @@ describe(`<${LandingPage.name}/>`, () => {
     expect(readJsonLd()).toContain(MOCK_FAQ_PAGE_JSON_LD_FRAGMENT);
   });
 
-  it('hands the hero, heading, modules and section navigation to the module renderer', async () => {
-    const sectionNavigation = mockLandingSectionNavigation();
-    resolvePageWith({ hero: MOCK_HERO, sectionNavigation });
+  it('hands the hero, heading, modules and navigation to the module renderer', async () => {
+    const page = {
+      ...MOCK_LANDING_PAGE,
+      hero: MOCK_HERO,
+      sectionNavigation: mockLandingSectionNavigation(),
+      adjacentPages: mockLandingAdjacentPages(),
+    };
+    getPageMock.mockResolvedValueOnce(okResult(page));
 
     await setup();
 
@@ -136,7 +142,7 @@ describe(`<${LandingPage.name}/>`, () => {
       headingAlignment: MOCK_LANDING_PAGE.headingAlignment,
       modules: MOCK_LANDING_PAGE.modules,
       landingPage: { id: MOCK_LANDING_PAGE.id, path: MOCK_LANDING_PATH },
-      sectionNavigation,
+      navigation: page,
     });
   });
 });

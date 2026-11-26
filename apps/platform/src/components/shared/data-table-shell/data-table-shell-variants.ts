@@ -46,6 +46,7 @@ export const dataTableShellVariants = tv({
     ],
     footer: [
       'flex flex-wrap items-center justify-between gap-2',
+      'max-md:flex-col max-md:items-stretch',
       'border-t border-platform-line-2 px-platform-cell-inset py-3',
       'text-platform-13 text-platform-muted',
     ],
