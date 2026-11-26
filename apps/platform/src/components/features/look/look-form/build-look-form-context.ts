@@ -30,6 +30,7 @@ type TBuildLookFormContextArgs = Pick<
   | 'updateField'
   | 'accentHueFieldId'
   | 'brandNameFieldId'
+  | 'buttonColorFieldIds'
   | 'repickKinds'
   | 'brandAssetFieldIds'
   | 'brandImageError'

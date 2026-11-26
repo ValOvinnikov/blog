@@ -67,6 +67,8 @@ export const applyPresetDefaults = (
   ...presetSeededValues(preset),
   preset,
   logoHue: undefined,
+  buttonColor: undefined,
+  buttonColorDark: undefined,
 });
 
 /** A seeded option still at the old preset's value takes the new preset's; one the owner changed is kept. */

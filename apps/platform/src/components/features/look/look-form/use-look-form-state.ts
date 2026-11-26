@@ -12,12 +12,13 @@ import {
   restoreLookDraft,
 } from '@platform/utils/look-form-values/look-form-values';
 import { useTranslations } from 'next-intl';
-import { useId, useState } from 'react';
+import { useState } from 'react';
 
 import { buildLookFormContext } from './build-look-form-context';
 import type { TLookFormTenant } from './look-form-tenant';
 import { canSaveLook, lookInvalidControls } from './look-save-checks';
 import { useBrandAssetFieldIds } from './use-brand-asset-field-ids';
+import { useCheckedFieldIds } from './use-checked-field-ids';
 import { useLookDraftFields } from './use-look-draft-fields';
 import { useLookSave } from './use-look-save';
 import { useLookSaveErrors } from './use-look-save-errors';
@@ -37,8 +38,7 @@ export const useLookFormState = ({
   revealInvalidField,
 }: TUseLookFormStateArgs) => {
   const { id: tenantId, name: tenantName, grants, archivedAt } = tenant;
-  const accentHueFieldId = useId();
-  const brandNameFieldId = useId();
+  const fieldIds = useCheckedFieldIds();
   const brandAssetFieldIds = useBrandAssetFieldIds();
   const toast = useToast();
   const t = useTranslations('lookForm');
@@ -71,11 +71,7 @@ export const useLookFormState = ({
     countChanges,
     canSave: canSaveLook,
     invalidControls: (checked) =>
-      lookInvalidControls(
-        checked,
-        { accentHue: accentHueFieldId, brandName: brandNameFieldId },
-        revealInvalidField,
-      ),
+      lookInvalidControls(checked, fieldIds, revealInvalidField),
     draft: {
       tenantId,
       page: 'look',
@@ -109,8 +105,12 @@ export const useLookFormState = ({
     setValues,
     updateField,
     entitlements: tenant,
-    accentHueFieldId,
-    brandNameFieldId,
+    accentHueFieldId: fieldIds.accentHue,
+    brandNameFieldId: fieldIds.brandName,
+    buttonColorFieldIds: {
+      buttonColor: fieldIds.buttonColor,
+      buttonColorDark: fieldIds.buttonColorDark,
+    },
     repickKinds,
     brandAssetFieldIds,
     brandImageError: fieldError,
