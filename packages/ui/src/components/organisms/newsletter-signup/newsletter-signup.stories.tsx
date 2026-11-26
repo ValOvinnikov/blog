@@ -16,12 +16,6 @@ const meta = {
 export default meta;
 type TStory = StoryObj<typeof meta>;
 
-/**
- * One `NewsletterSignup.Form` placed in each density — `Full` (the rich panel)
- * and `Compact` (the slim single-row strip). See
- * `Organisms/NewsletterSignup/Full` and `Organisms/NewsletterSignup/Compact`
- * for each density's own controls.
- */
 export const Overview: TStory = {
   render: () => (
     <div className="flex flex-col gap-8">

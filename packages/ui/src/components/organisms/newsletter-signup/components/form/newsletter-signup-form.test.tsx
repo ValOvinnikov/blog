@@ -45,7 +45,9 @@ describe(`<${NewsletterSignupForm.name}/>`, () => {
         name: MOCK_NEWSLETTER_SUBMIT_LABEL,
       });
 
-      expect(getEmailField()).toBeVisible();
+      const emailField = getEmailField();
+
+      expect(emailField).toBeVisible();
       expect(submitButton).toBeVisible();
     });
 
@@ -62,7 +64,7 @@ describe(`<${NewsletterSignupForm.name}/>`, () => {
     });
   });
 
-  it('forwards the typed character to onChange without keeping its own state', async () => {
+  it('reports the typed character without keeping its own state', async () => {
     const onChange = vi.fn();
     setup({ onChange });
 
@@ -87,10 +89,12 @@ describe(`<${NewsletterSignupForm.name}/>`, () => {
     {
       name: 'pressing Enter in the field',
       submit: async (user: UserEvent) => {
-        await user.type(getEmailField(), '{Enter}');
+        const emailField = getEmailField();
+
+        await user.type(emailField, '{Enter}');
       },
     },
-  ])('calls onSubmit when $name', async ({ submit }) => {
+  ])('submits on $name', async ({ submit }) => {
     const onSubmit = vi.fn();
     setup({ onSubmit, email: MOCK_EMAIL });
 
@@ -101,26 +105,22 @@ describe(`<${NewsletterSignupForm.name}/>`, () => {
 
   describe('while submitting', () => {
     let onSubmit: Mock<() => void>;
+    let button: HTMLElement;
 
     beforeEach(() => {
       onSubmit = vi.fn();
       setup({ status: FORM_STATUS.SUBMITTING, onSubmit });
+      button = screen.getByRole('button', { name: MOCK_NEWSLETTER_BUSY_LABEL });
     });
 
     it('locks the field and marks the button busy', () => {
-      const button = screen.getByRole('button', {
-        name: MOCK_NEWSLETTER_BUSY_LABEL,
-      });
+      const emailField = getEmailField();
 
-      expect(getEmailField()).toBeDisabled();
+      expect(emailField).toBeDisabled();
       expect(button).toHaveAttribute('aria-busy', 'true');
     });
 
     it('keeps the button focusable', async () => {
-      const button = screen.getByRole('button', {
-        name: MOCK_NEWSLETTER_BUSY_LABEL,
-      });
-
       await user.tab();
 
       expect(button).toHaveFocus();
@@ -133,10 +133,6 @@ describe(`<${NewsletterSignupForm.name}/>`, () => {
     });
 
     it('does not subscribe a second time', async () => {
-      const button = screen.getByRole('button', {
-        name: MOCK_NEWSLETTER_BUSY_LABEL,
-      });
-
       await user.click(button);
 
       expect(onSubmit).not.toHaveBeenCalled();
@@ -150,9 +146,10 @@ describe(`<${NewsletterSignupForm.name}/>`, () => {
 
     it('surfaces the error message inline and marks the field invalid', () => {
       const message = screen.getByText(MOCK_ERROR_MESSAGE);
+      const emailField = getEmailField();
 
       expect(message).toBeVisible();
-      expect(getEmailField()).toHaveAttribute('aria-invalid', 'true');
+      expect(emailField).toHaveAttribute('aria-invalid', 'true');
     });
 
     it('renders the error message without an icon', () => {
@@ -162,7 +159,9 @@ describe(`<${NewsletterSignupForm.name}/>`, () => {
     });
 
     it('describes the email field by the error message', () => {
-      expect(getEmailField()).toHaveAccessibleDescription(MOCK_ERROR_MESSAGE);
+      const emailField = getEmailField();
+
+      expect(emailField).toHaveAccessibleDescription(MOCK_ERROR_MESSAGE);
     });
   });
 
@@ -178,7 +177,9 @@ describe(`<${NewsletterSignupForm.name}/>`, () => {
     });
 
     it('leaves the email field with no accessible description', () => {
-      expect(getEmailField()).toHaveAccessibleDescription('');
+      const emailField = getEmailField();
+
+      expect(emailField).toHaveAccessibleDescription('');
     });
   });
 

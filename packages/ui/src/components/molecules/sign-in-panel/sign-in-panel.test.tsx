@@ -1,7 +1,7 @@
 import { faker } from '@faker-js/faker';
 import { FORM_STATUS, ICONS } from '@shinefold/config';
 import { customRender, screen } from '@shinefold/ui/testing/custom-render';
-import userEvent from '@testing-library/user-event';
+import userEvent, { type UserEvent } from '@testing-library/user-event';
 
 import { SignInPanel } from './sign-in-panel';
 
@@ -58,205 +58,212 @@ const setup = customRender(SignInPanel, {
 });
 
 describe(`<${SignInPanel.name}/>`, () => {
-  let providers: ReturnType<typeof mockProviders>;
-  let emailForm: ReturnType<typeof mockEmailForm>;
+  let user: UserEvent;
 
   beforeEach(() => {
-    providers = mockProviders();
-    emailForm = mockEmailForm();
-    setup({ providers, emailForm });
+    user = userEvent.setup();
   });
 
-  it('is a dialog named by its title', () => {
-    const dialog = screen.getByRole('dialog', { name: MOCK_LABELS.title });
+  describe('by default', () => {
+    let providers: ReturnType<typeof mockProviders>;
+    let emailForm: ReturnType<typeof mockEmailForm>;
 
-    expect(dialog).toBeVisible();
-  });
+    beforeEach(() => {
+      providers = mockProviders();
+      emailForm = mockEmailForm();
+      setup({ providers, emailForm });
+    });
 
-  it('shows every provider and the email field at once', () => {
-    const github = screen.getByRole('button', { name: MOCK_GITHUB.label });
-    const google = screen.getByRole('button', { name: MOCK_GOOGLE.label });
-    const email = screen.getByRole('textbox', { name: MOCK_LABELS.email });
+    it('is a dialog named by its title', () => {
+      const dialog = screen.getByRole('dialog', { name: MOCK_LABELS.title });
 
-    expect(github).toBeVisible();
-    expect(google).toBeVisible();
-    expect(email).toBeVisible();
-  });
+      expect(dialog).toBeVisible();
+    });
 
-  it('continues with the provider the reader picks', async () => {
-    const google = screen.getByRole('button', { name: MOCK_GOOGLE.label });
+    it('shows every provider and the email field at once', () => {
+      const github = screen.getByRole('button', { name: MOCK_GITHUB.label });
+      const google = screen.getByRole('button', { name: MOCK_GOOGLE.label });
+      const email = screen.getByRole('textbox', { name: MOCK_LABELS.email });
 
-    await userEvent.click(google);
+      expect(github).toBeVisible();
+      expect(google).toBeVisible();
+      expect(email).toBeVisible();
+    });
 
-    expect(providers[1]?.onSelect).toHaveBeenCalledOnce();
-  });
+    it('continues with the provider the reader picks', async () => {
+      const google = screen.getByRole('button', { name: MOCK_GOOGLE.label });
 
-  it('sends the link when the form is submitted', async () => {
-    const submit = screen.getByRole('button', { name: MOCK_LABELS.submit });
+      await user.click(google);
 
-    await userEvent.click(submit);
+      expect(providers[1]?.onSelect).toHaveBeenCalledOnce();
+    });
 
-    expect(emailForm.onSubmit).toHaveBeenCalledOnce();
-  });
-
-  it('passes each keystroke in the email field to onChange', async () => {
-    const email = screen.getByRole('textbox', { name: MOCK_LABELS.email });
-
-    await userEvent.type(email, 'a');
-
-    expect(emailForm.onChange).toHaveBeenCalledWith(`${MOCK_EMAIL}a`);
-  });
-});
-
-describe(`<${SignInPanel.name}/> with an address the browser would reject`, () => {
-  it.each([INVALID_EMAIL, ''])(
-    'hands %j to onSubmit so the caller can show its own error',
-    async (value) => {
-      const emailForm = mockEmailForm({ value });
-      setup({ emailForm });
+    it('sends the link when the form is submitted', async () => {
       const submit = screen.getByRole('button', { name: MOCK_LABELS.submit });
 
-      await userEvent.click(submit);
+      await user.click(submit);
 
       expect(emailForm.onSubmit).toHaveBeenCalledOnce();
-    },
-  );
-});
-
-describe(`<${SignInPanel.name}/> without providers`, () => {
-  it('hides the email divider', () => {
-    setup({ providers: [] });
-
-    const divider = screen.queryByText(MOCK_LABELS.or);
-
-    expect(divider).not.toBeInTheDocument();
-  });
-});
-
-describe(`<${SignInPanel.name}/> after a provider is pressed`, () => {
-  let providers: ReturnType<typeof mockProviders>;
-
-  beforeEach(() => {
-    providers = mockProviders();
-    setup({ providers, pendingProviderId: MOCK_GITHUB.id });
-  });
-
-  it('says where the pressed row is taking the reader', () => {
-    const pressed = screen.getByRole('button', {
-      name: MOCK_GITHUB.pendingLabel,
     });
 
-    expect(pressed).toHaveAttribute('aria-busy', 'true');
-  });
+    it('reports each keystroke in the email field', async () => {
+      const email = screen.getByRole('textbox', { name: MOCK_LABELS.email });
 
-  it('holds the other rows until the redirect', async () => {
-    const google = screen.getByRole('button', { name: MOCK_GOOGLE.label });
+      await user.type(email, 'a');
 
-    await userEvent.click(google);
-
-    expect(google).toHaveAttribute(ARIA_DISABLED, 'true');
-    expect(providers[1]?.onSelect).not.toHaveBeenCalled();
-  });
-});
-
-describe(`<${SignInPanel.name}/> while the link is sending`, () => {
-  let emailForm: ReturnType<typeof mockEmailForm>;
-
-  beforeEach(() => {
-    emailForm = mockEmailForm({ status: FORM_STATUS.SUBMITTING });
-    setup({ emailForm });
-  });
-
-  it('marks the send button busy and names it for sending', () => {
-    const submit = screen.getByRole('button', { name: MOCK_LABELS.sending });
-
-    expect(submit).toHaveAttribute('aria-busy', 'true');
-  });
-
-  it('keeps the send button focusable', () => {
-    const submit = screen.getByRole('button', { name: MOCK_LABELS.sending });
-
-    submit.focus();
-
-    expect(submit).toHaveFocus();
-  });
-
-  it('announces that the link is sending', () => {
-    const status = screen.getByRole('status');
-
-    expect(status).toHaveTextContent(MOCK_LABELS.sending);
-  });
-
-  it('does not send a second time', async () => {
-    const submit = screen.getByRole('button', { name: MOCK_LABELS.sending });
-
-    await userEvent.click(submit);
-
-    expect(emailForm.onSubmit).not.toHaveBeenCalled();
-  });
-
-  it('locks the email field and the providers', () => {
-    const email = screen.getByRole('textbox', { name: MOCK_LABELS.email });
-    const github = screen.getByRole('button', { name: MOCK_GITHUB.label });
-
-    expect(email).toBeDisabled();
-    expect(github).toHaveAttribute(ARIA_DISABLED, 'true');
-  });
-});
-
-describe(`<${SignInPanel.name}/> once the link is sent`, () => {
-  let emailForm: ReturnType<typeof mockEmailForm>;
-
-  beforeEach(() => {
-    emailForm = mockEmailForm({ status: FORM_STATUS.SUCCESS });
-    setup({ emailForm });
-  });
-
-  it('replaces the form with where the link went', () => {
-    const dialog = screen.getByRole('dialog', { name: MOCK_LABELS.sentTitle });
-    const status = screen.getByRole('status');
-    const email = screen.queryByRole('textbox');
-
-    expect(dialog).toBeVisible();
-    expect(status).toHaveTextContent(MOCK_LABELS.sentMessage);
-    expect(email).not.toBeInTheDocument();
-  });
-
-  it('starts over with a different email', async () => {
-    const reset = screen.getByRole('button', {
-      name: MOCK_LABELS.useDifferentEmail,
-    });
-
-    await userEvent.click(reset);
-
-    expect(emailForm.onReset).toHaveBeenCalledOnce();
-  });
-});
-
-describe(`<${SignInPanel.name}/> when the link could not be sent`, () => {
-  beforeEach(() => {
-    setup({
-      emailForm: mockEmailForm({
-        status: FORM_STATUS.ERROR,
-        errorMessage: MOCK_ERROR,
-      }),
+      expect(emailForm.onChange).toHaveBeenCalledWith(`${MOCK_EMAIL}a`);
     });
   });
 
-  it('shows the error under the field and ties it to the field', () => {
-    const alert = screen.getByRole('alert');
-    const email = screen.getByRole('textbox', { name: MOCK_LABELS.email });
+  describe('with an address the browser would reject', () => {
+    it.each([INVALID_EMAIL, ''])(
+      'submits %j so the caller can show its own error',
+      async (value) => {
+        const emailForm = mockEmailForm({ value });
+        setup({ emailForm });
+        const submit = screen.getByRole('button', { name: MOCK_LABELS.submit });
 
-    expect(alert).toHaveTextContent(MOCK_ERROR);
-    expect(email).toHaveAccessibleDescription(MOCK_ERROR);
+        await user.click(submit);
+
+        expect(emailForm.onSubmit).toHaveBeenCalledOnce();
+      },
+    );
   });
 
-  it('marks the field invalid and keeps focus in it', async () => {
-    const email = screen.getByRole('textbox', { name: MOCK_LABELS.email });
+  describe('without providers', () => {
+    it('hides the email divider', () => {
+      setup({ providers: [] });
 
-    await userEvent.click(email);
+      const divider = screen.queryByText(MOCK_LABELS.or);
 
-    expect(email).toBeInvalid();
-    expect(email).toHaveFocus();
+      expect(divider).not.toBeInTheDocument();
+    });
+  });
+
+  describe('after a provider is pressed', () => {
+    let providers: ReturnType<typeof mockProviders>;
+
+    beforeEach(() => {
+      providers = mockProviders();
+      setup({ providers, pendingProviderId: MOCK_GITHUB.id });
+    });
+
+    it('says where the pressed row is taking the reader', () => {
+      const pressed = screen.getByRole('button', {
+        name: MOCK_GITHUB.pendingLabel,
+      });
+
+      expect(pressed).toHaveAttribute('aria-busy', 'true');
+    });
+
+    it('holds the other rows until the redirect', async () => {
+      const google = screen.getByRole('button', { name: MOCK_GOOGLE.label });
+
+      await user.click(google);
+
+      expect(google).toHaveAttribute(ARIA_DISABLED, 'true');
+      expect(providers[1]?.onSelect).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('while the link is sending', () => {
+    let emailForm: ReturnType<typeof mockEmailForm>;
+
+    let submit: HTMLElement;
+
+    beforeEach(() => {
+      emailForm = mockEmailForm({ status: FORM_STATUS.SUBMITTING });
+      setup({ emailForm });
+      submit = screen.getByRole('button', { name: MOCK_LABELS.sending });
+    });
+
+    it('marks the send button busy and names it for sending', () => {
+      expect(submit).toHaveAttribute('aria-busy', 'true');
+    });
+
+    it('keeps the send button focusable', () => {
+      submit.focus();
+
+      expect(submit).toHaveFocus();
+    });
+
+    it('announces that the link is sending', () => {
+      const status = screen.getByRole('status');
+
+      expect(status).toHaveTextContent(MOCK_LABELS.sending);
+    });
+
+    it('does not send a second time', async () => {
+      await user.click(submit);
+
+      expect(emailForm.onSubmit).not.toHaveBeenCalled();
+    });
+
+    it('locks the email field and the providers', () => {
+      const email = screen.getByRole('textbox', { name: MOCK_LABELS.email });
+      const github = screen.getByRole('button', { name: MOCK_GITHUB.label });
+
+      expect(email).toBeDisabled();
+      expect(github).toHaveAttribute(ARIA_DISABLED, 'true');
+    });
+  });
+
+  describe('once the link is sent', () => {
+    let emailForm: ReturnType<typeof mockEmailForm>;
+
+    beforeEach(() => {
+      emailForm = mockEmailForm({ status: FORM_STATUS.SUCCESS });
+      setup({ emailForm });
+    });
+
+    it('replaces the form with where the link went', () => {
+      const dialog = screen.getByRole('dialog', {
+        name: MOCK_LABELS.sentTitle,
+      });
+      const status = screen.getByRole('status');
+      const email = screen.queryByRole('textbox');
+
+      expect(dialog).toBeVisible();
+      expect(status).toHaveTextContent(MOCK_LABELS.sentMessage);
+      expect(email).not.toBeInTheDocument();
+    });
+
+    it('starts over with a different email', async () => {
+      const reset = screen.getByRole('button', {
+        name: MOCK_LABELS.useDifferentEmail,
+      });
+
+      await user.click(reset);
+
+      expect(emailForm.onReset).toHaveBeenCalledOnce();
+    });
+  });
+
+  describe('when the link could not be sent', () => {
+    beforeEach(() => {
+      setup({
+        emailForm: mockEmailForm({
+          status: FORM_STATUS.ERROR,
+          errorMessage: MOCK_ERROR,
+        }),
+      });
+    });
+
+    it('shows the error under the field and ties it to the field', () => {
+      const alert = screen.getByRole('alert');
+      const email = screen.getByRole('textbox', { name: MOCK_LABELS.email });
+
+      expect(alert).toHaveTextContent(MOCK_ERROR);
+      expect(email).toHaveAccessibleDescription(MOCK_ERROR);
+    });
+
+    it('marks the field invalid and keeps focus in it', async () => {
+      const email = screen.getByRole('textbox', { name: MOCK_LABELS.email });
+
+      await user.click(email);
+
+      expect(email).toBeInvalid();
+      expect(email).toHaveFocus();
+    });
   });
 });

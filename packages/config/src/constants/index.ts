@@ -66,6 +66,7 @@ export * from './newsletter-result';
 export * from './newsletter-skip-reason';
 export * from './oauth-provider';
 export * from './operator-alert';
+export * from './pagination-ellipsis';
 export * from './path';
 export * from './plan-comparison';
 export * from './platform-plan-interval';

@@ -23,20 +23,21 @@ describe(`<${TextLink.name}/>`, () => {
     user = userEvent.setup();
   });
 
-  it('renders a link to href named by its children', () => {
-    setup();
+  describe('with the default props', () => {
+    let link: HTMLElement;
 
-    const link = screen.getByRole('link', { name: MOCK_LABEL });
+    beforeEach(() => {
+      setup();
+      link = screen.getByRole('link', { name: MOCK_LABEL });
+    });
 
-    expect(link).toHaveAttribute('href', MOCK_HREF);
-  });
+    it('links to its destination, named by its children', () => {
+      expect(link).toHaveAttribute('href', MOCK_HREF);
+    });
 
-  it('omits aria-current when not current', () => {
-    setup();
-
-    const link = screen.getByRole('link', { name: MOCK_LABEL });
-
-    expect(link).not.toHaveAttribute(ARIA_CURRENT);
+    it('omits aria-current when not current', () => {
+      expect(link).not.toHaveAttribute(ARIA_CURRENT);
+    });
   });
 
   it('sets aria-current to page when current', () => {
@@ -47,7 +48,7 @@ describe(`<${TextLink.name}/>`, () => {
     expect(link).toHaveAttribute(ARIA_CURRENT, ARIA_CURRENT_PAGE);
   });
 
-  it('names the link by ariaLabel when given', () => {
+  it('prefers the given accessible name over its children', () => {
     setup({ ariaLabel: MOCK_ARIA_LABEL });
 
     const link = screen.getByRole('link', { name: MOCK_ARIA_LABEL });
@@ -55,7 +56,7 @@ describe(`<${TextLink.name}/>`, () => {
     expect(link).toBeVisible();
   });
 
-  it('renders a childless link named by ariaLabel', () => {
+  it('renders a childless link named by its accessible name', () => {
     setup({ children: undefined, ariaLabel: MOCK_ARIA_LABEL });
 
     const link = screen.getByRole('link', { name: MOCK_ARIA_LABEL });
@@ -85,7 +86,7 @@ describe(`<${TextLink.name}/>`, () => {
     expect(link).toHaveAttribute('hreflang', LOCALE_ISO_CODES.DE);
   });
 
-  it('renders through the as component', () => {
+  it('renders through a custom link component', () => {
     setup({ as: MockLink });
 
     const mockLink = screen.getByTestId(MOCK_LINK_TEST_ID);
@@ -129,7 +130,7 @@ describe(`<${TextLink.name}/>`, () => {
     });
   });
 
-  it('keeps ariaLabel as the readable text without href', () => {
+  it('shows the accessible name as text without a destination', () => {
     setup({
       href: undefined,
       ariaLabel: MOCK_ARIA_LABEL,
@@ -141,7 +142,7 @@ describe(`<${TextLink.name}/>`, () => {
     expect(textLink).toHaveTextContent(MOCK_ARIA_LABEL);
   });
 
-  it('requires children or ariaLabel to name the link', () => {
+  it('requires children or an accessible name to name the link', () => {
     expectTypeOf<{ href: string }>().not.toExtend<TTextLinkProps>();
     expectTypeOf<{ ariaLabel: string }>().toExtend<TTextLinkProps>();
     expectTypeOf<{ children: string }>().toExtend<TTextLinkProps>();

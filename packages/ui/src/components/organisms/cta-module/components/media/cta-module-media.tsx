@@ -1,4 +1,8 @@
-import type { IWithClassName, IWithDataTestId } from '@shinefold/config';
+import {
+  MEDIA_RATIO,
+  type IWithClassName,
+  type IWithDataTestId,
+} from '@shinefold/config';
 import { MediaFrame } from '@shinefold/ui/components/atoms/media-frame';
 import type { ReactNode } from 'react';
 
@@ -16,7 +20,11 @@ export const CtaModuleMedia = ({
   children,
 }: TCtaModuleMediaProps) =>
   isFramed ? (
-    <MediaFrame ratio="video" className={className} dataTestId={dataTestId}>
+    <MediaFrame
+      ratio={MEDIA_RATIO.VIDEO}
+      className={className}
+      dataTestId={dataTestId}
+    >
       {children}
     </MediaFrame>
   ) : (

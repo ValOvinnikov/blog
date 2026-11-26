@@ -1,6 +1,7 @@
 import { faker } from '@faker-js/faker';
 import { customRender, screen } from '@shinefold/ui/testing/custom-render';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
+import type { Mock } from 'vitest';
 
 import { IconButton } from './icon-button';
 
@@ -29,7 +30,7 @@ describe(`<${IconButton.name}/>`, () => {
     expect(button).toBeVisible();
   });
 
-  it('calls onClick when clicked', async () => {
+  it('reports a press', async () => {
     const onClick = vi.fn();
     setup({ onClick });
 
@@ -39,7 +40,7 @@ describe(`<${IconButton.name}/>`, () => {
     expect(onClick).toHaveBeenCalledOnce();
   });
 
-  it('is disabled when isDisabled is set', () => {
+  it('can be disabled', () => {
     setup({ isDisabled: true });
 
     const button = screen.getByRole('button', { name: MOCK_ARIA_LABEL });
@@ -48,15 +49,16 @@ describe(`<${IconButton.name}/>`, () => {
   });
 
   describe('when disabled but focusable', () => {
-    let onClick: () => void;
+    let onClick: Mock<() => void>;
+    let button: HTMLElement;
 
     beforeEach(() => {
       onClick = vi.fn();
       setup({ isDisabled: true, isFocusableWhenDisabled: true, onClick });
+      button = screen.getByRole('button', { name: MOCK_ARIA_LABEL });
     });
 
     it('is aria-disabled and stays focusable', async () => {
-      const button = screen.getByRole('button', { name: MOCK_ARIA_LABEL });
       await user.tab();
 
       expect(button).toBeEnabled();
@@ -64,8 +66,7 @@ describe(`<${IconButton.name}/>`, () => {
       expect(button).toHaveFocus();
     });
 
-    it('does not call onClick when clicked', async () => {
-      const button = screen.getByRole('button', { name: MOCK_ARIA_LABEL });
+    it('ignores a press', async () => {
       await user.click(button);
 
       expect(onClick).not.toHaveBeenCalled();

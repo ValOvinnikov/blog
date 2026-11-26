@@ -20,38 +20,42 @@ const setup = customRender(NewsletterSignupFull, {
 });
 
 describe(`<${NewsletterSignupFull.name}/>`, () => {
-  it('renders the form it holds', () => {
-    setup();
-
-    const emailField = screen.getByRole('textbox', {
-      name: MOCK_NEWSLETTER_EMAIL_LABEL,
+  describe('with the default props', () => {
+    beforeEach(() => {
+      setup();
     });
 
-    expect(emailField).toBeVisible();
+    it('renders the form it holds', () => {
+      const emailField = screen.getByRole('textbox', {
+        name: MOCK_NEWSLETTER_EMAIL_LABEL,
+      });
+
+      expect(emailField).toBeVisible();
+    });
+
+    it('renders no trust-cue list', () => {
+      const cueList = screen.queryByRole('list');
+
+      expect(cueList).not.toBeInTheDocument();
+    });
   });
 
-  it('renders the supporting text', () => {
-    setup({ supportingText: MOCK_SUPPORTING_TEXT });
+  describe('with supporting text', () => {
+    beforeEach(() => {
+      setup({ supportingText: MOCK_SUPPORTING_TEXT });
+    });
 
-    const supportingText = screen.getByText(MOCK_SUPPORTING_TEXT);
+    it('renders the supporting text', () => {
+      const supportingText = screen.getByText(MOCK_SUPPORTING_TEXT);
 
-    expect(supportingText).toBeVisible();
-  });
+      expect(supportingText).toBeVisible();
+    });
 
-  it('renders no heading of its own', () => {
-    setup({ supportingText: MOCK_SUPPORTING_TEXT });
+    it('renders no heading of its own', () => {
+      const heading = screen.queryByRole('heading');
 
-    const heading = screen.queryByRole('heading');
-
-    expect(heading).not.toBeInTheDocument();
-  });
-
-  it('renders no trust-cue list when trustCues is omitted', () => {
-    setup();
-
-    const cueList = screen.queryByRole('list');
-
-    expect(cueList).not.toBeInTheDocument();
+      expect(heading).not.toBeInTheDocument();
+    });
   });
 
   it('renders every trust cue provided', () => {

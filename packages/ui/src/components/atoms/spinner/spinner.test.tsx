@@ -1,4 +1,5 @@
 import { faker } from '@faker-js/faker';
+import { ARIA_HIDDEN } from '@shinefold/ui/testing/aria';
 import { customRender, screen } from '@shinefold/ui/testing/custom-render';
 
 import { Spinner } from './spinner';
@@ -6,7 +7,6 @@ import { Spinner } from './spinner';
 faker.seed(123);
 
 const MOCK_LABEL = faker.lorem.words(2);
-const ARIA_HIDDEN = 'aria-hidden';
 
 const setup = customRender(Spinner, { label: MOCK_LABEL });
 
@@ -30,19 +30,18 @@ describe(`<${Spinner.name}/>`, () => {
   });
 
   describe('with a visible label', () => {
+    let labelText: HTMLElement;
+
     beforeEach(() => {
       setup({ hasLabel: true });
+      labelText = screen.getByText(MOCK_LABEL);
     });
 
     it('renders the label as visible text', () => {
-      const labelText = screen.getByText(MOCK_LABEL);
-
       expect(labelText).toBeVisible();
     });
 
     it('hides the visible label from assistive tech to avoid double announcing', () => {
-      const labelText = screen.getByText(MOCK_LABEL);
-
       expect(labelText).toHaveAttribute(ARIA_HIDDEN, 'true');
     });
   });

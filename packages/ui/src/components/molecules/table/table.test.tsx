@@ -4,7 +4,7 @@ import {
   screen,
   within,
 } from '@shinefold/ui/testing/custom-render';
-import userEvent from '@testing-library/user-event';
+import userEvent, { type UserEvent } from '@testing-library/user-event';
 import type { ReactNode } from 'react';
 
 import { Table } from './table';
@@ -42,7 +42,10 @@ const renderTable = () =>
   );
 
 describe(`<${Table.name}/>`, () => {
+  let user: UserEvent;
+
   beforeEach(() => {
+    user = userEvent.setup();
     renderTable();
   });
 
@@ -53,7 +56,6 @@ describe(`<${Table.name}/>`, () => {
   });
 
   it('wraps the table in a keyboard-focusable region named by its label', async () => {
-    const user = userEvent.setup();
     const region = screen.getByRole('region', { name: MOCK_REGION_LABEL });
     const table = within(region).getByRole('table');
 

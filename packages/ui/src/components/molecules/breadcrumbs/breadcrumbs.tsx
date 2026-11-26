@@ -25,7 +25,7 @@ export type TBreadcrumbsProps = IWithClassName &
 
 const s = breadcrumbsVariants();
 
-/** Page-chrome navigation trail (e.g. `Home › Topic › Post title`). */
+/** The trail of links from the home page to the current page. */
 export const Breadcrumbs = ({
   items,
   ariaLabel,
