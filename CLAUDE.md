@@ -142,7 +142,10 @@ helper the diff adds, where it looked (`packages/config/const-index.json`,
 nearest sibling) and what it found. A missing or empty Reuse item is a
 blocking review finding. `@shinefold/utils` holds the shared small helpers, so
 before writing a comparison, type check, emptiness test or small transform,
-look there first.
+look there first. A generic object or array transform — keys, entries, a
+record built from a list, mapped values, grouping, indexing — comes from
+`remeda`, which keeps key types without a cast; never hand-roll one from
+`Object.*` plus a cast, and never wrap one in `@shinefold/utils`.
 
 When something similar already exists and it is not obvious whether to extend
 it or add alongside it, that is **not** a judgement call to settle quietly.

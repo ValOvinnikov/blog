@@ -1,9 +1,7 @@
 'use client';
 
-import { DataRequestEraseDialog } from '@platform/components/features/data-requests/data-request-view/components/data-request-erase-dialog/data-request-erase-dialog';
 import { Button } from '@platform/components/shared/button';
 import { Card } from '@platform/components/shared/card';
-import type { TConfirmDialogActionResult } from '@platform/components/shared/confirm-dialog';
 import { Text } from '@platform/components/shared/text';
 import { BUTTON_VARIANT } from '@platform/constants/button';
 import {
@@ -14,7 +12,7 @@ import { FOCUS_RING_GROUND } from '@platform/constants/focus-ring';
 import { tv } from '@platform/utils/tv/tv';
 import { SIZE, type TMaybeUndefined } from '@shinefold/config';
 import { useTranslations } from 'next-intl';
-import { useRef } from 'react';
+import { type ReactNode, useRef } from 'react';
 
 const dataRequestResultCardVariants = tv({
   slots: {
@@ -25,25 +23,17 @@ const dataRequestResultCardVariants = tv({
 export type TDataRequestResultCardProps = {
   email: string;
   matchCount: number;
-  hasReaderAccount: boolean;
-  hasSignupBlock: boolean;
   exportingFormat: TMaybeUndefined<TDataRequestExportFormat>;
   onExport: (link: HTMLAnchorElement, format: TDataRequestExportFormat) => void;
-  onErase: (
-    includesReaderAccount: boolean,
-  ) => Promise<TConfirmDialogActionResult>;
-  onErased: () => void;
+  eraseAction?: ReactNode;
 };
 
 export const DataRequestResultCard = ({
   email,
   matchCount,
-  hasReaderAccount,
-  hasSignupBlock,
   exportingFormat,
   onExport,
-  onErase,
-  onErased,
+  eraseAction,
 }: TDataRequestResultCardProps) => {
   const t = useTranslations('dataRequestResultCard');
   const { actions } = dataRequestResultCardVariants();
@@ -58,39 +48,31 @@ export const DataRequestResultCard = ({
       <Card.Header
         title={t('title', { email })}
         actions={
-          matchCount > 0 && (
-            <div className={actions()}>
-              <Button
-                type="button"
-                variant={BUTTON_VARIANT.SECONDARY}
-                size={SIZE.SM}
-                focusGround={FOCUS_RING_GROUND.SURFACE_HEAD}
-                onClick={() => handleExport(DATA_REQUEST_EXPORT_FORMAT.JSON)}
-                isPending={exportingFormat === DATA_REQUEST_EXPORT_FORMAT.JSON}
-                pendingLabel={t('exporting')}
-              >
-                {t('exportJson')}
-              </Button>
-              <Button
-                type="button"
-                variant={BUTTON_VARIANT.SECONDARY}
-                size={SIZE.SM}
-                focusGround={FOCUS_RING_GROUND.SURFACE_HEAD}
-                onClick={() => handleExport(DATA_REQUEST_EXPORT_FORMAT.CSV)}
-                isPending={exportingFormat === DATA_REQUEST_EXPORT_FORMAT.CSV}
-                pendingLabel={t('exporting')}
-              >
-                {t('exportCsv')}
-              </Button>
-              <DataRequestEraseDialog
-                email={email}
-                hasReaderAccount={hasReaderAccount}
-                hasSignupBlock={hasSignupBlock}
-                onErase={onErase}
-                onErased={onErased}
-              />
-            </div>
-          )
+          <div className={actions()}>
+            <Button
+              type="button"
+              variant={BUTTON_VARIANT.SECONDARY}
+              size={SIZE.SM}
+              focusGround={FOCUS_RING_GROUND.SURFACE_HEAD}
+              onClick={() => handleExport(DATA_REQUEST_EXPORT_FORMAT.JSON)}
+              isPending={exportingFormat === DATA_REQUEST_EXPORT_FORMAT.JSON}
+              pendingLabel={t('exporting')}
+            >
+              {t('exportJson')}
+            </Button>
+            <Button
+              type="button"
+              variant={BUTTON_VARIANT.SECONDARY}
+              size={SIZE.SM}
+              focusGround={FOCUS_RING_GROUND.SURFACE_HEAD}
+              onClick={() => handleExport(DATA_REQUEST_EXPORT_FORMAT.CSV)}
+              isPending={exportingFormat === DATA_REQUEST_EXPORT_FORMAT.CSV}
+              pendingLabel={t('exporting')}
+            >
+              {t('exportCsv')}
+            </Button>
+            {eraseAction}
+          </div>
         }
       />
       <Card.Body>

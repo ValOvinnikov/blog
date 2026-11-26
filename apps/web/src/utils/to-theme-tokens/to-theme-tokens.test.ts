@@ -13,6 +13,10 @@ import {
   PRESET_REGISTRY,
   type TPresetBundle,
 } from '@shinefold/config';
+import {
+  MOCK_PINK_HEX,
+  MOCK_YELLOW_HEX,
+} from '@shinefold/config/testing/button-colors';
 
 import { toThemeTokens } from './to-theme-tokens';
 
@@ -117,5 +121,16 @@ describe(toThemeTokens, () => {
 
     expect(result.accentHue).toBe(EDITORIAL.themeTokens.accentHue);
     expect(result.logoHue).toBe(EDITORIAL.themeTokens.accentHue);
+  });
+
+  it("passes the row's button colours through", () => {
+    const result = toThemeTokens({
+      ...CONSOLE_ROW,
+      buttonColor: MOCK_YELLOW_HEX,
+      buttonColorDark: MOCK_PINK_HEX,
+    });
+
+    expect(result.buttonColor).toBe(MOCK_YELLOW_HEX);
+    expect(result.buttonColorDark).toBe(MOCK_PINK_HEX);
   });
 });

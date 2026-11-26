@@ -11,7 +11,9 @@ import {
   CARD_STYLE_DECLARATIONS,
   DENSITY,
   DENSITY_DECLARATIONS,
+  deriveButtonColors,
   DIVIDER_WIDTH_DECLARATIONS,
+  formatButtonStyleBlock,
   HEADER_CONTROL_SHAPE_DECLARATIONS,
   HEADER_CONTROL_STYLE_DECLARATIONS,
   HEADING_CASE_DECLARATIONS,
@@ -22,6 +24,10 @@ import {
   PRESET_REGISTRY,
   RADIUS_SCALE,
 } from '@shinefold/config';
+import {
+  MOCK_PINK_HEX,
+  MOCK_YELLOW_HEX,
+} from '@shinefold/config/testing/button-colors';
 
 import { buildThemeStyleBlock } from './build-theme-style-block';
 
@@ -406,6 +412,38 @@ describe(buildThemeStyleBlock, () => {
       );
 
       expect(dark).not.toContain(prefix);
+    },
+  );
+
+  it('writes no button roles when the site has no button colour', () => {
+    const css = buildThemeStyleBlock({
+      ...CONSOLE_TOKENS,
+      buttonColorDark: MOCK_PINK_HEX,
+    });
+
+    expect(css).not.toContain('--button-');
+  });
+
+  it.each([
+    { scheme: 'derived', buttonColorDark: undefined },
+    { scheme: 'stored', buttonColorDark: MOCK_PINK_HEX },
+  ])(
+    'writes the button roles with the $scheme dark-ground colour',
+    ({ buttonColorDark }) => {
+      const css = buildThemeStyleBlock({
+        ...CONSOLE_TOKENS,
+        buttonColor: MOCK_YELLOW_HEX,
+        buttonColorDark,
+      });
+
+      expect(css).toContain(
+        formatButtonStyleBlock(
+          deriveButtonColors({
+            color: MOCK_YELLOW_HEX,
+            darkGroundColor: buttonColorDark,
+          }),
+        ),
+      );
     },
   );
 });

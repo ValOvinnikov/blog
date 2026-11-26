@@ -4,6 +4,7 @@ import {
   PRESET_REGISTRY,
   resolveTenantEmailBrand,
 } from '@shinefold/config';
+import { MOCK_YELLOW_HEX } from '@shinefold/config/testing/button-colors';
 
 import { toTenantEmailBrand } from './to-tenant-email-brand';
 
@@ -72,5 +73,22 @@ describe(toTenantEmailBrand, () => {
     });
 
     expect(first.brandPrimary).not.toBe(second.brandPrimary);
+  });
+
+  it("resolves the row's button colour into the brand", () => {
+    const result = toTenantEmailBrand({
+      preset: PRESET_ID.CONSOLE,
+      accentHue: MOCK_ACCENT_HUE,
+      buttonColor: MOCK_YELLOW_HEX,
+    });
+
+    expect(result).toEqual(
+      resolveTenantEmailBrand({
+        preset: PRESET_ID.CONSOLE,
+        accentHue: MOCK_ACCENT_HUE,
+        logoHue: PRESET_REGISTRY[PRESET_ID.CONSOLE].themeTokens.logoHue,
+        buttonColor: MOCK_YELLOW_HEX,
+      }),
+    );
   });
 });
