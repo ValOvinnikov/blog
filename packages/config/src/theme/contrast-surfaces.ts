@@ -1,4 +1,19 @@
 import type { TThemeToken } from './contrast-pairs';
+import {
+  ASIDE_BAR,
+  EYEBROW_TEXT,
+  FEATURE_ICON_GLYPH,
+  HEADING,
+  LINK_TEXT,
+  LINK_UNDERLINE,
+  SIDENAV_CURRENT_BAR,
+  SIDENAV_CURRENT_TEXT,
+  TIER_BADGE_FILL,
+  TIER_BADGE_LABEL,
+  TIER_HIGHLIGHT_BORDER,
+  TIMELINE_MARKER_FILL,
+  TIMELINE_MARKER_NUMERAL,
+} from './preset-role-tokens';
 
 export const PRIMARY_SUBTLE = '--primary-subtle' satisfies TThemeToken;
 export const SECONDARY = '--secondary' satisfies TThemeToken;
@@ -15,9 +30,15 @@ export const AMBIENT_RAISED = '--ambient-raised' satisfies TThemeToken;
 export const FIELD_BOUNDARY = '--field-boundary' satisfies TThemeToken;
 export const TEXT = '--text' satisfies TThemeToken;
 export const TEXT_MUTED = '--text-muted' satisfies TThemeToken;
+export const TEXT_SUBTLE = '--text-subtle' satisfies TThemeToken;
+export const DIVIDER = '--divider' satisfies TThemeToken;
+export const BACKDROP = '--backdrop' satisfies TThemeToken;
+export const HEADING_HIGHLIGHT = '--heading-highlight' satisfies TThemeToken;
 export const BORDER_EMPHASIS = '--border-emphasis' satisfies TThemeToken;
 export const BRAND_PRIMARY_WASH = '--brand-primary-wash' satisfies TThemeToken;
 export const BRAND_PRIMARY = '--brand-primary' satisfies TThemeToken;
+export const BRAND_PRIMARY_HOVER =
+  '--brand-primary-hover' satisfies TThemeToken;
 export const BRAND_PRIMARY_SOLID =
   '--brand-primary-solid' satisfies TThemeToken;
 export const BRAND_PRIMARY_SOLID_HOVER =
@@ -35,12 +56,25 @@ export const TOKEN_ALIASES: Record<TThemeToken, TThemeToken> = {
   '--ring': BRAND_PRIMARY,
   '--info': BRAND_PRIMARY,
   '--info-muted': BRAND_PRIMARY_MUTED,
-  '--heading-highlight': BRAND_PRIMARY,
+  [HEADING_HIGHLIGHT]: BRAND_PRIMARY,
   '--code-fg': TEXT,
   '--code-comment': TEXT_MUTED,
   [BUTTON_FILL]: BRAND_PRIMARY_SOLID,
   [BUTTON_FILL_HOVER]: BRAND_PRIMARY_SOLID_HOVER,
   [BUTTON_LABEL]: BRAND_PRIMARY_CONTRAST,
+  [HEADING]: TEXT,
+  [LINK_TEXT]: BRAND_PRIMARY,
+  [LINK_UNDERLINE]: BRAND_PRIMARY,
+  [EYEBROW_TEXT]: BRAND_PRIMARY,
+  [FEATURE_ICON_GLYPH]: BRAND_PRIMARY,
+  [TIER_HIGHLIGHT_BORDER]: BRAND_PRIMARY,
+  [TIER_BADGE_FILL]: BRAND_PRIMARY_SOLID,
+  [TIER_BADGE_LABEL]: BRAND_PRIMARY_CONTRAST,
+  [TIMELINE_MARKER_FILL]: BRAND_PRIMARY_SOLID,
+  [TIMELINE_MARKER_NUMERAL]: BRAND_PRIMARY_CONTRAST,
+  [ASIDE_BAR]: BRAND_PRIMARY_MUTED,
+  [SIDENAV_CURRENT_BAR]: BRAND_PRIMARY,
+  [SIDENAV_CURRENT_TEXT]: BRAND_PRIMARY,
 };
 
 export const BANDS = [

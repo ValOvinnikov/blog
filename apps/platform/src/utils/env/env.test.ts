@@ -3,8 +3,10 @@ import {
   MOCK_WEB_APP_URL,
   MOCK_REVALIDATE_SECRET,
 } from '@platform/testing/env/fixtures';
-import { KEY_ENCODING } from '@shinefold/utils/encryption';
-import { MOCK_ENCRYPTION_KEY } from '@shinefold/utils/encryption/encryption-fixtures';
+import {
+  MOCK_ENCRYPTION_KEY,
+  MOCK_SHORT_KEY,
+} from '@shinefold/utils/encryption/encryption-fixtures';
 import { isUndefined } from '@shinefold/utils/primitives';
 
 faker.seed(1);
@@ -19,7 +21,6 @@ const MOCK_VERCEL_TEAM = faker.string.alphanumeric(12);
 const MOCK_AUTH_SECRET = faker.string.alphanumeric(24);
 const MOCK_INVALID_GITHUB_REPO = faker.lorem.word();
 const MOCK_INVALID_URL = faker.lorem.word();
-const SHORT_KEY = Buffer.alloc(16).toString(KEY_ENCODING);
 
 const OPTIONAL_VALID_VALUE = {
   BLOB_READ_WRITE_TOKEN: MOCK_BLOB_TOKEN,
@@ -38,8 +39,8 @@ const VALID_VALUE = {
 } as const;
 
 const INVALID_VALUE = {
-  PERSONAL_DATA_INDEX_KEY: SHORT_KEY,
-  PERSONAL_DATA_ENCRYPTION_KEY: `v2:${MOCK_ENCRYPTION_KEY},v1:${SHORT_KEY}`,
+  PERSONAL_DATA_INDEX_KEY: MOCK_SHORT_KEY,
+  PERSONAL_DATA_ENCRYPTION_KEY: `v2:${MOCK_ENCRYPTION_KEY},v1:${MOCK_SHORT_KEY}`,
   TENANT_PROVISIONING_GITHUB_REPO: MOCK_INVALID_GITHUB_REPO,
   WORKER_ENQUEUE_URL: MOCK_INVALID_URL,
 } as const;

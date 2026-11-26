@@ -8,7 +8,7 @@ import {
 import { toModuleHeadingBlock } from '@shinefold/service/shared/transformers/heading-block/to-module-heading-block';
 import { MOCK_FEATURE_LIST_MODULE_ID } from '@shinefold/service/testing/modules/feature-list/fixtures';
 import { mockReference } from '@shinefold/service/testing/shared/fixtures';
-import { evaluateGroqExpression } from '@shinefold/service/testing/shared/groq';
+import { evaluateModuleQuery } from '@shinefold/service/testing/shared/groq';
 import {
   MOCK_IMAGE_ASSET_DOCUMENT,
   mockLocalizedHeadingBlock,
@@ -78,23 +78,20 @@ const MOCK_ENGLISH_ONLY_FEATURE_DOCUMENT = {
   image: mockLocalizedImage({ [EN]: MOCK_ENGLISH_ONLY_FEATURE.alt }),
 };
 
-async function runFeatureList(
+function runFeatureList(
   locale: string,
   document: Record<string, unknown> = MOCK_FEATURE_LIST_DOCUMENT,
 ) {
-  const raw = await evaluateGroqExpression(
-    featureListModuleQuery.query,
+  return evaluateModuleQuery(
+    featureListModuleQuery,
     [
       document,
       MOCK_TRANSLATED_FEATURE,
       MOCK_ENGLISH_ONLY_FEATURE_DOCUMENT,
       MOCK_IMAGE_ASSET_DOCUMENT,
     ],
-    undefined,
-    { id: MOCK_FEATURE_LIST_MODULE_ID, locale, defaultLocale: EN },
+    { id: MOCK_FEATURE_LIST_MODULE_ID, locale },
   );
-
-  return featureListModuleQuery.parse(raw);
 }
 
 function featureText(module: Awaited<ReturnType<typeof runFeatureList>>) {

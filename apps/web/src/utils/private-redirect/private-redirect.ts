@@ -1,5 +1,5 @@
 import type { THttpStatus } from '@shinefold/config';
-import { CACHE_CONTROL } from '@web/constants/http';
+import { CACHE_CONTROL, CACHE_CONTROL_HEADER } from '@web/constants/http';
 import { NextResponse } from 'next/server';
 
 export const privateRedirect = (
@@ -7,6 +7,6 @@ export const privateRedirect = (
   status?: THttpStatus,
 ): NextResponse => {
   const response = NextResponse.redirect(target, status);
-  response.headers.set('Cache-Control', CACHE_CONTROL.PRIVATE_NO_STORE);
+  response.headers.set(CACHE_CONTROL_HEADER, CACHE_CONTROL.PRIVATE_NO_STORE);
   return response;
 };

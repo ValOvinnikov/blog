@@ -26,12 +26,16 @@ import {
 import { TestimonialModuleView } from './testimonial-module-view';
 
 vi.mock('@web/i18n/navigation');
+vi.mock('@shinefold/ui/components/organisms/carousel/use-carousel', () => ({
+  useCarousel: () => ({ canScrollPrev: false, canScrollNext: false }),
+}));
 
 faker.seed(22);
 
 const MOCK_TITLE_ID = faker.string.uuid();
 const MOCK_DATA_TEST_ID = faker.string.uuid();
 const CAROUSEL_LABEL = `${MOCK_TESTIMONIAL_HEADING} carousel`;
+const DATA_ALIGNMENT = 'data-alignment';
 
 const setup = customRender(TestimonialModuleView, {
   section: { brandVariant: BRAND_VARIANT.PRIMARY },
@@ -114,6 +118,27 @@ describe(`<${TestimonialModuleView.name}/>`, () => {
 
     expect(quotes).toHaveLength(MOCK_TESTIMONIAL_ITEMS.length);
   });
+
+  it.each([
+    {
+      contentAlignment: CONTENT_ALIGNMENT.CENTER,
+      expected: CONTENT_ALIGNMENT.CENTER,
+    },
+    {
+      contentAlignment: CONTENT_ALIGNMENT.RIGHT,
+      expected: CONTENT_ALIGNMENT.LEFT,
+    },
+    { contentAlignment: undefined, expected: CONTENT_ALIGNMENT.LEFT },
+  ])(
+    'aligns the carousel track $expected for content alignment $contentAlignment',
+    ({ contentAlignment, expected }) => {
+      setup({ displayMode: DISPLAY_MODE.CAROUSEL, contentAlignment });
+
+      const carousel = screen.getByRole('region', { name: CAROUSEL_LABEL });
+
+      expect(carousel).toHaveAttribute(DATA_ALIGNMENT, expected);
+    },
+  );
 
   it('renders the resolved cta buttons when present', () => {
     setup({ ctaButtons: MOCK_CTA_ACTIONS });

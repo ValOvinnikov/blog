@@ -3,6 +3,8 @@ export const CACHE_CONTROL = {
   PUBLIC_ONE_MINUTE: 'public, max-age=60, s-maxage=60',
 } as const;
 
+export const CACHE_CONTROL_HEADER = 'cache-control';
+
 export const ROBOTS_DIRECTIVE = {
   NOINDEX: 'noindex',
 } as const;

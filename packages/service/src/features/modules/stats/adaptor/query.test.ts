@@ -5,7 +5,7 @@ import {
   mockRawStatItem,
   mockRawStatsModule,
 } from '@shinefold/service/testing/modules/fixtures';
-import { evaluateGroqExpression } from '@shinefold/service/testing/shared/groq';
+import { evaluateModuleQuery } from '@shinefold/service/testing/shared/groq';
 import {
   mockLocalizedHeadingBlock,
   mockLocalizedStrings,
@@ -63,15 +63,11 @@ const MOCK_STATS_DOCUMENT = {
   footnote: mockLocalizedStrings(MOCK_FOOTNOTE),
 };
 
-async function runStats(document: Record<string, unknown>, locale: string) {
-  const raw = await evaluateGroqExpression(
-    statsModuleQuery.query,
-    [document],
-    undefined,
-    { id: MOCK_STATS_MODULE_ID, locale, defaultLocale: EN },
-  );
-
-  return statsModuleQuery.parse(raw);
+function runStats(document: Record<string, unknown>, locale: string) {
+  return evaluateModuleQuery(statsModuleQuery, [document], {
+    id: MOCK_STATS_MODULE_ID,
+    locale,
+  });
 }
 
 const EMPTY_OPTIONALS = {

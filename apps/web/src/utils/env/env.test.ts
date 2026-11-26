@@ -3,8 +3,11 @@
  */
 import { faker } from '@faker-js/faker';
 import type { TMaybeUndefined } from '@shinefold/config';
-import { KEY_ENCODING } from '@shinefold/utils/encryption';
-import { MOCK_ENCRYPTION_KEY } from '@shinefold/utils/encryption/encryption-fixtures';
+import {
+  MOCK_ENCRYPTION_KEY,
+  MOCK_SHORT_KEY,
+} from '@shinefold/utils/encryption/encryption-fixtures';
+import { isUndefined } from '@shinefold/utils/primitives';
 
 faker.seed(111);
 
@@ -19,7 +22,6 @@ const [MOCK_DATASET, MOCK_STAGING_DATASET] = faker.helpers.uniqueArray(
 );
 const MOCK_INVALID_FLAG = faker.lorem.word();
 const MOCK_INVALID_URL = faker.lorem.word();
-const SHORT_KEY = Buffer.alloc(16).toString(KEY_ENCODING);
 
 const ENV_KEYS = [
   'SANITY_REVALIDATE_SECRET',
@@ -41,7 +43,7 @@ const originalEnv = Object.fromEntries(
 ) as Record<TEnvKey, TMaybeUndefined<string>>;
 
 const setEnv = (key: TEnvKey, value: TMaybeUndefined<string>): void => {
-  if (value === undefined) {
+  if (isUndefined(value)) {
     delete process.env[key];
   } else {
     process.env[key] = value;
@@ -161,13 +163,13 @@ describe('env', () => {
       {
         case: 'a PERSONAL_DATA_INDEX_KEY shorter than 32 bytes',
         key: 'PERSONAL_DATA_INDEX_KEY' as const,
-        value: SHORT_KEY,
+        value: MOCK_SHORT_KEY,
         load: importEnvOnServer,
       },
       {
         case: 'a short PERSONAL_DATA_ENCRYPTION_KEY in an older version',
         key: 'PERSONAL_DATA_ENCRYPTION_KEY' as const,
-        value: `v2:${MOCK_ENCRYPTION_KEY},v1:${SHORT_KEY}`,
+        value: `v2:${MOCK_ENCRYPTION_KEY},v1:${MOCK_SHORT_KEY}`,
         load: importEnvOnServer,
       },
       {

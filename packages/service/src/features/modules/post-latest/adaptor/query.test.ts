@@ -13,7 +13,7 @@ import {
   mockModuleDocument,
 } from '@shinefold/service/testing/modules/fixtures';
 import { mockRawPostLatestModule } from '@shinefold/service/testing/modules/post-latest/fixtures';
-import { evaluateGroqExpression } from '@shinefold/service/testing/shared/groq';
+import { evaluateModuleQuery } from '@shinefold/service/testing/shared/groq';
 import { mockParagraphBlocks } from '@shinefold/service/testing/shared/localized';
 
 import { postLatestModuleQuery } from './query';
@@ -26,15 +26,11 @@ const MOCK_MODULE_DOCUMENT = mockModuleDocument({
   limit: MOCK_LIMIT,
 });
 
-async function runPostLatest(locale: string, document = MOCK_MODULE_DOCUMENT) {
-  const raw = await evaluateGroqExpression(
-    postLatestModuleQuery.query,
-    [document],
-    undefined,
-    { id: MOCK_MODULE_ID, locale, defaultLocale: EN },
-  );
-
-  return postLatestModuleQuery.parse(raw);
+function runPostLatest(locale: string, document = MOCK_MODULE_DOCUMENT) {
+  return evaluateModuleQuery(postLatestModuleQuery, [document], {
+    id: MOCK_MODULE_ID,
+    locale,
+  });
 }
 
 describe('postLatestModuleQuery', () => {
