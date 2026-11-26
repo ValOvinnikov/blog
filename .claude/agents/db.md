@@ -150,7 +150,8 @@ to dev's existing rows, so a new `NOT NULL` column needs a default.
    job runs on a `vX.Y.Z` tag plus the `production` Environment's
    required-reviewer approval: a guard that fails unless the host _equals_
    `PRODUCTION_DB_HOST` → `pg_dump` backup (30-day artifact) → `db:migrate`.
-   Never run `db:migrate` against the shared/production branch by hand. An
+   Never run `db:migrate` against the shared/production branch by hand, nor
+   Neon MCP SQL anywhere but the development branch (`CLAUDE.md` → "Don't"). An
    ad-hoc backup uses the same `pg_dump` against `DATABASE_URL_UNPOOLED`;
    `neonctl` is not wired into CI or local tooling, so a Neon branch snapshot
    (`neonctl branches create --parent production --name backup-<date>`) is a

@@ -192,6 +192,15 @@
             "command": "\"$CLAUDE_PROJECT_DIR\"/.claude/hooks/pre-agent-gate0-guard.sh"
           }
         ]
+      },
+      {
+        "matcher": "mcp__.*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"$CLAUDE_PROJECT_DIR\"/.claude/hooks/neon-dev-branch-guard.sh"
+          }
+        ]
       }
     ],
     "PostToolUse": [
