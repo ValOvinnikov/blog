@@ -4,6 +4,7 @@ import { mockAdmin } from '@platform/testing/admins/fixtures';
 import { mockViewer } from '@platform/testing/memberships/fixtures';
 import {
   MOCK_ARCHIVED_AT,
+  MOCK_MALFORMED_TENANT_ID,
   MOCK_TENANT_ID,
   mockTenant,
 } from '@platform/testing/tenants/fixtures';
@@ -33,30 +34,28 @@ vi.mock('@shinefold/db', async () => {
 
 faker.seed(5997);
 
-const MOCK_READ_ERROR_MESSAGE = faker.lorem.sentence();
-const MOCK_MALFORMED_TENANT_ID = faker.lorem.slug();
+const MOCK_READ_ERROR = new Error(faker.lorem.sentence());
 const MOCK_UNKNOWN_TENANT_ID = faker.string.uuid();
 
 const getTenantById = vi.mocked(queries.tenants.getTenantById);
 
-const tenant = mockTenant();
+const MOCK_TENANT = mockTenant();
 
 const TENANT_READS = [
   {
     tenantCase: 'an existing tenant',
     tenantId: MOCK_TENANT_ID,
-    arrangeRead: () => getTenantById.mockResolvedValue(tenant),
+    arrangeRead: () => getTenantById.mockResolvedValue(MOCK_TENANT),
   },
   {
     tenantCase: 'a malformed id whose read fails',
     tenantId: MOCK_MALFORMED_TENANT_ID,
-    arrangeRead: () =>
-      getTenantById.mockRejectedValue(new Error(MOCK_READ_ERROR_MESSAGE)),
+    arrangeRead: () => getTenantById.mockRejectedValue(MOCK_READ_ERROR),
   },
 ];
 
 const LIVE_AND_ARCHIVED_TENANTS = [
-  { tenantCase: 'a live tenant', resolvedTenant: tenant },
+  { tenantCase: 'a live tenant', resolvedTenant: MOCK_TENANT },
   {
     tenantCase: 'an archived tenant',
     resolvedTenant: mockTenant({ deprovisionedAt: MOCK_ARCHIVED_AT }),
@@ -64,10 +63,6 @@ const LIVE_AND_ARCHIVED_TENANTS = [
 ];
 
 describe(requireTenantById, () => {
-  beforeEach(() => {
-    getTenantById.mockReset();
-  });
-
   it.each(TENANT_READS)(
     'surfaces the admin gate failure for $tenantCase',
     async ({ tenantId, arrangeRead }) => {
@@ -83,10 +78,10 @@ describe(requireTenantById, () => {
   );
 
   it('surfaces a failed tenant read for an admin', async () => {
-    getTenantById.mockRejectedValue(new Error(MOCK_READ_ERROR_MESSAGE));
+    getTenantById.mockRejectedValue(MOCK_READ_ERROR);
 
     await expect(requireTenantById(MOCK_MALFORMED_TENANT_ID)).rejects.toThrow(
-      MOCK_READ_ERROR_MESSAGE,
+      MOCK_READ_ERROR,
     );
   });
 
@@ -122,35 +117,40 @@ describe(requireTenantById, () => {
     },
   );
 
-  it.each([
-    { role: ADMIN_ROLE.SUPERADMIN, canGrant: true },
-    { role: ADMIN_ROLE.ADMIN, canGrant: false },
-    { role: ADMIN_ROLE.MODERATOR, canGrant: false },
-  ])(
-    'lets a $role admin grant entitlements: $canGrant',
-    async ({ role, canGrant }) => {
-      getTenantById.mockResolvedValue(tenant);
-      vi.mocked(requireAdmin).mockResolvedValueOnce(mockAdmin({ role }));
+  describe('for an existing tenant', () => {
+    beforeEach(() => {
+      getTenantById.mockResolvedValue(MOCK_TENANT);
+    });
 
-      const { canGrantEntitlements } = await requireTenantById(MOCK_TENANT_ID);
+    it.each([
+      { role: ADMIN_ROLE.SUPERADMIN, canGrant: true },
+      { role: ADMIN_ROLE.ADMIN, canGrant: false },
+      { role: ADMIN_ROLE.MODERATOR, canGrant: false },
+    ])(
+      'lets a $role admin grant entitlements: $canGrant',
+      async ({ role, canGrant }) => {
+        vi.mocked(requireAdmin).mockResolvedValueOnce(mockAdmin({ role }));
 
-      expect(canGrantEntitlements).toBe(canGrant);
-    },
-  );
+        const { canGrantEntitlements } =
+          await requireTenantById(MOCK_TENANT_ID);
 
-  it("opens what the tenant's open grants unlock", async () => {
-    getTenantById.mockResolvedValue(tenant);
-    vi.mocked(
-      queries.tenantEntitlementGrants.listResolvableEntitlementGrants,
-    ).mockResolvedValueOnce([
-      mockEntitlementGrant({ key: CAPABILITY.CONTACT_FORM }),
-    ]);
+        expect(canGrantEntitlements).toBe(canGrant);
+      },
+    );
 
-    const { tenant: resolved } = await requireTenantById(MOCK_TENANT_ID);
+    it("opens what the tenant's open grants unlock", async () => {
+      vi.mocked(
+        queries.tenantEntitlementGrants.listResolvableEntitlementGrants,
+      ).mockResolvedValueOnce([
+        mockEntitlementGrant({ key: CAPABILITY.CONTACT_FORM }),
+      ]);
 
-    expect(
-      queries.tenantEntitlementGrants.listResolvableEntitlementGrants,
-    ).toHaveBeenCalledWith(MOCK_TENANT_ID);
-    expect(resolved.pageAccess.leads).toBe(true);
+      const { tenant: resolved } = await requireTenantById(MOCK_TENANT_ID);
+
+      expect(
+        queries.tenantEntitlementGrants.listResolvableEntitlementGrants,
+      ).toHaveBeenCalledWith(MOCK_TENANT_ID);
+      expect(resolved.pageAccess.leads).toBe(true);
+    });
   });
 });

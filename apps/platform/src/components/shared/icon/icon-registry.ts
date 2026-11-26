@@ -35,6 +35,7 @@ import Moon from '@platform/assets/icons/moon.svg';
 import Palette from '@platform/assets/icons/palette.svg';
 import Pause from '@platform/assets/icons/pause.svg';
 import Phone from '@platform/assets/icons/phone.svg';
+import Pin from '@platform/assets/icons/pin.svg';
 import Plus from '@platform/assets/icons/plus.svg';
 import Power from '@platform/assets/icons/power.svg';
 import Quote from '@platform/assets/icons/quote.svg';
@@ -101,6 +102,7 @@ export const ICON_REGISTRY = {
   [ICONS.PALETTE]: Palette,
   [ICONS.PAUSE]: Pause,
   [ICONS.PHONE]: Phone,
+  [ICONS.PIN]: Pin,
   [ICONS.PLUS]: Plus,
   [ICONS.POWER]: Power,
   [ICONS.QUOTE]: Quote,

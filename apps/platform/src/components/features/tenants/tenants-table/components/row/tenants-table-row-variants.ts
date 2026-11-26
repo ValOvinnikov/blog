@@ -6,5 +6,6 @@ export const tenantsTableRowVariants = tv({
     lines: ['min-w-0'],
     name: ['text-platform-text max-md:truncate max-md:font-medium'],
     domain: ['text-platform-12 text-platform-muted max-md:truncate'],
+    actions: ['flex items-center gap-2'],
   },
 });
