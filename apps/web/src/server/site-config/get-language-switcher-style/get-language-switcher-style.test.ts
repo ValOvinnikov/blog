@@ -1,7 +1,7 @@
 import { faker } from '@faker-js/faker';
 import { LANGUAGE_SWITCHER_STYLE } from '@shinefold/config';
-import { queries } from '@shinefold/db';
 import { mockSiteConfig } from '@web/testing/server/site-config/fixtures';
+import { getSiteConfigMock } from '@web/testing/server/site-config/site-config-row-edges';
 import { MOCK_ERROR } from '@web/testing/shared/error/fixtures';
 import { MOCK_TENANT_ID } from '@web/testing/shared/tenant/fixtures';
 
@@ -9,28 +9,7 @@ import { getLanguageSwitcherStyle } from './get-language-switcher-style';
 
 faker.seed(6010);
 
-vi.mock('@web/server/tenant/request-tenant/request-tenant');
-vi.mock(
-  '@web/server/settings-features/get-tenant-entitlements/get-tenant-entitlements',
-);
-
-vi.mock(
-  '@shinefold/db',
-  () => import('@web/testing/server/site-config/site-config-db'),
-);
-
-vi.mock(
-  'next/cache',
-  () => import('@web/testing/server/next-cache/passthrough-next-cache'),
-);
-
-const getSiteConfigMock = vi.mocked(queries.siteConfig.getSiteConfig);
-
 describe(getLanguageSwitcherStyle, () => {
-  beforeEach(() => {
-    getSiteConfigMock.mockReset();
-  });
-
   it("returns the tenant's saved style", async () => {
     getSiteConfigMock.mockResolvedValue(
       mockSiteConfig({ languageSwitcherStyle: LANGUAGE_SWITCHER_STYLE.CODES }),

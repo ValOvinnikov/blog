@@ -5,22 +5,17 @@ import {
   type TMaybeUndefined,
 } from '@shinefold/config';
 import { SITE_CONFIG_LOG } from '@web/constants/site-config';
-import { getSiteConfig } from '@web/server/site-config/get-site-config/get-site-config';
-import { logger } from '@web/utils/logger/logger';
+import { getSiteConfigRow } from '@web/server/site-config/get-site-config-row/get-site-config-row';
 
 export const getLockedColorScheme = async (
   tenant?: string,
 ): Promise<TMaybeUndefined<TColorScheme>> => {
-  const result = await getSiteConfig(tenant);
+  const row = await getSiteConfigRow(
+    SITE_CONFIG_LOG.COLOR_MODE_FETCH_FAILED,
+    tenant,
+  );
 
-  if (!result.ok) {
-    logger.error(SITE_CONFIG_LOG.COLOR_MODE_FETCH_FAILED, {
-      error: result.error,
-    });
-    return undefined;
-  }
-
-  switch (result.data?.colorMode) {
+  switch (row?.colorMode) {
     case COLOR_MODE.LIGHT:
       return COLOR_SCHEME.LIGHT;
     case COLOR_MODE.DARK:
