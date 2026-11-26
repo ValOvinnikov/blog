@@ -40,7 +40,7 @@ Variants: size: SIZE.SM|SIZE.MD|SIZE.LG
 
 The styled `<button>` for in-page actions (submit, toggle, dismiss), which stays focusable and full colour while busy.
 Props: type?: 'button' | 'submit' | 'reset' · title?: string · children?: ReactNode · onClick?: MouseEventHandler<HTMLButtonElement> · isDisabled?: boolean · isBusy?: boolean · busyLabel?: string · busyStyle?: TButtonBusyVariants['busyStyle'] · spinnerVariant?: TSpinnerProps['variant'] · 'aria-busy'?: AriaAttributes['aria-busy'] · 'aria-describedby'?: AriaAttributes['aria-describedby'] _(extends IWithClassName, IWithDataTestId, TButtonVariants)_
-Variants: variant: primary|ghost|link|danger · size: SIZE.SM|SIZE.MD|SIZE.LG
+Variants: variant: primary|ghost|outline|link|danger · size: SIZE.SM|SIZE.MD|SIZE.LG
 
 ### Caption — `components/atoms/caption/caption.tsx`
 
@@ -299,7 +299,7 @@ Slots:
 ### PrimaryNavigation — `components/molecules/primary-navigation/primary-navigation.tsx`
 
 The site's main menu, where readers reach its top-level pages and their sub-pages.
-Props: links: INavItem[] · children?: TCompoundChildren<typeof PrimaryNavigationParts> · groupName?: string · ariaLabel?: string · linkAs?: TAnchorElementType · mobileToggle?: TPrimaryNavigationMobileToggleProps · layout?: TPrimaryNavigationVariants['layout'] · submenuStyle?: TPrimaryNavigationItemProps['submenuStyle'] _(extends IWithClassName, IWithDataTestId)_
+Props: links: INavItem[] · action?: TPrimaryNavigationAction · children?: TCompoundChildren<typeof PrimaryNavigationParts> · groupName?: string · linkAs?: TAnchorElementType · mobileToggle?: TPrimaryNavigationMobileToggleProps · layout?: TPrimaryNavigationVariants['layout'] · submenuStyle?: TPrimaryNavigationItemProps['submenuStyle'] _(extends IWithClassName, IWithDataTestId)_
 Variants: collapsible: (boolean) · layout: HEADER_LAYOUT.CLASSIC|HEADER_LAYOUT.LINKS_BESIDE_BRAND|HEADER_LAYOUT.CENTRED_LINKS|HEADER_LAYOUT.TWO_ROWS|HEADER_LAYOUT.CENTRED_BRAND|HEADER_LAYOUT.MENU_BUTTON
 
 Slots:

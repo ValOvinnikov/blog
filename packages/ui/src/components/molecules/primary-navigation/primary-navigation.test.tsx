@@ -1,4 +1,5 @@
 import { faker } from '@faker-js/faker';
+import { HEADER_ACTION_PHONE_PLACEMENT } from '@shinefold/config';
 import {
   customRender,
   screen,
@@ -21,6 +22,10 @@ const MOCK_PANEL_ACTION_LABEL = faker.lorem.word();
 const MOCK_DRAWER_ACTION_LABEL = faker.lorem.word();
 const MOCK_TOGGLE_LABEL = faker.lorem.words(2);
 const MOCK_PANEL_ID = faker.string.uuid();
+const MOCK_HEADER_ACTION = {
+  href: `/${faker.lorem.slug()}`,
+  label: faker.lorem.words(2),
+};
 
 const links = faker.helpers.multiple(
   () => ({
@@ -273,6 +278,63 @@ describe(`<${PrimaryNavigation.name}/>`, () => {
       await user.click(toggle);
 
       expect(onToggle).toHaveBeenCalledOnce();
+    });
+  });
+
+  describe('header action', () => {
+    it('renders the action as a link named by its label', () => {
+      setup({ action: MOCK_HEADER_ACTION });
+
+      const actionLink = screen.getByRole('link', {
+        name: MOCK_HEADER_ACTION.label,
+      });
+
+      expect(actionLink).toHaveAttribute('href', MOCK_HEADER_ACTION.href);
+    });
+
+    it('shows a menu-placed action as the first item of the open panel', () => {
+      setup({
+        action: {
+          ...MOCK_HEADER_ACTION,
+          phonePlacement: HEADER_ACTION_PHONE_PLACEMENT.MENU,
+        },
+        mobileToggle: mobileToggle(true),
+      });
+
+      const [firstPanelLink] = within(
+        screen.getByTestId(MOBILE_PANEL_TEST_ID),
+      ).getAllByRole('link');
+
+      expect(firstPanelLink).toHaveAccessibleName(MOCK_HEADER_ACTION.label);
+    });
+
+    it('shows an action with no placement first in the open panel', () => {
+      setup({
+        action: MOCK_HEADER_ACTION,
+        mobileToggle: mobileToggle(true),
+      });
+
+      const [firstPanelLink] = within(
+        screen.getByTestId(MOBILE_PANEL_TEST_ID),
+      ).getAllByRole('link');
+
+      expect(firstPanelLink).toHaveAccessibleName(MOCK_HEADER_ACTION.label);
+    });
+
+    it('keeps a bar-placed action out of the open panel', () => {
+      setup({
+        action: {
+          ...MOCK_HEADER_ACTION,
+          phonePlacement: HEADER_ACTION_PHONE_PLACEMENT.BAR,
+        },
+        mobileToggle: mobileToggle(true),
+      });
+
+      const panelActionLink = within(
+        screen.getByTestId(MOBILE_PANEL_TEST_ID),
+      ).queryByRole('link', { name: MOCK_HEADER_ACTION.label });
+
+      expect(panelActionLink).not.toBeInTheDocument();
     });
   });
 

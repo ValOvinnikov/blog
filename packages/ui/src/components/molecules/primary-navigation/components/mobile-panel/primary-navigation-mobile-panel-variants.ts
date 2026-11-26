@@ -12,6 +12,7 @@ export const primaryNavigationMobilePanelVariants = tv({
       'lg:hidden',
     ],
     link: PANEL_LINK,
+    action: [],
     panelActionsRow: [
       'flex w-full items-center gap-3',
       'mt-2 border-t border-border px-3 pt-3',
@@ -27,6 +28,7 @@ export const primaryNavigationMobilePanelVariants = tv({
       [HEADER_LAYOUT.CENTRED_BRAND]: {},
       [HEADER_LAYOUT.MENU_BUTTON]: {
         panel: ['lg:flex'],
+        action: ['lg:hidden'],
         panelActionsRow: ['lg:hidden'],
         drawerActionsRow: ['lg:hidden'],
       },
