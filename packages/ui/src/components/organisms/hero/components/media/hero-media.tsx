@@ -1,8 +1,9 @@
-import type {
-  IWithClassName,
-  IWithDataTestId,
-  TContentAlignment,
-  THeroVariant,
+import {
+  MEDIA_RATIO,
+  type IWithClassName,
+  type IWithDataTestId,
+  type TContentAlignment,
+  type THeroVariant,
 } from '@shinefold/config';
 import { MediaFrame } from '@shinefold/ui/components/atoms/media-frame';
 import type { TMediaFrameRatio } from '@shinefold/ui/components/atoms/media-frame/media-frame-variants';
@@ -19,10 +20,10 @@ export type THeroMediaProps = IWithClassName &
     children?: ReactNode;
   };
 
-/** The media slot of a `Hero`; frames its content via `MediaFrame`, at a configurable ratio (16:9 by default). */
+/** The media slot of a `Hero`. */
 export const HeroMedia = ({
   isFramed = true,
-  ratio = 'video',
+  ratio = MEDIA_RATIO.VIDEO,
   variant,
   contentAlignment,
   className,

@@ -8,19 +8,18 @@ const SUN_VIEW_BOX = '0 0 24 24';
 
 describe('svg import tooling', () => {
   describe('a bare .svg import', () => {
+    let icon: HTMLElement;
+
     beforeEach(() => {
       renderElement(<SunIcon data-testid={SUN_ICON_TEST_ID} />);
+      icon = screen.getByTestId(SUN_ICON_TEST_ID);
     });
 
     it('resolves to a renderable React component', () => {
-      const icon = screen.getByTestId(SUN_ICON_TEST_ID);
-
       expect(icon).toBeVisible();
     });
 
     it('keeps the source viewBox so CSS-driven resizing rescales', () => {
-      const icon = screen.getByTestId(SUN_ICON_TEST_ID);
-
       expect(icon).toHaveAttribute('viewBox', SUN_VIEW_BOX);
     });
   });

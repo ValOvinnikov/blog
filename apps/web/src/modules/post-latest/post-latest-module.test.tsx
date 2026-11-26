@@ -2,7 +2,7 @@ import { faker } from '@faker-js/faker';
 import { errorResult, okResult } from '@shinefold/utils';
 import { POST_LATEST_LOG } from '@web/constants/post-latest';
 import { customRenderAsync, screen } from '@web/testing/custom-render';
-import { mockSanityImage } from '@web/testing/modules/hero/fixtures';
+import { testPostCardsImagesContract } from '@web/testing/modules/post-cards/post-cards-images-contract';
 import { mockPostLatestModuleData } from '@web/testing/modules/post-latest/fixtures';
 import { MOCK_ERROR } from '@web/testing/shared/error/fixtures';
 import { mockPostCard } from '@web/testing/shared/post/fixtures';
@@ -89,38 +89,12 @@ describe(`<${PostLatestModule.name}/>`, () => {
     expect(pagination).not.toBeInTheDocument();
   });
 
-  it('renders each post image when showImages is true', async () => {
-    const sanityImage = mockSanityImage();
-    getPostLatestMock.mockResolvedValue(
-      okResult(
-        mockPostLatestModuleData({
-          posts: [mockPostCard({ heroImage: sanityImage })],
-          showImages: true,
-        }),
-      ),
-    );
-
-    await setup();
-
-    const image = screen.getByRole('img', { name: sanityImage.alt });
-
-    expect(image).toBeVisible();
-  });
-
-  it('renders no post images when showImages is false', async () => {
-    getPostLatestMock.mockResolvedValue(
-      okResult(
-        mockPostLatestModuleData({
-          posts: [mockPostCard({ heroImage: mockSanityImage() })],
-          showImages: false,
-        }),
-      ),
-    );
-
-    await setup();
-
-    const image = screen.queryByRole('img');
-
-    expect(image).not.toBeInTheDocument();
+  testPostCardsImagesContract({
+    setup,
+    resolvePosts: (source) => {
+      getPostLatestMock.mockResolvedValue(
+        okResult(mockPostLatestModuleData(source)),
+      );
+    },
   });
 });

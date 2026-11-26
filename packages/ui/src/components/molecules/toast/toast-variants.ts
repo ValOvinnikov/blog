@@ -1,5 +1,5 @@
-import { TOAST_TYPE } from '@shinefold/config';
-import { tv } from '@shinefold/ui/lib/styling';
+import { TOAST_TYPE, TEXT_ROLE } from '@shinefold/config';
+import { tv, TYPOGRAPHY } from '@shinefold/ui/lib/styling';
 import type { VariantProps } from 'tailwind-variants';
 
 export const toastVariants = tv({
@@ -20,7 +20,7 @@ export const toastVariants = tv({
     icon: ['shrink-0'],
     spinner: ['shrink-0', 'text-brand-primary'],
     titleText: ['font-semibold'],
-    time: ['shrink-0 text-label text-subtle'],
+    time: ['shrink-0', TYPOGRAPHY[TEXT_ROLE.CAPTION]],
     dismiss: ['shrink-0 hover:text-error'],
     body: ['flex flex-col gap-1.5 p-3'],
     message: [
@@ -39,7 +39,8 @@ export const toastVariants = tv({
       'focus-visible:ring-brand-primary focus-visible:ring-offset-ambient focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2',
     ],
     actionKey: [
-      'rounded-sm border border-border px-[0.4ch] text-label text-subtle',
+      'rounded-sm border border-border px-[0.4ch]',
+      TYPOGRAPHY[TEXT_ROLE.CAPTION],
     ],
     timer: [
       'absolute inset-x-0 bottom-0 h-0.5 origin-left opacity-70',

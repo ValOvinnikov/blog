@@ -1,5 +1,10 @@
 import { faker } from '@faker-js/faker';
 import { BRAND_VARIANT, HERO_VARIANT } from '@shinefold/config';
+import {
+  MOCK_HIGHLIGHTED_PHRASE,
+  MOCK_ONE_HIGHLIGHT_PIECES,
+  toHeadingWords,
+} from '@shinefold/ui/testing/heading-pieces';
 import { customRender, screen } from '@web/testing/custom-render';
 import {
   MOCK_CTA_PRIMARY_ACTION,
@@ -20,7 +25,7 @@ const setup = customRender(HeroModuleShell, {
   brandVariant: BRAND_VARIANT.PRIMARY,
   presentation: mockHeroPresentation(),
   eyebrow: undefined,
-  title: MOCK_TITLE,
+  title: { heading: MOCK_TITLE },
   excerpt: undefined,
   layout: undefined,
   ctaButtons: [],
@@ -62,6 +67,22 @@ describe(`<${HeroModuleShell.name}/>`, () => {
 
       expect(image).not.toBeInTheDocument();
     });
+  });
+
+  it('labels the section with the plain words around the highlight', () => {
+    const highlightedTitle = toHeadingWords(MOCK_ONE_HIGHLIGHT_PIECES);
+    setup({
+      title: {
+        heading: highlightedTitle,
+        headingPieces: MOCK_ONE_HIGHLIGHT_PIECES,
+      },
+    });
+
+    const section = screen.getByRole('region', { name: highlightedTitle });
+    const heading = screen.getByRole('heading', { level: 1 });
+
+    expect(section).toBeVisible();
+    expect(heading).toContainElement(screen.getByText(MOCK_HIGHLIGHTED_PHRASE));
   });
 
   it('renders a link for an authored action', () => {

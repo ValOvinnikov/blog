@@ -21,7 +21,7 @@ export interface IHeroModuleShellProps extends IWithDataTestId {
   brandVariant: TBrandVariant;
   presentation: THeroPresentation;
   eyebrow: TMaybeUndefined<string>;
-  title: string;
+  title: THeroProps['title'];
   excerpt: TMaybeUndefined<string>;
   layout: TMaybeUndefined<TLayout>;
   ctaButtons: TCtaButton[];
@@ -84,7 +84,7 @@ export const HeroModuleShell = ({
         tone={brandVariant}
         variant={variant}
         eyebrow={eyebrow}
-        title={{ heading: title }}
+        title={title}
         titleId={titleId}
         excerpt={excerpt}
         layout={{

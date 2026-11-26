@@ -1,6 +1,7 @@
 import { faker } from '@faker-js/faker';
 import { customRender, screen } from '@shinefold/ui/testing/custom-render';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
+import type { Mock } from 'vitest';
 
 import { ThemeToggle } from './theme-toggle';
 
@@ -25,50 +26,53 @@ describe(`<${ThemeToggle.name}/>`, () => {
     user = userEvent.setup();
   });
 
-  it('offers the dark label while the theme is light', () => {
-    setup({ isDark: false });
+  describe('while the theme is light', () => {
+    let onToggle: Mock<() => void>;
+    let button: HTMLElement;
 
-    const button = screen.getByRole('button', { name: MOCK_DARK_LABEL });
+    beforeEach(() => {
+      onToggle = vi.fn();
+      setup({ isDark: false, onToggle });
+      button = screen.getByRole('button', { name: MOCK_DARK_LABEL });
+    });
 
-    expect(button).toBeVisible();
+    it('offers the dark label', () => {
+      expect(button).toBeVisible();
+    });
+
+    it('reports a press', async () => {
+      await user.click(button);
+
+      expect(onToggle).toHaveBeenCalledTimes(1);
+    });
+
+    it('renders only the moon icon', () => {
+      const moonIcon = screen.getByTestId(MOON_ICON_TEST_ID);
+      const sunIcon = screen.queryByTestId(SUN_ICON_TEST_ID);
+
+      expect(moonIcon).toBeVisible();
+      expect(sunIcon).not.toBeInTheDocument();
+    });
   });
 
-  it('offers the light label while the theme is dark', () => {
-    setup({ isDark: true });
+  describe('while the theme is dark', () => {
+    beforeEach(() => {
+      setup({ isDark: true });
+    });
 
-    const button = screen.getByRole('button', { name: MOCK_LIGHT_LABEL });
+    it('offers the light label', () => {
+      const button = screen.getByRole('button', { name: MOCK_LIGHT_LABEL });
 
-    expect(button).toBeVisible();
-  });
+      expect(button).toBeVisible();
+    });
 
-  it('calls onToggle when clicked', async () => {
-    const onToggle = vi.fn();
-    setup({ onToggle });
+    it('renders only the sun icon', () => {
+      const sunIcon = screen.getByTestId(SUN_ICON_TEST_ID);
+      const moonIcon = screen.queryByTestId(MOON_ICON_TEST_ID);
 
-    const button = screen.getByRole('button', { name: MOCK_DARK_LABEL });
-    await user.click(button);
-
-    expect(onToggle).toHaveBeenCalledTimes(1);
-  });
-
-  it('renders only the moon icon while the theme is light', () => {
-    setup({ isDark: false });
-
-    const moonIcon = screen.getByTestId(MOON_ICON_TEST_ID);
-    const sunIcon = screen.queryByTestId(SUN_ICON_TEST_ID);
-
-    expect(moonIcon).toBeVisible();
-    expect(sunIcon).not.toBeInTheDocument();
-  });
-
-  it('renders only the sun icon while the theme is dark', () => {
-    setup({ isDark: true });
-
-    const sunIcon = screen.getByTestId(SUN_ICON_TEST_ID);
-    const moonIcon = screen.queryByTestId(MOON_ICON_TEST_ID);
-
-    expect(sunIcon).toBeVisible();
-    expect(moonIcon).not.toBeInTheDocument();
+      expect(sunIcon).toBeVisible();
+      expect(moonIcon).not.toBeInTheDocument();
+    });
   });
 
   it('renders both icons when the theme class picks the icon', () => {

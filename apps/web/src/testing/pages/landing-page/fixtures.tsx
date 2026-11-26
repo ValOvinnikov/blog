@@ -16,6 +16,10 @@ export const MOCK_SECTION_PRICING_PATH = `${MOCK_SECTION_ROOT_PATH}/pricing`;
 export const MOCK_SECTION_ROOT_TITLE = 'Modules';
 export const MOCK_SECTION_FAQ_TITLE = 'FAQ';
 export const MOCK_SECTION_PRICING_TITLE = 'Pricing';
+export const MOCK_SECTION_PRICING_PLANS_PATH = `${MOCK_SECTION_PRICING_PATH}/plans`;
+export const MOCK_SECTION_PRICING_PLANS_TITLE = 'Plans';
+export const MOCK_SECTION_PRICING_TIERS_PATH = `${MOCK_SECTION_PRICING_PATH}/tiers`;
+export const MOCK_SECTION_PRICING_TIERS_TITLE = 'Tiers';
 
 export const MOCK_LANDING_PAGE_OG_IMAGE = mockSanityImage();
 
@@ -69,6 +73,35 @@ export const mockLandingSectionNavigation = (
     ...overrides,
   };
 };
+
+export const mockGroupedLandingSectionNavigation =
+  (): TLandingSectionNavigation =>
+    mockLandingSectionNavigation({
+      pages: [
+        {
+          title: MOCK_SECTION_FAQ_TITLE,
+          path: MOCK_SECTION_FAQ_PATH,
+          isCurrent: false,
+        },
+        {
+          title: MOCK_SECTION_PRICING_TITLE,
+          path: MOCK_SECTION_PRICING_PATH,
+          isCurrent: true,
+          pages: [
+            {
+              title: MOCK_SECTION_PRICING_PLANS_TITLE,
+              path: MOCK_SECTION_PRICING_PLANS_PATH,
+              isCurrent: true,
+            },
+            {
+              title: MOCK_SECTION_PRICING_TIERS_TITLE,
+              path: MOCK_SECTION_PRICING_TIERS_PATH,
+              isCurrent: false,
+            },
+          ],
+        },
+      ],
+    });
 
 export const mockLandingAdjacentPages = (
   overrides: Partial<TLandingAdjacentPages> = {},

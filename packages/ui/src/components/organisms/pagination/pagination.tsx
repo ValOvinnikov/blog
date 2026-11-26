@@ -1,7 +1,9 @@
 import {
   A_AS_CONST,
+  PAGINATION_ELLIPSIS,
   type IWithClassName,
   type IWithDataTestId,
+  type TPaginationEllipsis,
 } from '@shinefold/config';
 import type { TAnchorElementType } from '@shinefold/config/react';
 
@@ -10,12 +12,11 @@ import { paginationVariants } from './pagination-variants';
 const SIBLING_COUNT = 1;
 const MAX_VISIBLE_PAGES = SIBLING_COUNT * 2 + 5;
 
-type TPaginationItem = number | 'start-ellipsis' | 'end-ellipsis';
+type TPaginationItem = number | TPaginationEllipsis;
 
 const range = (start: number, end: number): number[] =>
   Array.from({ length: end - start + 1 }, (_, i) => start + i);
 
-/** Which page numbers/ellipses to render for a given `currentPage`/`totalPages` — always the first page, the last page, and up to `SIBLING_COUNT` neighbours either side of the current page. */
 const getPaginationItems = (
   currentPage: number,
   totalPages: number,
@@ -28,22 +29,26 @@ const getPaginationItems = (
   const showEndEllipsis = rightSibling < totalPages - 1;
 
   if (!showStartEllipsis && showEndEllipsis) {
-    return [...range(1, 3 + SIBLING_COUNT * 2), 'end-ellipsis', totalPages];
+    return [
+      ...range(1, 3 + SIBLING_COUNT * 2),
+      PAGINATION_ELLIPSIS.END,
+      totalPages,
+    ];
   }
 
   if (showStartEllipsis && !showEndEllipsis) {
     return [
       1,
-      'start-ellipsis',
+      PAGINATION_ELLIPSIS.START,
       ...range(totalPages - (3 + SIBLING_COUNT * 2) + 1, totalPages),
     ];
   }
 
   return [
     1,
-    'start-ellipsis',
+    PAGINATION_ELLIPSIS.START,
     ...range(leftSibling, rightSibling),
-    'end-ellipsis',
+    PAGINATION_ELLIPSIS.END,
     totalPages,
   ];
 };
@@ -61,7 +66,7 @@ export type TPaginationProps = IWithClassName &
 
 const s = paginationVariants();
 
-/** Prev/next + numbered links for paginated listings, route-agnostic (`createHref`) and polymorphic (`linkAs`); renders nothing when there is a single page. */
+/** Previous, next and numbered page links for a paginated listing. */
 export const Pagination = ({
   currentPage,
   totalPages,

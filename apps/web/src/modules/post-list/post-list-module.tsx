@@ -3,7 +3,7 @@ import { service } from '@shinefold/service';
 import { VoiceRichText } from '@web/components/shared/voice-rich-text';
 import { POST_LIST_LOG } from '@web/constants/post-list';
 import type { TModuleComponentProps } from '@web/modules/module-renderer';
-import { getPostCardsSection } from '@web/server/post-cards/get-post-cards-section/get-post-cards-section';
+import { getPostCardsViewProps } from '@web/server/post-cards/get-post-cards-view-props/get-post-cards-view-props';
 import { getRequestContext } from '@web/server/request-context/request-context';
 import { getVoiceRich } from '@web/server/site-config/get-voice-rich/get-voice-rich';
 import { fillVoicePlaceholders } from '@web/utils/fill-voice-placeholders';
@@ -73,32 +73,22 @@ export const PostListModule = async ({
     throw markErrorLogged(result.error);
   }
 
-  const {
-    brandVariant,
-    headingBlock,
-    layout,
-    currentPage,
-    totalPages,
-    contentAlignment,
-    showImages,
-    columns,
-  } = result.data;
+  const { currentPage, totalPages, showImages, columns } = result.data;
 
   if (resolvedPage > totalPages) {
     notFound();
   }
 
-  const { items, appearance } = await getPostCardsSection(
-    tenantId,
-    result.data,
-  );
+  const viewProps = await getPostCardsViewProps(tenantId, result.data, {
+    titleId: archive ? ARCHIVE_TITLE_ID[archive.kind] : 'blog-posts-title',
+    dataTestId: `post-list-module-${id}`,
+  });
 
   const scopedParams = archive ? { name: archive.name } : undefined;
   const createHref = archive
     ? (pageNumber: number) =>
         ARCHIVE_ROUTE_BUILDER[archive.kind](archive.slug, pageNumber)
     : routes.blogIndex;
-  const titleId = archive ? ARCHIVE_TITLE_ID[archive.kind] : 'blog-posts-title';
 
   const pagination: IPostListModulePagination = {
     currentPage,
@@ -111,13 +101,8 @@ export const PostListModule = async ({
 
   return (
     <PostListModuleView
-      section={{ brandVariant, layout, appearance }}
-      headingBlock={headingBlock}
+      {...viewProps}
       grid={{ columns, showImages }}
-      items={items}
-      contentAlignment={contentAlignment}
-      titleId={titleId}
-      dataTestId={`post-list-module-${id}`}
       emptyMessage={
         <VoiceRichText
           value={fillVoicePlaceholders(emptyRich, scopedParams ?? {})}

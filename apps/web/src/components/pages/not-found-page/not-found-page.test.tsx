@@ -1,12 +1,7 @@
 import { routes, SITE_MESSAGES } from '@shinefold/config';
 import { customRender, screen, within } from '@web/testing/custom-render';
-import {
-  MOCK_VOICE_BOLD_TEXT,
-  MOCK_VOICE_ITALIC_TEXT,
-  MOCK_VOICE_LINK_HREF,
-  MOCK_VOICE_LINK_TEXT,
-  mockFormattedVoiceRich,
-} from '@web/testing/shared/voice/fixtures';
+import { expectFormattedVoiceRich } from '@web/testing/shared/voice/expect-formatted-voice-rich';
+import { mockFormattedVoiceRich } from '@web/testing/shared/voice/fixtures';
 import { resolveVoiceRichFields } from '@web/utils/resolve-voice-rich-fields';
 
 import { NotFoundPage } from './not-found-page';
@@ -20,11 +15,8 @@ const setup = customRender(NotFoundPage, {
 
 describe(`<${NotFoundPage.name}/>`, () => {
   describe('with the catalog copy', () => {
-    let homeLink: HTMLElement;
-
     beforeEach(() => {
       setup();
-      homeLink = screen.getByRole('link', { name: returnHome });
     });
 
     it('renders the eyebrow', () => {
@@ -45,30 +37,28 @@ describe(`<${NotFoundPage.name}/>`, () => {
       expect(supportingParagraph).toBeVisible();
     });
 
-    it('renders a link back home', () => {
-      expect(homeLink).toHaveAttribute('href', routes.home());
-    });
+    describe('its link back home', () => {
+      let link: HTMLElement;
 
-    it('renders the decorative arrow icon inside the link', () => {
-      const icon = within(homeLink).getByTestId('not-found-arrow-icon');
+      beforeEach(() => {
+        link = screen.getByRole('link', { name: returnHome });
+      });
 
-      expect(icon).toBeVisible();
+      it('points at the home route', () => {
+        expect(link).toHaveAttribute('href', routes.home());
+      });
+
+      it('renders the decorative arrow icon inside the link', () => {
+        const icon = within(link).getByTestId('not-found-arrow-icon');
+
+        expect(icon).toBeVisible();
+      });
     });
   });
 
   it('renders tenant-authored supporting text with its formatting and link', () => {
     setup({ supportingText: mockFormattedVoiceRich() });
 
-    const link = screen.getByRole('link', { name: MOCK_VOICE_LINK_TEXT });
-    const bold = screen.getByText(MOCK_VOICE_BOLD_TEXT, {
-      selector: 'strong',
-    });
-    const italic = screen.getByText(MOCK_VOICE_ITALIC_TEXT, {
-      selector: 'em',
-    });
-
-    expect(link).toHaveAttribute('href', MOCK_VOICE_LINK_HREF);
-    expect(bold).toBeVisible();
-    expect(italic).toBeVisible();
+    expectFormattedVoiceRich();
   });
 });

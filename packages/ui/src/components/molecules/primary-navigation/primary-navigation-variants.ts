@@ -12,16 +12,11 @@ export const primaryNavigationVariants = tv({
     // No `relative` here on purpose: the phone menu's `absolute inset-x-0` takes `Header`'s bar as its containing block, so it spans the bar's width.
     root: ['flex min-w-0 flex-wrap items-center gap-x-2 gap-y-2 lg:gap-x-6'],
     links: ['flex min-w-0 flex-wrap items-center gap-x-4 gap-y-2'],
-    controls: ['flex shrink-0 items-center gap-x-2 lg:gap-x-6'],
-    toggle: ['shrink-0'],
-    barPanelActions: ['flex shrink-0 items-center gap-x-2'],
   },
   variants: {
     collapsible: {
       true: {
         links: ['hidden lg:flex'],
-        toggle: ['lg:hidden'],
-        barPanelActions: ['hidden lg:flex'],
       },
     },
     layout: {
@@ -33,7 +28,6 @@ export const primaryNavigationVariants = tv({
       [HEADER_LAYOUT.CENTRED_LINKS]: {
         root: ['justify-end lg:contents'],
         links: ['lg:gap-x-6'],
-        controls: ['lg:justify-self-end'],
       },
       [HEADER_LAYOUT.TWO_ROWS]: {
         root: ['justify-end lg:contents'],
@@ -41,12 +35,10 @@ export const primaryNavigationVariants = tv({
           'lg:col-span-full lg:row-start-2 lg:gap-x-7',
           'lg:border-t lg:border-border lg:pt-3',
         ],
-        controls: ['lg:justify-self-end'],
       },
       [HEADER_LAYOUT.CENTRED_BRAND]: {
         root: ['justify-end lg:contents'],
         links: ['lg:col-start-1 lg:row-start-1 lg:gap-x-6'],
-        controls: ['lg:col-start-3 lg:row-start-1 lg:justify-self-end'],
       },
       [HEADER_LAYOUT.MENU_BUTTON]: { root: ['justify-end'] },
     },
@@ -55,10 +47,7 @@ export const primaryNavigationVariants = tv({
     {
       collapsible: true,
       layout: HEADER_LAYOUT.MENU_BUTTON,
-      class: {
-        links: ['lg:hidden'],
-        toggle: ['lg:inline-grid'],
-      },
+      class: { links: ['lg:hidden'] },
     },
   ],
   defaultVariants: {

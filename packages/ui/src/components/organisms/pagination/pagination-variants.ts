@@ -1,4 +1,5 @@
-import { tv } from '@shinefold/ui/lib/styling';
+import { TEXT_ROLE } from '@shinefold/config';
+import { tv, TYPOGRAPHY } from '@shinefold/ui/lib/styling';
 
 export const paginationVariants = tv({
   slots: {
@@ -6,15 +7,15 @@ export const paginationVariants = tv({
     list: ['m-0 flex list-none items-center gap-1 p-0'],
     link: [
       'inline-flex h-9 min-w-9 items-center justify-center rounded-md px-2',
-      'font-mono text-label',
+      TYPOGRAPHY[TEXT_ROLE.CAPTION],
       'transition-colors duration-base ease-smooth',
-      'text-subtle hover:text-text',
+      'hover:text-text',
       'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary',
       'focus-visible:ring-offset-2 focus-visible:ring-offset-ambient',
     ],
     ellipsis: [
       'inline-flex h-9 min-w-9 items-center justify-center',
-      'font-mono text-label text-subtle',
+      TYPOGRAPHY[TEXT_ROLE.CAPTION],
     ],
   },
   variants: {

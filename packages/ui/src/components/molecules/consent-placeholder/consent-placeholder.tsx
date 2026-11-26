@@ -1,4 +1,5 @@
 import {
+  MEDIA_RATIO,
   SIZE,
   type IWithClassName,
   type IWithDataTestId,
@@ -31,7 +32,7 @@ export const ConsentPlaceholder = ({
   allowLabel,
   settingsLabel,
   scopeNote,
-  ratio = 'video',
+  ratio = MEDIA_RATIO.VIDEO,
   onAllow,
   onOpenSettings,
   className,

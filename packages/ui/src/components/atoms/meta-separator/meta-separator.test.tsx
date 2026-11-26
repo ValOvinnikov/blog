@@ -1,4 +1,5 @@
 import { faker } from '@faker-js/faker';
+import { ARIA_HIDDEN } from '@shinefold/ui/testing/aria';
 import { customRender, screen } from '@shinefold/ui/testing/custom-render';
 
 import { MetaSeparator } from './meta-separator';
@@ -10,19 +11,18 @@ const MOCK_SEPARATOR = faker.string.symbol(1);
 const setup = customRender(MetaSeparator, { separator: MOCK_SEPARATOR });
 
 describe(`<${MetaSeparator.name}/>`, () => {
-  it('renders the given separator', () => {
+  let separator: HTMLElement;
+
+  beforeEach(() => {
     setup();
+    separator = screen.getByText(MOCK_SEPARATOR);
+  });
 
-    const separator = screen.getByText(MOCK_SEPARATOR);
-
+  it('renders the given separator', () => {
     expect(separator).toBeVisible();
   });
 
   it('hides the separator from assistive tech', () => {
-    setup();
-
-    const separator = screen.getByText(MOCK_SEPARATOR);
-
-    expect(separator).toHaveAttribute('aria-hidden', 'true');
+    expect(separator).toHaveAttribute(ARIA_HIDDEN, 'true');
   });
 });

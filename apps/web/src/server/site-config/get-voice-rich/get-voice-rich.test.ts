@@ -1,11 +1,13 @@
 import { faker } from '@faker-js/faker';
 import { LOCALE_ISO_CODES } from '@shinefold/config';
-import { queries } from '@shinefold/db';
 import { SITE_CONFIG_LOG } from '@web/constants/site-config';
 import { getRequestContext } from '@web/server/request-context/request-context';
 import { UNRESOLVED_TENANT_PLACEHOLDER } from '@web/server/tenant/constants/constants';
-import { getRequestTenantId } from '@web/server/tenant/request-tenant/request-tenant';
 import { mockSiteConfig } from '@web/testing/server/site-config/fixtures';
+import {
+  getRequestTenantIdMock,
+  getSiteConfigMock,
+} from '@web/testing/server/site-config/site-config-row-edges';
 import { MOCK_ERROR } from '@web/testing/shared/error/fixtures';
 import { MOCK_REQUEST_CONTEXT } from '@web/testing/shared/tenant/fixtures';
 import { mockVoiceRichText } from '@web/testing/shared/voice/fixtures';
@@ -17,23 +19,10 @@ import { getVoiceRich } from './get-voice-rich';
 faker.seed(6010);
 
 vi.mock('@web/server/request-context/request-context');
-vi.mock('@web/server/tenant/request-tenant/request-tenant');
-
-vi.mock(
-  '@shinefold/db',
-  () => import('@web/testing/server/site-config/site-config-db'),
-);
-
-vi.mock(
-  'next/cache',
-  () => import('@web/testing/server/next-cache/passthrough-next-cache'),
-);
 
 vi.mock('next-intl/server', () => ({
   getMessages: vi.fn(),
 }));
-
-const getSiteConfigMock = vi.mocked(queries.siteConfig.getSiteConfig);
 
 const FIELD_ID = 'blogListEmpty';
 const MOCK_CATALOG_EMPTY = faker.lorem.sentence();
@@ -46,9 +35,7 @@ const MOCK_BASE_MESSAGES = {
 
 describe(getVoiceRich, () => {
   beforeEach(() => {
-    vi.mocked(getMessages).mockReset();
     vi.mocked(getMessages).mockResolvedValue(MOCK_BASE_MESSAGES);
-    getSiteConfigMock.mockReset();
     getSiteConfigMock.mockResolvedValue(mockSiteConfig());
   });
 
@@ -118,7 +105,7 @@ describe(getVoiceRich, () => {
   it("reads the site config of the request context's tenant", async () => {
     await getVoiceRich(FIELD_ID);
 
-    expect(getRequestTenantId).toHaveBeenCalledWith(
+    expect(getRequestTenantIdMock).toHaveBeenCalledWith(
       MOCK_REQUEST_CONTEXT.tenantId,
     );
   });
@@ -131,7 +118,7 @@ describe(getVoiceRich, () => {
 
     await getVoiceRich(FIELD_ID);
 
-    expect(getRequestTenantId).toHaveBeenCalledWith(
+    expect(getRequestTenantIdMock).toHaveBeenCalledWith(
       UNRESOLVED_TENANT_PLACEHOLDER,
     );
   });

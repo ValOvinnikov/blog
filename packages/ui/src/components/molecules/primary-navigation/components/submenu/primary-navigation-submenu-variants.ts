@@ -1,4 +1,4 @@
-import { HEADER_SUBMENU_STYLE } from '@shinefold/config';
+import { HEADER_SUBMENU_STYLE, TEXT_ROLE } from '@shinefold/config';
 import {
   BELOW_HEADER,
   FOCUS_RING,
@@ -7,6 +7,7 @@ import {
   NAV_LINK_CURRENT,
   TRANSITION_COLORS,
   tv,
+  TYPOGRAPHY,
 } from '@shinefold/ui/lib/styling';
 import type { VariantProps } from 'tailwind-variants';
 
@@ -15,7 +16,7 @@ export const primaryNavigationSubmenuVariants = tv({
     trigger: [
       'group inline-flex cursor-pointer items-center gap-x-1',
       NAV_LINK,
-      'font-mono text-meta',
+      TYPOGRAPHY[TEXT_ROLE.META],
       TRANSITION_COLORS,
       FOCUS_RING,
       'has-[+:popover-open]:nav-link-marked has-[+:popover-open]:text-brand-primary',

@@ -1,12 +1,9 @@
 import {
-  ICONS,
+  HEADER_ACTION_PHONE_PLACEMENT,
   type IWithClassName,
   type IWithDataTestId,
-  SIZE,
 } from '@shinefold/config';
 import type { TAnchorElementType } from '@shinefold/config/react';
-import { Icon } from '@shinefold/ui/components/atoms/icon';
-import { IconButton } from '@shinefold/ui/components/atoms/icon-button';
 import {
   mapCompoundSlots,
   type TCompoundChildren,
@@ -14,7 +11,9 @@ import {
 } from '@shinefold/ui/lib/react';
 import { type ElementType, Fragment } from 'react';
 
+import type { TPrimaryNavigationAction } from './components/action/primary-navigation-action';
 import { PrimaryNavigationActions } from './components/actions/primary-navigation-actions';
+import { PrimaryNavigationControls } from './components/controls/primary-navigation-controls';
 import { PrimaryNavigationDrawerActions } from './components/drawer-actions/primary-navigation-drawer-actions';
 import {
   PrimaryNavigationItem,
@@ -27,7 +26,7 @@ import {
   type TPrimaryNavigationVariants,
 } from './primary-navigation-variants';
 
-export type { TAnchorElementType };
+export type { TAnchorElementType, TPrimaryNavigationAction };
 
 export interface INavItem {
   href: string;
@@ -53,9 +52,9 @@ const PrimaryNavigationParts = {
 export type TPrimaryNavigationProps = IWithClassName &
   IWithDataTestId & {
     links: INavItem[];
+    action?: TPrimaryNavigationAction;
     children?: TCompoundChildren<typeof PrimaryNavigationParts>;
     groupName?: string;
-    ariaLabel?: string;
     linkAs?: TAnchorElementType;
     mobileToggle?: TPrimaryNavigationMobileToggleProps;
     layout?: TPrimaryNavigationVariants['layout'];
@@ -65,9 +64,9 @@ export type TPrimaryNavigationProps = IWithClassName &
 /** The site's main menu, where readers reach its top-level pages and their sub-pages. */
 const PrimaryNavigationRoot = ({
   links,
+  action,
   children,
   groupName,
-  ariaLabel = 'Primary',
   className,
   dataTestId,
   linkAs,
@@ -79,20 +78,18 @@ const PrimaryNavigationRoot = ({
     children,
     PrimaryNavigationParts,
   );
-  const {
-    root,
-    links: linksSlot,
-    controls,
-    toggle,
-    barPanelActions,
-  } = primaryNavigationVariants({
+  const menuAction =
+    action?.phonePlacement === HEADER_ACTION_PHONE_PLACEMENT.BAR
+      ? undefined
+      : action;
+  const { root, links: linksSlot } = primaryNavigationVariants({
     collapsible: Boolean(mobileToggle),
     layout,
   });
 
   return (
     <nav
-      aria-label={ariaLabel}
+      aria-label="Primary"
       className={root({ class: className })}
       data-testid={dataTestId}
     >
@@ -106,30 +103,15 @@ const PrimaryNavigationRoot = ({
           />
         ))}
       </div>
-      {(slots.PanelActions || slots.Actions || mobileToggle) && (
-        <div className={controls()}>
-          {slots.PanelActions && (
-            <div className={barPanelActions()}>{slots.PanelActions}</div>
-          )}
-          {slots.Actions}
-          {mobileToggle && (
-            <IconButton
-              variant="circle"
-              ariaLabel={mobileToggle.ariaLabel}
-              title={mobileToggle.ariaLabel}
-              aria-expanded={mobileToggle.isOpen}
-              aria-controls={mobileToggle.panelId}
-              onClick={mobileToggle.onToggle}
-              className={toggle()}
-            >
-              <Icon
-                name={mobileToggle.isOpen ? ICONS.CLOSE : ICONS.MENU}
-                size={SIZE.MD}
-              />
-            </IconButton>
-          )}
-        </div>
-      )}
+      <PrimaryNavigationControls
+        layout={layout}
+        linkAs={linkAs}
+        action={action}
+        hasActionInMenu={Boolean(menuAction)}
+        mobileToggle={mobileToggle}
+        panelActions={slots.PanelActions}
+        actions={slots.Actions}
+      />
       {mobileToggle && (
         <PrimaryNavigationMobilePanel
           links={links}
@@ -138,6 +120,7 @@ const PrimaryNavigationRoot = ({
           groupName={groupName}
           layout={layout}
           linkAs={linkAs}
+          action={menuAction}
           panelActions={slots.PanelActions}
           drawerActions={slots.DrawerActions}
         />

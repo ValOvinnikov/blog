@@ -1,18 +1,11 @@
 import { PRESET_ID, PRESET_REGISTRY } from '@shinefold/config';
-import { getSiteConfig } from '@web/server/site-config/get-site-config/get-site-config';
-import { logger } from '@web/utils/logger/logger';
+import { getSiteConfigRow } from '@web/server/site-config/get-site-config-row/get-site-config-row';
 
 export const getSiteConfigWithPreset = async (
   failureEvent: string,
   tenant?: string,
 ) => {
-  const result = await getSiteConfig(tenant);
-
-  if (!result.ok) {
-    logger.error(failureEvent, { error: result.error });
-  }
-
-  const row = result.ok ? result.data : undefined;
+  const row = await getSiteConfigRow(failureEvent, tenant);
 
   return { row, preset: PRESET_REGISTRY[row?.preset ?? PRESET_ID.CONSOLE] };
 };

@@ -1,4 +1,8 @@
 import type { TAnchorElementType } from '@shinefold/config/react';
+import {
+  PrimaryNavigationAction,
+  type TPrimaryNavigationAction,
+} from '@shinefold/ui/components/molecules/primary-navigation/components/action/primary-navigation-action';
 import { PrimaryNavigationItem } from '@shinefold/ui/components/molecules/primary-navigation/components/item/primary-navigation-item';
 import type { INavItem } from '@shinefold/ui/components/molecules/primary-navigation/primary-navigation';
 import { type ReactNode, useId } from 'react';
@@ -15,6 +19,7 @@ export type TPrimaryNavigationMobilePanelProps = {
   groupName?: string;
   layout?: TPrimaryNavigationMobilePanelVariants['layout'];
   linkAs?: TAnchorElementType;
+  action?: TPrimaryNavigationAction;
   panelActions?: ReactNode;
   drawerActions?: ReactNode;
 };
@@ -26,12 +31,18 @@ export const PrimaryNavigationMobilePanel = ({
   groupName,
   layout,
   linkAs,
+  action,
   panelActions,
   drawerActions,
 }: TPrimaryNavigationMobilePanelProps) => {
   const ownGroupName = useId();
-  const { panel, link, panelActionsRow, drawerActionsRow } =
-    primaryNavigationMobilePanelVariants({ layout });
+  const {
+    panel,
+    link,
+    action: actionSlot,
+    panelActionsRow,
+    drawerActionsRow,
+  } = primaryNavigationMobilePanelVariants({ layout });
 
   return (
     <div
@@ -40,6 +51,14 @@ export const PrimaryNavigationMobilePanel = ({
       className={panel()}
       data-testid="primary-navigation-mobile-panel"
     >
+      {action && isOpen && (
+        <PrimaryNavigationAction
+          action={action}
+          linkAs={linkAs}
+          isInPanel={true}
+          className={actionSlot()}
+        />
+      )}
       {links.map((item) => (
         <PrimaryNavigationItem
           key={item.href}

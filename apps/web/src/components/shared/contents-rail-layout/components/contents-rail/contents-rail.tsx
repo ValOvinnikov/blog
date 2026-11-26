@@ -29,7 +29,7 @@ export const ContentsRail = ({ headings, className }: IContentsRailProps) => {
     <SidebarNav
       className={className}
       items={items}
-      activeKey={activeKey && toAnchor(activeKey)}
+      activeHref={activeKey && toAnchor(activeKey)}
       label={t('label')}
       ariaCurrent="location"
     />

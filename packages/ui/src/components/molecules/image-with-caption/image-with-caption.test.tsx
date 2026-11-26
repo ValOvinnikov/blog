@@ -16,20 +16,22 @@ const setup = customRender(ImageWithCaption, {
 });
 
 describe(`<${ImageWithCaption.name}/>`, () => {
-  it('renders as a figure', () => {
-    setup();
+  describe('with the default props', () => {
+    beforeEach(() => {
+      setup();
+    });
 
-    const figure = screen.getByRole('figure');
+    it('renders as a figure', () => {
+      const figure = screen.getByRole('figure');
 
-    expect(figure).toBeVisible();
-  });
+      expect(figure).toBeVisible();
+    });
 
-  it('renders children inside the frame', () => {
-    setup();
+    it('renders children inside the frame', () => {
+      const image = screen.getByRole('img', { name: MOCK_ALT_TEXT });
 
-    const image = screen.getByRole('img', { name: MOCK_ALT_TEXT });
-
-    expect(image).toBeVisible();
+      expect(image).toBeVisible();
+    });
   });
 
   it.each([

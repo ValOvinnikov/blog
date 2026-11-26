@@ -1,7 +1,6 @@
 import type { TMaybeUndefined } from '@shinefold/config';
 import { SITE_CONFIG_LOG } from '@web/constants/site-config';
-import { getSiteConfig } from '@web/server/site-config/get-site-config/get-site-config';
-import { logger } from '@web/utils/logger/logger';
+import { getSiteConfigRow } from '@web/server/site-config/get-site-config-row/get-site-config-row';
 
 type TBrandNameSource = {
   tenantId: TMaybeUndefined<string>;
@@ -14,15 +13,11 @@ export const getBrandName = async ({
 }: TBrandNameSource): Promise<TMaybeUndefined<string>> => {
   if (!tenantId) return tenantName;
 
-  const result = await getSiteConfig(tenantId);
+  const row = await getSiteConfigRow(
+    SITE_CONFIG_LOG.BRAND_NAME_FETCH_FAILED,
+    tenantId,
+    { tenantId },
+  );
 
-  if (!result.ok) {
-    logger.error(SITE_CONFIG_LOG.BRAND_NAME_FETCH_FAILED, {
-      tenantId,
-      error: result.error,
-    });
-    return tenantName;
-  }
-
-  return result.data?.brandName ?? tenantName;
+  return row?.brandName ?? tenantName;
 };

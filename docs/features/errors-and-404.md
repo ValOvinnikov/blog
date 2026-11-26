@@ -15,6 +15,7 @@ code:
   - apps/web/src/components/pages/standalone-not-found-page/**
   - apps/web/src/components/shared/error-boundary-copy/**
   - apps/web/src/components/shared/error-page-layout/**
+  - apps/web/src/hooks/use-error-page-announcement/**
   - apps/web/src/components/shared/document-shell/**
   - apps/web/src/metadata/not-found-metadata/**
   - apps/web/src/utils/resolve-not-found-messages/**
@@ -65,7 +66,7 @@ A reader who hits a missing page sees the tenant's own 404 in its theme and lang
 - Paginated archives: a non-numeric or non-canonical page segment 404s; `/page/1` permanently redirects (308) to the unpaginated URL.
 - A not-found boundary must never call `headers()`; `global-not-found` and `global-error` never wait on a tenant.
 - `GlobalErrorPage` cannot use the catalogue, Voice or `SmartLink` (it sits above every provider) and links home with a plain anchor.
-- Error boundaries write their live-region announcement after mount (`aria-live="assertive"`) and move focus to `<main>`; `LocaleErrorPage` reports each distinct error once.
+- Both error pages render `ErrorPageLayout` and call `useErrorPageAnnouncement`, which reports each distinct error once, writes the live-region announcement after mount (`aria-live="assertive"`) and moves focus to `<main>`.
 
 ## Dependencies
 
@@ -87,7 +88,7 @@ A reader who hits a missing page sees the tenant's own 404 in its theme and lang
 
 ## Tests and stories
 
-- Web tests: `global-error.test.tsx`, `global-not-found.test.tsx`, both `not-found.test.tsx`, `error.test.tsx`, a `*.test.tsx` beside each page component above, `document-shell.test.tsx`, `build-not-found-metadata.test.ts`, `guard-page-loader-result.test.ts`, `proxy.test.ts`.
+- Web tests: `global-error.test.tsx`, `global-not-found.test.tsx`, both `not-found.test.tsx`, `error.test.tsx`, a `*.test.tsx` beside each page component above (the error pages share `testing/pages/error-page/error-page-contract.tsx`), `document-shell.test.tsx`, `build-not-found-metadata.test.ts`, `guard-page-loader-result.test.ts`, `proxy.test.ts`.
 - Stories: `not-found-page.stories.tsx`, `locale-error-page.stories.tsx`, `global-error-page.stories.tsx`.
 - Platform tests: `dead-end-view.test.tsx`, `global-error.test.tsx`; none for `error.tsx` or `not-found.tsx`.
 

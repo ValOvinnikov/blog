@@ -1,129 +1,29 @@
-import { routes, SITE_MESSAGES } from '@shinefold/config';
-import userEvent, { type UserEvent } from '@testing-library/user-event';
+import { SITE_MESSAGES } from '@shinefold/config';
 import { ERROR_BOUNDARY_LOG } from '@web/constants/error-boundary';
-import { customRender, render, screen } from '@web/testing/custom-render';
-import { ARIA_LIVE_ASSERTIVE_SELECTOR } from '@web/testing/shared/aria/constants';
-import {
-  MOCK_ERROR_DIGEST,
-  MOCK_ERROR_WITH_DIGEST,
-} from '@web/testing/shared/error/fixtures';
+import { render, screen } from '@web/testing/custom-render';
+import { testErrorPageContract } from '@web/testing/pages/error-page/error-page-contract';
+import { MOCK_ERROR_WITH_DIGEST } from '@web/testing/shared/error/fixtures';
 
 import { GlobalErrorPage } from './global-error-page';
 
-const { reportClientErrorMock } = vi.hoisted(() => ({
-  reportClientErrorMock: vi.fn(),
-}));
-
-vi.mock('@web/utils/report-client-error', () => ({
-  reportClientError: reportClientErrorMock,
-}));
+vi.mock('@web/utils/report-client-error');
 
 const {
   title: HEADING,
-  announcement: ANNOUNCEMENT,
-  retry: TRY_AGAIN,
-  goHome: GO_HOME,
+  announcement,
+  retry: tryAgain,
+  goHome,
 } = SITE_MESSAGES.localeErrorPage;
 
-const error = MOCK_ERROR_WITH_DIGEST;
-const reset = vi.fn();
-
-const setup = customRender(GlobalErrorPage, { error, reset });
-
 describe(`<${GlobalErrorPage.name}/>`, () => {
-  describe('with the default error', () => {
-    let user: UserEvent;
-
-    beforeEach(() => {
-      user = userEvent.setup();
-      setup();
-    });
-
-    it('renders the heading', () => {
-      const heading = screen.getByRole('heading', { name: HEADING });
-
-      expect(heading).toBeVisible();
-    });
-
-    it('reports the error on mount, with its digest', () => {
-      expect(reportClientErrorMock).toHaveBeenCalledWith(
-        ERROR_BOUNDARY_LOG.GLOBAL_RENDER_FAILED,
-        error,
-        { digest: MOCK_ERROR_DIGEST },
-      );
-    });
-
-    describe('its actions', () => {
-      let tryAgainButton: HTMLElement;
-      let goHomeLink: HTMLElement;
-
-      beforeEach(() => {
-        tryAgainButton = screen.getByRole('button', { name: TRY_AGAIN });
-        goHomeLink = screen.getByRole('link', { name: GO_HOME });
-      });
-
-      it('renders a try-again button', () => {
-        expect(tryAgainButton).toBeVisible();
-      });
-
-      it('calls reset when "Try again" is clicked', async () => {
-        await user.click(tryAgainButton);
-
-        expect(reset).toHaveBeenCalledTimes(1);
-      });
-
-      it('renders "Go home" as a real link, not a button', () => {
-        expect(goHomeLink).toBeVisible();
-        expect(goHomeLink).toHaveAttribute('href', routes.home());
-      });
-
-      it('names both actions in the announcement as the controls render them', () => {
-        const announcement = ANNOUNCEMENT.toLowerCase();
-
-        expect(announcement).toContain(
-          (tryAgainButton.textContent ?? '').toLowerCase(),
-        );
-        expect(announcement).toContain(
-          (goHomeLink.textContent ?? '').toLowerCase(),
-        );
-      });
-    });
-
-    describe('its live region', () => {
-      let liveRegion: HTMLElement;
-
-      beforeEach(() => {
-        liveRegion = screen.getByText(ANNOUNCEMENT, {
-          selector: ARIA_LIVE_ASSERTIVE_SELECTOR,
-        });
-      });
-
-      it('announces the error to assistive technology after mount', () => {
-        expect(liveRegion).toBeVisible();
-      });
-
-      it('sets aria-atomic on the live region', () => {
-        expect(liveRegion).toHaveAttribute('aria-atomic', 'true');
-      });
-    });
-
-    it('moves focus to the page container on mount', () => {
-      const main = screen.getByRole('main');
-
-      expect(main).toHaveFocus();
-    });
-  });
-
-  it('does not re-report on a re-render with the same error', () => {
-    const { rerender } = setup();
-
-    rerender(<GlobalErrorPage error={error} reset={reset} />);
-
-    expect(reportClientErrorMock).toHaveBeenCalledTimes(1);
+  testErrorPageContract({
+    Page: GlobalErrorPage,
+    logEvent: ERROR_BOUNDARY_LOG.GLOBAL_RENDER_FAILED,
+    copy: { title: HEADING, tryAgain, goHome, announcement },
   });
 
   it('renders without the i18n provider, since it sits above it in the tree', () => {
-    render(<GlobalErrorPage error={error} reset={reset} />);
+    render(<GlobalErrorPage error={MOCK_ERROR_WITH_DIGEST} reset={vi.fn()} />);
 
     const heading = screen.getByRole('heading', { name: HEADING });
 

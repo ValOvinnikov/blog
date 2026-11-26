@@ -3,10 +3,15 @@ import { routes, SITE_MESSAGES } from '@shinefold/config';
 import { ARIA_CURRENT } from '@shinefold/ui/testing/aria';
 import { customRender, screen } from '@web/testing/custom-render';
 import {
+  mockGroupedLandingSectionNavigation,
   mockLandingSectionNavigation,
   MOCK_SECTION_FAQ_PATH,
   MOCK_SECTION_FAQ_TITLE,
   MOCK_SECTION_PRICING_PATH,
+  MOCK_SECTION_PRICING_PLANS_PATH,
+  MOCK_SECTION_PRICING_PLANS_TITLE,
+  MOCK_SECTION_PRICING_TIERS_PATH,
+  MOCK_SECTION_PRICING_TIERS_TITLE,
   MOCK_SECTION_PRICING_TITLE,
   MOCK_SECTION_ROOT_PATH,
   MOCK_SECTION_ROOT_TITLE,
@@ -25,6 +30,17 @@ const MOCK_PARENT_TITLE = faker.lorem.words(2);
 const MOCK_PARENT_PATH = faker.lorem.slug();
 const BACK_LINK_NAME = BACK_TO_TEMPLATE.replace('{title}', MOCK_PARENT_TITLE);
 
+const SECTION_LINK_TARGETS = [
+  [MOCK_SECTION_ROOT_TITLE, routes.landingPage(MOCK_SECTION_ROOT_PATH)],
+  [MOCK_SECTION_FAQ_TITLE, routes.landingPage(MOCK_SECTION_FAQ_PATH)],
+  [MOCK_SECTION_PRICING_TITLE, routes.landingPage(MOCK_SECTION_PRICING_PATH)],
+];
+
+const getLinkTargets = () =>
+  screen
+    .getAllByRole('link')
+    .map((link) => [link.textContent, link.getAttribute('href')]);
+
 const setup = customRender(SectionNavigation, {
   sectionNavigation: mockLandingSectionNavigation(),
 });
@@ -42,18 +58,9 @@ describe(`<${SectionNavigation.name}/>`, () => {
     });
 
     it('links the section root first, then its pages, with no back link', () => {
-      const links = screen
-        .getAllByRole('link')
-        .map((link) => [link.textContent, link.getAttribute('href')]);
+      const links = getLinkTargets();
 
-      expect(links).toEqual([
-        [MOCK_SECTION_ROOT_TITLE, routes.landingPage(MOCK_SECTION_ROOT_PATH)],
-        [MOCK_SECTION_FAQ_TITLE, routes.landingPage(MOCK_SECTION_FAQ_PATH)],
-        [
-          MOCK_SECTION_PRICING_TITLE,
-          routes.landingPage(MOCK_SECTION_PRICING_PATH),
-        ],
-      ]);
+      expect(links).toEqual(SECTION_LINK_TARGETS);
     });
 
     it('marks the current page with aria-current="page", and no other', () => {
@@ -155,6 +162,37 @@ describe(`<${SectionNavigation.name}/>`, () => {
         'href',
         routes.landingPage(MOCK_PARENT_PATH),
       );
+    });
+  });
+
+  describe('with a group of sub-pages and the current page inside it', () => {
+    beforeEach(() => {
+      setup({ sectionNavigation: mockGroupedLandingSectionNavigation() });
+    });
+
+    it("lists each group's title followed by its pages", () => {
+      const links = getLinkTargets();
+
+      expect(links).toEqual([
+        ...SECTION_LINK_TARGETS,
+        [
+          MOCK_SECTION_PRICING_PLANS_TITLE,
+          routes.landingPage(MOCK_SECTION_PRICING_PLANS_PATH),
+        ],
+        [
+          MOCK_SECTION_PRICING_TIERS_TITLE,
+          routes.landingPage(MOCK_SECTION_PRICING_TIERS_PATH),
+        ],
+      ]);
+    });
+
+    it('marks the sub-page as current and not its group', () => {
+      const currentLinks = screen
+        .getAllByRole('link')
+        .filter((link) => link.hasAttribute(ARIA_CURRENT))
+        .map((link) => link.textContent);
+
+      expect(currentLinks).toEqual([MOCK_SECTION_PRICING_PLANS_TITLE]);
     });
   });
 });
