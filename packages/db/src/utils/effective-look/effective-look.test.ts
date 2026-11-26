@@ -33,6 +33,7 @@ import {
 } from '@shinefold/config/constants';
 import { LOOK_FIELD, PLAN_ENTITLEMENTS } from '@shinefold/db/constants';
 import { MOCK_ACCENT_HUE } from '@shinefold/db/testing/site-config/fixtures';
+import { SHINEFOLD_LOGO_COLOR } from '@shinefold/utils/shinefold-logo';
 
 import {
   isLookFieldWithin,
@@ -104,6 +105,11 @@ const MOCK_ENTITLEMENTS = {
   unlockedPresets: [],
 };
 const SHINEFOLD_LOOK = { ...STORED_LOOK, preset: PRESET_ID.SHINEFOLD };
+const SHINEFOLD_GRANT = { unlockedPresets: [PRESET_ID.SHINEFOLD] };
+const UNSAVED_BUTTON_COLOR = {
+  buttonColor: undefined,
+  buttonColorDark: undefined,
+};
 
 describe(toEffectiveLookWithin, () => {
   it('returns every stored value on Growth', () => {
@@ -236,12 +242,48 @@ describe(toEffectiveLookWithin, () => {
 
   it('keeps a stored Shinefold preset with its grant', () => {
     expect(
-      toEffectiveLookWithin(SHINEFOLD_LOOK, {
-        ...GROWTH,
-        unlockedPresets: [PRESET_ID.SHINEFOLD],
-      }),
+      toEffectiveLookWithin(SHINEFOLD_LOOK, { ...GROWTH, ...SHINEFOLD_GRANT }),
     ).toEqual(SHINEFOLD_LOOK);
   });
+
+  it('gives an unsaved Shinefold Look the logo yellow, no dark colour', () => {
+    expect(
+      toEffectiveLookWithin(
+        { ...SHINEFOLD_LOOK, ...UNSAVED_BUTTON_COLOR },
+        { ...GROWTH, ...SHINEFOLD_GRANT },
+      ),
+    ).toMatchObject({
+      buttonColor: SHINEFOLD_LOGO_COLOR.YELLOW,
+      buttonColorDark: undefined,
+    });
+  });
+
+  it.each([
+    [TENANT_PLAN.FREE, FREE],
+    [TENANT_PLAN.STARTER, STARTER],
+  ] as const)(
+    'gives a Shinefold site the logo yellow on %s whatever is stored',
+    (_, entitlements) => {
+      expect(
+        toEffectiveLookWithin(SHINEFOLD_LOOK, {
+          ...entitlements,
+          ...SHINEFOLD_GRANT,
+        }).buttonColor,
+      ).toBe(SHINEFOLD_LOGO_COLOR.YELLOW);
+    },
+  );
+
+  it.each([PRESET_ID.CONSOLE, PRESET_ID.EDITORIAL])(
+    'returns no button colour for an unsaved %s site',
+    (preset) => {
+      expect(
+        toEffectiveLookWithin(
+          { ...STORED_LOOK, ...UNSAVED_BUTTON_COLOR, preset },
+          GROWTH,
+        ),
+      ).toEqual({ ...STORED_LOOK, ...UNSAVED_BUTTON_COLOR, preset });
+    },
+  );
 });
 
 describe(isLookFieldWithin, () => {

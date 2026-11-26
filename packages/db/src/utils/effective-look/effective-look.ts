@@ -3,13 +3,18 @@ import {
   LANGUAGE_SWITCHER_STYLE,
   OPEN_PRESET_IDS,
   PRESET_ID,
+  PRESET_REGISTRY,
   type TPresetId,
 } from '@shinefold/config/constants';
-import { LOOK_FIELDS, type TLookField } from '@shinefold/db/constants';
+import {
+  LOOK_FIELD,
+  LOOK_FIELDS,
+  type TLookField,
+} from '@shinefold/db/constants';
 import type { TSiteConfigResult } from '@shinefold/db/queries/site-config/get-site-config';
 import { presetSiteConfig } from '@shinefold/db/utils/preset-site-config/preset-site-config';
 import type { TTenantEntitlements } from '@shinefold/db/utils/resolve-tenant-entitlements/resolve-tenant-entitlements';
-import { isOneOf } from '@shinefold/utils/primitives';
+import { isOneOf, isUndefined } from '@shinefold/utils/primitives';
 
 export type TLook = Pick<TSiteConfigResult, TLookField>;
 
@@ -25,7 +30,7 @@ function presetLook(preset: TPresetId): TLook {
     logoAssetUrl: undefined,
     logoDarkAssetUrl: undefined,
     faviconAssetUrl: undefined,
-    buttonColor: undefined,
+    buttonColor: PRESET_REGISTRY[preset].buttonColor ?? undefined,
     buttonColorDark: undefined,
   };
 }
@@ -64,21 +69,24 @@ export function toEffectivePreset(
   return isPresetWithin(preset, entitlements) ? preset : PRESET_ID.CONSOLE;
 }
 
-/** The Look a site renders: Console for a preset it may not use, and that preset's value for every field outside the entitlements. */
+/** The Look a site renders: Console for a preset it may not use, and that preset's value for every field outside the entitlements and for an unsaved button colour. */
 export function toEffectiveLookWithin<T extends TLookInput>(
   look: T,
   entitlements: TEffectiveLookEntitlements,
 ): T {
   const preset = toEffectivePreset(look.preset, entitlements);
   const fallback = presetLook(preset);
-  const locked = LOOK_FIELDS.filter(
-    (field) => field in look && !isLookFieldWithin(field, entitlements),
+  const fromPreset = LOOK_FIELDS.filter(
+    (field) =>
+      field in look &&
+      (!isLookFieldWithin(field, entitlements) ||
+        (field === LOOK_FIELD.BUTTON_COLOR && isUndefined(look[field]))),
   );
 
   return {
     ...look,
     preset,
-    ...Object.fromEntries(locked.map((field) => [field, fallback[field]])),
+    ...Object.fromEntries(fromPreset.map((field) => [field, fallback[field]])),
   };
 }
 
