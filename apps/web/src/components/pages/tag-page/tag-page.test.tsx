@@ -1,22 +1,12 @@
 import { faker } from '@faker-js/faker';
 import { SITE_MESSAGES } from '@shinefold/config';
-import { service, type TTagDetailPage } from '@shinefold/service';
-import { errorResult, okResult } from '@shinefold/utils';
+import { service } from '@shinefold/service';
 import { TAG_LOG } from '@web/constants/tag';
-import {
-  customRenderServerAsync,
-  screen,
-  within,
-} from '@web/testing/custom-render';
-import { mockPostListModuleData } from '@web/testing/modules/post-list/fixtures';
-import { MOCK_ERROR } from '@web/testing/shared/error/fixtures';
-import { MOCK_POST_LIST_ID } from '@web/testing/shared/module-renderer-contract/fixtures';
+import { customRenderServerAsync } from '@web/testing/custom-render';
+import { testNamesTermInEmptyPostList } from '@web/testing/pages/empty-post-list-contract/empty-post-list-contract';
+import { testLoadedPageContract } from '@web/testing/pages/loaded-page-contract/loaded-page-contract';
 import { mockTag, mockTagDetailPage } from '@web/testing/shared/tag/fixtures';
-import {
-  MOCK_TENANT_NAME,
-  MOCK_TENANT_SANITY_CONTEXT,
-} from '@web/testing/shared/tenant/fixtures';
-import { logger } from '@web/utils/logger/logger';
+import { MOCK_TENANT_SANITY_CONTEXT } from '@web/testing/shared/tenant/fixtures';
 
 import { TagPage } from './tag-page';
 
@@ -41,7 +31,6 @@ vi.mock('@shinefold/service', () => ({
 vi.mock('@web/i18n/navigation');
 
 const getTagPageMock = vi.mocked(service.pages.tag.v1.getTagPage);
-const getPostListMock = vi.mocked(service.modules.postList.v1.getPostList);
 
 const MOCK_TAG_SLUG = faker.lorem.slug();
 const MOCK_TAG = mockTag({
@@ -50,73 +39,28 @@ const MOCK_TAG = mockTag({
   slug: MOCK_TAG_SLUG,
 });
 
-const resolveTagPageWith = (overrides: Partial<TTagDetailPage>) =>
-  getTagPageMock.mockResolvedValueOnce(
-    okResult(mockTagDetailPage({ tag: MOCK_TAG, ...overrides })),
-  );
+const MOCK_TAG_PAGE = mockTagDetailPage({ tag: MOCK_TAG });
 
 const setup = customRenderServerAsync(TagPage, {
   slug: MOCK_TAG_SLUG,
 });
 
 describe(`<${TagPage.name}/>`, () => {
-  beforeEach(() => {
-    getTagPageMock.mockResolvedValue(
-      okResult(mockTagDetailPage({ tag: MOCK_TAG })),
-    );
+  testLoadedPageContract({
+    pageLoaderMock: getTagPageMock,
+    setup,
+    successData: MOCK_TAG_PAGE,
+    loaderArgs: [MOCK_TAG_SLUG, MOCK_TENANT_SANITY_CONTEXT],
+    logEvent: TAG_LOG.PAGE_FETCH_FAILED,
+    logContext: { slug: MOCK_TAG_SLUG },
+    currentCrumb: MOCK_TAG.title,
   });
 
-  describe('with the default tag', () => {
-    beforeEach(async () => {
-      await setup();
-    });
-
-    it('fetches the tag for the given slug with the tenant context', () => {
-      expect(getTagPageMock).toHaveBeenCalledWith(
-        MOCK_TAG_SLUG,
-        MOCK_TENANT_SANITY_CONTEXT,
-      );
-    });
-
-    it('renders the breadcrumb trail outside main', () => {
-      const breadcrumbs = screen.getByRole('navigation', {
-        name: SITE_MESSAGES.breadcrumbs.ariaLabel,
-      });
-      const homeLink = within(breadcrumbs).getByRole('link', {
-        name: MOCK_TENANT_NAME,
-      });
-      const currentCrumb = within(breadcrumbs).getByText(MOCK_TAG.title);
-      const main = screen.getByRole('main');
-
-      expect(homeLink).toBeVisible();
-      expect(currentCrumb).toBeVisible();
-      expect(main).not.toContainElement(breadcrumbs);
-    });
-  });
-
-  it('logs and throws to the error boundary when the fetch fails', async () => {
-    getTagPageMock.mockResolvedValueOnce(errorResult(MOCK_ERROR));
-
-    await expect(setup()).rejects.toBe(MOCK_ERROR);
-
-    expect(logger.error).toHaveBeenCalledWith(TAG_LOG.PAGE_FETCH_FAILED, {
-      slug: MOCK_TAG_SLUG,
-      error: MOCK_ERROR,
-    });
-  });
-
-  it('names the tag in an empty post list', async () => {
-    resolveTagPageWith({
-      modules: [{ id: MOCK_POST_LIST_ID, type: 'module_postList' }],
-    });
-    getPostListMock.mockResolvedValueOnce(okResult(mockPostListModuleData()));
-
-    await setup();
-
-    const emptyState = screen.getByText(
-      SITE_MESSAGES.tagPage.empty.replace('{name}', MOCK_TAG.title),
-    );
-
-    expect(emptyState).toBeVisible();
+  testNamesTermInEmptyPostList({
+    pageLoaderMock: getTagPageMock,
+    postListMock: vi.mocked(service.modules.postList.v1.getPostList),
+    setup,
+    successData: MOCK_TAG_PAGE,
+    emptyState: SITE_MESSAGES.tagPage.empty.replace('{name}', MOCK_TAG.title),
   });
 });

@@ -1,13 +1,9 @@
 import { faker } from '@faker-js/faker';
 import { TAXONOMY_KIND } from '@shinefold/config';
 import { service } from '@shinefold/service';
-import { errorResult, okResult } from '@shinefold/utils';
-import {
-  customRenderServerAsync,
-  screen,
-  within,
-} from '@web/testing/custom-render';
-import { mockHeroBlogData } from '@web/testing/modules/hero-blog/fixtures';
+import { errorResult } from '@shinefold/utils';
+import { customRenderServerAsync, screen } from '@web/testing/custom-render';
+import { testPageHeading } from '@web/testing/pages/page-heading-contract/page-heading-contract';
 import { MOCK_ERROR } from '@web/testing/shared/error/fixtures';
 import { mockHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
 import {
@@ -38,7 +34,6 @@ vi.mock('@web/server/site-config/get-voice-rich/get-voice-rich');
 vi.mock('@shinefold/service', () => ({
   service: {
     modules: {
-      heroBlog: { v1: { getHeroBlog: vi.fn() } },
       postList: { v1: { getPostList: vi.fn() } },
     },
   },
@@ -46,15 +41,12 @@ vi.mock('@shinefold/service', () => ({
 
 vi.mock('@web/i18n/navigation');
 
-const getHeroBlogMock = vi.mocked(service.modules.heroBlog.v1.getHeroBlog);
 const getPostListMock = vi.mocked(service.modules.postList.v1.getPostList);
 
 const MOCK_TERM = mockTopic({
   id: faker.string.uuid(),
   title: faker.lorem.word(),
 });
-const MOCK_HERO_ID = faker.string.uuid();
-const MOCK_HERO_HEADING = faker.lorem.words(3);
 const MOCK_PAGE_HEADING = faker.lorem.words(2);
 const MOCK_SUPPORTING_TEXT = faker.lorem.sentence();
 const MOCK_PAGE_NUMBER = faker.number.int({ min: 2, max: 9 });
@@ -85,18 +77,6 @@ describe(`<${TaxonomyPage.name}/>`, () => {
       await setup({
         children: <div data-testid={MOCK_CHILDREN_STUB_TEST_ID} />,
       });
-    });
-
-    it('renders the page heading and supporting text inside main', () => {
-      const main = screen.getByRole('main');
-      const heading = within(main).getByRole('heading', {
-        level: 1,
-        name: MOCK_PAGE_HEADING,
-      });
-      const supportingText = within(main).getByText(MOCK_SUPPORTING_TEXT);
-
-      expect(heading).toBeVisible();
-      expect(supportingText).toBeVisible();
     });
 
     it('renders the given breadcrumbs outside main', () => {
@@ -143,28 +123,9 @@ describe(`<${TaxonomyPage.name}/>`, () => {
     expect(readJsonLd()).toContain(MOCK_FAQ_PAGE_JSON_LD_FRAGMENT);
   });
 
-  it('renders the hero in place of the heading when one is set', async () => {
-    getHeroBlogMock.mockResolvedValueOnce(
-      okResult(mockHeroBlogData({ heading: MOCK_HERO_HEADING })),
-    );
-
-    await setup({
-      pageData: {
-        ...MOCK_PAGE_DATA,
-        hero: { id: MOCK_HERO_ID, type: 'module_heroBlog' },
-      },
-    });
-
-    const heroHeading = screen.getByRole('heading', {
-      level: 1,
-      name: MOCK_HERO_HEADING,
-    });
-    const pageHeading = screen.queryByRole('heading', {
-      level: 1,
-      name: MOCK_PAGE_HEADING,
-    });
-
-    expect(heroHeading).toBeVisible();
-    expect(pageHeading).not.toBeInTheDocument();
+  testPageHeading({
+    renderPage: () => setup(),
+    heading: MOCK_PAGE_HEADING,
+    supportingText: MOCK_SUPPORTING_TEXT,
   });
 });
