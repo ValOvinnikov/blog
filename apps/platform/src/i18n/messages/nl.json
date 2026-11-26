@@ -2745,6 +2745,8 @@
       "footerBackground": "Achtergrond van de voettekst",
       "footerSurface": "Oppervlak van de voettekst",
       "cookieSettingsButton": "Knop voor cookie-instellingen",
+      "buttonColor": "Knopkleur",
+      "buttonColorDark": "Knopkleur op donkere achtergronden",
       "brandName": "Merknaam",
       "logoAssetUrl": "Logoafbeelding",
       "logoDarkAssetUrl": "Logoafbeelding voor donkere modus",

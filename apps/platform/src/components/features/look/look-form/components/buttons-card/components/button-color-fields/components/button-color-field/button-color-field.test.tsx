@@ -1,5 +1,11 @@
+import messages from '@platform/i18n/messages/en.json';
+import { ARIA_DISABLED } from '@platform/testing/aria';
 import { customRender, screen, waitFor } from '@platform/testing/custom-render';
-import { BUTTON_COLOR_FOLLOWS_ACCENT } from '@platform/testing/look/look-button-color';
+import {
+  BUTTON_COLOR_FOLLOWS_ACCENT,
+  followSwitch,
+  hexInputs,
+} from '@platform/testing/look/look-button-color';
 import {
   MOCK_PINK_HEX,
   MOCK_YELLOW_HEX,
@@ -9,13 +15,14 @@ import userEvent, { type UserEvent } from '@testing-library/user-event';
 import { ButtonColorField } from './button-color-field';
 
 const MOCK_INPUT_ID = 'button-color';
-const UNLOCKED = {
+const MOCK_UNLOCKED = {
   isDisabled: false,
   isLocked: false,
   aria: { labelledBy: undefined, describedBy: undefined },
   labelId: 'label',
   growthBadgeId: undefined,
 };
+const MOCK_LOCKED = { ...MOCK_UNLOCKED, isLocked: true };
 
 const onChange = vi.fn();
 
@@ -26,11 +33,8 @@ const setup = customRender(ButtonColorField, {
   followLabel: BUTTON_COLOR_FOLLOWS_ACCENT,
   inputId: MOCK_INPUT_ID,
   isInvalid: false,
-  lock: UNLOCKED,
+  lock: MOCK_UNLOCKED,
 });
-
-const followSwitch = () =>
-  screen.getByRole('switch', { name: BUTTON_COLOR_FOLLOWS_ACCENT });
 
 describe(`<${ButtonColorField.name}/>`, () => {
   let user: UserEvent;
@@ -42,7 +46,7 @@ describe(`<${ButtonColorField.name}/>`, () => {
 
   it('seeds the colour when following is switched off', async () => {
     setup();
-    const switchControl = followSwitch();
+    const switchControl = followSwitch(BUTTON_COLOR_FOLLOWS_ACCENT);
 
     await user.click(switchControl);
 
@@ -54,7 +58,7 @@ describe(`<${ButtonColorField.name}/>`, () => {
   describe('with a colour picked', () => {
     it('clears the colour when following is switched back on', async () => {
       setup({ color: MOCK_PINK_HEX });
-      const switchControl = followSwitch();
+      const switchControl = followSwitch(BUTTON_COLOR_FOLLOWS_ACCENT);
 
       await user.click(switchControl);
 
@@ -64,13 +68,32 @@ describe(`<${ButtonColorField.name}/>`, () => {
     });
 
     it('disables both controls while disabled', () => {
-      setup({ color: MOCK_PINK_HEX, lock: { ...UNLOCKED, isDisabled: true } });
+      setup({
+        color: MOCK_PINK_HEX,
+        lock: { ...MOCK_UNLOCKED, isDisabled: true },
+      });
 
-      const switchControl = followSwitch();
-      const hexInput = screen.getByRole('textbox');
+      const switchControl = followSwitch(BUTTON_COLOR_FOLLOWS_ACCENT);
+      const [hexInput] = hexInputs();
 
       expect(switchControl).toBeDisabled();
       expect(hexInput).toBeDisabled();
+    });
+
+    it('keeps the locked picker and hex field focusable but unchangeable', async () => {
+      setup({ color: MOCK_PINK_HEX, lock: MOCK_LOCKED });
+      const picker = screen.getByLabelText(
+        messages.buttonColorField.pickerAriaLabel,
+      );
+      const [hexInput] = hexInputs();
+
+      await user.type(hexInput!, MOCK_YELLOW_HEX);
+
+      expect(picker).toBeEnabled();
+      expect(picker).toHaveAttribute(ARIA_DISABLED, 'true');
+      expect(hexInput).toBeEnabled();
+      expect(hexInput).toHaveAttribute(ARIA_DISABLED, 'true');
+      expect(onChange).not.toHaveBeenCalled();
     });
   });
 });

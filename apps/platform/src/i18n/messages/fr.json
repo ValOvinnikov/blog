@@ -2745,6 +2745,8 @@
       "footerBackground": "Arrière-plan du pied de page",
       "footerSurface": "Surface du pied de page",
       "cookieSettingsButton": "Bouton des paramètres des cookies",
+      "buttonColor": "Couleur des boutons",
+      "buttonColorDark": "Couleur des boutons sur fond sombre",
       "brandName": "Nom de la marque",
       "logoAssetUrl": "Image du logo",
       "logoDarkAssetUrl": "Image du logo pour le mode sombre",

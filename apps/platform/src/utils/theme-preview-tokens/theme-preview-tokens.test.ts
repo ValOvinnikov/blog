@@ -34,6 +34,7 @@ import {
   RADIUS_SCALE,
 } from '@shinefold/config';
 import {
+  MOCK_PARTIAL_HEX,
   MOCK_PINK_HEX,
   MOCK_YELLOW_HEX,
 } from '@shinefold/config/testing/button-colors';
@@ -231,7 +232,7 @@ describe(buildSitePreviewTheme, () => {
   it('leaves the buttons on the accent while the button colour is not a hex colour yet', () => {
     const values = {
       ...defaultLookFormValues(),
-      buttonColor: MOCK_YELLOW_HEX.slice(0, -1),
+      buttonColor: MOCK_PARTIAL_HEX,
     };
 
     expect(

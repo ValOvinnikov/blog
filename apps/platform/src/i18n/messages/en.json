@@ -2745,6 +2745,8 @@
       "footerBackground": "Footer background",
       "footerSurface": "Footer surface",
       "cookieSettingsButton": "Cookie settings button",
+      "buttonColor": "Button colour",
+      "buttonColorDark": "Button colour on dark backgrounds",
       "brandName": "Brand name",
       "logoAssetUrl": "Logo image",
       "logoDarkAssetUrl": "Dark-mode logo image",

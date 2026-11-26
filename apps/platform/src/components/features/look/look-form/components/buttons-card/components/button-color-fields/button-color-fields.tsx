@@ -1,4 +1,3 @@
-import { ButtonColorField } from '@platform/components/features/look/button-color-field';
 import { LookField } from '@platform/components/features/look/look-form/components/look-field';
 import { useLookFieldLock } from '@platform/components/features/look/look-form/use-look-field-lock';
 import { useLookForm } from '@platform/components/features/look/look-form-provider';
@@ -16,6 +15,8 @@ import {
 } from '@shinefold/config';
 import { hasArrayGotItems, isUndefined } from '@shinefold/utils/primitives';
 import { useFormatter, useTranslations } from 'next-intl';
+
+import { ButtonColorField } from './components/button-color-field/button-color-field';
 
 export const ButtonColorFields = () => {
   const {

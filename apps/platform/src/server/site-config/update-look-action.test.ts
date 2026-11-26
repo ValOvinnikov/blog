@@ -153,7 +153,7 @@ const VALID_INPUT: TUpdateLookInput = {
   brandName: MOCK_BRAND_NAME,
 };
 
-const STORED_LOOK = {
+const MOCK_STORED_LOOK = {
   ...VALID_INPUT,
   logoHue: undefined,
   buttonColor: MOCK_BUTTON_COLOR,
@@ -185,7 +185,7 @@ describe(updateLookAction, () => {
       user: { id: MOCK_OPERATOR_ID, email: MOCK_OPERATOR_EMAIL },
     });
     getSiteConfigMock.mockReset();
-    getSiteConfigMock.mockResolvedValue(mockSiteConfig(STORED_LOOK));
+    getSiteConfigMock.mockResolvedValue(mockSiteConfig(MOCK_STORED_LOOK));
     upsertSiteConfigMock.mockReset();
     stampSiteConfigSavedAtMock.mockReset();
     insertAuditEventMock.mockReset();
@@ -228,32 +228,26 @@ describe(updateLookAction, () => {
       });
     });
 
-    it('refuses a Growth-only field changed from its stored value, and writes nothing', async () => {
-      const result = await updateLookAction(MOCK_TENANT_ID, {
-        ...VALID_INPUT,
-        radiusScale: RADIUS_SCALE.LG,
-      });
+    it.each([
+      [LOOK_FIELD.RADIUS_SCALE, RADIUS_SCALE.LG],
+      [LOOK_FIELD.BUTTON_COLOR, faker.color.rgb()],
+    ])(
+      'refuses a %s changed from its stored value, and writes nothing',
+      async (field, value) => {
+        const result = await updateLookAction(MOCK_TENANT_ID, {
+          ...VALID_INPUT,
+          [field]: value,
+        });
 
-      expect(result).toEqual({
-        outcome: ACTION_OUTCOME.REFUSED,
-        reason: SETTINGS_REFUSAL.NOT_IN_PLAN,
-        values: { plan: TENANT_PLAN.FREE },
-        items: [LOOK_FIELD.RADIUS_SCALE],
-      });
-      expect(upsertSiteConfigMock).not.toHaveBeenCalled();
-    });
-
-    it('refuses a button colour picked on Free, and writes nothing', async () => {
-      const result = await updateLookAction(MOCK_TENANT_ID, {
-        ...VALID_INPUT,
-        buttonColor: faker.color.rgb(),
-      });
-
-      expect(result).toEqual(
-        expect.objectContaining({ items: [LOOK_FIELD.BUTTON_COLOR] }),
-      );
-      expect(upsertSiteConfigMock).not.toHaveBeenCalled();
-    });
+        expect(result).toEqual({
+          outcome: ACTION_OUTCOME.REFUSED,
+          reason: SETTINGS_REFUSAL.NOT_IN_PLAN,
+          values: { plan: TENANT_PLAN.FREE },
+          items: [field],
+        });
+        expect(upsertSiteConfigMock).not.toHaveBeenCalled();
+      },
+    );
 
     it('saves an accent hue change while the Growth-only fields keep their stored values', async () => {
       const result = await updateLookAction(MOCK_TENANT_ID, {
@@ -270,7 +264,7 @@ describe(updateLookAction, () => {
 
     it('saves when the Growth-only fields hold the preset values the Free page shows', async () => {
       const presetValues = toEffectiveLookWithin(
-        { ...STORED_LOOK, radiusScale: RADIUS_SCALE.LG },
+        { ...MOCK_STORED_LOOK, radiusScale: RADIUS_SCALE.LG },
         PLAN_ENTITLEMENTS[TENANT_PLAN.FREE],
       );
 
@@ -303,7 +297,7 @@ describe(updateLookAction, () => {
   describe('with the Shinefold preset stored and no grant', () => {
     beforeEach(() => {
       getSiteConfigMock.mockResolvedValue(
-        mockSiteConfig({ ...STORED_LOOK, preset: PRESET_ID.SHINEFOLD }),
+        mockSiteConfig({ ...MOCK_STORED_LOOK, preset: PRESET_ID.SHINEFOLD }),
       );
     });
 

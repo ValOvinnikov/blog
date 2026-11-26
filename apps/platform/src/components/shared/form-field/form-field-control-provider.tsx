@@ -8,6 +8,7 @@ type TFormFieldControlContext = {
   id?: string;
   describedBy?: string;
   appearance?: TFieldAppearance;
+  isLocked?: boolean;
 };
 
 const FormFieldControlContext =
@@ -21,11 +22,12 @@ export const FormFieldControlProvider = ({
   id,
   describedBy,
   appearance,
+  isLocked,
   children,
 }: TFormFieldControlProviderProps) => {
   const value = useMemo(
-    () => ({ id, describedBy, appearance }),
-    [id, describedBy, appearance],
+    () => ({ id, describedBy, appearance, isLocked }),
+    [id, describedBy, appearance, isLocked],
   );
 
   return (

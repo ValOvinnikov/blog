@@ -2745,6 +2745,8 @@
       "footerBackground": "Fußzeilen-Hintergrund",
       "footerSurface": "Fußzeilen-Fläche",
       "cookieSettingsButton": "Schaltfläche für Cookie-Einstellungen",
+      "buttonColor": "Schaltflächenfarbe",
+      "buttonColorDark": "Schaltflächenfarbe auf dunklem Hintergrund",
       "brandName": "Markenname",
       "logoAssetUrl": "Logo-Bild",
       "logoDarkAssetUrl": "Logo-Bild für den Dunkelmodus",

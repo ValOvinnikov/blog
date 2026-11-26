@@ -19,6 +19,7 @@ import { saveAndExpectLook } from '@platform/testing/look/look-form-save';
 import { setupLookForm } from '@platform/testing/look/look-form-setup';
 import { BRAND_VARIANT, COLOR_SCHEME } from '@shinefold/config';
 import {
+  MOCK_PARTIAL_HEX,
   MOCK_PINK_HEX,
   MOCK_WHITE_HEX,
   MOCK_YELLOW_HEX,
@@ -35,7 +36,6 @@ vi.mock('@platform/server/site-config/clear-brand-asset-action');
 
 const { lookForm: LOOK_FORM } = messages;
 const tLookForm = makeEnTranslator('lookForm');
-const PARTIAL_HEX = MOCK_YELLOW_HEX.slice(0, -1);
 const FAINT_ON_PLAIN_LIGHT = tLookForm('buttonColorFaintGround', {
   skin: LOOK_FORM.skinLabel[BRAND_VARIANT.PRIMARY],
   scheme: COLOR_SCHEME.LIGHT,
@@ -101,7 +101,7 @@ describe(`<${LookForm.name}/>`, () => {
 
     describe('with a colour that is not a hex colour', () => {
       beforeEach(async () => {
-        await pickButtonColor(user, PARTIAL_HEX);
+        await pickButtonColor(user, MOCK_PARTIAL_HEX);
       });
 
       it('shows a field error', () => {

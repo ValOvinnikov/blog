@@ -24,7 +24,7 @@ import {
 import { toOptions } from '@shinefold/utils/primitives';
 import { useTranslations } from 'next-intl';
 
-import { ButtonColorFields } from './components/button-color-fields';
+import { ButtonColorFields } from './components/button-color-fields/button-color-fields';
 
 export type TButtonsCardProps = {
   summary: string;
