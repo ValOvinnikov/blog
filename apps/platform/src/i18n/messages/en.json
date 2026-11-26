@@ -312,7 +312,9 @@
     },
     "manage": "Manage",
     "manageAriaLabel": "Manage {tenantName}",
-    "matchedDomain": "Matched on {domain}"
+    "matchedDomain": "Matched on {domain}",
+    "showing": "{from, number}–{to, number} of {count, number} {count, plural, one {tenant} other {tenants}}",
+    "count": "{count, plural, one {# tenant} other {# tenants}}"
   },
   "tenantsSearch": {
     "label": "Search tenants",

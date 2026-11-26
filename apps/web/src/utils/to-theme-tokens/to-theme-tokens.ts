@@ -2,15 +2,21 @@ import {
   isAccentHueAccessible,
   PRESET_ID,
   PRESET_REGISTRY,
+  type TMaybeUndefined,
   type TPresetId,
   type TThemeTokens,
 } from '@shinefold/config';
 
-type TThemeTokensRow = TThemeTokens & { preset: TPresetId };
+export type TSiteThemeTokens = TThemeTokens & {
+  buttonColor?: string;
+  buttonColorDark?: string;
+};
+
+type TThemeTokensRow = TSiteThemeTokens & { preset: TPresetId };
 
 export const toThemeTokens = (
-  row: TThemeTokensRow | undefined,
-): TThemeTokens => {
+  row: TMaybeUndefined<TThemeTokensRow>,
+): TSiteThemeTokens => {
   const preset = row?.preset ?? PRESET_ID.CONSOLE;
   const {
     themeTokens: base,
@@ -46,5 +52,7 @@ export const toThemeTokens = (
     headingCase: row?.headingCase ?? headingCase,
     imageProportion: row?.imageProportion ?? imageProportion,
     dividerWidth: row?.dividerWidth ?? dividerWidth,
+    buttonColor: row?.buttonColor,
+    buttonColorDark: row?.buttonColorDark,
   };
 };

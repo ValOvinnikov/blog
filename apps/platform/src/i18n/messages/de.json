@@ -312,7 +312,9 @@
     },
     "manage": "Verwalten",
     "manageAriaLabel": "{tenantName} verwalten",
-    "matchedDomain": "Gefunden über {domain}"
+    "matchedDomain": "Gefunden über {domain}",
+    "showing": "{from, number}–{to, number} von {count, number} {count, plural, one {Mandant} other {Mandanten}}",
+    "count": "{count, plural, one {# Mandant} other {# Mandanten}}"
   },
   "tenantsSearch": {
     "label": "Mandanten suchen",

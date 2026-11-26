@@ -110,3 +110,5 @@ export const TENANT_VISIBILITY = {
 export type TTenantVisibility = TValueOf<typeof TENANT_VISIBILITY>;
 
 export const TENANTS_SEARCH_DEBOUNCE_MS = 300;
+
+export const TENANTS_PAGE_SIZE = 25;

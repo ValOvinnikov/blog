@@ -1,4 +1,5 @@
 import { JsonLd } from '@web/components/shared/json-ld';
+import { POST_LOG } from '@web/constants/post';
 import { routing } from '@web/i18n/routing';
 import { getPostPage } from '@web/server/post/get-post-page/get-post-page';
 import { getRequestContext } from '@web/server/request-context/request-context';
@@ -13,7 +14,7 @@ export const BlogPostingSchema = async ({ slug }: TBlogPostingSchemaProps) => {
   const result = await getPostPage(slug);
   const post = guardPageLoaderResult(
     result,
-    'blog_posting_schema.fetch_failed',
+    POST_LOG.BLOG_POSTING_SCHEMA_FETCH_FAILED,
     { slug },
   );
   const {

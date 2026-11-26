@@ -50,6 +50,7 @@ export const Carousel = <T,>({
       aria-roledescription="carousel"
       aria-label={ariaLabel}
       className={className}
+      data-alignment={alignment}
       data-testid={dataTestId}
     >
       <div ref={viewportRef} className={s.viewport()}>

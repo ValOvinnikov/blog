@@ -14,6 +14,11 @@ import { Icon } from '@shinefold/ui/components/atoms/icon';
 import { TextLink } from '@shinefold/ui/components/atoms/text-link';
 import { ShareLink } from '@shinefold/ui/components/molecules/share-link';
 import { EveryBrandBand } from '@shinefold/ui/testing/brand-bands';
+import {
+  MOCK_ONE_HIGHLIGHT_PIECES,
+  MOCK_TWO_HIGHLIGHT_PIECES,
+  toHeadingWords,
+} from '@shinefold/ui/testing/heading-pieces';
 import { objectKeys } from '@shinefold/utils/primitives';
 import type { Meta, StoryObj } from '@storybook/react-vite';
 
@@ -114,7 +119,7 @@ const meta = {
   },
   args: {
     eyebrow: 'Architecture',
-    title: 'Building a Design System from Scratch',
+    title: { heading: 'Building a Design System from Scratch' },
     excerpt:
       'A deep dive into Atomic Design principles, Tailwind CSS v4, and class-variance-authority — all working together in a portable component library.',
     titleId: 'hero-title',
@@ -146,7 +151,7 @@ export const Full: TStory = {};
 export const Minimal: TStory = {
   args: {
     eyebrow: PROFILE_EYEBROW,
-    title: 'Notes on shipping frontend at scale',
+    title: { heading: 'Notes on shipping frontend at scale' },
     excerpt:
       'Architecture, performance, and design systems — from fintech and retail. Written, not generated.',
     children: undefined,
@@ -447,7 +452,7 @@ export const BannerProfileWithoutMedia: TStory = {
     variant: HERO_VARIANT.BANNER,
     tone: BRAND_VARIANT.SECONDARY,
     eyebrow: 'Platform engineering',
-    title: 'Jane Doe',
+    title: { heading: 'Jane Doe' },
     excerpt: 'Staff engineer',
     children: bannerProfileContent(false),
   },
@@ -581,7 +586,7 @@ export const StackedProfileToneBrandPrimary: TStory = {
     variant: HERO_VARIANT.STACKED,
     tone: BRAND_VARIANT.BRAND_PRIMARY,
     eyebrow: PROFILE_EYEBROW,
-    title: 'Jane Doe',
+    title: { heading: 'Jane Doe' },
     excerpt: PROFILE_EXCERPT,
     children: profileContent,
   },
@@ -592,7 +597,7 @@ export const StackedProfileTonePrimary: TStory = {
     variant: HERO_VARIANT.STACKED,
     tone: BRAND_VARIANT.PRIMARY,
     eyebrow: PROFILE_EYEBROW,
-    title: 'Jane Doe',
+    title: { heading: 'Jane Doe' },
     excerpt: PROFILE_EXCERPT,
     children: profileContent,
   },
@@ -603,7 +608,7 @@ export const StackedProfileToneSecondary: TStory = {
     variant: HERO_VARIANT.STACKED,
     tone: BRAND_VARIANT.SECONDARY,
     eyebrow: PROFILE_EYEBROW,
-    title: 'Jane Doe',
+    title: { heading: 'Jane Doe' },
     excerpt: PROFILE_EXCERPT,
     children: profileContent,
   },
@@ -741,4 +746,42 @@ export const FootnoteWithoutActions: TStory = {
     variant: HERO_VARIANT.STACKED,
     children: footnote,
   },
+};
+
+export const TitleWithOneHighlight: TStory = {
+  args: {
+    title: {
+      heading: toHeadingWords(MOCK_ONE_HIGHLIGHT_PIECES),
+      headingPieces: MOCK_ONE_HIGHLIGHT_PIECES,
+    },
+  },
+};
+
+export const TitleWithOneHighlightDark: TStory = {
+  ...TitleWithOneHighlight,
+  globals: { theme: 'dark' },
+};
+
+export const TitleWithTwoHighlights: TStory = {
+  args: {
+    title: {
+      heading: toHeadingWords(MOCK_TWO_HIGHLIGHT_PIECES),
+      headingPieces: MOCK_TWO_HIGHLIGHT_PIECES,
+    },
+  },
+};
+
+export const TitleWithTwoHighlightsDark: TStory = {
+  ...TitleWithTwoHighlights,
+  globals: { theme: 'dark' },
+};
+
+export const TitleHighlightsOnEveryBrandBand: TStory = {
+  ...SplitAndStackedOnEveryBrandBand,
+  args: TitleWithTwoHighlights.args,
+};
+
+export const TitleHighlightsOnEveryBrandBandDark: TStory = {
+  ...TitleHighlightsOnEveryBrandBand,
+  globals: { theme: 'dark' },
 };

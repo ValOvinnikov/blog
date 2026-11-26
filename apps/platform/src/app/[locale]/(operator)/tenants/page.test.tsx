@@ -1,4 +1,4 @@
-import { faker } from '@faker-js/faker';
+import { TENANTS_PAGE_SIZE } from '@platform/constants/tenant';
 import messages from '@platform/i18n/messages/en.json';
 import { customRenderAsync, screen } from '@platform/testing/custom-render';
 import { mockDbConstants } from '@platform/testing/mock-db-constants';
@@ -6,7 +6,7 @@ import {
   MOCK_CUSTOM_DOMAIN,
   MOCK_TENANT_NAME,
   MOCK_TENANT_SLUG,
-  mockTenant,
+  mockTenantsPageRow,
 } from '@platform/testing/tenants/fixtures';
 import { DEFAULT_TENANTS_SORT } from '@platform/utils/tenants-list-query/tenants-list-query';
 import { SORT_DIRECTION, TENANT_SORT_COLUMN } from '@shinefold/config';
@@ -15,17 +15,15 @@ import { isEmailAccountConfigured } from '@shinefold/email';
 
 import TenantsPage from './page';
 
-faker.seed(5996);
-
-const { listTenantsMock } = vi.hoisted(() => ({
-  listTenantsMock: vi.fn(),
+const { listTenantsPageMock } = vi.hoisted(() => ({
+  listTenantsPageMock: vi.fn(),
 }));
 
 vi.mock('@platform/server/auth/require-admin');
 
 vi.mock('@shinefold/db', async () => ({
   ...(await mockDbConstants()),
-  queries: { tenants: { listTenants: listTenantsMock } },
+  queries: { tenants: { listTenantsPage: listTenantsPageMock } },
 }));
 
 vi.mock('@shinefold/email', async (importOriginal) => ({
@@ -33,18 +31,23 @@ vi.mock('@shinefold/email', async (importOriginal) => ({
   isEmailAccountConfigured: vi.fn(),
 }));
 
+const MOCK_LATER_PAGE = 2;
+
 const setup = customRenderAsync(TenantsPage, {
   searchParams: Promise.resolve({}),
 });
 
 describe(`<${TenantsPage.name}/>`, () => {
   beforeEach(() => {
-    listTenantsMock.mockReset().mockResolvedValue([]);
+    listTenantsPageMock.mockResolvedValue({ rows: [], total: 0 });
     vi.mocked(isEmailAccountConfigured).mockReturnValue(true);
   });
 
   it('lists the tenants it reads', async () => {
-    listTenantsMock.mockResolvedValueOnce([mockTenant()]);
+    listTenantsPageMock.mockResolvedValueOnce({
+      rows: [mockTenantsPageRow()],
+      total: 1,
+    });
 
     await setup();
 
@@ -54,9 +57,10 @@ describe(`<${TenantsPage.name}/>`, () => {
   });
 
   it('shows the extra address a search matched', async () => {
-    listTenantsMock.mockResolvedValueOnce([
-      { ...mockTenant(), matchedDomain: MOCK_CUSTOM_DOMAIN },
-    ]);
+    listTenantsPageMock.mockResolvedValueOnce({
+      rows: [mockTenantsPageRow({ matchedDomain: MOCK_CUSTOM_DOMAIN })],
+      total: 1,
+    });
 
     await setup({ searchParams: Promise.resolve({ q: MOCK_CUSTOM_DOMAIN }) });
 
@@ -73,30 +77,40 @@ describe(`<${TenantsPage.name}/>`, () => {
     async ({ archived, includeArchived }) => {
       await setup({ searchParams: Promise.resolve({ archived }) });
 
-      expect(listTenantsMock).toHaveBeenCalledWith({
+      expect(listTenantsPageMock).toHaveBeenCalledWith({
         includeArchived,
         sort: DEFAULT_TENANTS_SORT,
         search: '',
+        page: 1,
+        pageSize: TENANTS_PAGE_SIZE,
       });
     },
   );
 
-  it('reads tenants in the sort and search the URL asks for', async () => {
+  it('reads tenants in the sort, search and page the URL asks for', async () => {
+    listTenantsPageMock.mockResolvedValueOnce({
+      rows: [],
+      total: TENANTS_PAGE_SIZE + 1,
+    });
+
     await setup({
       searchParams: Promise.resolve({
         sort: TENANT_SORT_COLUMN.NAME,
         direction: SORT_DIRECTION.ASCENDING,
         q: MOCK_TENANT_SLUG,
+        page: String(MOCK_LATER_PAGE),
       }),
     });
 
-    expect(listTenantsMock).toHaveBeenCalledWith({
+    expect(listTenantsPageMock).toHaveBeenCalledWith({
       includeArchived: false,
       sort: {
         column: TENANT_SORT_COLUMN.NAME,
         direction: SORT_DIRECTION.ASCENDING,
       },
       search: MOCK_TENANT_SLUG,
+      page: MOCK_LATER_PAGE,
+      pageSize: TENANTS_PAGE_SIZE,
     });
   });
 

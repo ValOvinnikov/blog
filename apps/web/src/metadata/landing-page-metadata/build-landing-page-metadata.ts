@@ -1,4 +1,6 @@
 import { routes } from '@shinefold/config';
+import { LANDING_PAGE_LOG } from '@web/constants/landing-page';
+import { OG_TYPE } from '@web/constants/metadata';
 import { toLocalizedPageMetadata } from '@web/metadata/to-localized-page-metadata';
 import { getLandingPage } from '@web/server/landing/get-landing-page/get-landing-page';
 import { logger } from '@web/utils/logger/logger';
@@ -10,7 +12,7 @@ export const buildLandingPageMetadata = async (
   const result = await getLandingPage(path);
 
   if (!result.ok) {
-    logger.error('landing_page_metadata.fetch_failed', {
+    logger.error(LANDING_PAGE_LOG.METADATA_FETCH_FAILED, {
       path,
       error: result.error,
     });
@@ -29,6 +31,6 @@ export const buildLandingPageMetadata = async (
       language,
       href: routes.landingPage(translatedPath),
     })),
-    ogType: 'website',
+    ogType: OG_TYPE.WEBSITE,
   });
 };

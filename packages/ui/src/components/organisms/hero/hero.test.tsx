@@ -17,12 +17,18 @@ import {
   MOCK_POST_EXCERPT,
   MOCK_POST_TITLE,
 } from '@shinefold/ui/testing/fixtures';
+import {
+  MOCK_HIGHLIGHTED_PHRASE,
+  MOCK_ONE_HIGHLIGHT_PIECES,
+  toHeadingWords,
+} from '@shinefold/ui/testing/heading-pieces';
 
 import { Hero, type THeroProps } from './hero';
 
 faker.seed(6013);
 
 const MOCK_TITLE_ID = faker.string.uuid();
+const MOCK_TITLE = { heading: MOCK_POST_TITLE };
 const MOCK_BODY_TEXT = faker.lorem.sentence();
 const MOCK_EYEBROW = faker.lorem.words(3);
 const MOCK_PORTRAIT_ALT = `Portrait of ${MOCK_PERSON_NAME}`;
@@ -34,7 +40,7 @@ const MOCK_SOCIAL_LINK_LABEL = faker.lorem.word();
 const MOCK_SOCIAL_HREF = faker.internet.url();
 
 const setup = customRender(Hero, {
-  title: MOCK_POST_TITLE,
+  title: MOCK_TITLE,
   titleId: MOCK_TITLE_ID,
   tone: BRAND_VARIANT.PRIMARY,
 });
@@ -45,7 +51,7 @@ const renderHero = (
 ) =>
   renderElement(
     <Hero
-      title={MOCK_POST_TITLE}
+      title={MOCK_TITLE}
       titleId={MOCK_TITLE_ID}
       tone={BRAND_VARIANT.PRIMARY}
       {...props}
@@ -119,6 +125,35 @@ describe(`<${Hero.name}/>`, () => {
 
       expect(slot).not.toBeInTheDocument();
     });
+  });
+
+  it('draws the title pieces as one heading with the highlight inside it', () => {
+    setup({
+      title: {
+        heading: toHeadingWords(MOCK_ONE_HIGHLIGHT_PIECES),
+        headingPieces: MOCK_ONE_HIGHLIGHT_PIECES,
+      },
+    });
+
+    const heading = screen.getByRole('heading', {
+      level: 1,
+      name: toHeadingWords(MOCK_ONE_HIGHLIGHT_PIECES),
+    });
+
+    const highlight = screen.getByText(MOCK_HIGHLIGHTED_PHRASE);
+
+    expect(heading).toContainElement(highlight);
+  });
+
+  it('names the heading with the plain words when its pieces are empty', () => {
+    setup({ title: { heading: MOCK_POST_TITLE, headingPieces: [] } });
+
+    const heading = screen.getByRole('heading', {
+      level: 1,
+      name: MOCK_POST_TITLE,
+    });
+
+    expect(heading).toBeVisible();
   });
 
   it('renders the excerpt when provided', () => {

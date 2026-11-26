@@ -209,7 +209,7 @@ or a `mockReset()` that only returns a fake to its default.
   // ✅ a component: JSX-style, no space before the slash
   describe(`<${PostShare.name}/>`, () => {});
   // ✅ anything else: the symbol itself
-  describe(objectKeys, () => {});
+  describe(isOneOf, () => {});
   // ❌ describe(PostShare, …)   — a bare symbol on a component is a defect
   // ❌ describe('PostShare', …) — a string drifts on rename
   ```

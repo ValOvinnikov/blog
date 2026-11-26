@@ -34,7 +34,7 @@ graph is acyclic
   `@shinefold/db`'s provisioning exception and `apps/worker` are below.)
 - `@shinefold/db` is the only package importing the Neon/Drizzle SDKs — Postgres
   data: Auth.js users and sessions, tenants and their domains, memberships and
-  invites, admins, site config, feature toggles, owner analytics ids, email
+  invites, admins and their pinned tenants, site config, feature toggles, owner analytics ids, email
   config and templates, subscribers, bookmarks, contact-form leads, magic-link send counters, AI takeaway generation counts, email
   send and delivery-outcome counts, newsletter post-send claims, Stripe
   billing state, handled Stripe webhook event ids and the Stripe price and promotion-code catalogue, audit events and findings (comments are planned; no table exists yet). It never imports React or `@shinefold/service`
@@ -142,7 +142,10 @@ helper the diff adds, where it looked (`packages/config/const-index.json`,
 nearest sibling) and what it found. A missing or empty Reuse item is a
 blocking review finding. `@shinefold/utils` holds the shared small helpers, so
 before writing a comparison, type check, emptiness test or small transform,
-look there first.
+look there first. A generic object or array transform — keys, entries, a
+record built from a list, mapped values, grouping, indexing — comes from
+`remeda`, which keeps key types without a cast; never hand-roll one from
+`Object.*` plus a cast, and never wrap one in `@shinefold/utils`.
 
 When something similar already exists and it is not obvious whether to extend
 it or add alongside it, that is **not** a judgement call to settle quietly.

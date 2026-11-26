@@ -89,42 +89,7 @@ export const ICONS = {
   UPLOAD: 'UPLOAD',
   EYE: 'EYE',
   EYE_OFF: 'EYE_OFF',
+  PIN: 'PIN',
 } as const;
 
 export type TIconName = TValueOf<typeof ICONS>;
-
-export const FEATURE_ICONS = [
-  ICONS.CODE,
-  ICONS.LAYERS,
-  ICONS.CPU,
-  ICONS.WRENCH,
-  ICONS.SETTINGS,
-  ICONS.ROCKET,
-  ICONS.ZAP,
-  ICONS.TARGET,
-  ICONS.CHART,
-  ICONS.TRENDING_UP,
-  ICONS.SEARCH,
-  ICONS.CHECK,
-  ICONS.SHIELD_CHECK,
-  ICONS.LOCK,
-  ICONS.CLOCK,
-  ICONS.CLOUD,
-  ICONS.GRID,
-  ICONS.PALETTE,
-  ICONS.STAR,
-  ICONS.LIGHTBULB,
-  ICONS.BOOK,
-  ICONS.PEN,
-  ICONS.USERS,
-  ICONS.COMMENT,
-  ICONS.MAIL,
-  ICONS.PHONE,
-  ICONS.SMILE,
-  ICONS.HEART,
-  ICONS.GLOBE,
-  ICONS.MAP_PIN,
-  ICONS.CAMERA,
-] as const satisfies readonly TIconName[];
-
-export type TFeatureIconName = (typeof FEATURE_ICONS)[number];

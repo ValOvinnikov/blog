@@ -26,4 +26,12 @@ export const NEWSLETTER_LOG = {
     'newsletter.resend_confirmation_tenant_not_active',
   LINK_LOCALE_TENANT_LOOKUP_FAILED:
     'newsletter.link_locale_tenant_lookup_failed',
+  CONFIRM_TENANT_NOT_ACTIVE: 'newsletter.confirm_tenant_not_active',
+  CONFIRM_FAILED: 'newsletter.confirm_failed',
+  EMAIL_CONFIG_FETCH_FAILED:
+    'newsletter_email_settings.email_config_fetch_failed',
+  EMAIL_TEMPLATE_FETCH_FAILED:
+    'newsletter_email_settings.email_template_fetch_failed',
+  REPLY_TO_INVALID: 'newsletter_email_settings.reply_to_invalid',
+  SUBSCRIBE_BLOCKED: 'newsletter.subscribe_blocked',
 } as const;

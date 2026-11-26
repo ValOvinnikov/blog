@@ -40,6 +40,31 @@ Yellow is never text or a thin line on a white ground: it is too pale to read
 there. On light grounds yellow is a fill or a highlight behind dark text; on
 dark grounds it can be text, a line or a control.
 
+## The Shinefold preset
+
+The marketing site and the help centre use the Shinefold preset, a Look
+preset only a tenant granted it can pick. It sets Space Grotesk headings,
+Inter body, Pill buttons in Yellow, Outlined cards and an Ink footer in
+columns. Besides the colours above it uses these, from the agreed mock:
+
+| Name       | Value     | Where                                                                         |
+| ---------- | --------- | ----------------------------------------------------------------------------- |
+| Slate      | `#4B5058` | Muted text on light grounds and on Yellow                                     |
+| Hairline   | `#DFE1E6` | Card and divider lines on light grounds                                       |
+| Cream      | `#FFF6DD` | The Shaded band in light mode                                                 |
+| Chip       | `#FFF3CF` | The eyebrow's chip in light mode                                              |
+| Mist       | `#A9AFBA` | Muted text on dark grounds                                                    |
+| Block line | `#232B3D` | Card, divider and band-edge lines on dark grounds                             |
+| Ink raised | `#2A2D36` | A dark button's hover on Yellow; the dark Ink band's edge                     |
+| Amber      | `#8A6100` | Highlighted heading words in light mode, the Yellow darkened to read on white |
+
+Block is the dark page's cards and the Shaded band in dark mode; Ink is the
+dark page and the Ink band. On light grounds Yellow is only a fill, an
+underline or a bar beside dark text, never text; Amber stands in where light
+mode needs yellow text. Every colour, per band and
+mode, is listed in
+[design tokens and surfaces](../features/design-tokens-and-surfaces.md).
+
 ## Which logo each surface shows
 
 | Surface                                     | Shows                                                                   |

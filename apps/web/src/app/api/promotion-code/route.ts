@@ -1,6 +1,6 @@
 import { HTTP_STATUS } from '@shinefold/config';
 import { queries } from '@shinefold/db';
-import { CACHE_CONTROL } from '@web/constants/http';
+import { CACHE_CONTROL, CACHE_CONTROL_HEADER } from '@web/constants/http';
 import { PRICING_LOG, PRICING_SEARCH_PARAM } from '@web/constants/pricing';
 import { logger } from '@web/utils/logger/logger';
 import type { TPromotionDiscount } from '@web/utils/promotion-discount';
@@ -9,7 +9,7 @@ import { NextResponse } from 'next/server';
 const MAX_CODE_LENGTH = 64;
 
 const PUBLIC_CACHE_HEADERS = {
-  'Cache-Control': CACHE_CONTROL.PUBLIC_ONE_MINUTE,
+  [CACHE_CONTROL_HEADER]: CACHE_CONTROL.PUBLIC_ONE_MINUTE,
 };
 
 const emptyResponse = (status: number) =>

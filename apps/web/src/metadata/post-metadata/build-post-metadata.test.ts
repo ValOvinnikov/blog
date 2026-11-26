@@ -2,6 +2,7 @@ import { faker } from '@faker-js/faker';
 import { LOCALE_ISO_CODES, routes } from '@shinefold/config';
 import { type TPostDetail } from '@shinefold/service';
 import { errorResult, okResult } from '@shinefold/utils';
+import { POST_LOG } from '@web/constants/post';
 import { getRequestContext } from '@web/server/request-context/request-context';
 import {
   MOCK_DUTCH_REQUEST_CONTEXT,
@@ -17,6 +18,7 @@ import {
 } from '@web/testing/shared/post/fixtures';
 import { MOCK_OG_IMAGE_URL } from '@web/testing/shared/seo/og-image-fixtures';
 import { logger } from '@web/utils/logger/logger';
+import type { Metadata } from 'next';
 
 import { buildPostMetadata } from './build-post-metadata';
 
@@ -50,19 +52,19 @@ describe(buildPostMetadata, () => {
   });
 
   describe('when the post resolves', () => {
-    beforeEach(() => {
+    let metadata: Metadata;
+
+    beforeEach(async () => {
       getPostPageMock.mockResolvedValue(okResult(basePost));
+
+      metadata = await buildPostMetadata(SLUG);
     });
 
-    it('reads the post the post page renders', async () => {
-      await buildPostMetadata(SLUG);
-
+    it('reads the post the post page renders', () => {
       expect(getPostPageMock).toHaveBeenCalledWith(SLUG);
     });
 
-    it('builds the metadata from the resolved seo', async () => {
-      const metadata = await buildPostMetadata(SLUG);
-
+    it('builds the metadata from the resolved seo', () => {
       expect(metadata.title).toBe(title);
       expect(metadata.description).toBe(description);
       expect(metadata.alternates?.canonical).toBe(routes.post(SLUG));
@@ -71,9 +73,7 @@ describe(buildPostMetadata, () => {
       expect(metadata.openGraph?.images).toEqual([{ url: MOCK_OG_IMAGE_URL }]);
     });
 
-    it('sets the OG published time and authors from the post', async () => {
-      const metadata = await buildPostMetadata(SLUG);
-
+    it('sets the OG published time and authors from the post', () => {
       const { publishedTime, authors } = metadata.openGraph as {
         publishedTime?: string;
         authors?: string[];
@@ -101,7 +101,7 @@ describe(buildPostMetadata, () => {
 
       expect(metadata).toEqual({});
       expect(vi.mocked(logger.error)).toHaveBeenCalledWith(
-        'post_metadata.fetch_failed',
+        POST_LOG.METADATA_FETCH_FAILED,
         { slug: SLUG, error: MOCK_ERROR },
       );
     });

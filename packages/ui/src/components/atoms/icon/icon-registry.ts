@@ -109,6 +109,8 @@ import PenComponent from '@shinefold/ui/assets/icons/pen.svg';
 import PenUrl from '@shinefold/ui/assets/icons/pen.svg?url';
 import PhoneComponent from '@shinefold/ui/assets/icons/phone.svg';
 import PhoneUrl from '@shinefold/ui/assets/icons/phone.svg?url';
+import PinComponent from '@shinefold/ui/assets/icons/pin.svg';
+import PinUrl from '@shinefold/ui/assets/icons/pin.svg?url';
 import PlusComponent from '@shinefold/ui/assets/icons/plus.svg';
 import PlusUrl from '@shinefold/ui/assets/icons/plus.svg?url';
 import PowerComponent from '@shinefold/ui/assets/icons/power.svg';
@@ -266,6 +268,7 @@ export const ICON_REGISTRY: Record<TIconName, TIconRegistryEntry> = {
   [ICONS.CAMERA]: { component: CameraComponent, url: CameraUrl },
   [ICONS.LIGHTBULB]: { component: LightbulbComponent, url: LightbulbUrl },
   [ICONS.MAP_PIN]: { component: MapPinComponent, url: MapPinUrl },
+  [ICONS.PIN]: { component: PinComponent, url: PinUrl },
   [ICONS.PHONE]: { component: PhoneComponent, url: PhoneUrl },
   [ICONS.TRENDING_UP]: { component: TrendingUpComponent, url: TrendingUpUrl },
   [ICONS.BOLD]: { component: BoldComponent, url: BoldUrl },

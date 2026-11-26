@@ -1,5 +1,6 @@
 import { isOneOf } from '@shinefold/utils/primitives';
 
+import type { TMaybeNull } from '@shinefold/config/types';
 import type { TValueOf } from '@shinefold/config/utils';
 
 import type {
@@ -108,6 +109,7 @@ export type TPresetBundle = {
   busyButtonStyle: TBusyButtonStyle;
   spinnerStyle: TSpinnerStyle;
   buttonShape: TButtonShape;
+  buttonColor: TMaybeNull<string>;
   headerLayout: THeaderLayout;
   headerSubmenuStyle: THeaderSubmenuStyle;
   headerBarStyle: THeaderBarStyle;

@@ -5,6 +5,7 @@ import {
   buildOwnerNoticeEmailTag,
   sendEmail,
 } from '@shinefold/email';
+import { CONTACT_FORM_LOG } from '@web/constants/contact-form';
 import { resolveNewsletterFromAddress } from '@web/server/newsletter/newsletter-from-address/newsletter-from-address';
 import { getTenantBaseUrl } from '@web/server/tenant/tenant-base-url/tenant-base-url';
 import { env } from '@web/utils/env/env';
@@ -16,7 +17,7 @@ const PLATFORM_LEADS_PATH = '/dashboard/leads';
 const resolveLeadsUrl = (): string => {
   const { PLATFORM_APP_URL: platformUrl } = env;
   if (!platformUrl) {
-    logger.warn('contact_form.platform_url_missing');
+    logger.warn(CONTACT_FORM_LOG.PLATFORM_URL_MISSING);
     return PLATFORM_LEADS_PATH;
   }
   return `${platformUrl.replace(/\/$/, '')}${PLATFORM_LEADS_PATH}`;

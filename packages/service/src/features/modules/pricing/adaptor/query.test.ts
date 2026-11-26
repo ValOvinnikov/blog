@@ -24,7 +24,7 @@ import {
   mockRawPricingPrice,
   mockRawPricingTier,
 } from '@shinefold/service/testing/modules/pricing/fixtures';
-import { evaluateGroqExpression } from '@shinefold/service/testing/shared/groq';
+import { evaluateModuleQuery } from '@shinefold/service/testing/shared/groq';
 import {
   mockLocalizedHeadingBlock,
   mockLocalizedStrings,
@@ -111,15 +111,11 @@ const MOCK_PRICING_DOCUMENT = {
   }),
 };
 
-async function runPricing(document: Record<string, unknown>, locale: string) {
-  const raw = await evaluateGroqExpression(
-    pricingModuleQuery.query,
-    [document],
-    undefined,
-    { id: MOCK_PRICING_MODULE_ID, locale, defaultLocale: EN },
-  );
-
-  return pricingModuleQuery.parse(raw);
+function runPricing(document: Record<string, unknown>, locale: string) {
+  return evaluateModuleQuery(pricingModuleQuery, [document], {
+    id: MOCK_PRICING_MODULE_ID,
+    locale,
+  });
 }
 
 describe('pricingModuleQuery', () => {

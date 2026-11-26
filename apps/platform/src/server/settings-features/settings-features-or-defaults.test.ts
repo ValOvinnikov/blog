@@ -1,12 +1,17 @@
-import { mockSettingsFeaturesValues } from '@platform/testing/settings-features/fixtures';
+import {
+  mockSettingsFeaturesValues,
+  mockUnsavedSettingsFeaturesAndPreset,
+} from '@platform/testing/settings-features/fixtures';
 import { MOCK_TENANT_ID } from '@platform/testing/tenants/fixtures';
 import { featureDefaultsToValues } from '@platform/utils/settings-features-fields/settings-features-fields';
 import { PRESET_ID, PRESET_REGISTRY } from '@shinefold/config';
+import type { getSettingsFeaturesAndPreset } from '@shinefold/db/queries/settings-features';
 
 import { getSettingsFeaturesOrDefaults } from './settings-features-or-defaults';
 
 const { getSettingsFeaturesAndPresetMock } = vi.hoisted(() => ({
-  getSettingsFeaturesAndPresetMock: vi.fn(),
+  getSettingsFeaturesAndPresetMock:
+    vi.fn<typeof getSettingsFeaturesAndPreset>(),
 }));
 
 vi.mock('@shinefold/db', () => ({
@@ -60,7 +65,7 @@ describe(getSettingsFeaturesOrDefaults, () => {
     'falls back to the featureDefaults of $scenario',
     async ({ preset, expectedPreset }) => {
       getSettingsFeaturesAndPresetMock.mockResolvedValue({
-        features: undefined,
+        ...mockUnsavedSettingsFeaturesAndPreset(),
         preset,
       });
 

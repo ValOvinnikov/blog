@@ -1,6 +1,7 @@
 export type { TCookieStatementPage } from './cookie-statement';
 export type { THomePage } from './home';
 export type {
+  TLandingAdjacentPages,
   TLandingBreadcrumb,
   TLandingPage,
   TLandingRedirect,

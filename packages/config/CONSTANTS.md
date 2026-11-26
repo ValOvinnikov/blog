@@ -185,7 +185,7 @@ Every key/value const an agent should reuse before writing a literal. The
 
 ### `@shinefold/config/constants` — `packages/config/src/constants/icon.ts`
 
-- **ICONS**: `SUN`, `MOON`, `HOUSE`, `SHARE`, `COPY`, `CHECK`, `CHECK_SHEET`, `EXTERNAL_LINK`, `MENU`, `MENU_ROWS`, `CLOSE`, `X`, `GITHUB`, `LINKEDIN`, `FACEBOOK`, `YOUTUBE`, `INSTAGRAM`, `MASTODON`, `BLUESKY`, `THREADS`, `RSS`, `ARROW_UP`, `GOOGLE`, `BOOKMARK`, `SPINNER`, `WARNING`, `INFO`, `SETTINGS`, `POWER`, `MAIL`, `CHEVRON_RIGHT`, `CHEVRON_LEFT`, `CHEVRON_DOWN`, `CHEVRON_UP`, `SELECT_CHEVRON`, `ARROW`, `SHIELD_CHECK`, `GRID`, `PLUS`, `PALETTE`, `QUOTE`, `GLOBE`, `STUDIO`, `COMMENT`, `USER`, `USERS`, `CODE`, `LAYERS`, `ZAP`, `SEARCH`, `CHART`, `CLOCK`, `WRENCH`, `ROCKET`, `BOOK`, `PEN`, `STAR`, `LOCK`, `CLOUD`, `CPU`, `TARGET`, `HEART`, `CAMERA`, `LIGHTBULB`, `MAP_PIN`, `PHONE`, `TRENDING_UP`, `SMILE`, `BOLD`, `ITALIC`, `LINK`, `SEND`, `COOKIE`, `UNFOLD`, `TICK`, `SIDEBAR`, `MONITOR`, `TABLET`, `USER_CHECK`, `CROSSHAIR`, `MAXIMIZE`, `PAUSE`, `UPLOAD`, `EYE`, `EYE_OFF`
+- **ICONS**: `SUN`, `MOON`, `HOUSE`, `SHARE`, `COPY`, `CHECK`, `CHECK_SHEET`, `EXTERNAL_LINK`, `MENU`, `MENU_ROWS`, `CLOSE`, `X`, `GITHUB`, `LINKEDIN`, `FACEBOOK`, `YOUTUBE`, `INSTAGRAM`, `MASTODON`, `BLUESKY`, `THREADS`, `RSS`, `ARROW_UP`, `GOOGLE`, `BOOKMARK`, `SPINNER`, `WARNING`, `INFO`, `SETTINGS`, `POWER`, `MAIL`, `CHEVRON_RIGHT`, `CHEVRON_LEFT`, `CHEVRON_DOWN`, `CHEVRON_UP`, `SELECT_CHEVRON`, `ARROW`, `SHIELD_CHECK`, `GRID`, `PLUS`, `PALETTE`, `QUOTE`, `GLOBE`, `STUDIO`, `COMMENT`, `USER`, `USERS`, `CODE`, `LAYERS`, `ZAP`, `SEARCH`, `CHART`, `CLOCK`, `WRENCH`, `ROCKET`, `BOOK`, `PEN`, `STAR`, `LOCK`, `CLOUD`, `CPU`, `TARGET`, `HEART`, `CAMERA`, `LIGHTBULB`, `MAP_PIN`, `PHONE`, `TRENDING_UP`, `SMILE`, `BOLD`, `ITALIC`, `LINK`, `SEND`, `COOKIE`, `UNFOLD`, `TICK`, `SIDEBAR`, `MONITOR`, `TABLET`, `USER_CHECK`, `CROSSHAIR`, `MAXIMIZE`, `PAUSE`, `UPLOAD`, `EYE`, `EYE_OFF`, `PIN`
 
 ### `@shinefold/config/constants` — `packages/config/src/constants/image-layout.ts`
 
@@ -976,7 +976,7 @@ Every key/value const an agent should reuse before writing a literal. The
 
 ### `@web/constants/account` — `apps/web/src/constants/account.ts`
 
-- **ACCOUNT_LOG**: `PROVIDER_UNLINK_FAILED`=`"account.provider_unlink_failed"`, `DISPLAY_NAME_UPDATE_FAILED`=`"account.display_name_update_failed"`
+- **ACCOUNT_LOG**: `PROVIDER_UNLINK_FAILED`=`"account.provider_unlink_failed"`, `DISPLAY_NAME_UPDATE_FAILED`=`"account.display_name_update_failed"`, `EXPORT_FAILED`=`"account.export_failed"`, `DELETE_FAILED`=`"account.delete_failed"`
 
 ### `@web/constants/bar-backgrounds` — `apps/web/src/constants/bar-backgrounds.ts`
 
@@ -984,7 +984,7 @@ Every key/value const an agent should reuse before writing a literal. The
 
 ### `@web/constants/bookmark` — `apps/web/src/constants/bookmark.ts`
 
-- **BOOKMARK_LOG**: `BUTTON_STATUS_FETCH_FAILED`=`"bookmark_button.status_fetch_failed"`, `TENANT_NOT_ACTIVE`=`"bookmark.tenant_not_active"`, `UPDATE_FAILED`=`"bookmark.update_failed"`
+- **BOOKMARK_LOG**: `BUTTON_STATUS_FETCH_FAILED`=`"bookmark_button.status_fetch_failed"`, `TENANT_NOT_ACTIVE`=`"bookmark.tenant_not_active"`, `UPDATE_FAILED`=`"bookmark.update_failed"`, `PAGE_POSTS_RESOLVE_FAILED`=`"bookmarks_page.posts_resolve_failed"`
 
 ### `@web/constants/busy-style` — `apps/web/src/constants/busy-style.ts`
 
@@ -994,6 +994,10 @@ Every key/value const an agent should reuse before writing a literal. The
 
 - **CLIENT_LOG_LOG**: `REPORT_RECEIVED`=`"client_log.report_received"`
 
+### `@web/constants/clipboard` — `apps/web/src/constants/clipboard.ts`
+
+- **CLIPBOARD_LOG**: `WRITE_FAILED`=`"copy_to_clipboard.write_failed"`
+
 ### `@web/constants/consent` — `apps/web/src/constants/consent.ts`
 
 - **CONSENT_STATUS**: `UNKNOWN`, `UNANSWERED`, `ANSWERED`, `GRANTED`, `DENIED`
@@ -1001,7 +1005,11 @@ Every key/value const an agent should reuse before writing a literal. The
 
 ### `@web/constants/contact-form` — `apps/web/src/constants/contact-form.ts`
 
-- **CONTACT_FORM_LOG**: `MODULE_FETCH_FAILED`=`"contact_form_module.fetch_failed"`
+- **CONTACT_FORM_LOG**: `MODULE_FETCH_FAILED`=`"contact_form_module.fetch_failed"`, `LEAD_STORE_FAILED`=`"contact_form.lead_store_failed"`, `TENANT_UNRESOLVED`=`"contact_form.tenant_unresolved"`, `NOTIFICATION_SEND_FAILED`=`"contact_form.notification_send_failed"`, `PLATFORM_URL_MISSING`=`"contact_form.platform_url_missing"`, `SUBMIT_BLOCKED`=`"contact_form.submit_blocked"`
+
+### `@web/constants/content` — `apps/web/src/constants/content.ts`
+
+- **CONTENT_LOG**: `MODULE_FETCH_FAILED`=`"content_module.fetch_failed"`
 
 ### `@web/constants/cookie-list` — `apps/web/src/constants/cookie-list.ts`
 
@@ -1038,6 +1046,10 @@ Every key/value const an agent should reuse before writing a literal. The
 
 - **FAQ_LOG**: `MODULE_FETCH_FAILED`=`"faq_module.fetch_failed"`
 
+### `@web/constants/feature-highlights` — `apps/web/src/constants/feature-highlights.ts`
+
+- **FEATURE_HIGHLIGHTS_LOG**: `MODULE_FETCH_FAILED`=`"feature_highlights_module.fetch_failed"`
+
 ### `@web/constants/feature-list` — `apps/web/src/constants/feature-list.ts`
 
 - **FEATURE_LIST_LOG**: `MODULE_FETCH_FAILED`=`"feature_list_module.fetch_failed"`
@@ -1071,6 +1083,10 @@ Every key/value const an agent should reuse before writing a literal. The
 
 - **HERO_STATEMENT_LOG**: `MODULE_FETCH_FAILED`=`"hero_statement_module.fetch_failed"`
 
+### `@web/constants/home-page` — `apps/web/src/constants/home-page.ts`
+
+- **HOME_PAGE_LOG**: `METADATA_FETCH_FAILED`=`"home_page.metadata_fetch_failed"`, `PAGE_FETCH_FAILED`=`"home_page.fetch_failed"`
+
 ### `@web/constants/http` — `apps/web/src/constants/http.ts`
 
 - **CACHE_CONTROL**: `PRIVATE_NO_STORE`=`"private, no-store"`, `PUBLIC_ONE_MINUTE`=`"public, max-age=60, s-maxage=60"`
@@ -1083,6 +1099,14 @@ Every key/value const an agent should reuse before writing a literal. The
 ### `@web/constants/internal-pages` — `apps/web/src/constants/internal-pages.ts`
 
 - **INTERNAL_PAGES_LOG**: `SECRET_MISSING`=`"internal_pages.secret_missing"`, `TENANT_LOOKUP_FAILED`=`"internal_pages.tenant_lookup_failed"`, `TITLE_FETCH_FAILED`=`"internal_pages.title_fetch_failed"`, `PATH_FETCH_FAILED`=`"internal_pages.path_fetch_failed"`
+
+### `@web/constants/landing-page` — `apps/web/src/constants/landing-page.ts`
+
+- **LANDING_PAGE_LOG**: `METADATA_FETCH_FAILED`=`"landing_page_metadata.fetch_failed"`, `REDIRECT_FETCH_FAILED`=`"landing_redirect.fetch_failed"`, `PAGE_FETCH_FAILED`=`"landing_page.fetch_failed"`, `BREADCRUMBS_FETCH_FAILED`=`"landing_breadcrumbs.fetch_failed"`
+
+### `@web/constants/logo-wall` — `apps/web/src/constants/logo-wall.ts`
+
+- **LOGO_WALL_LOG**: `MODULE_FETCH_FAILED`=`"logo_wall_module.fetch_failed"`
 
 ### `@web/constants/metadata` — `apps/web/src/constants/metadata.ts`
 
@@ -1102,7 +1126,7 @@ Every key/value const an agent should reuse before writing a literal. The
 
 - **NEWSLETTER_OUTCOME**: `ALREADY_SUBSCRIBED`
 - **NEWSLETTER_SUBSCRIPTION_ACTION**: `UNSUBSCRIBE`, `RESEND`
-- **NEWSLETTER_LOG**: `MODULE_FETCH_FAILED`=`"newsletter_module.fetch_failed"`, `SUBSCRIBE_FAILED`=`"newsletter.subscribe_failed"`, `SUBSCRIBE_TENANT_NOT_ACTIVE`=`"newsletter.subscribe_tenant_not_active"`, `SUBSCRIBE_CAPABILITY_DISABLED`=`"newsletter.subscribe_capability_disabled"`, `SUBSCRIBED_COOKIE_SET_FAILED`=`"newsletter.subscribed_cookie_set_failed"`, `SUBSCRIBED_COOKIE_CLEAR_FAILED`=`"newsletter.subscribed_cookie_clear_failed"`, `GATE_STATUS_FETCH_FAILED`=`"newsletter.gate_status_fetch_failed"`, `UNSUBSCRIBE_FAILED`=`"newsletter.unsubscribe_failed"`, `UNSUBSCRIBE_TENANT_UNRESOLVED`=`"newsletter.unsubscribe_tenant_unresolved"`, `UNSUBSCRIBE_KEY_MISSING`=`"newsletter.unsubscribe_key_missing"`, `UNSUBSCRIBE_LINK_FAILED`=`"newsletter.unsubscribe_link_failed"`, `UNSUBSCRIBE_LINK_TENANT_UNRESOLVED`=`"newsletter.unsubscribe_link_tenant_unresolved"`, `CONFIRMATION_RESEND_FAILED`=`"newsletter.confirmation_resend_failed"`, `RESEND_CONFIRMATION_TENANT_NOT_ACTIVE`=`"newsletter.resend_confirmation_tenant_not_active"`, `LINK_LOCALE_TENANT_LOOKUP_FAILED`=`"newsletter.link_locale_tenant_lookup_failed"`
+- **NEWSLETTER_LOG**: `MODULE_FETCH_FAILED`=`"newsletter_module.fetch_failed"`, `SUBSCRIBE_FAILED`=`"newsletter.subscribe_failed"`, `SUBSCRIBE_TENANT_NOT_ACTIVE`=`"newsletter.subscribe_tenant_not_active"`, `SUBSCRIBE_CAPABILITY_DISABLED`=`"newsletter.subscribe_capability_disabled"`, `SUBSCRIBED_COOKIE_SET_FAILED`=`"newsletter.subscribed_cookie_set_failed"`, `SUBSCRIBED_COOKIE_CLEAR_FAILED`=`"newsletter.subscribed_cookie_clear_failed"`, `GATE_STATUS_FETCH_FAILED`=`"newsletter.gate_status_fetch_failed"`, `UNSUBSCRIBE_FAILED`=`"newsletter.unsubscribe_failed"`, `UNSUBSCRIBE_TENANT_UNRESOLVED`=`"newsletter.unsubscribe_tenant_unresolved"`, `UNSUBSCRIBE_KEY_MISSING`=`"newsletter.unsubscribe_key_missing"`, `UNSUBSCRIBE_LINK_FAILED`=`"newsletter.unsubscribe_link_failed"`, `UNSUBSCRIBE_LINK_TENANT_UNRESOLVED`=`"newsletter.unsubscribe_link_tenant_unresolved"`, `CONFIRMATION_RESEND_FAILED`=`"newsletter.confirmation_resend_failed"`, `RESEND_CONFIRMATION_TENANT_NOT_ACTIVE`=`"newsletter.resend_confirmation_tenant_not_active"`, `LINK_LOCALE_TENANT_LOOKUP_FAILED`=`"newsletter.link_locale_tenant_lookup_failed"`, `CONFIRM_TENANT_NOT_ACTIVE`=`"newsletter.confirm_tenant_not_active"`, `CONFIRM_FAILED`=`"newsletter.confirm_failed"`, `EMAIL_CONFIG_FETCH_FAILED`=`"newsletter_email_settings.email_config_fetch_failed"`, `EMAIL_TEMPLATE_FETCH_FAILED`=`"newsletter_email_settings.email_template_fetch_failed"`, `REPLY_TO_INVALID`=`"newsletter_email_settings.reply_to_invalid"`, `SUBSCRIBE_BLOCKED`=`"newsletter.subscribe_blocked"`
 
 ### `@web/constants/post-featured` — `apps/web/src/constants/post-featured.ts`
 
@@ -1126,7 +1150,7 @@ Every key/value const an agent should reuse before writing a literal. The
 
 ### `@web/constants/post` — `apps/web/src/constants/post.ts`
 
-- **POST_LOG**: `ARTICLE_FETCH_FAILED`=`"post_article.fetch_failed"`, `PAGE_FETCH_FAILED`=`"blog_post_page.fetch_failed"`
+- **POST_LOG**: `ARTICLE_FETCH_FAILED`=`"post_article.fetch_failed"`, `PAGE_FETCH_FAILED`=`"blog_post_page.fetch_failed"`, `METADATA_FETCH_FAILED`=`"post_metadata.fetch_failed"`, `BREADCRUMBS_FETCH_FAILED`=`"post_breadcrumbs.fetch_failed"`, `BLOG_POSTING_SCHEMA_FETCH_FAILED`=`"blog_posting_schema.fetch_failed"`
 
 ### `@web/constants/pricing` — `apps/web/src/constants/pricing.ts`
 
@@ -1160,7 +1184,7 @@ Every key/value const an agent should reuse before writing a literal. The
 
 ### `@web/constants/rss` — `apps/web/src/constants/rss.ts`
 
-- **RSS_LOG**: `POSTS_FETCH_FAILED`=`"rss.posts_fetch_failed"`, `INDEX_PAGE_FETCH_FAILED`=`"rss.index_page_fetch_failed"`, `NAVIGATION_FETCH_FAILED`=`"rss.navigation_fetch_failed"`
+- **RSS_LOG**: `POSTS_FETCH_FAILED`=`"rss.posts_fetch_failed"`, `INDEX_PAGE_FETCH_FAILED`=`"rss.index_page_fetch_failed"`, `NAVIGATION_FETCH_FAILED`=`"rss.navigation_fetch_failed"`, `TAG_FETCH_FAILED`=`"tag_rss.tag_fetch_failed"`, `TAG_POSTS_FETCH_FAILED`=`"tag_rss.posts_fetch_failed"`
 
 ### `@web/constants/section-appearance` — `apps/web/src/constants/section-appearance.ts`
 
@@ -1173,6 +1197,10 @@ Every key/value const an agent should reuse before writing a literal. The
 ### `@web/constants/section-index` — `apps/web/src/constants/section-index.ts`
 
 - **SECTION_INDEX_LOG**: `PAGE_FETCH_FAILED`=`"section_index_page.fetch_failed"`, `METADATA_FETCH_FAILED`=`"section_index_metadata.fetch_failed"`
+
+### `@web/constants/section-pages` — `apps/web/src/constants/section-pages.ts`
+
+- **SECTION_PAGES_LOG**: `MISSING_LANDING_PAGE_CONTEXT`=`"section_pages_module.missing_landing_page_context"`, `MODULE_FETCH_FAILED`=`"section_pages_module.fetch_failed"`
 
 ### `@web/constants/session` — `apps/web/src/constants/session.ts`
 
@@ -1191,7 +1219,7 @@ Every key/value const an agent should reuse before writing a literal. The
 
 ### `@web/constants/site-config` — `apps/web/src/constants/site-config.ts`
 
-- **SITE_CONFIG_LOG**: `FETCH_FAILED`=`"site_config.fetch_failed"`, `BRAND_NAME_FETCH_FAILED`=`"brand_name.site_config_fetch_failed"`, `BRAND_LOGO_FETCH_FAILED`=`"brand_logo.site_config_fetch_failed"`, `PLAN_FETCH_FAILED`=`"site_config.plan_fetch_failed"`, `ANALYTICS_FETCH_FAILED`=`"site_config.analytics_fetch_failed"`, `VOICE_RICH_FETCH_FAILED`=`"voice_rich.fetch_failed"`, `COLOR_MODE_FETCH_FAILED`=`"color_mode.site_config_fetch_failed"`
+- **SITE_CONFIG_LOG**: `FETCH_FAILED`=`"site_config.fetch_failed"`, `BRAND_NAME_FETCH_FAILED`=`"brand_name.site_config_fetch_failed"`, `BRAND_LOGO_FETCH_FAILED`=`"brand_logo.site_config_fetch_failed"`, `PLAN_FETCH_FAILED`=`"site_config.plan_fetch_failed"`, `ANALYTICS_FETCH_FAILED`=`"site_config.analytics_fetch_failed"`, `VOICE_RICH_FETCH_FAILED`=`"voice_rich.fetch_failed"`, `COLOR_MODE_FETCH_FAILED`=`"color_mode.site_config_fetch_failed"`, `LANGUAGE_SWITCHER_STYLE_FETCH_FAILED`=`"language_switcher_style.site_config_fetch_failed"`
 
 ### `@web/constants/sitemap` — `apps/web/src/constants/sitemap.ts`
 
@@ -1203,7 +1231,7 @@ Every key/value const an agent should reuse before writing a literal. The
 
 ### `@web/constants/tag-index` — `apps/web/src/constants/tag-index.ts`
 
-- **TAG_INDEX_LOG**: `PAGE_FETCH_FAILED`=`"tag_index_page.fetch_failed"`, `BREADCRUMBS_FETCH_FAILED`=`"tag_index_breadcrumbs.fetch_failed"`
+- **TAG_INDEX_LOG**: `PAGE_FETCH_FAILED`=`"tag_index_page.fetch_failed"`, `BREADCRUMBS_FETCH_FAILED`=`"tag_index_breadcrumbs.fetch_failed"`, `METADATA_FETCH_FAILED`=`"tag_index_metadata.fetch_failed"`
 
 ### `@web/constants/tag` — `apps/web/src/constants/tag.ts`
 
@@ -1243,11 +1271,15 @@ Every key/value const an agent should reuse before writing a literal. The
 
 ### `@web/constants/topic-index` — `apps/web/src/constants/topic-index.ts`
 
-- **TOPIC_INDEX_LOG**: `PAGE_FETCH_FAILED`=`"topic_index_page.fetch_failed"`, `BREADCRUMBS_FETCH_FAILED`=`"topic_index_breadcrumbs.fetch_failed"`
+- **TOPIC_INDEX_LOG**: `PAGE_FETCH_FAILED`=`"topic_index_page.fetch_failed"`, `BREADCRUMBS_FETCH_FAILED`=`"topic_index_breadcrumbs.fetch_failed"`, `METADATA_FETCH_FAILED`=`"topic_index_metadata.fetch_failed"`
 
 ### `@web/constants/topic` — `apps/web/src/constants/topic.ts`
 
-- **TOPIC_LOG**: `PAGE_FETCH_FAILED`=`"topic_page.fetch_failed"`, `BREADCRUMBS_FETCH_FAILED`=`"topic_breadcrumbs.fetch_failed"`, `METADATA_FETCH_FAILED`=`"topic_metadata.fetch_failed"`
+- **TOPIC_LOG**: `PAGE_FETCH_FAILED`=`"topic_page.fetch_failed"`, `BREADCRUMBS_FETCH_FAILED`=`"topic_breadcrumbs.fetch_failed"`, `METADATA_FETCH_FAILED`=`"topic_metadata.fetch_failed"`, `LIST_FETCH_FAILED`=`"topics.fetch_failed"`
+
+### `@web/constants/translation-map` — `apps/web/src/constants/translation-map.ts`
+
+- **TRANSLATION_MAP_LOG**: `FETCH_FAILED`=`"translation_map.fetch_failed"`
 
 ## app:worker
 

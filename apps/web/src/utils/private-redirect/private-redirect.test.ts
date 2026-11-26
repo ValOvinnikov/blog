@@ -1,12 +1,12 @@
 import { faker } from '@faker-js/faker';
 import { HTTP_STATUS } from '@shinefold/config';
+import { CACHE_CONTROL, CACHE_CONTROL_HEADER } from '@web/constants/http';
 
 import { privateRedirect } from './private-redirect';
 
 faker.seed(125);
 
 const MOCK_TARGET = new URL(faker.internet.url());
-const PRIVATE_NO_STORE = 'private, no-store';
 
 describe(privateRedirect, () => {
   it('redirects to the target and forbids any cache from storing it', () => {
@@ -14,7 +14,9 @@ describe(privateRedirect, () => {
 
     expect(response.status).toBe(HTTP_STATUS.TEMPORARY_REDIRECT);
     expect(response.headers.get('location')).toBe(MOCK_TARGET.href);
-    expect(response.headers.get('cache-control')).toBe(PRIVATE_NO_STORE);
+    expect(response.headers.get(CACHE_CONTROL_HEADER)).toBe(
+      CACHE_CONTROL.PRIVATE_NO_STORE,
+    );
   });
 
   it('redirects with the given status', () => {

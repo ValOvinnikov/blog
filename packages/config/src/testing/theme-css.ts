@@ -1,5 +1,9 @@
 import { readFileSync } from 'node:fs';
 
+import { skinSchemeSelector } from '@shinefold/config/theme/css-block';
+import { formatSkinCss } from '@shinefold/config/theme/skin-css';
+
+import { BRAND_VARIANT, COLOR_SCHEME } from '@shinefold/config/constants';
 import type { TThemeDeclarations } from '@shinefold/config/theme';
 import type { TMaybeUndefined } from '@shinefold/config/types';
 
@@ -31,4 +35,21 @@ export const readThemeDeclarations = (
   return Object.fromEntries(
     Object.keys(map).map((property) => [property, declared[property]]),
   );
+};
+
+export const readDefaultRoleScopes = (): [string, string, string][] => {
+  const themeCss = readThemeCss();
+  const skinCss = formatSkinCss();
+
+  return [
+    ['the page', themeCss, ':root'],
+    ['the dark page', themeCss, '.dark'],
+    ...Object.values(BRAND_VARIANT).flatMap((variant) =>
+      Object.values(COLOR_SCHEME).map((scheme): [string, string, string] => [
+        `the ${scheme} ${variant} band`,
+        skinCss,
+        skinSchemeSelector(variant, scheme),
+      ]),
+    ),
+  ];
 };

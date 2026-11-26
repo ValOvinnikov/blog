@@ -15,7 +15,7 @@ import {
   mockModuleDocument,
 } from '@shinefold/service/testing/modules/fixtures';
 import { mockRawPostRelatedModule } from '@shinefold/service/testing/modules/post-related/fixtures';
-import { evaluateGroqExpression } from '@shinefold/service/testing/shared/groq';
+import { evaluateModuleQuery } from '@shinefold/service/testing/shared/groq';
 import { mockParagraphBlocks } from '@shinefold/service/testing/shared/localized';
 
 import { postRelatedModuleQuery } from './query';
@@ -31,18 +31,14 @@ const MOCK_MODULE_DOCUMENT = mockModuleDocument({
   limit: MOCK_LIMIT,
 });
 
-async function runPostRelated(
+function runPostRelated(
   locale: string,
   document: Record<string, unknown> = MOCK_MODULE_DOCUMENT,
 ) {
-  const raw = await evaluateGroqExpression(
-    postRelatedModuleQuery.query,
-    [document],
-    undefined,
-    { id: MOCK_MODULE_ID, locale, defaultLocale: EN },
-  );
-
-  return postRelatedModuleQuery.parse(raw);
+  return evaluateModuleQuery(postRelatedModuleQuery, [document], {
+    id: MOCK_MODULE_ID,
+    locale,
+  });
 }
 
 describe('postRelatedModuleQuery', () => {

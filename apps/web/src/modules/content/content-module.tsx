@@ -1,4 +1,5 @@
 import { service } from '@shinefold/service';
+import { CONTENT_LOG } from '@web/constants/content';
 import { getRequestContext } from '@web/server/request-context/request-context';
 import { logger } from '@web/utils/logger/logger';
 
@@ -13,7 +14,7 @@ export const ContentModule = async ({ id }: IContentModuleProps) => {
   const result = await service.modules.content.v1.getContent(id, sanityContext);
 
   if (!result.ok) {
-    logger.error('content_module.fetch_failed', {
+    logger.error(CONTENT_LOG.MODULE_FETCH_FAILED, {
       id,
       error: result.error,
     });

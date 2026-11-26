@@ -1,30 +1,22 @@
 import { DATA_REQUEST_MATCH_KIND } from '@platform/constants/data-request';
 import { mockAdmin } from '@platform/testing/admins/fixtures';
 import {
+  mockEmptyPersonalDataExport,
+  mockPersonalDataExport,
+} from '@platform/testing/data-requests/export-fixtures';
+import {
   MOCK_DATA_REQUEST_EMAIL,
   MOCK_EXPORT_GENERATED_AT,
-  mockPersonalDataExport,
   mockPersonalDataReaderAccount,
 } from '@platform/testing/data-requests/fixtures';
 
 import { toPersonalDataExportCsv } from './personal-data-export-csv';
 
 const ROW_SEPARATOR = '\r\n';
-const KIND_COLUMN_INDEX = 3;
+const KIND_COLUMN_INDEX = 4;
+const LEADING_CELLS = `${MOCK_EXPORT_GENERATED_AT.toISOString()},${MOCK_DATA_REQUEST_EMAIL},${mockAdmin().userId}`;
 
 const toRows = (csv: string) => csv.trim().split(ROW_SEPARATOR);
-
-const mockEmptyPersonalDataExport = () => ({
-  ...mockPersonalDataExport(),
-  subscribers: [],
-  leads: [],
-  membershipInvites: [],
-  unsentStudioReinvites: [],
-  selfServeOwnerSites: [],
-  readerAccount: undefined,
-  blockedSignupIdentities: [],
-  auditEvents: [],
-});
 
 describe(toPersonalDataExportCsv, () => {
   describe('with every kind of record stored', () => {
@@ -52,8 +44,8 @@ describe(toPersonalDataExportCsv, () => {
       ]);
     });
 
-    it('starts every row with its time, the searched email and the operator', () => {
-      const leading = `${MOCK_EXPORT_GENERATED_AT.toISOString()},${MOCK_DATA_REQUEST_EMAIL},${mockAdmin().userId},`;
+    it('starts every row with its time, email, operator and whether data is held', () => {
+      const leading = `${LEADING_CELLS},${true},`;
 
       const startsWithLeading = rows.map((row) => row.startsWith(leading));
 
@@ -67,15 +59,18 @@ describe(toPersonalDataExportCsv, () => {
     });
   });
 
-  it('writes only the header row when nothing is stored', () => {
+  it('writes one row stating that no data is held when nothing is stored', () => {
     const csv = toPersonalDataExportCsv(mockEmptyPersonalDataExport());
 
-    expect(toRows(csv)).toHaveLength(1);
+    const [, ...rows] = toRows(csv);
+
+    expect(rows).toEqual([`${LEADING_CELLS},${false},`]);
   });
 
   it('lists a reader account without bookmarks as a single row', () => {
     const csv = toPersonalDataExportCsv({
       ...mockEmptyPersonalDataExport(),
+      isDataHeld: true,
       readerAccount: mockPersonalDataReaderAccount({ bookmarks: [] }),
     });
 
