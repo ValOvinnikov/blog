@@ -8,6 +8,7 @@ import { MOCK_TENANT_ID } from '@platform/testing/tenants/fixtures';
 import { noEntitlementGrantQueries } from '@platform/testing/tenants/no-entitlement-grant-queries';
 import { adminRoutes } from '@platform/utils/routes/routes';
 import { NEXT_NAVIGATION_ERROR, type TMaybeNull } from '@shinefold/config';
+import type { getSettingsFeaturesAndPreset } from '@shinefold/db/queries/settings-features';
 import { redirect } from 'next/navigation';
 import type { Session } from 'next-auth';
 
@@ -18,7 +19,8 @@ const {
   getSettingsFeaturesAndPresetMock,
 } = vi.hoisted(() => ({
   listMembershipsWithTenantsForUserMock: vi.fn(),
-  getSettingsFeaturesAndPresetMock: vi.fn(),
+  getSettingsFeaturesAndPresetMock:
+    vi.fn<typeof getSettingsFeaturesAndPreset>(),
 }));
 
 vi.mock('@platform/server/auth/auth');
