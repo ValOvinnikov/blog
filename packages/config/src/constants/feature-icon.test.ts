@@ -1,4 +1,5 @@
-import { FEATURE_ICONS, ICONS } from './icon';
+import { FEATURE_ICONS } from './feature-icon';
+import { ICONS } from './icon';
 
 describe('FEATURE_ICONS', () => {
   it('contains only valid ICONS values', () => {
