@@ -3,6 +3,8 @@ import type { Instrumentation } from 'next';
 
 export const register = async (): Promise<void> => {
   if (process.env.NEXT_RUNTIME === 'nodejs') {
+    // Importing the env module validates it, so a malformed value stops the server here rather than on first use.
+    await import('@platform/utils/env/env');
     const { registerLokiSink } =
       await import('@platform/server/log-shipping/register-loki-sink/register-loki-sink');
     registerLokiSink();

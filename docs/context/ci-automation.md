@@ -662,10 +662,30 @@ that, but a format check — `PERSONAL_DATA_ENCRYPTION_KEY`'s keyring,
 `Invalid environment variables` however valid the stored value is. So
 `vercel build` runs with `SKIP_ENV_VALIDATION=true`, set on that one command
 and never on `pull` or `deploy`. Validation still happens where the real
-values exist: each app's `instrumentation.ts` imports its env module when the
-deployed server starts, so a malformed value fails there with the schema's own
-message. `SKIP_ENV_VALIDATION` must never be set on a Vercel project, or that
-startup check is gone too.
+values exist: web's and platform's `register()` in `instrumentation.ts` imports
+the app's env module directly when the deployed server starts, independent of
+the Loki sink, so a malformed value fails there with the schema's own message.
+`SKIP_ENV_VALIDATION` must never be set on a Vercel project, or that startup
+check is gone too.
+
+The skip is set in exactly these places, and `turbo.json` passes it through to
+the `build` and `storybook:build` tasks:
+
+- `ci.yml`, `verify` job, `Build` step — no env vars exist on the runner.
+- `deploy-development.yml`, `verify` job, `Build` step — same reason.
+- `deploy-development.yml`, the `vercel build` command in `deploy-web`,
+  `deploy-platform` and `deploy-worker`.
+- `deploy-production.yml`, the `vercel build` command in `deploy-web` and
+  `deploy-platform`.
+
+With validation skipped, a Sensitive var read during build or prerender
+arrives as `[SENSITIVE]` instead of failing, and could be baked into static
+output. No build-time code reads one today: every `[tenant]` route returns no
+`generateStaticParams` paths, platform's `[locale]` routes all render on
+demand, and the prerendered routes — each app's `/_not-found`, web's
+`robots.txt`, platform's icons and manifest — read no server env var.
+`next.config.ts` reads only `NODE_ENV`. A route made static later reads server
+env vars at request time, never while prerendering.
 
 ## A deploy goes live only after every app starts
 
