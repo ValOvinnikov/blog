@@ -3,6 +3,8 @@ import type { TThemeToken } from './contrast-pairs';
 export const HEADING = '--heading' satisfies TThemeToken;
 export const LINK_TEXT = '--link-text' satisfies TThemeToken;
 export const LINK_UNDERLINE = '--link-underline' satisfies TThemeToken;
+export const STANDALONE_LINK_UNDERLINE =
+  '--standalone-link-underline' satisfies TThemeToken;
 export const EYEBROW_TEXT = '--eyebrow-text' satisfies TThemeToken;
 export const EYEBROW_CHIP = '--eyebrow-chip' satisfies TThemeToken;
 export const FEATURE_ICON_TILE = '--feature-icon-tile' satisfies TThemeToken;

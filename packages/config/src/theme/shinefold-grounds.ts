@@ -21,6 +21,7 @@ import {
   LINK_UNDERLINE,
   SIDENAV_CURRENT_BAR,
   SIDENAV_CURRENT_TEXT,
+  STANDALONE_LINK_UNDERLINE,
   TIER_BADGE_FILL,
   TIER_BADGE_LABEL,
   TIER_HIGHLIGHT_BORDER,
@@ -62,6 +63,7 @@ export const marksOf = (
   [TIMELINE_MARKER_NUMERAL]: onMark,
   [ASIDE_BAR]: mark,
   [SIDENAV_CURRENT_BAR]: mark,
+  [STANDALONE_LINK_UNDERLINE]: mark,
 });
 
 export const inkOn = (muted: string): TPresetSurfaceColors => ({

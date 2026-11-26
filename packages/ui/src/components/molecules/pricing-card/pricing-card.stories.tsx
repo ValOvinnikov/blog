@@ -2,6 +2,7 @@ import { Button } from '@shinefold/ui/components/atoms/button';
 import { LinkButton } from '@shinefold/ui/components/molecules/link-button';
 import { CardStyles } from '@shinefold/ui/testing/card-styles';
 import { inNarrowColumn, threeAcross } from '@shinefold/ui/testing/card-widths';
+import { SHINEFOLD_PRESET_STORY } from '@shinefold/ui/testing/shinefold-preset';
 import type { Meta, StoryObj } from '@storybook/react-vite';
 
 import { PricingCard } from './pricing-card';
@@ -135,4 +136,9 @@ export const PeriodStyles: TStory = {
       ))}
     </div>
   ),
+};
+
+export const HighlightedShinefoldPreset: TStory = {
+  args: Highlighted.args,
+  ...SHINEFOLD_PRESET_STORY,
 };

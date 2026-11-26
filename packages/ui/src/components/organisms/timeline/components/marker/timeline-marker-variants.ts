@@ -1,8 +1,8 @@
 import { TIMELINE_MARKER_STYLE } from '@shinefold/config';
-import { BRAND_PILL, tv } from '@shinefold/ui/lib/styling';
+import { PILL, tv } from '@shinefold/ui/lib/styling';
 
 export const timelineMarkerVariants = tv({
-  base: [BRAND_PILL, 'h-8'],
+  base: [PILL, 'h-8 bg-timeline-marker-fill text-timeline-marker-numeral'],
   variants: {
     markerStyle: {
       [TIMELINE_MARKER_STYLE.NUMBERED]: ['w-8'],

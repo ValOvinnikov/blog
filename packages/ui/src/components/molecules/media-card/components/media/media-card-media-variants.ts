@@ -2,8 +2,9 @@ import { tv } from '@shinefold/ui/lib/styling';
 import type { VariantProps } from 'tailwind-variants';
 
 const TINTED_FILL = [
-  'bg-media-fill text-brand-primary',
-  'group-hover:bg-transparent group-focus-within:bg-transparent',
+  'bg-feature-icon-tile text-feature-icon-glyph',
+  // A preset that sets the tile keeps it on hover, so the glyph stays on the fill it was measured against.
+  'group-hover:bg-[var(--feature-icon-tile,transparent)] group-focus-within:bg-[var(--feature-icon-tile,transparent)]',
 ];
 
 export const mediaCardMediaVariants = tv({

@@ -23,15 +23,14 @@ export const Eyebrow = ({
   dataTestId,
   children,
 }: TEyebrowProps) => {
-  const rootClassName = eyebrowVariants({
-    hasHref: Boolean(href),
-    class: className,
-  });
+  const { root, chip } = eyebrowVariants({ hasHref: Boolean(href) });
+  const rootClassName = root({ class: className });
+  const content = <span className={chip()}>{children}</span>;
 
   if (!href) {
     return (
       <p className={rootClassName} data-testid={dataTestId}>
-        {children}
+        {content}
       </p>
     );
   }
@@ -40,7 +39,7 @@ export const Eyebrow = ({
 
   return (
     <Component className={rootClassName} data-testid={dataTestId} href={href}>
-      {children}
+      {content}
     </Component>
   );
 };

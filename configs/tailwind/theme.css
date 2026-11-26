@@ -105,6 +105,8 @@
   --color-link-text: var(--link-text); /* @role in-text link */
   /* prettier-ignore */
   --color-link-underline: var(--link-underline); /* @role in-text link underline */
+  /* prettier-ignore */
+  --color-standalone-link-underline: var(--standalone-link-underline, transparent); /* @role standalone link hover underline */
   --color-eyebrow-text: var(--eyebrow-text); /* @role eyebrow text */
   /* prettier-ignore */
   --color-eyebrow-chip: var(--eyebrow-chip, transparent); /* @role eyebrow background */

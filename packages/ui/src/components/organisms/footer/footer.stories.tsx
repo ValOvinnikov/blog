@@ -7,6 +7,7 @@ import {
 } from '@shinefold/config';
 import { Icon } from '@shinefold/ui/components/atoms/icon';
 import { TextLink } from '@shinefold/ui/components/atoms/text-link';
+import { SHINEFOLD_PRESET_STORY } from '@shinefold/ui/testing/shinefold-preset';
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { keys } from 'remeda';
 
@@ -268,4 +269,9 @@ export const Minimal: TStory = {
   args: {
     children: <Footer.Copyright title="My Blog" year={2027} />,
   },
+};
+
+export const ColumnsShinefoldPreset: TStory = {
+  ...Columns,
+  ...SHINEFOLD_PRESET_STORY,
 };

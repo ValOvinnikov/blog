@@ -2,6 +2,7 @@ import { TEXT_ROLE } from '@shinefold/config';
 import {
   CARD_CONTAINER,
   INTERACTIVE_ITEM_CARD,
+  STANDALONE_LINK_HOVER_UNDERLINE,
   tv,
   TYPOGRAPHY,
 } from '@shinefold/ui/lib/styling';
@@ -16,6 +17,7 @@ export const taxonomyCardVariants = tv({
       'px-card-x py-card-y',
     ],
     accessibleName: ['sr-only'],
+    link: STANDALONE_LINK_HOVER_UNDERLINE,
     description: [TYPOGRAPHY[TEXT_ROLE.CARD_BODY], 'line-clamp-2'],
     count: [TYPOGRAPHY[TEXT_ROLE.META], 'mt-auto'],
   },

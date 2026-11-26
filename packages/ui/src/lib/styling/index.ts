@@ -11,12 +11,14 @@ export { FOCUS_RING, TRANSITION_COLORS } from './interaction';
 export { CARD_CONTAINER, INTERACTIVE_ITEM_CARD } from './item-card';
 export {
   LINK_UNDERLINE,
+  DESCENDANT_LINKS_HOVER_UNDERLINE,
   LINK_UNDERLINE_AT_REST,
+  STANDALONE_LINK_HOVER_UNDERLINE,
   LINK_UNDERLINE_EMPHASIS,
 } from './link-underline';
 export { MENU_ROW } from './menu-row';
 export { NAV_LINK, NAV_LINK_CURRENT } from './nav-link';
-export { BRAND_PILL } from './pill';
+export { PILL } from './pill';
 export { POPOVER_SURFACE } from './popover-surface';
 export { tv } from './tv';
 export { TYPOGRAPHY } from './typography';
