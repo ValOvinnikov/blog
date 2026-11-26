@@ -1,4 +1,5 @@
 import { PricingCard } from '@shinefold/ui/components/molecules/pricing-card';
+import { hasLength, isUndefined } from '@shinefold/utils/primitives';
 import { ActionGroup } from '@web/components/shared/action-group';
 import type { IPricingCardData } from '@web/utils/to-pricing-panels';
 
@@ -22,7 +23,7 @@ export const PricingTierCard = ({ card }: IPricingTierCardProps) => {
   const compareAt = headline?.compareAt;
 
   return (
-    <PricingCard isHighlighted={highlightLabel !== undefined}>
+    <PricingCard isHighlighted={!isUndefined(highlightLabel)}>
       {[
         highlightLabel ? (
           <PricingCard.Badge key="badge">{highlightLabel}</PricingCard.Badge>
@@ -54,10 +55,10 @@ export const PricingTierCard = ({ card }: IPricingTierCardProps) => {
         ...extras.map((extra, index) => (
           <PricingCard.Extra key={`extra-${index}`}>{extra}</PricingCard.Extra>
         )),
-        features.length > 0 ? (
+        hasLength(features) ? (
           <PricingCard.Features key="features" items={features} />
         ) : null,
-        ctaButtons.length > 0 ? (
+        hasLength(ctaButtons) ? (
           <PricingCard.Actions key="actions">
             <ActionGroup actions={ctaButtons} />
           </PricingCard.Actions>

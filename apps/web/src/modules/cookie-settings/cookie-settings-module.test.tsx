@@ -1,4 +1,5 @@
 import { faker } from '@faker-js/faker';
+import { SITE_MESSAGES } from '@shinefold/config';
 import { errorResult, okResult } from '@shinefold/utils';
 import { CONSENT_LOG } from '@web/constants/consent';
 import { customRenderAsync, screen } from '@web/testing/custom-render';
@@ -28,24 +29,34 @@ faker.seed(6088);
 
 const MOCK_MODULE_ID = faker.string.uuid();
 const MOCK_EDITOR_HEADING = faker.lorem.sentence();
+const { heading: DEFAULT_HEADING } = SITE_MESSAGES.consent.preferences;
 
 const setup = customRenderAsync(CookieSettingsModule, { id: MOCK_MODULE_ID });
 
 describe(`<${CookieSettingsModule.name}/>`, () => {
   beforeEach(() => {
-    getCookieSettingsMock.mockReset();
     getCookieSettingsMock.mockResolvedValue(
       okResult(mockCookieSettingsModule()),
     );
   });
 
-  it('fetches the module with the tenant Sanity context', async () => {
-    await setup();
+  describe('with the default module', () => {
+    beforeEach(async () => {
+      await setup();
+    });
 
-    expect(getCookieSettingsMock).toHaveBeenCalledWith(
-      MOCK_MODULE_ID,
-      MOCK_TENANT_SANITY_CONTEXT,
-    );
+    it('fetches the module with the tenant Sanity context', () => {
+      expect(getCookieSettingsMock).toHaveBeenCalledWith(
+        MOCK_MODULE_ID,
+        MOCK_TENANT_SANITY_CONTEXT,
+      );
+    });
+
+    it('names the section with the cookie settings heading', () => {
+      const section = screen.getByRole('region', { name: DEFAULT_HEADING });
+
+      expect(section).toBeVisible();
+    });
   });
 
   it('logs and renders nothing when the fetch fails', async () => {
@@ -58,14 +69,6 @@ describe(`<${CookieSettingsModule.name}/>`, () => {
       id: MOCK_MODULE_ID,
       error: MOCK_ERROR,
     });
-  });
-
-  it('names the section with the cookie settings heading when the editor set none', async () => {
-    await setup();
-
-    const section = screen.getByRole('region', { name: 'Cookie settings' });
-
-    expect(section).toBeVisible();
   });
 
   it("names the section with the editor's heading", async () => {

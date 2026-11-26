@@ -1,25 +1,10 @@
 'use client';
 
 import type { TMaybeNull } from '@shinefold/config';
+import { isNull } from '@shinefold/utils/primitives';
 import { useOverlayOpenState } from '@web/hooks/use-overlay-open-state';
+import { getFocusables } from '@web/utils/get-focusables';
 import { useCallback, useEffect } from 'react';
-
-const FOCUSABLE_SELECTOR =
-  'a[href], button:not([disabled]), summary, [tabindex]:not([tabindex="-1"])';
-
-const isInsideClosedDetails = (element: Element): boolean => {
-  const closedDetails = element.parentElement?.closest('details:not([open])');
-  if (!closedDetails) return false;
-
-  const isOwnSummary =
-    element.matches('summary') && element.parentElement === closedDetails;
-  return isOwnSummary ? isInsideClosedDetails(closedDetails) : true;
-};
-
-const getFocusables = (panel: TMaybeNull<HTMLElement>) =>
-  Array.from(
-    panel?.querySelectorAll<HTMLElement>(FOCUSABLE_SELECTOR) ?? [],
-  ).filter((element) => !isInsideClosedDetails(element));
 
 export type TDismissibleMenuAccessors = {
   getTrigger: () => TMaybeNull<HTMLElement>;
@@ -165,7 +150,7 @@ export const useDismissibleMenu = ({
       const next = event.relatedTarget as TMaybeNull<Node>;
 
       if (
-        next === null ||
+        isNull(next) ||
         getPanel()?.contains(next) ||
         getTrigger()?.contains(next)
       ) {

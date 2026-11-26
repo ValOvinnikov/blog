@@ -4,6 +4,7 @@ import {
   BookmarksList,
   type IBookmarkRow,
 } from '@shinefold/ui/components/organisms/bookmarks-list';
+import { hasLength } from '@shinefold/utils/primitives';
 import NextLink from 'next/link';
 import type { ReactNode } from 'react';
 
@@ -53,7 +54,7 @@ export const BookmarksPageView = ({
           <BookmarksList
             rows={rows}
             emptyMessage={emptyMessage}
-            hint={rows.length > 0 ? hint : undefined}
+            hint={hasLength(rows) ? hint : undefined}
             linkAs={NextLink}
           />
         </Panel.Body>

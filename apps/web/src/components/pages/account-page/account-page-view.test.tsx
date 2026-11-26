@@ -27,28 +27,32 @@ const setup = (overrides?: Partial<IAccountPageViewProps>) =>
   );
 
 describe(`<${AccountPageView.name}/>`, () => {
-  it('renders the page heading', () => {
-    setup();
-
-    const accountHeading = screen.getByRole('heading', {
-      level: 1,
-      name: MOCK_VIEW.heading,
+  describe('with every section', () => {
+    beforeEach(() => {
+      setup();
     });
 
-    expect(accountHeading).toBeVisible();
-  });
+    it('renders the page heading', () => {
+      const accountHeading = screen.getByRole('heading', {
+        level: 1,
+        name: MOCK_VIEW.heading,
+      });
 
-  it('renders all three sections, in identity/newsletter/privacy order', () => {
-    setup();
+      expect(accountHeading).toBeVisible();
+    });
 
-    const sectionHeadings = screen.getAllByRole('heading', { level: 2 });
-    const sectionTitles = sectionHeadings.map((heading) => heading.textContent);
+    it('renders all three sections, in identity/newsletter/privacy order', () => {
+      const sectionHeadings = screen.getAllByRole('heading', { level: 2 });
+      const sectionTitles = sectionHeadings.map(
+        (heading) => heading.textContent,
+      );
 
-    expect(sectionTitles).toEqual([
-      MOCK_IDENTITY_HEADING,
-      MOCK_NEWSLETTER_HEADING,
-      MOCK_PRIVACY_HEADING,
-    ]);
+      expect(sectionTitles).toEqual([
+        MOCK_IDENTITY_HEADING,
+        MOCK_NEWSLETTER_HEADING,
+        MOCK_PRIVACY_HEADING,
+      ]);
+    });
   });
 
   it('renders no newsletter section when the slot is absent', () => {

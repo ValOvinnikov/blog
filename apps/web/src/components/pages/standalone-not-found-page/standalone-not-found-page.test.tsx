@@ -80,15 +80,30 @@ describe(`<${StandaloneNotFoundPage.name}/>`, () => {
   });
 
   describe('given a tenant', () => {
-    it('resolves theme tokens and messages with that tenant', async () => {
-      await setup({ tenant: MOCK_TENANT_ID });
+    describe('in the default language', () => {
+      beforeEach(async () => {
+        await setup({ tenant: MOCK_TENANT_ID });
+      });
 
-      expect(getThemeTokensMock).toHaveBeenCalledWith(MOCK_TENANT_ID);
-      expect(resolveTenantMessagesMock).toHaveBeenCalledWith(
-        EN_MESSAGES,
-        EN,
-        MOCK_TENANT_ID,
-      );
+      it('resolves theme tokens and messages with that tenant', () => {
+        expect(getThemeTokensMock).toHaveBeenCalledWith(MOCK_TENANT_ID);
+        expect(resolveTenantMessagesMock).toHaveBeenCalledWith(
+          EN_MESSAGES,
+          EN,
+          MOCK_TENANT_ID,
+        );
+      });
+
+      it('renders the tenant-voiced heading and supporting text', () => {
+        const heading = screen.getByRole('heading', {
+          level: 1,
+          name: MOCK_VOICED_HEADING,
+        });
+        const link = screen.getByRole('link', { name: MOCK_VOICE_LINK_TEXT });
+
+        expect(heading).toBeVisible();
+        expect(link).toHaveAttribute('href', MOCK_VOICE_LINK_HREF);
+      });
     });
 
     it('resolves the tenant messages in the given language', async () => {
@@ -100,32 +115,19 @@ describe(`<${StandaloneNotFoundPage.name}/>`, () => {
         MOCK_TENANT_ID,
       );
     });
-
-    it('renders the tenant-voiced heading and supporting text', async () => {
-      await setup({ tenant: MOCK_TENANT_ID });
-
-      const heading = screen.getByRole('heading', {
-        level: 1,
-        name: MOCK_VOICED_HEADING,
-      });
-      const link = screen.getByRole('link', { name: MOCK_VOICE_LINK_TEXT });
-
-      expect(heading).toBeVisible();
-      expect(link).toHaveAttribute('href', MOCK_VOICE_LINK_HREF);
-    });
   });
 
   describe('given no tenant', () => {
-    it('never resolves theme tokens or tenant messages', async () => {
+    beforeEach(async () => {
       await setup();
+    });
 
+    it('never resolves theme tokens or tenant messages', () => {
       expect(getThemeTokensMock).not.toHaveBeenCalled();
       expect(resolveTenantMessagesMock).not.toHaveBeenCalled();
     });
 
-    it('renders the base, un-voiced copy', async () => {
-      await setup();
-
+    it('renders the base, un-voiced copy', () => {
       const supportingText = screen.getByText(
         EN_MESSAGES.notFound.supportingText,
       );

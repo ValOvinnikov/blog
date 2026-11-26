@@ -19,15 +19,6 @@ const findLink = (
 ) => links.find((link) => link.platform === platform);
 
 describe(buildShareLinks, () => {
-  it('builds an X intent url with the title and url encoded', () => {
-    const links = buildShareLinks({ url: MOCK_URL, title: MOCK_TITLE });
-    const xLink = findLink(links, SOCIAL_PLATFORMS.X);
-
-    expect(xLink?.href).toBe(
-      `https://twitter.com/intent/tweet?text=${MOCK_FIRST_WORD}+${MOCK_SECOND_WORD}&url=${encodeURIComponent(MOCK_URL)}`,
-    );
-  });
-
   it('encodes special characters in the title', () => {
     const links = buildShareLinks({ url: MOCK_URL, title: MOCK_SPECIAL_TITLE });
     const xLink = findLink(links, SOCIAL_PLATFORMS.X);
@@ -37,27 +28,38 @@ describe(buildShareLinks, () => {
     );
   });
 
-  it('builds a LinkedIn share-offsite url with the url encoded', () => {
-    const links = buildShareLinks({ url: MOCK_URL, title: MOCK_TITLE });
-    const linkedInLink = findLink(links, SOCIAL_PLATFORMS.LINKEDIN);
+  describe('for a plain title', () => {
+    let links: ReturnType<typeof buildShareLinks>;
 
-    expect(linkedInLink?.href).toBe(
-      `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(MOCK_URL)}`,
-    );
-  });
+    beforeEach(() => {
+      links = buildShareLinks({ url: MOCK_URL, title: MOCK_TITLE });
+    });
 
-  it('returns exactly the X and LinkedIn links, in that order', () => {
-    const links = buildShareLinks({ url: MOCK_URL, title: MOCK_TITLE });
+    it('builds an X intent url with the title and url encoded', () => {
+      const xLink = findLink(links, SOCIAL_PLATFORMS.X);
 
-    expect(links.map((link) => link.platform)).toEqual([
-      SOCIAL_PLATFORMS.X,
-      SOCIAL_PLATFORMS.LINKEDIN,
-    ]);
-  });
+      expect(xLink?.href).toBe(
+        `https://twitter.com/intent/tweet?text=${MOCK_FIRST_WORD}+${MOCK_SECOND_WORD}&url=${encodeURIComponent(MOCK_URL)}`,
+      );
+    });
 
-  it('leaves icons for the web layer to attach', () => {
-    const links = buildShareLinks({ url: MOCK_URL, title: MOCK_TITLE });
+    it('builds a LinkedIn share-offsite url with the url encoded', () => {
+      const linkedInLink = findLink(links, SOCIAL_PLATFORMS.LINKEDIN);
 
-    expect(links.map((link) => link.icon)).toEqual([undefined, undefined]);
+      expect(linkedInLink?.href).toBe(
+        `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(MOCK_URL)}`,
+      );
+    });
+
+    it('returns exactly the X and LinkedIn links, in that order', () => {
+      expect(links.map((link) => link.platform)).toEqual([
+        SOCIAL_PLATFORMS.X,
+        SOCIAL_PLATFORMS.LINKEDIN,
+      ]);
+    });
+
+    it('leaves icons for the web layer to attach', () => {
+      expect(links.map((link) => link.icon)).toEqual([undefined, undefined]);
+    });
   });
 });

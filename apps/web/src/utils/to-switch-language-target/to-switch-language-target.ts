@@ -1,5 +1,6 @@
 import { routes, type TLocaleIsoCode } from '@shinefold/config';
 import type { TTranslationMap } from '@shinefold/service';
+import { isUndefined } from '@shinefold/utils/primitives';
 import { localeForPrefix } from '@web/i18n/routing';
 import { findListPage } from '@web/utils/find-list-page';
 import { findTranslatedPath } from '@web/utils/find-translated-path';
@@ -19,8 +20,9 @@ const toFallbackHref = (
   to: TLocaleIsoCode,
 ): string => {
   const [first = '', second] = pathname.split('/').filter(Boolean);
-  const listPage =
-    second === undefined ? undefined : findListPage(first, translationMap);
+  const listPage = isUndefined(second)
+    ? undefined
+    : findListPage(first, translationMap);
 
   return listPage?.languages.includes(to) ? listPage.href : routes.home();
 };

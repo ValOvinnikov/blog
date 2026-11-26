@@ -1,5 +1,5 @@
 import type { TMaybeUndefined } from '@shinefold/config';
-import { HTTP_METHOD } from '@shinefold/config/constants';
+import { HTTP_METHOD, MEDIA_TYPE } from '@shinefold/config/constants';
 import { isString } from '@shinefold/utils/primitives';
 import {
   MAX_MESSAGE_LENGTH,
@@ -49,7 +49,7 @@ const send = (payload: TClientLogPayload): void => {
   const body = JSON.stringify(payload);
 
   if (typeof navigator !== 'undefined' && navigator.sendBeacon) {
-    const blob = new Blob([body], { type: 'application/json' });
+    const blob = new Blob([body], { type: MEDIA_TYPE.JSON });
     const queued = navigator.sendBeacon(CLIENT_LOG_ENDPOINT, blob);
     if (queued) return;
   }
@@ -59,7 +59,7 @@ const send = (payload: TClientLogPayload): void => {
   // A failed report must never surface as an unhandled rejection in the error path it reports on.
   fetch(CLIENT_LOG_ENDPOINT, {
     method: HTTP_METHOD.POST,
-    headers: { 'Content-Type': 'application/json' },
+    headers: { 'Content-Type': MEDIA_TYPE.JSON },
     body,
     keepalive: true,
   }).catch(() => {});

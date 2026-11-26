@@ -3,6 +3,7 @@ import {
   LOCALE_ISO_CODES,
   NEXT_NAVIGATION_ERROR,
   routes,
+  SITE_MESSAGES,
 } from '@shinefold/config';
 import { errorResult, okResult } from '@shinefold/utils';
 import { getRequestContext } from '@web/server/request-context/request-context';
@@ -45,8 +46,8 @@ vi.mock('@shinefold/service', () => ({
 faker.seed(6008);
 
 const { EN, NL } = LOCALE_ISO_CODES;
-const LINK_TEXT = 'browse the blog';
-const EMPTY_MESSAGE = 'No bookmarks yet — save a post to find it here.';
+const MOCK_LINK_TEXT = 'browse the blog';
+const { empty: EMPTY_MESSAGE } = SITE_MESSAGES.bookmarksPage;
 const MOCK_USER_ID = faker.string.uuid();
 const MOCK_CREATED_AT = faker.date.past();
 const MOCK_FIRST_POST_ID = faker.string.uuid();
@@ -70,9 +71,6 @@ const setup = customRenderAsync(BookmarksPage, {});
 
 describe(`<${BookmarksPage.name}/>`, () => {
   beforeEach(() => {
-    authMock.mockReset();
-    listBookmarksMock.mockReset();
-    getPostsByIdsMock.mockReset();
     authMock.mockResolvedValue({ user: { id: MOCK_USER_ID } });
     listBookmarksMock.mockResolvedValue([]);
     getPostsByIdsMock.mockResolvedValue(okResult([]));
@@ -101,17 +99,28 @@ describe(`<${BookmarksPage.name}/>`, () => {
     expect(getPostsByIdsMock).not.toHaveBeenCalled();
   });
 
-  it('resolves the signed-in user and tenant bookmarks into posts', async () => {
-    await setup();
+  describe('with no bookmarks', () => {
+    beforeEach(async () => {
+      await setup();
+    });
 
-    expect(listBookmarksMock).toHaveBeenCalledWith(
-      MOCK_TENANT_ID,
-      MOCK_USER_ID,
-    );
-    expect(getPostsByIdsMock).toHaveBeenCalledWith(
-      [],
-      MOCK_TENANT_SANITY_CONTEXT,
-    );
+    it('resolves the signed-in user and tenant bookmarks into posts', () => {
+      expect(listBookmarksMock).toHaveBeenCalledWith(
+        MOCK_TENANT_ID,
+        MOCK_USER_ID,
+      );
+      expect(getPostsByIdsMock).toHaveBeenCalledWith(
+        [],
+        MOCK_TENANT_SANITY_CONTEXT,
+      );
+    });
+
+    it('renders the catalog empty message', () => {
+      const emptyMessage = screen.getByText(EMPTY_MESSAGE);
+
+      expect(vi.mocked(getVoiceRich)).toHaveBeenCalledWith('bookmarksEmpty');
+      expect(emptyMessage).toBeVisible();
+    });
   });
 
   it('forwards the request context Sanity context to getPostsByIds', async () => {
@@ -128,100 +137,100 @@ describe(`<${BookmarksPage.name}/>`, () => {
     );
   });
 
-  it('re-sorts resolved posts back into bookmark-recency order', async () => {
-    listBookmarksMock.mockResolvedValue([
-      mockBookmark(MOCK_SECOND_POST_ID),
-      mockBookmark(MOCK_FIRST_POST_ID),
-    ]);
-    getPostsByIdsMock.mockResolvedValue(
-      okResult([
-        {
-          ...mockPostCard({ id: MOCK_FIRST_POST_ID, slug: MOCK_FIRST_SLUG }),
-          language: EN,
-        },
-        {
-          ...mockPostCard({ id: MOCK_SECOND_POST_ID, slug: MOCK_SECOND_SLUG }),
-          language: EN,
-        },
-      ]),
-    );
-
-    await setup();
-
-    const links = screen.getAllByRole('link');
-    const secondLink = screen.getByRole('link', {
-      name: `${MOCK_SECOND_SLUG}.md`,
-    });
-    const firstLink = screen.getByRole('link', {
-      name: `${MOCK_FIRST_SLUG}.md`,
+  describe('with two bookmarks, the second post saved most recently', () => {
+    beforeEach(() => {
+      listBookmarksMock.mockResolvedValue([
+        mockBookmark(MOCK_SECOND_POST_ID),
+        mockBookmark(MOCK_FIRST_POST_ID),
+      ]);
     });
 
-    expect(getPostsByIdsMock).toHaveBeenCalledWith(
-      [MOCK_SECOND_POST_ID, MOCK_FIRST_POST_ID],
-      MOCK_TENANT_SANITY_CONTEXT,
-    );
-    expect(links.map((link) => link.textContent)).toEqual([
-      `${MOCK_SECOND_SLUG}.md`,
-      `${MOCK_FIRST_SLUG}.md`,
-    ]);
-    expect(secondLink).toHaveAttribute('href', routes.post(MOCK_SECOND_SLUG));
-    expect(firstLink).toHaveAttribute('href', routes.post(MOCK_FIRST_SLUG));
-  });
+    it('re-sorts resolved posts back into bookmark-recency order', async () => {
+      getPostsByIdsMock.mockResolvedValue(
+        okResult([
+          {
+            ...mockPostCard({ id: MOCK_FIRST_POST_ID, slug: MOCK_FIRST_SLUG }),
+            language: EN,
+          },
+          {
+            ...mockPostCard({
+              id: MOCK_SECOND_POST_ID,
+              slug: MOCK_SECOND_SLUG,
+            }),
+            language: EN,
+          },
+        ]),
+      );
 
-  it('links each bookmark to the language it was saved in', async () => {
-    listBookmarksMock.mockResolvedValue([
-      mockBookmark(MOCK_SECOND_POST_ID),
-      mockBookmark(MOCK_FIRST_POST_ID),
-    ]);
-    getPostsByIdsMock.mockResolvedValue(
-      okResult([
-        {
-          ...mockPostCard({ id: MOCK_SECOND_POST_ID, slug: MOCK_NL_SLUG }),
-          language: NL,
-        },
-        {
-          ...mockPostCard({ id: MOCK_FIRST_POST_ID, slug: MOCK_FIRST_SLUG }),
-          language: EN,
-        },
-      ]),
-    );
-    vi.mocked(getRequestContext).mockResolvedValueOnce({
-      ...MOCK_REQUEST_CONTEXT,
-      locale: NL,
-      defaultLocale: EN,
+      await setup();
+
+      const links = screen.getAllByRole('link');
+      const secondLink = screen.getByRole('link', {
+        name: `${MOCK_SECOND_SLUG}.md`,
+      });
+      const firstLink = screen.getByRole('link', {
+        name: `${MOCK_FIRST_SLUG}.md`,
+      });
+
+      expect(getPostsByIdsMock).toHaveBeenCalledWith(
+        [MOCK_SECOND_POST_ID, MOCK_FIRST_POST_ID],
+        MOCK_TENANT_SANITY_CONTEXT,
+      );
+      expect(links.map((link) => link.textContent)).toEqual([
+        `${MOCK_SECOND_SLUG}.md`,
+        `${MOCK_FIRST_SLUG}.md`,
+      ]);
+      expect(secondLink).toHaveAttribute('href', routes.post(MOCK_SECOND_SLUG));
+      expect(firstLink).toHaveAttribute('href', routes.post(MOCK_FIRST_SLUG));
     });
 
-    await setup();
+    it('links each bookmark to the language it was saved in', async () => {
+      getPostsByIdsMock.mockResolvedValue(
+        okResult([
+          {
+            ...mockPostCard({ id: MOCK_SECOND_POST_ID, slug: MOCK_NL_SLUG }),
+            language: NL,
+          },
+          {
+            ...mockPostCard({ id: MOCK_FIRST_POST_ID, slug: MOCK_FIRST_SLUG }),
+            language: EN,
+          },
+        ]),
+      );
+      vi.mocked(getRequestContext).mockResolvedValueOnce({
+        ...MOCK_REQUEST_CONTEXT,
+        locale: NL,
+        defaultLocale: EN,
+      });
 
-    const dutchLink = screen.getByRole('link', { name: `${MOCK_NL_SLUG}.md` });
-    const englishLink = screen.getByRole('link', {
-      name: `${MOCK_FIRST_SLUG}.md`,
+      await setup();
+
+      const dutchLink = screen.getByRole('link', {
+        name: `${MOCK_NL_SLUG}.md`,
+      });
+      const englishLink = screen.getByRole('link', {
+        name: `${MOCK_FIRST_SLUG}.md`,
+      });
+
+      expect(dutchLink).toHaveAttribute(
+        'href',
+        `/${NL.toLowerCase()}${routes.post(MOCK_NL_SLUG)}`,
+      );
+      expect(englishLink).toHaveAttribute('href', routes.post(MOCK_FIRST_SLUG));
     });
-
-    expect(dutchLink).toHaveAttribute(
-      'href',
-      `/${NL.toLowerCase()}${routes.post(MOCK_NL_SLUG)}`,
-    );
-    expect(englishLink).toHaveAttribute('href', routes.post(MOCK_FIRST_SLUG));
-  });
-
-  it('renders the catalog empty message when there are no bookmarks', async () => {
-    await setup();
-
-    const emptyMessage = screen.getByText(EMPTY_MESSAGE);
-
-    expect(vi.mocked(getVoiceRich)).toHaveBeenCalledWith('bookmarksEmpty');
-    expect(emptyMessage).toBeVisible();
   });
 
   it('renders the tenant-authored empty message with its formatting and link', async () => {
     vi.mocked(getVoiceRich).mockResolvedValueOnce(
-      mockFormattedVoiceRich({ linkText: LINK_TEXT, href: routes.blogIndex() }),
+      mockFormattedVoiceRich({
+        linkText: MOCK_LINK_TEXT,
+        href: routes.blogIndex(),
+      }),
     );
 
     await setup();
 
-    const inlineLink = screen.getByRole('link', { name: LINK_TEXT });
+    const inlineLink = screen.getByRole('link', { name: MOCK_LINK_TEXT });
     const boldText = screen.getByText('bold', { selector: 'strong' });
     const italicText = screen.getByText('italic', { selector: 'em' });
 

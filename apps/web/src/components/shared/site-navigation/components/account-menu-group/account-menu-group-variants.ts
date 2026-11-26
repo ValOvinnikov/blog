@@ -1,11 +1,13 @@
-import { MENU_ROW, tv } from '@shinefold/ui/lib/styling';
+import { TEXT_ROLE } from '@shinefold/config';
+import { MENU_ROW, tv, TYPOGRAPHY } from '@shinefold/ui/lib/styling';
 
 export const accountMenuGroupVariants = tv({
   slots: {
     group: ['group/account w-full'],
     row: [
       'group flex min-h-11 w-full cursor-pointer list-none items-center gap-2 px-3',
-      'font-mono text-meta text-text',
+      TYPOGRAPHY[TEXT_ROLE.META],
+      'text-text',
       '[&::-webkit-details-marker]:hidden',
       ...MENU_ROW,
     ],

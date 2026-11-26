@@ -1,5 +1,6 @@
 import type { PortableTextComponents } from '@portabletext/react';
 import type { TVoicePortableText } from '@shinefold/config';
+import { hasArrayGotMultipleItems } from '@shinefold/utils/primitives';
 import { PortableText } from '@web/components/shared/portable-text';
 import { voicePortableTextToInlineText } from '@web/utils/voice-portable-text-to-inline-text';
 
@@ -25,6 +26,8 @@ const stackedComponents: PortableTextComponents = {
 export const VoiceRichText = ({ value }: IVoiceRichTextProps) => (
   <PortableText
     value={voicePortableTextToInlineText(value)}
-    components={value.length > 1 ? stackedComponents : inlineComponents}
+    components={
+      hasArrayGotMultipleItems(value) ? stackedComponents : inlineComponents
+    }
   />
 );

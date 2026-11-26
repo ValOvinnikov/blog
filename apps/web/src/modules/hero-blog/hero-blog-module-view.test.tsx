@@ -30,18 +30,22 @@ describe(`<${HeroBlogModuleView.name}/>`, () => {
     expect(region).toBeVisible();
   });
 
-  it('gives two instances of the same module distinct heading ids', () => {
-    setup();
-    setup();
-
-    const headings = screen.getAllByRole('heading', {
-      level: 1,
-      name: MOCK_HEADING,
+  describe('with two instances of the same module', () => {
+    beforeEach(() => {
+      setup();
+      setup();
     });
-    const regions = screen.getAllByRole('region', { name: MOCK_HEADING });
-    const headingIds = new Set(headings.map(({ id }) => id));
 
-    expect(headingIds.size).toBe(headings.length);
-    expect(regions).toHaveLength(headings.length);
+    it('gives each instance a distinct heading id', () => {
+      const headings = screen.getAllByRole('heading', {
+        level: 1,
+        name: MOCK_HEADING,
+      });
+      const regions = screen.getAllByRole('region', { name: MOCK_HEADING });
+      const headingIds = new Set(headings.map(({ id }) => id));
+
+      expect(headingIds.size).toBe(headings.length);
+      expect(regions).toHaveLength(headings.length);
+    });
   });
 });

@@ -2,6 +2,7 @@ import {
   PRESET_ID,
   TENANT_CONFIG_REVALIDATE_SECONDS,
   type TCapability,
+  type TMaybeUndefined,
 } from '@shinefold/config';
 import { queries } from '@shinefold/db';
 import { safeAsync } from '@shinefold/utils';
@@ -33,19 +34,12 @@ const getCachedEffectiveSettingsFeaturesForTenant = (tenantId: string) =>
 const getEffectiveSettingsFeaturesForTenantId = safeAsync(
   async (
     tenantId?: string,
-  ): Promise<Record<TCapability, boolean> | undefined> => {
+  ): Promise<TMaybeUndefined<Record<TCapability, boolean>>> => {
     if (!tenantId) return undefined;
     return getCachedEffectiveSettingsFeaturesForTenant(tenantId);
   },
 );
 
-/**
- * Resolves the tenant's current per-capability toggle state, falling back to
- * their *live* `site_config.preset`'s `featureDefaults` when no
- * `settings_features` row exists yet. Read at request time rather than
- * eagerly seeded at provisioning, so a later preset change is always
- * reflected — `settings_features` is never eagerly inserted anywhere
- * (mirrors `site_config`'s own lazy-default precedent).
- */
+/** Falls back to the tenant's live preset defaults while no `settings_features` row exists. */
 export const getEffectiveSettingsFeatures = async (tenant?: string) =>
   getEffectiveSettingsFeaturesForTenantId(await getRequestTenantId(tenant));

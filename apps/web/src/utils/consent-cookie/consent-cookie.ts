@@ -3,6 +3,7 @@ import {
   type TConsentCategory,
   type TMaybeUndefined,
 } from '@shinefold/config';
+import { hasLength, isUndefined } from '@shinefold/utils/primitives';
 
 export const CONSENT_COOKIE_NAME = 'consent';
 const CONSENT_COOKIE_VERSION = '1';
@@ -25,7 +26,11 @@ export const decodeConsent = (
   value: TMaybeUndefined<string>,
 ): TMaybeUndefined<TConsentCategory[]> => {
   const [version, list, ...rest] = (value ?? '').split('.');
-  if (version !== CONSENT_COOKIE_VERSION || list === undefined || rest.length)
+  if (
+    version !== CONSENT_COOKIE_VERSION ||
+    isUndefined(list) ||
+    hasLength(rest)
+  )
     return undefined;
 
   const categories = list.split(',').filter((category) => category !== '');

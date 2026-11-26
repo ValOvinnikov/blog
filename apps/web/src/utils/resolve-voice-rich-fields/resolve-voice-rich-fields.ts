@@ -3,6 +3,7 @@ import {
   VOICE_FIELDS,
   type TVoicePortableText,
 } from '@shinefold/config';
+import { isString, isUndefined } from '@shinefold/utils/primitives';
 import { wrapVoiceText } from '@web/utils/wrap-voice-text';
 
 type TVoiceField = (typeof VOICE_FIELDS)[number];
@@ -28,29 +29,22 @@ const getAtPath = (source: unknown, segments: readonly string[]): unknown =>
 
 const toVoicePortableText = (
   value: string | TVoicePortableText,
-): TVoicePortableText =>
-  typeof value === 'string' ? wrapVoiceText(value) : value;
+): TVoicePortableText => (isString(value) ? wrapVoiceText(value) : value);
 
-/**
- * Resolves every RICH voice field to its stored override, or the catalog
- * default at its registry path wrapped as a single paragraph when no
- * override exists — the shared source `resolveTenantMessages` and
- * `getVoiceRich` both build their RICH values from.
- */
 export const resolveVoiceRichFields = (
   overrides: Record<string, string | TVoicePortableText>,
   baseMessages: Record<string, unknown>,
 ): Record<TVoiceRichFieldId, TVoicePortableText> => {
   const entries = RICH_FIELDS.map((field) => {
     const override = overrides[field.id];
-    if (override !== undefined) {
+    if (!isUndefined(override)) {
       return [field.id, toVoicePortableText(override)] as const;
     }
 
     const catalogValue = getAtPath(baseMessages, field.path.split('.'));
     return [
       field.id,
-      wrapVoiceText(typeof catalogValue === 'string' ? catalogValue : ''),
+      wrapVoiceText(isString(catalogValue) ? catalogValue : ''),
     ] as const;
   });
 

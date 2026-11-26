@@ -1,6 +1,7 @@
 import type { TMaybeNull, TMaybeUndefined } from '@shinefold/config';
 import { HTTP_STATUS } from '@shinefold/config/constants';
 import { resolveClientKey } from '@shinefold/utils/client-key';
+import { isNull } from '@shinefold/utils/primitives';
 import { CLIENT_LOG_LOG } from '@web/constants/client-log';
 import {
   clientLogSchema,
@@ -81,7 +82,7 @@ export async function POST(request: Request): Promise<NextResponse> {
   }
 
   const rawBody = await readBodyWithinByteCap(request.body, MAX_PAYLOAD_BYTES);
-  if (rawBody === null) {
+  if (isNull(rawBody)) {
     return NextResponse.json(
       { message: PAYLOAD_TOO_LARGE_MESSAGE },
       { status: 413 },

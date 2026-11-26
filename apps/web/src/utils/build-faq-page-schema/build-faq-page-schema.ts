@@ -1,4 +1,6 @@
+import type { TMaybeUndefined } from '@shinefold/config';
 import type { TFaqPageQuestion } from '@shinefold/service';
+import { hasLength } from '@shinefold/utils/primitives';
 
 export type TFaqPageSchema = {
   '@context': 'https://schema.org';
@@ -12,8 +14,8 @@ export type TFaqPageSchema = {
 
 export const buildFaqPageSchema = (
   faqs: TFaqPageQuestion[],
-): TFaqPageSchema | undefined => {
-  if (faqs.length === 0) return undefined;
+): TMaybeUndefined<TFaqPageSchema> => {
+  if (!hasLength(faqs)) return undefined;
 
   return {
     '@context': 'https://schema.org',

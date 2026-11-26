@@ -1,8 +1,7 @@
 import type { PortableTextReactComponents } from '@portabletext/react';
 import { Heading } from '@shinefold/ui/components/atoms/heading';
 import { QuoteBlock } from '@shinefold/ui/components/atoms/quote-block';
-
-import { portableTextVariants } from '../portable-text-variants';
+import { portableTextVariants } from '@web/components/shared/portable-text/portable-text-variants';
 
 const s = portableTextVariants();
 

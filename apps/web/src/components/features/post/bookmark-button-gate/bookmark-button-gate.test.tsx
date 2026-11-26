@@ -44,7 +44,6 @@ const setup = customRenderServerAsync(
 
 describe(`<${BookmarkButtonGate.name}/>`, () => {
   beforeEach(() => {
-    vi.mocked(isReaderAccountFeatureEnabled).mockResolvedValue(true);
     vi.mocked(useSession).mockReturnValue({
       data: { user: { id: faker.string.uuid() }, expires: '' },
       status: SESSION_STATUS.AUTHENTICATED,
@@ -53,14 +52,24 @@ describe(`<${BookmarkButtonGate.name}/>`, () => {
     vi.mocked(getBookmarkStatus).mockResolvedValue(false);
   });
 
-  it('renders the bookmark toggle for the post when bookmarks are enabled', async () => {
-    await setup();
+  describe('when bookmarks are enabled', () => {
+    beforeEach(async () => {
+      await setup();
+    });
 
-    const toggle = await screen.findByRole('button', { name: saveAriaLabel });
-    await waitFor(() => expect(toggle).toBeEnabled());
+    it('renders the bookmark toggle for the post', async () => {
+      const toggle = await screen.findByRole('button', { name: saveAriaLabel });
+      await waitFor(() => expect(toggle).toBeEnabled());
 
-    expect(toggle).toBeVisible();
-    expect(getBookmarkStatus).toHaveBeenCalledWith(MOCK_POST_ID);
+      expect(toggle).toBeVisible();
+      expect(getBookmarkStatus).toHaveBeenCalledWith(MOCK_POST_ID);
+    });
+
+    it('checks bookmarks as a reader-account feature', () => {
+      expect(isReaderAccountFeatureEnabled).toHaveBeenCalledWith(
+        CAPABILITY.BOOKMARKS,
+      );
+    });
   });
 
   it.each<[string, () => void]>([
@@ -83,13 +92,5 @@ describe(`<${BookmarkButtonGate.name}/>`, () => {
     const toggle = screen.queryByRole('button', { name: saveAriaLabel });
 
     expect(toggle).not.toBeInTheDocument();
-  });
-
-  it('checks bookmarks as a reader-account feature', async () => {
-    await setup();
-
-    expect(isReaderAccountFeatureEnabled).toHaveBeenCalledWith(
-      CAPABILITY.BOOKMARKS,
-    );
   });
 });

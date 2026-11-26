@@ -23,35 +23,30 @@ vi.mock(
 const setup = customRenderAsync(BookmarksRoute, { params: mockRouteParams() });
 
 describe(`<${BookmarksRoute.name}/>`, () => {
-  beforeEach(() => {
-    vi.mocked(isReaderAccountFeatureEnabled).mockReset();
-  });
+  describe('when bookmarks are enabled', () => {
+    beforeEach(async () => {
+      await setup();
+    });
 
-  it('renders BookmarksPage when bookmarks are enabled', async () => {
-    vi.mocked(isReaderAccountFeatureEnabled).mockResolvedValue(true);
+    it('renders BookmarksPage', () => {
+      const bookmarksPage = screen.getByTestId('bookmarks-page');
 
-    await setup();
+      expect(bookmarksPage).toBeVisible();
+      expect(notFound).not.toHaveBeenCalled();
+    });
 
-    const bookmarksPage = screen.getByTestId('bookmarks-page');
-    expect(bookmarksPage).toBeVisible();
-    expect(notFound).not.toHaveBeenCalled();
+    it('checks bookmarks as a reader-account feature', () => {
+      expect(isReaderAccountFeatureEnabled).toHaveBeenCalledWith(
+        CAPABILITY.BOOKMARKS,
+      );
+    });
   });
 
   it('responds not-found when bookmarks are disabled', async () => {
-    vi.mocked(isReaderAccountFeatureEnabled).mockResolvedValue(false);
+    vi.mocked(isReaderAccountFeatureEnabled).mockResolvedValueOnce(false);
 
     await expect(setup()).rejects.toThrow(NEXT_NAVIGATION_ERROR.NEXT_NOT_FOUND);
 
     expect(notFound).toHaveBeenCalledTimes(1);
-  });
-
-  it('checks bookmarks as a reader-account feature', async () => {
-    vi.mocked(isReaderAccountFeatureEnabled).mockResolvedValue(true);
-
-    await setup();
-
-    expect(isReaderAccountFeatureEnabled).toHaveBeenCalledWith(
-      CAPABILITY.BOOKMARKS,
-    );
   });
 });

@@ -4,44 +4,37 @@ import userEvent, { type UserEvent } from '@testing-library/user-event';
 import { ConsentPreferencesDialog } from '@web/components/shared/consent-preferences-dialog';
 import { renderElement, screen, waitFor } from '@web/testing/custom-render';
 import { clearConsentCookie } from '@web/testing/shared/consent/consent-cookie';
+import { KEY_ESCAPE } from '@web/testing/shared/keyboard/constants';
 
 import { CookiePreferencesLink } from './cookie-preferences-link';
 
 faker.seed(6526);
 
-const LINK_TEXT = faker.lorem.words(2);
+const MOCK_LINK_TEXT = faker.lorem.words(2);
 const DIALOG_NAME = SITE_MESSAGES.consent.preferences.heading;
 
 describe(`<${CookiePreferencesLink.name}/>`, () => {
   let user: UserEvent;
+  let link: HTMLElement;
 
   beforeEach(() => {
     clearConsentCookie();
     user = userEvent.setup();
     renderElement(
       <>
-        <CookiePreferencesLink>{LINK_TEXT}</CookiePreferencesLink>
+        <CookiePreferencesLink>{MOCK_LINK_TEXT}</CookiePreferencesLink>
         <ConsentPreferencesDialog />
       </>,
     );
+    link = screen.getByRole('button', { name: MOCK_LINK_TEXT });
   });
 
   afterEach(clearConsentCookie);
-
-  it('opens the cookie preferences when clicked', async () => {
-    const link = screen.getByRole('button', { name: LINK_TEXT });
-
-    await user.click(link);
-
-    const dialog = await screen.findByRole('dialog', { name: DIALOG_NAME });
-    expect(dialog).toBeVisible();
-  });
 
   it.each(['{Enter}', ' '])(
     'opens the cookie preferences from the keyboard with %s',
     async (key) => {
       await user.tab();
-      const link = screen.getByRole('button', { name: LINK_TEXT });
       expect(link).toHaveFocus();
 
       await user.keyboard(key);
@@ -51,15 +44,25 @@ describe(`<${CookiePreferencesLink.name}/>`, () => {
     },
   );
 
-  it('takes focus back when the preferences close', async () => {
-    const link = screen.getByRole('button', { name: LINK_TEXT });
-    await user.click(link);
-    await screen.findByRole('dialog', { name: DIALOG_NAME });
+  describe('once clicked', () => {
+    beforeEach(async () => {
+      await user.click(link);
+    });
 
-    await user.keyboard('{Escape}');
+    it('opens the cookie preferences', async () => {
+      const dialog = await screen.findByRole('dialog', { name: DIALOG_NAME });
 
-    await waitFor(() => {
-      expect(link).toHaveFocus();
+      expect(dialog).toBeVisible();
+    });
+
+    it('takes focus back when the preferences close', async () => {
+      await screen.findByRole('dialog', { name: DIALOG_NAME });
+
+      await user.keyboard(KEY_ESCAPE);
+
+      await waitFor(() => {
+        expect(link).toHaveFocus();
+      });
     });
   });
 });

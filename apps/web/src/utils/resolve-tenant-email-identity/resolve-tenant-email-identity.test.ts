@@ -60,17 +60,6 @@ describe(resolveTenantEmailIdentity, () => {
     );
   });
 
-  it("names the brand from the tenant's own row", async () => {
-    vi.mocked(getSiteConfig).mockResolvedValue(okResult());
-
-    await resolveTenantEmailIdentity(MOCK_TENANT_ID);
-
-    expect(getBrandName).toHaveBeenCalledWith({
-      tenantId: MOCK_TENANT_ID,
-      tenantName: MOCK_TENANT_NAME,
-    });
-  });
-
   it('falls back to the default brand when site config fails', async () => {
     vi.mocked(getSiteConfig).mockResolvedValue(
       errorResult(ERROR_CODE.DB_NOT_FOUND),
@@ -86,17 +75,31 @@ describe(resolveTenantEmailIdentity, () => {
     );
   });
 
-  it('falls back to the default name and warns when the tenant is missing', async () => {
-    vi.mocked(getSiteConfig).mockResolvedValue(okResult());
-    vi.mocked(queries.tenants.getTenantById).mockResolvedValue(undefined);
-    vi.mocked(getBrandName).mockResolvedValue(undefined);
+  describe('with an empty site config', () => {
+    beforeEach(() => {
+      vi.mocked(getSiteConfig).mockResolvedValue(okResult());
+    });
 
-    const identity = await resolveTenantEmailIdentity(MOCK_TENANT_ID);
+    it("names the brand from the tenant's own row", async () => {
+      await resolveTenantEmailIdentity(MOCK_TENANT_ID);
 
-    expect(identity.brandName).toBe('Newsletter');
-    expect(vi.mocked(logger.warn)).toHaveBeenCalledWith(
-      TENANT_EMAIL_IDENTITY_LOG.TENANT_ROW_NOT_FOUND,
-      { tenantId: MOCK_TENANT_ID },
-    );
+      expect(getBrandName).toHaveBeenCalledWith({
+        tenantId: MOCK_TENANT_ID,
+        tenantName: MOCK_TENANT_NAME,
+      });
+    });
+
+    it('falls back to the default name and warns when the tenant is missing', async () => {
+      vi.mocked(queries.tenants.getTenantById).mockResolvedValue(undefined);
+      vi.mocked(getBrandName).mockResolvedValue(undefined);
+
+      const identity = await resolveTenantEmailIdentity(MOCK_TENANT_ID);
+
+      expect(identity.brandName).toBe('Newsletter');
+      expect(vi.mocked(logger.warn)).toHaveBeenCalledWith(
+        TENANT_EMAIL_IDENTITY_LOG.TENANT_ROW_NOT_FOUND,
+        { tenantId: MOCK_TENANT_ID },
+      );
+    });
   });
 });

@@ -42,8 +42,6 @@ export async function GET(
       getTranslations({ locale, namespace: 'rss' }),
     ]);
 
-  // A single unpaginated query: a failure yields the whole feed empty, not a
-  // partially-populated one.
   if (!postsResult.ok) {
     logger.error(RSS_LOG.POSTS_FETCH_FAILED, { error: postsResult.error });
   }

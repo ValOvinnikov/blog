@@ -41,15 +41,16 @@ const setup = customRender(withToastProvider(DisplayNameControl), {
 
 describe(`<${DisplayNameControl.name}/>`, () => {
   let user: UserEvent;
+  let nameField: HTMLElement;
 
   beforeEach(() => {
     stubRouterRefresh(routerRefreshMock);
     user = userEvent.setup();
     setup();
+    nameField = screen.getByRole('textbox', { name: NAME_FIELD_LABEL });
   });
 
   it('renders the current display name in the field and avatar initials', () => {
-    const nameField = screen.getByRole('textbox', { name: NAME_FIELD_LABEL });
     const initials = screen.getByText(MOCK_INITIALS);
     const promptIcon = screen.getByTestId('display-name-prompt-icon');
 
@@ -62,7 +63,6 @@ describe(`<${DisplayNameControl.name}/>`, () => {
     updateDisplayNameActionMock.mockResolvedValue({
       outcome: ACTION_OUTCOME.SUCCESS,
     });
-    const nameField = screen.getByRole('textbox', { name: NAME_FIELD_LABEL });
     const saveButton = screen.getByRole('button', { name: SAVE_LABEL });
     await user.clear(nameField);
     await user.type(nameField, MOCK_NEW_NAME);
@@ -76,7 +76,6 @@ describe(`<${DisplayNameControl.name}/>`, () => {
   });
 
   it('disables the save button when the name is cleared to empty', async () => {
-    const nameField = screen.getByRole('textbox', { name: NAME_FIELD_LABEL });
     await user.clear(nameField);
 
     const saveButton = screen.getByRole('button', { name: SAVE_LABEL });

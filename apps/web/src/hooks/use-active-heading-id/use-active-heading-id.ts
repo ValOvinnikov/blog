@@ -1,13 +1,15 @@
 'use client';
 
+import type { TMaybeNull } from '@shinefold/config';
+import { hasLength, isNull } from '@shinefold/utils/primitives';
 import { useEffect, useState } from 'react';
 
 /**
  * `ids` need not be deduped or memoized by the caller — a fresh array
  * reference each render is safe.
  */
-export const useActiveHeadingId = (ids: string[]): string | null => {
-  const [activeId, setActiveId] = useState<string | null>(null);
+export const useActiveHeadingId = (ids: string[]): TMaybeNull<string> => {
+  const [activeId, setActiveId] = useState<TMaybeNull<string>>(null);
   const idsKey = ids.join('|');
 
   useEffect(() => {
@@ -16,9 +18,9 @@ export const useActiveHeadingId = (ids: string[]): string | null => {
     const elements = idsKey
       .split('|')
       .map((id) => document.getElementById(id))
-      .filter((element): element is HTMLElement => element !== null);
+      .filter((element): element is HTMLElement => !isNull(element));
 
-    if (elements.length === 0) return;
+    if (!hasLength(elements)) return;
 
     const observer = new IntersectionObserver(
       (entries) => {

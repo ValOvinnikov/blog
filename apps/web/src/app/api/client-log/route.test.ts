@@ -1,5 +1,10 @@
 import { faker } from '@faker-js/faker';
-import { HTTP_METHOD, HTTP_STATUS } from '@shinefold/config/constants';
+import {
+  HTTP_METHOD,
+  HTTP_STATUS,
+  MEDIA_TYPE,
+} from '@shinefold/config/constants';
+import { LOG_LEVEL } from '@shinefold/insight';
 import { FORWARDED_FOR_HEADER } from '@shinefold/utils/client-key';
 import { CLIENT_LOG_LOG } from '@web/constants/client-log';
 import type * as TRateLimiterModule from '@web/server/rate-limit/rate-limiter/rate-limiter';
@@ -29,7 +34,7 @@ const MOCK_PAYLOAD = {
 };
 
 const MOCK_FORGED_ENTRY = JSON.stringify({
-  level: 'error',
+  level: LOG_LEVEL.ERROR,
   event: faker.lorem.word(),
 });
 const MOCK_PATH = `/${faker.lorem.word()}/${faker.lorem.word()}`;
@@ -53,7 +58,7 @@ describe(POST, () => {
     new Request(MOCK_CLIENT_LOG_URL, {
       method: HTTP_METHOD.POST,
       headers: {
-        'Content-Type': 'application/json',
+        'Content-Type': MEDIA_TYPE.JSON,
         [FORWARDED_FOR_HEADER]: clientIp,
         ...headers,
       },

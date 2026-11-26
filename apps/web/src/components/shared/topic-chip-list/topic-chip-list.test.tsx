@@ -16,14 +16,17 @@ faker.seed(5801);
 
 const { ariaLabel: NAV_NAME, all: ALL_CHIP_NAME } = SITE_MESSAGES.topicChipList;
 
-const topics = [MOCK_ENGINEERING_TOPIC, MOCK_SECOND_TOPIC];
+const MOCK_TOPICS = [MOCK_ENGINEERING_TOPIC, MOCK_SECOND_TOPIC];
 
-const setup = customRender(TopicChipList, { topics });
+const setup = customRender(TopicChipList, { topics: MOCK_TOPICS });
 
 describe(`<${TopicChipList.name}/>`, () => {
   describe('with default props', () => {
+    let allLink: HTMLElement;
+
     beforeEach(() => {
       setup();
+      allLink = screen.getByRole('link', { name: ALL_CHIP_NAME });
     });
 
     it('renders a Topics nav landmark', () => {
@@ -33,12 +36,12 @@ describe(`<${TopicChipList.name}/>`, () => {
     });
 
     it('renders an "All" chip linking to the blog index', () => {
-      const allLink = screen.getByRole('link', { name: ALL_CHIP_NAME });
-
       expect(allLink).toHaveAttribute('href', routes.blogIndex());
     });
 
-    it.each(topics.map((topic, index) => ({ position: index + 1, topic })))(
+    it.each(
+      MOCK_TOPICS.map((topic, index) => ({ position: index + 1, topic })),
+    )(
       'renders chip $position linking to its archive',
       ({ topic: { title, slug } }) => {
         const link = screen.getByRole('link', { name: title });
@@ -48,7 +51,6 @@ describe(`<${TopicChipList.name}/>`, () => {
     );
 
     it('marks "All" as the current page when no activeSlug is given', () => {
-      const allLink = screen.getByRole('link', { name: ALL_CHIP_NAME });
       const engineeringLink = screen.getByRole('link', {
         name: MOCK_ENGINEERING_TOPIC.title,
       });
@@ -88,7 +90,7 @@ describe(`<${TopicChipList.name}/>`, () => {
       title: faker.lorem.word({ length: 12 }),
       slug: undefined,
     });
-    setup({ topics: [...topics, archivelessTopic] });
+    setup({ topics: [...MOCK_TOPICS, archivelessTopic] });
 
     const chip = screen.getByText(archivelessTopic.title);
     const chipLink = screen.queryByRole('link', {

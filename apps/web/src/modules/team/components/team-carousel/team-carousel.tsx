@@ -5,11 +5,12 @@ import type { TTeamMember, TTeamModule } from '@shinefold/service';
 import type { ICarouselProps } from '@shinefold/ui/components/organisms/carousel';
 import { LabelledCarousel } from '@web/components/shared/labelled-carousel';
 import { TeamMemberCard } from '@web/modules/team/components/team-member-card/team-member-card';
+import type { TCardAlign } from '@web/utils/to-card-align';
 
 export interface ITeamCarouselProps extends IWithClassName, IWithDataTestId {
   members: TTeamMember[];
   imageShape: TTeamModule['imageShape'];
-  align: 'left' | 'center';
+  align: TCardAlign;
   title: string;
   contentAlignment?: ICarouselProps<TTeamMember>['contentAlignment'];
 }

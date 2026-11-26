@@ -8,20 +8,9 @@ type TSmartLinkProps = {
   prefetch?: boolean;
 } & Omit<ComponentPropsWithoutRef<'a'>, 'href' | 'target' | 'rel'>;
 
+// next-intl's scheme check cannot recognise a protocol-relative href as external.
 const isProtocolRelative = (href: string) => href.startsWith('//');
 
-/**
- * Protocol-relative hrefs (`//host/path`) are the one case next-intl's
- * scheme check can't classify as external, so those render through plain
- * `next/link` instead. Works both as a direct link and as the `as`/`linkAs`
- * polymorphic target for `@shinefold/ui` components (`TextLink`, `LinkButton`,
- * `PrimaryNavigation`).
- *
- * @example
- * <LinkButton as={SmartLink} href={action.href} target={action.target}>
- *   {action.label}
- * </LinkButton>
- */
 export const SmartLink = ({
   href,
   target,

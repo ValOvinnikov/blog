@@ -35,28 +35,30 @@ describe(`<${PricingPeriodSwitch.name}/>`, () => {
     expect(yearlyContent).not.toBeVisible();
   });
 
-  it('swaps to the yearly panel when Yearly is chosen', async () => {
-    const yearlyRadio = screen.getByRole('radio', { name: tabs.YEAR });
-    await user.click(yearlyRadio);
+  describe('with Yearly chosen', () => {
+    beforeEach(async () => {
+      const yearlyRadio = screen.getByRole('radio', { name: tabs.YEAR });
+      await user.click(yearlyRadio);
+    });
 
-    const monthlyContent = screen.getByText(MOCK_MONTHLY_CONTENT);
-    const yearlyContent = screen.getByText(MOCK_YEARLY_CONTENT);
+    it('swaps to the yearly panel', () => {
+      const monthlyContent = screen.getByText(MOCK_MONTHLY_CONTENT);
+      const yearlyContent = screen.getByText(MOCK_YEARLY_CONTENT);
 
-    expect(yearlyContent).toBeVisible();
-    expect(monthlyContent).not.toBeVisible();
-  });
+      expect(yearlyContent).toBeVisible();
+      expect(monthlyContent).not.toBeVisible();
+    });
 
-  it('swaps back to the monthly panel when Monthly is chosen again', async () => {
-    const yearlyRadio = screen.getByRole('radio', { name: tabs.YEAR });
-    const monthlyRadio = screen.getByRole('radio', { name: tabs.MONTH });
-    await user.click(yearlyRadio);
-    await user.click(monthlyRadio);
+    it('swaps back to the monthly panel when Monthly is chosen again', async () => {
+      const monthlyRadio = screen.getByRole('radio', { name: tabs.MONTH });
+      await user.click(monthlyRadio);
 
-    const monthlyContent = screen.getByText(MOCK_MONTHLY_CONTENT);
-    const yearlyContent = screen.getByText(MOCK_YEARLY_CONTENT);
+      const monthlyContent = screen.getByText(MOCK_MONTHLY_CONTENT);
+      const yearlyContent = screen.getByText(MOCK_YEARLY_CONTENT);
 
-    expect(monthlyContent).toBeVisible();
-    expect(yearlyContent).not.toBeVisible();
+      expect(monthlyContent).toBeVisible();
+      expect(yearlyContent).not.toBeVisible();
+    });
   });
 
   it('labels the switch as the billing period', () => {

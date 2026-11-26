@@ -3,20 +3,7 @@
 import { useDismissibleMenu } from '@web/hooks/use-dismissible-menu';
 import { useCallback, useRef } from 'react';
 
-/**
- * `PrimaryNavigation` renders the toggle button and dropdown panel itself
- * and doesn't forward refs for either, so this hook can't wire separate
- * `triggerRef`/`panelRef` the way `usePopover` does. Instead the caller wraps
- * the whole `PrimaryNavigation` tree in one element and passes its ref here
- * as `containerRef`; the toggle/panel are then located *inside* that ref via
- * the `panelId` that already links the toggle's `aria-controls` to the
- * panel's `id` — every lookup stays scoped to `containerRef.current`, never
- * `document`.
- *
- * `containerRef` also doubles as `useDismissibleMenu`'s `getContainer`, so
- * the outside-click check treats anything inside the whole container —
- * including the always-visible `actions` slot — as "inside".
- */
+/** Dismiss behaviour for `PrimaryNavigation`, which forwards no refs, located through one wrapping `containerRef`. */
 export const useMobileNavToggle = (panelId: string) => {
   const containerRef = useRef<HTMLDivElement>(null);
 

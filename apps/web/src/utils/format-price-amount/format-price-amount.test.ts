@@ -1,14 +1,18 @@
 import { faker } from '@faker-js/faker';
+import { BILLING_CURRENCY } from '@shinefold/db/constants';
 
 import { formatPriceAmount } from './format-price-amount';
 
 faker.seed(112);
 
 const MOCK_FREE_LABEL = faker.lorem.word();
-const GBP = { currency: 'GBP', locale: 'en-GB' };
+const GBP = { currency: BILLING_CURRENCY.GBP, locale: 'en-GB' };
 const JPY = { currency: 'JPY', locale: 'ja-JP' };
 
-const format = (amount: number, { currency, locale } = GBP) =>
+const format = (
+  amount: number,
+  { currency, locale }: { currency: string; locale: string } = GBP,
+) =>
   formatPriceAmount({ amount, locale, currency, freeLabel: MOCK_FREE_LABEL });
 
 describe(formatPriceAmount, () => {

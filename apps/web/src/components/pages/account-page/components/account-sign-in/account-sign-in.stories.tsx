@@ -1,3 +1,4 @@
+import { OAUTH_PROVIDER } from '@shinefold/config/constants';
 import type { Meta, StoryObj } from '@storybook/nextjs-vite';
 
 import { AccountSignIn } from './account-sign-in';
@@ -8,7 +9,7 @@ const meta = {
   tags: ['autodocs'],
   args: {
     heading: 'Account',
-    oauthProviderIds: ['github', 'google'],
+    oauthProviderIds: [OAUTH_PROVIDER.GITHUB, OAUTH_PROVIDER.GOOGLE],
   },
 } satisfies Meta<typeof AccountSignIn>;
 

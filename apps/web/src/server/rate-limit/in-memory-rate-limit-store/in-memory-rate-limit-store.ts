@@ -1,3 +1,4 @@
+import { isUndefined } from '@shinefold/utils/primitives';
 // Bounds a long-lived warm instance to one entry per recent client rather than
 // one per client it has ever seen.
 const MAX_TRACKED_KEYS = 5000;
@@ -18,7 +19,7 @@ export const createInMemoryRateLimitStore = () => {
   // A repeat hit never re-inserts its key, so the Map's first key is the oldest.
   const evictOldest = (): void => {
     const oldestKey = counts.keys().next().value;
-    if (oldestKey !== undefined) {
+    if (!isUndefined(oldestKey)) {
       counts.delete(oldestKey);
     }
   };

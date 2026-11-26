@@ -73,18 +73,28 @@ describe(GET, () => {
     expect(response.headers.get('location')).toBe(`${MOCK_ORIGIN}${href}`);
   });
 
-  it("looks the kind up in the tenant's default locale", async () => {
-    getSectionDocumentByKindMock.mockResolvedValueOnce({
-      ok: true,
-      data: undefined,
+  describe('when no page of the kind is published', () => {
+    beforeEach(() => {
+      getSectionDocumentByKindMock.mockResolvedValueOnce({
+        ok: true,
+        data: undefined,
+      });
     });
 
-    await requestKind(LEGAL_PAGE_KIND.TERMS);
+    it("looks the kind up in the tenant's default locale", async () => {
+      await requestKind(LEGAL_PAGE_KIND.TERMS);
 
-    expect(getSectionDocumentByKindMock).toHaveBeenCalledWith(
-      LEGAL_PAGE_KIND.TERMS,
-      { ...MOCK_TENANT_SANITY_CONTEXT, locale: NL, defaultLocale: NL },
-    );
+      expect(getSectionDocumentByKindMock).toHaveBeenCalledWith(
+        LEGAL_PAGE_KIND.TERMS,
+        { ...MOCK_TENANT_SANITY_CONTEXT, locale: NL, defaultLocale: NL },
+      );
+    });
+
+    it('returns not found', async () => {
+      const response = await requestKind(LEGAL_PAGE_KIND.IMPRINT);
+
+      expect(response.status).toBe(HTTP_STATUS.NOT_FOUND);
+    });
   });
 
   it.each([LEGAL_PAGE_KIND.OTHER, faker.lorem.word()])(
@@ -96,17 +106,6 @@ describe(GET, () => {
       expect(getSectionDocumentByKindMock).not.toHaveBeenCalled();
     },
   );
-
-  it('returns not found when no page of the kind is published', async () => {
-    getSectionDocumentByKindMock.mockResolvedValueOnce({
-      ok: true,
-      data: undefined,
-    });
-
-    const response = await requestKind(LEGAL_PAGE_KIND.IMPRINT);
-
-    expect(response.status).toBe(HTTP_STATUS.NOT_FOUND);
-  });
 
   it('returns not found when the host resolves to no tenant', async () => {
     vi.mocked(getHostTenantSanityContext).mockResolvedValueOnce({

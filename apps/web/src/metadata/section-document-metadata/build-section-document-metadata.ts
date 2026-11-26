@@ -1,5 +1,6 @@
 import { routes } from '@shinefold/config';
 import type { TSectionDocumentType } from '@shinefold/service';
+import { OG_TYPE } from '@web/constants/metadata';
 import { SECTION_DOCUMENT_LOG } from '@web/constants/section-document';
 import { toLocalizedPageMetadata } from '@web/metadata/to-localized-page-metadata';
 import { getSectionDocumentPage } from '@web/server/section-document/get-section-document-page/get-section-document-page';
@@ -39,6 +40,6 @@ export const buildSectionDocumentMetadata = async (
       language,
       href: toHref(translatedSlug),
     })),
-    ogType: 'website',
+    ogType: OG_TYPE.WEBSITE,
   });
 };

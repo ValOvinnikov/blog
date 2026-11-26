@@ -1,5 +1,5 @@
 import { faker } from '@faker-js/faker';
-import { HTTP_STATUS } from '@shinefold/config/constants';
+import { HTTP_STATUS, MEDIA_TYPE } from '@shinefold/config/constants';
 import { MOCK_ERROR } from '@web/testing/shared/error/fixtures';
 import {
   MOCK_TENANT_HOST,
@@ -77,7 +77,7 @@ describe(GET, () => {
     const contentDisposition = response.headers.get('Content-Disposition');
 
     expect(response.status).toBe(HTTP_STATUS.OK);
-    expect(contentType).toBe('application/json');
+    expect(contentType).toBe(MEDIA_TYPE.JSON);
     expect(contentDisposition).toBe('attachment; filename="account-data.json"');
     expect(json.profile).toEqual(MOCK_PROFILE);
     expect(json.bookmarks[0].postId).toBe(MOCK_POST_ID);

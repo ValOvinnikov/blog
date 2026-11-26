@@ -32,30 +32,34 @@ const renderInParagraph = (value: TVoicePortableText) =>
   );
 
 describe(`<${VoiceRichText.name}/>`, () => {
-  it('renders an authored link as a working link', () => {
-    renderInParagraph(MOCK_FORMATTED_VALUE);
+  describe('with a single formatted block', () => {
+    beforeEach(() => {
+      renderInParagraph(MOCK_FORMATTED_VALUE);
+    });
 
-    const link = screen.getByRole('link', { name: MOCK_VOICE_LINK_TEXT });
+    it('renders an authored link as a working link', () => {
+      const link = screen.getByRole('link', { name: MOCK_VOICE_LINK_TEXT });
 
-    expect(link).toHaveAttribute('href', MOCK_VOICE_LINK_HREF);
-  });
+      expect(link).toHaveAttribute('href', MOCK_VOICE_LINK_HREF);
+    });
 
-  it('renders bold and italic marks', () => {
-    renderInParagraph(MOCK_FORMATTED_VALUE);
+    it('renders bold and italic marks', () => {
+      const bold = screen.getByText(MOCK_VOICE_BOLD_TEXT, {
+        selector: 'strong',
+      });
+      const italic = screen.getByText(MOCK_VOICE_ITALIC_TEXT, {
+        selector: 'em',
+      });
 
-    const bold = screen.getByText(MOCK_VOICE_BOLD_TEXT, { selector: 'strong' });
-    const italic = screen.getByText(MOCK_VOICE_ITALIC_TEXT, { selector: 'em' });
+      expect(bold).toBeVisible();
+      expect(italic).toBeVisible();
+    });
 
-    expect(bold).toBeVisible();
-    expect(italic).toBeVisible();
-  });
+    it('adds no paragraph of its own', () => {
+      const paragraphs = screen.getAllByRole('paragraph');
 
-  it('adds no paragraph of its own for a single block', () => {
-    renderInParagraph(MOCK_FORMATTED_VALUE);
-
-    const paragraphs = screen.getAllByRole('paragraph');
-
-    expect(paragraphs).toHaveLength(1);
+      expect(paragraphs).toHaveLength(1);
+    });
   });
 
   it('renders each block of a multi-block value as a line in one paragraph', () => {

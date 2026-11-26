@@ -1,6 +1,5 @@
 import type { PortableTextReactComponents } from '@portabletext/react';
-
-import { portableTextVariants } from '../portable-text-variants';
+import { portableTextVariants } from '@web/components/shared/portable-text/portable-text-variants';
 
 const s = portableTextVariants();
 
