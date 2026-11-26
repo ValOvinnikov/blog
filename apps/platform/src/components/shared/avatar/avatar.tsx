@@ -1,6 +1,6 @@
 import { AVATAR_UNKNOWN_INITIAL } from '@platform/constants/avatar';
 import type { IWithClassName } from '@shinefold/config/types';
-import { hasLength } from '@shinefold/utils/primitives';
+import { hasLength, isUndefined, toInitial } from '@shinefold/utils/primitives';
 
 import { avatarVariants, type TAvatarVariants } from './avatar-variants';
 
@@ -10,21 +10,28 @@ export type TAvatarProps = IWithClassName & {
   variant: NonNullable<TAvatarVariants['variant']>;
 };
 
+const toInitials = (text: string): string[] =>
+  Array.from(text).flatMap((char) => toInitial(char) ?? []);
+
 const getInitials = (name: string): string => {
-  const words = name.trim().split(/\s+/).filter(Boolean);
+  const words = name
+    .split(/\s+/)
+    .filter((word) => !isUndefined(toInitial(word)));
 
   if (!hasLength(words)) {
     return '';
   }
 
   if (words.length === 1) {
-    return (words[0] ?? '').slice(0, 2).toUpperCase();
+    return toInitials(words[0] ?? '')
+      .slice(0, 2)
+      .join('');
   }
 
-  const first = (words[0] ?? '')[0] ?? '';
-  const last = (words[words.length - 1] ?? '')[0] ?? '';
+  const first = toInitial(words[0] ?? '') ?? '';
+  const last = toInitial(words[words.length - 1] ?? '') ?? '';
 
-  return `${first}${last}`.toUpperCase();
+  return `${first}${last}`;
 };
 
 export const Avatar = ({ name, email, variant, className }: TAvatarProps) => (

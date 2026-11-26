@@ -19,6 +19,7 @@ const MOCK_FULL_NAME = `${MOCK_FIRST_NAME} ${MOCK_LAST_NAME}`;
 const MOCK_EMAIL = faker.internet.email({ firstName: MOCK_LAST_NAME });
 const MOCK_INITIALS =
   `${MOCK_FIRST_NAME.charAt(0)}${MOCK_LAST_NAME.charAt(0)}`.toUpperCase();
+const MOCK_PUNCTUATION_ONLY_NAME = '!!!';
 
 const setup = customRender(Avatar, {
   name: MOCK_FULL_NAME,
@@ -44,6 +45,21 @@ describe(`<${Avatar.name}/>`, () => {
       MOCK_LAST_NAME,
       MOCK_LAST_NAME.slice(0, 2).toUpperCase(),
     ],
+    [
+      'a name with a bracketed word',
+      `${MOCK_FIRST_NAME} (${MOCK_LAST_NAME})`,
+      MOCK_INITIALS,
+    ],
+    [
+      'a name with a standalone dash',
+      `${MOCK_FIRST_NAME} — ${MOCK_LAST_NAME}`,
+      MOCK_INITIALS,
+    ],
+    [
+      'a single bracketed word',
+      `(${MOCK_LAST_NAME})`,
+      MOCK_LAST_NAME.slice(0, 2).toUpperCase(),
+    ],
   ])('renders initials for %s', (_case, name, expected) => {
     setup({ name });
 
@@ -62,6 +78,14 @@ describe(`<${Avatar.name}/>`, () => {
 
   it("shows the email's first letter when there is no name", () => {
     setup({ name: '', email: MOCK_EMAIL });
+
+    const initial = screen.getByText(MOCK_EMAIL.charAt(0).toUpperCase());
+
+    expect(initial).toBeVisible();
+  });
+
+  it("shows the email's first letter when the name has no letters or digits", () => {
+    setup({ name: MOCK_PUNCTUATION_ONLY_NAME, email: MOCK_EMAIL });
 
     const initial = screen.getByText(MOCK_EMAIL.charAt(0).toUpperCase());
 
