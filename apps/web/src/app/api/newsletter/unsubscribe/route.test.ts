@@ -9,7 +9,7 @@ import {
 import { queries, TENANT_STATUS } from '@shinefold/db';
 import type * as DbConstants from '@shinefold/db/constants';
 import { toOutcome } from '@shinefold/utils/to-outcome';
-import { CACHE_CONTROL } from '@web/constants/http';
+import { CACHE_CONTROL, CACHE_CONTROL_HEADER } from '@web/constants/http';
 import { NEWSLETTER_LOG } from '@web/constants/newsletter';
 import { resolveNewsletterLinkLocale } from '@web/server/newsletter/newsletter-link-locale/newsletter-link-locale';
 import { readNewsletterUnsubscribeSubscriberId } from '@web/server/newsletter/newsletter-unsubscribe-token/newsletter-unsubscribe-token';
@@ -112,7 +112,7 @@ describe(GET, () => {
     expect(locationOf(response)).toBe(
       `${MOCK_TENANT_BASE_URL}/newsletter/unsubscribe`,
     );
-    expect(response.headers.get('cache-control')).toBe(
+    expect(response.headers.get(CACHE_CONTROL_HEADER)).toBe(
       CACHE_CONTROL.PRIVATE_NO_STORE,
     );
     expect(unsubscribeByIdMock).not.toHaveBeenCalled();

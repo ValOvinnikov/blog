@@ -8,14 +8,13 @@ import {
 import { queries } from '@shinefold/db';
 import { errorResult, okResult } from '@shinefold/utils';
 import { toOutcome } from '@shinefold/utils/to-outcome';
-import { CACHE_CONTROL } from '@web/constants/http';
+import { CACHE_CONTROL, CACHE_CONTROL_HEADER } from '@web/constants/http';
 import { NEWSLETTER_LOG } from '@web/constants/newsletter';
 import { resolveNewsletterLinkLocale } from '@web/server/newsletter/newsletter-link-locale/newsletter-link-locale';
 import { resolveWritableTenant } from '@web/server/tenant/write-gate/write-gate';
 import { MOCK_CONFIRMATION_TOKEN } from '@web/testing/server/newsletter/fixtures';
 import { mockNewsletterLinkLocale } from '@web/testing/server/newsletter/newsletter-link-locale/fixtures';
 import { MOCK_ERROR } from '@web/testing/shared/error/fixtures';
-import { CACHE_CONTROL_HEADER } from '@web/testing/shared/http/constants';
 import {
   MOCK_TENANT_BASE_URL,
   MOCK_TENANT_ID,
