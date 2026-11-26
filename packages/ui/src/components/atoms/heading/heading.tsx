@@ -2,11 +2,16 @@ import {
   type IWithClassName,
   type IWithDataTestId,
   TEXT_ROLE,
+  type THeadingPiece,
 } from '@shinefold/config';
 import { headingTags, type THeadingLevel } from '@shinefold/ui/lib/react';
-import type { CSSProperties, ReactNode } from 'react';
+import { Fragment, type CSSProperties, type ReactNode } from 'react';
 
-import { headingVariants, type THeadingVariants } from './heading-variants';
+import {
+  headingHighlightVariants,
+  headingVariants,
+  type THeadingVariants,
+} from './heading-variants';
 
 export type THeadingProps = IWithClassName &
   IWithDataTestId & {
@@ -14,8 +19,10 @@ export type THeadingProps = IWithClassName &
     visual?: THeadingVariants['visual'];
     id?: string;
     style?: CSSProperties;
-    children?: ReactNode;
-  };
+  } & (
+    | { pieces: readonly THeadingPiece[]; children?: never }
+    | { pieces?: never; children?: ReactNode }
+  );
 
 const LEVEL_TITLE_ROLE: Record<
   THeadingLevel,
@@ -35,6 +42,7 @@ export const Heading = ({
   dataTestId,
   id,
   style,
+  pieces,
   children,
 }: THeadingProps) => {
   const Tag = headingTags[level];
@@ -45,7 +53,17 @@ export const Heading = ({
       className={headingVariants({ visual, class: className })}
       data-testid={dataTestId}
     >
-      {children}
+      {pieces
+        ? pieces.map(({ text, isHighlighted }, index) =>
+            isHighlighted ? (
+              <span key={index} className={headingHighlightVariants()}>
+                {text}
+              </span>
+            ) : (
+              <Fragment key={index}>{text}</Fragment>
+            ),
+          )
+        : children}
     </Tag>
   );
 };
