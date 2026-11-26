@@ -2,13 +2,13 @@ import { TENANTS_PAGE_SIZE } from '@platform/constants/tenant';
 import messages from '@platform/i18n/messages/en.json';
 import { mockAdmin } from '@platform/testing/admins/fixtures';
 import { customRenderAsync, screen } from '@platform/testing/custom-render';
+import { makeEnTranslator } from '@platform/testing/en-translator';
 import { mockDbConstants } from '@platform/testing/mock-db-constants';
 import {
   MOCK_CUSTOM_DOMAIN,
-  MOCK_OTHER_TENANT_ID,
-  MOCK_OTHER_TENANT_NAME,
   MOCK_TENANT_NAME,
   MOCK_TENANT_SLUG,
+  mockOtherTenantsPageRow,
   mockTenantsPageRow,
 } from '@platform/testing/tenants/fixtures';
 import { DEFAULT_TENANTS_SORT } from '@platform/utils/tenants-list-query/tenants-list-query';
@@ -24,8 +24,7 @@ const { listTenantsPageMock, listPinnedTenantsMock } = vi.hoisted(() => ({
 }));
 
 vi.mock('@platform/server/auth/require-admin');
-vi.mock('@platform/server/tenants/pin-tenant-action');
-vi.mock('@platform/server/tenants/unpin-tenant-action');
+vi.mock('@platform/server/tenants/set-tenant-pin-action');
 
 vi.mock('@shinefold/db', async () => ({
   ...(await mockDbConstants()),
@@ -41,6 +40,7 @@ vi.mock('@shinefold/email', async (importOriginal) => ({
 }));
 
 const MOCK_LATER_PAGE = 2;
+const tPinned = makeEnTranslator('pinnedTenants');
 
 const setup = customRenderAsync(TenantsPage, {
   searchParams: Promise.resolve({}),
@@ -54,17 +54,12 @@ describe(`<${TenantsPage.name}/>`, () => {
   });
 
   it("lists the signed-in admin's pins, read by their admin row", async () => {
-    listPinnedTenantsMock.mockResolvedValueOnce([
-      mockTenantsPageRow({
-        id: MOCK_OTHER_TENANT_ID,
-        name: MOCK_OTHER_TENANT_NAME,
-      }),
-    ]);
+    listPinnedTenantsMock.mockResolvedValueOnce([mockOtherTenantsPageRow()]);
 
     await setup();
 
     const heading = screen.getByRole('heading', {
-      name: new RegExp(messages.pinnedTenants.title),
+      name: tPinned('titleAccessible', { count: 1 }),
     });
 
     expect(heading).toBeVisible();

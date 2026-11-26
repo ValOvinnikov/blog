@@ -1,8 +1,7 @@
-import { pinTenantAction } from '@platform/server/tenants/pin-tenant-action';
-import { unpinTenantAction } from '@platform/server/tenants/unpin-tenant-action';
+import { setTenantPinAction } from '@platform/server/tenants/set-tenant-pin-action';
 import { screen } from '@platform/testing/custom-render';
-import { makeEnTranslator } from '@platform/testing/en-translator';
-import { holdSave } from '@platform/testing/pinned-tenants/held-save';
+import { holdPinSave } from '@platform/testing/pinned-tenants/held-save';
+import { pinLabelsFor } from '@platform/testing/pinned-tenants/pin-labels';
 import { customRenderInPinnedTenants } from '@platform/testing/pinned-tenants/render-in-pinned-tenants';
 import {
   MOCK_TENANT_ID,
@@ -13,14 +12,9 @@ import userEvent, { type UserEvent } from '@testing-library/user-event';
 
 import { PinTenantToggle } from './pin-tenant-toggle';
 
-vi.mock('@platform/server/tenants/pin-tenant-action');
-vi.mock('@platform/server/tenants/unpin-tenant-action');
+vi.mock('@platform/server/tenants/set-tenant-pin-action');
 
-const tPinned = makeEnTranslator('pinnedTenants');
-const NAMED = { name: MOCK_TENANT_NAME };
-const PIN_LABEL = tPinned('pinAriaLabel', NAMED);
-const UNPIN_LABEL = tPinned('unpinAriaLabel', NAMED);
-const ARIA_PRESSED = 'aria-pressed';
+const { pinLabel, unpinLabel } = pinLabelsFor(MOCK_TENANT_NAME);
 
 const setup = customRenderInPinnedTenants(PinTenantToggle, {
   tenant: mockPinnedTenant(),
@@ -28,72 +22,58 @@ const setup = customRenderInPinnedTenants(PinTenantToggle, {
 
 describe(`<${PinTenantToggle.name}/>`, () => {
   let user: UserEvent;
+  let save: ReturnType<typeof holdPinSave>;
 
   beforeEach(() => {
     user = userEvent.setup();
+    save = holdPinSave();
+  });
+
+  afterEach(async () => {
+    await save.settle();
   });
 
   describe('for a tenant that is not pinned', () => {
+    let toggle: HTMLElement;
+
     beforeEach(() => {
       setup();
+      toggle = screen.getByRole('button', { name: pinLabel });
     });
 
     it('offers to pin it, unpressed', () => {
-      const toggle = screen.getByRole('button', { name: PIN_LABEL });
-
-      expect(toggle).toHaveAttribute(ARIA_PRESSED, 'false');
+      expect(toggle).not.toBePressed();
     });
 
     it('pins it at once and saves the pin', async () => {
-      const save = holdSave();
-      vi.mocked(pinTenantAction).mockReturnValueOnce(save.promise);
-
-      const toggle = screen.getByRole('button', { name: PIN_LABEL });
       await user.click(toggle);
 
-      const pinnedToggle = screen.getByRole('button', { name: UNPIN_LABEL });
+      const pinnedToggle = screen.getByRole('button', { name: unpinLabel });
 
-      expect(pinnedToggle).toHaveAttribute(ARIA_PRESSED, 'true');
-      expect(pinTenantAction).toHaveBeenCalledWith(MOCK_TENANT_ID);
-
-      save.settle();
-      const settledToggle = await screen.findByRole('button', {
-        name: PIN_LABEL,
-      });
-
-      expect(settledToggle).toBeVisible();
+      expect(pinnedToggle).toBePressed();
+      expect(setTenantPinAction).toHaveBeenCalledWith(MOCK_TENANT_ID, true);
     });
   });
 
   describe('for a tenant that is pinned', () => {
+    let toggle: HTMLElement;
+
     beforeEach(() => {
       setup({}, { pinnedTenants: [mockPinnedTenant()] });
+      toggle = screen.getByRole('button', { name: unpinLabel });
     });
 
     it('offers to unpin it, pressed', () => {
-      const toggle = screen.getByRole('button', { name: UNPIN_LABEL });
-
-      expect(toggle).toHaveAttribute(ARIA_PRESSED, 'true');
+      expect(toggle).toBePressed();
     });
 
     it('unpins it at once and saves the removal', async () => {
-      const save = holdSave();
-      vi.mocked(unpinTenantAction).mockReturnValueOnce(save.promise);
-
-      const toggle = screen.getByRole('button', { name: UNPIN_LABEL });
       await user.click(toggle);
 
-      const unpinnedToggle = screen.getByRole('button', { name: PIN_LABEL });
+      const unpinnedToggle = screen.getByRole('button', { name: pinLabel });
 
-      expect(unpinnedToggle).toHaveAttribute(ARIA_PRESSED, 'false');
-      expect(unpinTenantAction).toHaveBeenCalledWith(MOCK_TENANT_ID);
-
-      save.settle();
-      const settledToggle = await screen.findByRole('button', {
-        name: UNPIN_LABEL,
-      });
-
-      expect(settledToggle).toBeVisible();
+      expect(unpinnedToggle).not.toBePressed();
+      expect(setTenantPinAction).toHaveBeenCalledWith(MOCK_TENANT_ID, false);
     });
   });
 });

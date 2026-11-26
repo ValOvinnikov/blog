@@ -5,11 +5,9 @@ import {
 } from '@platform/utils/pinned-tenants/pinned-tenants';
 
 import {
-  MOCK_OTHER_TENANT_DOMAIN,
-  MOCK_OTHER_TENANT_ID,
-  MOCK_OTHER_TENANT_NAME,
-} from './fixtures';
-import { mockTenantsPageRow } from './tenants-page-row';
+  mockOtherTenantsPageRow,
+  mockTenantsPageRow,
+} from './tenants-page-row';
 
 const mockFaker = createMockFaker(8079);
 
@@ -24,12 +22,7 @@ export const mockPinnedTenant = (
 export const mockOtherPinnedTenant = (
   overrides: Partial<TPinnedTenant> = {},
 ): TPinnedTenant =>
-  mockPinnedTenant({
-    id: MOCK_OTHER_TENANT_ID,
-    name: MOCK_OTHER_TENANT_NAME,
-    primaryDomain: MOCK_OTHER_TENANT_DOMAIN,
-    ...overrides,
-  });
+  toPinnedTenant({ ...mockOtherTenantsPageRow(), ...overrides });
 
 export const mockThirdPinnedTenant = (
   overrides: Partial<TPinnedTenant> = {},

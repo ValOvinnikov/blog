@@ -1,9 +1,8 @@
 import { faker } from '@faker-js/faker';
-import { pinTenantAction } from '@platform/server/tenants/pin-tenant-action';
-import { unpinTenantAction } from '@platform/server/tenants/unpin-tenant-action';
+import { setTenantPinAction } from '@platform/server/tenants/set-tenant-pin-action';
 import { screen, waitFor } from '@platform/testing/custom-render';
 import { makeEnTranslator } from '@platform/testing/en-translator';
-import { holdSave } from '@platform/testing/pinned-tenants/held-save';
+import { holdPinSave } from '@platform/testing/pinned-tenants/held-save';
 import { customRenderInPinnedTenants } from '@platform/testing/pinned-tenants/render-in-pinned-tenants';
 import {
   MOCK_OTHER_TENANT_NAME,
@@ -23,14 +22,15 @@ import {
   usePinnedTenants,
 } from './pinned-tenants-provider';
 
-vi.mock('@platform/server/tenants/pin-tenant-action');
-vi.mock('@platform/server/tenants/unpin-tenant-action');
+vi.mock('@platform/server/tenants/set-tenant-pin-action');
 
 faker.seed(8079);
 
 const MOCK_PIN_LABEL = faker.lorem.word();
 const MOCK_UNPIN_LABEL = faker.lorem.word();
 const tPinned = makeEnTranslator('pinnedTenants');
+const MOCK_NAME_PARAMS = { name: MOCK_TENANT_NAME };
+const SAVE_FAILED = tPinned('saveFailed', MOCK_NAME_PARAMS);
 
 const PinsHarness = () => {
   const { pinnedTenants, setPinned } = usePinnedTenants();
@@ -56,71 +56,121 @@ const setup = customRenderInPinnedTenants(PinsHarness, {});
 
 describe(`<${PinnedTenantsProvider.name}/>`, () => {
   let user: UserEvent;
-  let save: ReturnType<typeof holdSave>;
 
   beforeEach(() => {
     user = userEvent.setup();
-    save = holdSave();
   });
 
-  it('shows a new pin at once and saves it for the tenant', async () => {
-    vi.mocked(pinTenantAction).mockReturnValueOnce(save.promise);
-    setup({}, { pinnedTenants: [mockOtherPinnedTenant()] });
+  it('keeps an empty status region while nothing is pinned', () => {
+    setup();
 
-    const pinButton = screen.getByRole('button', { name: MOCK_PIN_LABEL });
-    await user.click(pinButton);
+    const liveRegion = screen.getByRole('status');
 
-    const pinnedName = screen.getByText(MOCK_TENANT_NAME);
-    const otherName = screen.getByText(MOCK_OTHER_TENANT_NAME);
+    expect(liveRegion).toBeEmptyDOMElement();
+  });
 
-    expect(pinnedName).toBeVisible();
-    expect(otherName).toBeVisible();
-    expect(pinTenantAction).toHaveBeenCalledWith(MOCK_TENANT_ID);
+  it.each([
+    {
+      direction: 'pin',
+      pinnedTenants: [],
+      buttonLabel: MOCK_PIN_LABEL,
+      announcement: tPinned('pinnedAnnouncement', MOCK_NAME_PARAMS),
+    },
+    {
+      direction: 'unpin',
+      pinnedTenants: [mockPinnedTenant()],
+      buttonLabel: MOCK_UNPIN_LABEL,
+      announcement: tPinned('unpinnedAnnouncement', MOCK_NAME_PARAMS),
+    },
+  ])(
+    'announces a saved $direction to assistive technology',
+    async ({ pinnedTenants, buttonLabel, announcement }) => {
+      setup({}, { pinnedTenants });
 
-    save.settle();
-    await waitFor(() => {
+      const pinChange = screen.getByRole('button', { name: buttonLabel });
+      await user.click(pinChange);
+
+      const liveRegion = screen.getByRole('status');
+
+      await waitFor(() => {
+        expect(liveRegion).toHaveTextContent(announcement);
+      });
+    },
+  );
+
+  describe('while the save is held', () => {
+    let save: ReturnType<typeof holdPinSave>;
+
+    beforeEach(() => {
+      save = holdPinSave();
+    });
+
+    it('shows a new pin until its save settles and saves it for the tenant', async () => {
+      setup({}, { pinnedTenants: [mockOtherPinnedTenant()] });
+
+      const pinButton = screen.getByRole('button', { name: MOCK_PIN_LABEL });
+      await user.click(pinButton);
+
+      const pinnedName = screen.getByText(MOCK_TENANT_NAME);
+      const otherName = screen.getByText(MOCK_OTHER_TENANT_NAME);
+
+      expect(pinnedName).toBeVisible();
+      expect(otherName).toBeVisible();
+      expect(setTenantPinAction).toHaveBeenCalledWith(MOCK_TENANT_ID, true);
+
+      await save.settle();
       const settledName = screen.queryByText(MOCK_TENANT_NAME);
 
       expect(settledName).not.toBeInTheDocument();
     });
+
+    it('drops an unpinned tenant until its save settles and saves the removal', async () => {
+      setup({}, { pinnedTenants: [mockPinnedTenant()] });
+
+      const unpinButton = screen.getByRole('button', {
+        name: MOCK_UNPIN_LABEL,
+      });
+      await user.click(unpinButton);
+
+      const unpinnedName = screen.queryByText(MOCK_TENANT_NAME);
+
+      expect(unpinnedName).not.toBeInTheDocument();
+      expect(setTenantPinAction).toHaveBeenCalledWith(MOCK_TENANT_ID, false);
+
+      await save.settle();
+      const settledName = screen.getByText(MOCK_TENANT_NAME);
+
+      expect(settledName).toBeVisible();
+    });
   });
 
-  it('drops an unpinned tenant at once and saves the removal', async () => {
-    vi.mocked(unpinTenantAction).mockReturnValueOnce(save.promise);
-    setup({}, { pinnedTenants: [mockPinnedTenant()] });
+  describe('when saving fails', () => {
+    beforeEach(async () => {
+      vi.mocked(setTenantPinAction).mockResolvedValueOnce(
+        toOutcome(ACTION_OUTCOME.SERVER_ERROR),
+      );
+      setup();
 
-    const unpinButton = screen.getByRole('button', { name: MOCK_UNPIN_LABEL });
-    await user.click(unpinButton);
+      const pinButton = screen.getByRole('button', { name: MOCK_PIN_LABEL });
+      await user.click(pinButton);
+      await screen.findByText(SAVE_FAILED);
+    });
 
-    const unpinnedName = screen.queryByText(MOCK_TENANT_NAME);
+    it('undoes the pin and says so', async () => {
+      const toast = screen.getByText(SAVE_FAILED);
 
-    expect(unpinnedName).not.toBeInTheDocument();
-    expect(unpinTenantAction).toHaveBeenCalledWith(MOCK_TENANT_ID);
+      expect(toast).toBeVisible();
+      await waitFor(() => {
+        const pinnedName = screen.queryByText(MOCK_TENANT_NAME);
 
-    save.settle();
-    const settledName = await screen.findByText(MOCK_TENANT_NAME);
+        expect(pinnedName).not.toBeInTheDocument();
+      });
+    });
 
-    expect(settledName).toBeVisible();
-  });
+    it('announces nothing to assistive technology', () => {
+      const liveRegion = screen.getByRole('status');
 
-  it('undoes the pin and says so when saving fails', async () => {
-    vi.mocked(pinTenantAction).mockResolvedValueOnce(
-      toOutcome(ACTION_OUTCOME.SERVER_ERROR),
-    );
-    setup();
-
-    const pinButton = screen.getByRole('button', { name: MOCK_PIN_LABEL });
-    await user.click(pinButton);
-
-    const toast = await screen.findByText(
-      tPinned('saveFailed', { name: MOCK_TENANT_NAME }),
-    );
-
-    expect(toast).toBeVisible();
-    await waitFor(() => {
-      const pinnedName = screen.queryByText(MOCK_TENANT_NAME);
-
-      expect(pinnedName).not.toBeInTheDocument();
+      expect(liveRegion).toBeEmptyDOMElement();
     });
   });
 });
