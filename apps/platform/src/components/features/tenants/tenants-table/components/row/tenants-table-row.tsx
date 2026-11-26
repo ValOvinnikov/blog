@@ -11,7 +11,7 @@ import { adminRoutes } from '@platform/utils/routes/routes';
 import { tenantStatusTone } from '@platform/utils/status-tone/status-tone';
 import { SIZE, TENANT_SORT_COLUMN } from '@shinefold/config';
 import { TENANT_PROVISIONING_STATUS } from '@shinefold/db/constants';
-import type { TTenantsPageRow } from '@shinefold/db/queries/tenants/list-tenants-page/list-tenants-page';
+import type { TTenantsPageRow } from '@shinefold/db/queries/tenants/tenants-page-row';
 import { useLocale, useTranslations } from 'next-intl';
 
 import { tenantsTableRowVariants } from './tenants-table-row-variants';
