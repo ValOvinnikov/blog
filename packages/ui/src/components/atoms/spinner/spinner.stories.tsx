@@ -1,8 +1,8 @@
 import { SIZE } from '@shinefold/config';
 import { Button } from '@shinefold/ui/components/atoms/button';
 import { ReducedMotion } from '@shinefold/ui/testing/reduced-motion';
-import { objectKeys } from '@shinefold/utils/primitives';
 import type { Meta, StoryObj } from '@storybook/react-vite';
+import { keys } from 'remeda';
 
 import { Spinner } from './spinner';
 import { spinnerVariants } from './spinner-variants';
@@ -17,11 +17,11 @@ const meta = {
   argTypes: {
     variant: {
       control: 'select',
-      options: objectKeys(spinnerVariants.variants.variant),
+      options: keys(spinnerVariants.variants.variant),
     },
     size: {
       control: 'select',
-      options: objectKeys(spinnerVariants.variants.size),
+      options: keys(spinnerVariants.variants.size),
     },
   },
 } satisfies Meta<typeof Spinner>;
@@ -45,7 +45,7 @@ export const Large: TStory = {
 
 const AllStyles = () => (
   <div className="flex flex-col gap-4 text-brand-primary">
-    {objectKeys(spinnerVariants.variants.variant).map((variant) => (
+    {keys(spinnerVariants.variants.variant).map((variant) => (
       <Spinner
         key={variant}
         label={variant}

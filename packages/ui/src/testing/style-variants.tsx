@@ -1,6 +1,6 @@
 import type { IWithClassName, TThemeDeclarations } from '@shinefold/config';
-import { objectKeys } from '@shinefold/utils/primitives';
 import type { CSSProperties, ReactNode } from 'react';
+import { entries } from 'remeda';
 
 type TStyleVariantsProps<TStyle extends string> = IWithClassName & {
   declarations: Record<TStyle, TThemeDeclarations>;
@@ -17,13 +17,11 @@ export const StyleVariants = <TStyle extends string>({
   children,
 }: TStyleVariantsProps<TStyle>) => (
   <div className={className}>
-    {objectKeys(declarations).map((style) => (
+    {entries(declarations).map(([style, styleDeclarations]) => (
       <div
         key={style}
         className={variantClassName}
-        style={
-          { ...declarations[style], ...sharedDeclarations } as CSSProperties
-        }
+        style={{ ...styleDeclarations, ...sharedDeclarations } as CSSProperties}
       >
         <p>{style}</p>
         {children(style)}

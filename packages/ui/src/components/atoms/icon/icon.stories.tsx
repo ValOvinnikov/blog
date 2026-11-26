@@ -1,11 +1,12 @@
 import { FEATURE_ICONS, ICONS, SIZE, type TIconName } from '@shinefold/config';
-import { objectKeys, toTitleCase } from '@shinefold/utils/primitives';
+import { toTitleCase } from '@shinefold/utils/primitives';
 import type { Meta, StoryObj } from '@storybook/react-vite';
+import { keys } from 'remeda';
 
 import { Icon } from './icon';
 import { iconVariants } from './icon-variants';
 
-const iconNames = objectKeys(ICONS);
+const iconNames = keys(ICONS);
 
 const IconGallery = ({ names }: { names: readonly TIconName[] }) => (
   <div className="grid grid-cols-3 gap-6 sm:grid-cols-5">
@@ -37,7 +38,7 @@ const meta = {
     },
     size: {
       control: 'select',
-      options: objectKeys(iconVariants.variants.size),
+      options: keys(iconVariants.variants.size),
     },
   },
 } satisfies Meta<typeof Icon>;

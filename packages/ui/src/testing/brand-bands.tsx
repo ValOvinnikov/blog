@@ -1,7 +1,7 @@
 import { BRAND_VARIANT, type TBrandVariant } from '@shinefold/config';
 import type { IWithChildren } from '@shinefold/config/react';
-import { objectKeys } from '@shinefold/utils/primitives';
 import type { ReactNode } from 'react';
+import { keys } from 'remeda';
 import { within } from 'storybook/test';
 
 export const BRAND_BAND_LABELS = {
@@ -35,7 +35,7 @@ export const EveryBrandBand = ({
   children: (tone: TBrandVariant) => ReactNode;
 }) => (
   <div style={{ display: 'flex', flexWrap: 'wrap', gap: '1.5rem' }}>
-    {objectKeys(BRAND_BAND_LABELS).map((tone) => (
+    {keys(BRAND_BAND_LABELS).map((tone) => (
       <BrandBand key={tone} tone={tone}>
         {children(tone)}
       </BrandBand>

@@ -1,7 +1,7 @@
 import { SIZE } from '@shinefold/config';
 import { MOCK_SITE_NAME } from '@shinefold/ui/testing/fixtures';
-import { objectKeys } from '@shinefold/utils/primitives';
 import type { Meta, StoryObj } from '@storybook/react-vite';
+import { keys } from 'remeda';
 
 import { BrandMark } from './brand-mark';
 import { brandMarkVariants } from './brand-mark-variants';
@@ -20,7 +20,7 @@ const meta = {
   argTypes: {
     size: {
       control: 'select',
-      options: objectKeys(brandMarkVariants.variants.size),
+      options: keys(brandMarkVariants.variants.size),
     },
   },
 } satisfies Meta<typeof BrandMark>;

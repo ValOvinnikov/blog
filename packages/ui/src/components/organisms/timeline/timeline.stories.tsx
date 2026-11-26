@@ -7,8 +7,8 @@ import {
   type TTimelineMarkerStyle,
   type TTimelineOrientation,
 } from '@shinefold/config';
-import { objectKeys } from '@shinefold/utils/primitives';
 import type { Decorator, Meta, StoryObj } from '@storybook/react-vite';
+import { keys } from 'remeda';
 
 import { Timeline } from './timeline';
 import { timelineVariants } from './timeline-variants';
@@ -100,15 +100,15 @@ const meta = {
   argTypes: {
     orientation: {
       control: 'select',
-      options: objectKeys(timelineVariants.variants.orientation),
+      options: keys(timelineVariants.variants.orientation),
     },
     itemAlignment: {
       control: 'select',
-      options: objectKeys(timelineVariants.variants.itemAlignment),
+      options: keys(timelineVariants.variants.itemAlignment),
     },
     markerStyle: {
       control: 'select',
-      options: objectKeys(timelineVariants.variants.markerStyle),
+      options: keys(timelineVariants.variants.markerStyle),
     },
   },
   args: {

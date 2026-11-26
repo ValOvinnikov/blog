@@ -1,6 +1,6 @@
 import { ALERT_TYPE } from '@shinefold/config';
-import { objectKeys } from '@shinefold/utils/primitives';
 import type { Meta, StoryObj } from '@storybook/react-vite';
+import { keys } from 'remeda';
 
 import { Alert } from './alert';
 
@@ -11,7 +11,7 @@ const meta = {
   argTypes: {
     type: {
       control: 'select',
-      options: objectKeys(ALERT_TYPE),
+      options: keys(ALERT_TYPE),
     },
   },
   args: {
@@ -44,12 +44,7 @@ export const Error: TStory = {
   },
 };
 
-export const Info: TStory = {
-  args: {
-    type: ALERT_TYPE.INFO,
-    message: 'New posts land in your inbox roughly twice a month.',
-  },
-};
+export const Info: TStory = {};
 
 export const WithoutIcon: TStory = {
   args: {

@@ -7,8 +7,8 @@ import {
 } from '@shinefold/config';
 import { Icon } from '@shinefold/ui/components/atoms/icon';
 import { TextLink } from '@shinefold/ui/components/atoms/text-link';
-import { objectKeys } from '@shinefold/utils/primitives';
 import type { Meta, StoryObj } from '@storybook/react-vite';
+import { keys } from 'remeda';
 
 import { Footer, type TFooterProps } from './footer';
 import { footerVariants } from './footer-variants';
@@ -105,11 +105,11 @@ const meta = {
   argTypes: {
     layout: {
       control: 'select',
-      options: objectKeys(footerVariants.variants.layout),
+      options: keys(footerVariants.variants.layout),
     },
     surface: {
       control: 'select',
-      options: objectKeys(footerVariants.variants.surface),
+      options: keys(footerVariants.variants.surface),
     },
     tone: {
       control: 'select',

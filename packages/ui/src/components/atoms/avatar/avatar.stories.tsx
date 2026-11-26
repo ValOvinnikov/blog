@@ -1,27 +1,30 @@
 import { SIZE } from '@shinefold/config';
-import { objectKeys } from '@shinefold/utils/primitives';
 import type { Meta, StoryObj } from '@storybook/react-vite';
+import { keys } from 'remeda';
 
 import { Avatar } from './avatar';
 import { avatarVariants } from './avatar-variants';
+
+const AVATAR_NAME = 'Jane Doe';
+const AVATAR_SRC = 'https://i.pravatar.cc/150?img=1';
 
 const meta = {
   title: 'Atoms/Avatar',
   component: Avatar,
   tags: ['autodocs'],
   args: {
-    name: 'Jane Doe',
-    alt: 'Jane Doe',
+    name: AVATAR_NAME,
+    alt: AVATAR_NAME,
     size: SIZE.MD,
   },
   argTypes: {
     size: {
       control: 'select',
-      options: objectKeys(avatarVariants.variants.size),
+      options: keys(avatarVariants.variants.size),
     },
     shape: {
       control: 'select',
-      options: objectKeys(avatarVariants.variants.shape),
+      options: keys(avatarVariants.variants.shape),
     },
   },
 } satisfies Meta<typeof Avatar>;
@@ -30,7 +33,7 @@ export default meta;
 type TStory = StoryObj<typeof meta>;
 
 export const WithImage: TStory = {
-  args: { src: 'https://i.pravatar.cc/150?img=1' },
+  args: { src: AVATAR_SRC },
 };
 
 export const Initials: TStory = {};
@@ -44,7 +47,7 @@ export const Large: TStory = {
 };
 
 export const SquareWithImage: TStory = {
-  args: { shape: 'square', src: 'https://i.pravatar.cc/150?img=1' },
+  args: { shape: 'square', src: AVATAR_SRC },
 };
 
 export const SquareInitials: TStory = {

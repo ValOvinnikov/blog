@@ -4,8 +4,8 @@ import { TextLink } from '@shinefold/ui/components/atoms/text-link';
 import { CardGrid } from '@shinefold/ui/components/organisms/card-grid';
 import { Carousel } from '@shinefold/ui/components/organisms/carousel';
 import { EveryBrandBand } from '@shinefold/ui/testing/brand-bands';
-import { objectKeys } from '@shinefold/utils/primitives';
 import type { Meta, StoryObj } from '@storybook/react-vite';
+import { keys } from 'remeda';
 
 import { QuoteCard, type TQuoteCardProps } from './quote-card';
 import { quoteCardVariants } from './quote-card-variants';
@@ -23,7 +23,7 @@ const meta = {
   argTypes: {
     align: {
       control: 'select',
-      options: objectKeys(quoteCardVariants.variants.align),
+      options: keys(quoteCardVariants.variants.align),
     },
   },
   args: {

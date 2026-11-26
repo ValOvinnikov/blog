@@ -12,9 +12,9 @@ import {
   type INavItem,
   PrimaryNavigation,
 } from '@shinefold/ui/components/molecules/primary-navigation';
-import { objectKeys } from '@shinefold/utils/primitives';
 import type { Decorator, Meta, StoryObj } from '@storybook/react-vite';
 import { useState } from 'react';
+import { keys } from 'remeda';
 import { userEvent, within } from 'storybook/test';
 
 import { Header, type THeaderProps } from './header';
@@ -124,11 +124,11 @@ const meta = {
   argTypes: {
     layout: {
       control: 'select',
-      options: objectKeys(headerVariants.variants.layout),
+      options: keys(headerVariants.variants.layout),
     },
     barStyle: {
       control: 'select',
-      options: objectKeys(headerVariants.variants.barStyle),
+      options: keys(headerVariants.variants.barStyle),
     },
     tone: {
       control: 'select',

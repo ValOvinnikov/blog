@@ -1,8 +1,8 @@
 import { TOAST_TYPE } from '@shinefold/config';
 import { spinnerVariants } from '@shinefold/ui/components/atoms/spinner/spinner-variants';
 import { ButtonShapes } from '@shinefold/ui/testing/button-shapes';
-import { objectKeys } from '@shinefold/utils/primitives';
 import type { Meta, StoryObj } from '@storybook/react-vite';
+import { keys } from 'remeda';
 
 import { Toast, type IToast } from './toast';
 
@@ -28,7 +28,7 @@ const meta = {
   argTypes: {
     spinnerVariant: {
       control: 'select',
-      options: objectKeys(spinnerVariants.variants.variant),
+      options: keys(spinnerVariants.variants.variant),
     },
   },
   args: {
@@ -97,7 +97,7 @@ export const LoadingInEverySpinnerStyle: TStory = {
   args: Loading.args,
   render: (args) => (
     <div className="flex w-80 flex-col gap-4">
-      {objectKeys(spinnerVariants.variants.variant).map((spinnerVariant) => (
+      {keys(spinnerVariants.variants.variant).map((spinnerVariant) => (
         <Toast key={spinnerVariant} {...args} spinnerVariant={spinnerVariant} />
       ))}
     </div>

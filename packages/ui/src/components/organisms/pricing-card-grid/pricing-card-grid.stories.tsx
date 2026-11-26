@@ -2,8 +2,8 @@ import { Button } from '@shinefold/ui/components/atoms/button';
 import { LinkButton } from '@shinefold/ui/components/molecules/link-button';
 import { PricingCard } from '@shinefold/ui/components/molecules/pricing-card';
 import { EveryBrandBand } from '@shinefold/ui/testing/brand-bands';
-import { objectKeys } from '@shinefold/utils/primitives';
 import type { Meta, StoryObj } from '@storybook/react-vite';
+import { keys } from 'remeda';
 
 import { PricingCardGrid } from './pricing-card-grid';
 import { pricingCardGridVariants } from './pricing-card-grid-variants';
@@ -98,7 +98,7 @@ const meta = {
   argTypes: {
     columns: {
       control: 'select',
-      options: objectKeys(pricingCardGridVariants.variants.columns),
+      options: keys(pricingCardGridVariants.variants.columns),
     },
   },
   args: {

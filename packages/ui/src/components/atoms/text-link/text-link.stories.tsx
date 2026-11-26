@@ -2,9 +2,9 @@ import { faker } from '@faker-js/faker';
 import { ICONS, SIZE } from '@shinefold/config';
 import { Icon } from '@shinefold/ui/components/atoms/icon';
 import { focusLastLink } from '@shinefold/ui/testing/brand-bands';
-import { objectKeys } from '@shinefold/utils/primitives';
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import type { AnchorHTMLAttributes } from 'react';
+import { keys } from 'remeda';
 
 import { TextLink } from './text-link';
 import { textLinkVariants } from './text-link-variants';
@@ -29,15 +29,15 @@ const meta = {
   argTypes: {
     appearance: {
       control: 'select',
-      options: objectKeys(textLinkVariants.variants.appearance),
+      options: keys(textLinkVariants.variants.appearance),
     },
     variant: {
       control: 'select',
-      options: objectKeys(textLinkVariants.variants.variant),
+      options: keys(textLinkVariants.variants.variant),
     },
     currentStyle: {
       control: 'select',
-      options: objectKeys(textLinkVariants.variants.currentStyle),
+      options: keys(textLinkVariants.variants.currentStyle),
     },
     isCurrent: { control: 'boolean' },
     isStretched: { control: 'boolean' },
