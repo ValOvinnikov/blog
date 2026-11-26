@@ -48,11 +48,8 @@ export async function loadNewsletterSendContext(
     throw new FatalError(`Tenant "${tenantId}" has no site config.`);
   }
   const { name, locale } = tenant;
-  const { preset, accentHue, logoHue, headingFont, bodyFont } = siteConfig;
-  const { buttonColor } = toEffectiveLookWithin(
-    siteConfig,
-    await getTenantEntitlements(tenant),
-  );
+  const { preset, accentHue, logoHue, buttonColor, headingFont, bodyFont } =
+    toEffectiveLookWithin(siteConfig, await getTenantEntitlements(tenant));
   const brandInput = { preset, accentHue, logoHue, buttonColor };
   const replyToAddress = emailConfig?.replyToAddress;
 

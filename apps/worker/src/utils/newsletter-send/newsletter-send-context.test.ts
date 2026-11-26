@@ -1,5 +1,6 @@
 import {
   PRESET_ID,
+  PRESET_REGISTRY,
   resolveTenantEmailBrand,
   resolveTenantEmailDarkBrand,
 } from '@shinefold/config';
@@ -25,42 +26,57 @@ vi.mock('@shinefold/db/queries/tenant-entitlement-grants');
 vi.mock('@shinefold/db/queries/tenants');
 vi.mock('@worker/utils/env/env');
 
-const MOCK_BRAND_INPUT = {
+const MOCK_LOGO_HUE = 140;
+const { headingFont: STORED_HEADING_FONT, bodyFont: STORED_BODY_FONT } =
+  PRESET_REGISTRY[PRESET_ID.EDITORIAL].themeTokens;
+const { headingFont: PRESET_HEADING_FONT, bodyFont: PRESET_BODY_FONT } =
+  PRESET_REGISTRY[PRESET_ID.CONSOLE].themeTokens;
+
+const MOCK_STORED_LOOK = {
   preset: PRESET_ID.CONSOLE,
   accentHue: MOCK_ACCENT_HUE,
+  logoHue: MOCK_LOGO_HUE,
+  buttonColor: MOCK_YELLOW_HEX,
+  headingFont: STORED_HEADING_FONT,
+  bodyFont: STORED_BODY_FONT,
+};
+
+const MOCK_PRESET_LOOK = {
+  ...MOCK_STORED_LOOK,
   logoHue: undefined,
+  buttonColor: undefined,
+  headingFont: PRESET_HEADING_FONT,
+  bodyFont: PRESET_BODY_FONT,
 };
 
 describe(loadNewsletterSendContext, () => {
   beforeEach(() => {
     mockEnv.NEWSLETTER_UNSUBSCRIBE_KEY = MOCK_UNSUBSCRIBE_KEY;
-    vi.mocked(getSiteConfig).mockResolvedValue({
-      ...MOCK_BRAND_INPUT,
-      buttonColor: MOCK_YELLOW_HEX,
-    } as TSiteConfigResult);
+    vi.mocked(getSiteConfig).mockResolvedValue(
+      MOCK_STORED_LOOK as TSiteConfigResult,
+    );
   });
 
   it.each([
-    { plan: TENANT_PLAN.GROWTH, buttonColor: MOCK_YELLOW_HEX },
-    { plan: TENANT_PLAN.STARTER, buttonColor: undefined },
-    { plan: TENANT_PLAN.FREE, buttonColor: undefined },
+    { plan: TENANT_PLAN.GROWTH, look: MOCK_STORED_LOOK },
+    { plan: TENANT_PLAN.STARTER, look: MOCK_PRESET_LOOK },
+    { plan: TENANT_PLAN.FREE, look: MOCK_PRESET_LOOK },
   ])(
-    "gives a $plan site's brands the button colour its Look allows",
-    async ({ plan, buttonColor }) => {
+    "styles a $plan site's email with the Look its plan allows",
+    async ({ plan, look }) => {
       vi.mocked(getTenantById).mockResolvedValue(mockTenant({ plan }));
       vi.mocked(getTenantEntitlements).mockResolvedValue(
         resolveTenantEntitlements(plan, [], new Date()),
       );
 
-      const { brand, darkBrand } =
+      const { brand, darkBrand, headingFont, bodyFont } =
         await loadNewsletterSendContext(MOCK_TENANT_ID);
 
-      expect({ brand, darkBrand }).toEqual({
-        brand: resolveTenantEmailBrand({ ...MOCK_BRAND_INPUT, buttonColor }),
-        darkBrand: resolveTenantEmailDarkBrand({
-          ...MOCK_BRAND_INPUT,
-          buttonColor,
-        }),
+      expect({ brand, darkBrand, headingFont, bodyFont }).toEqual({
+        brand: resolveTenantEmailBrand(look),
+        darkBrand: resolveTenantEmailDarkBrand(look),
+        headingFont: look.headingFont,
+        bodyFont: look.bodyFont,
       });
     },
   );
