@@ -308,6 +308,19 @@ describe(`<${PrimaryNavigation.name}/>`, () => {
       expect(firstPanelLink).toHaveAccessibleName(MOCK_HEADER_ACTION.label);
     });
 
+    it('shows an action with no placement first in the open panel', () => {
+      setup({
+        action: MOCK_HEADER_ACTION,
+        mobileToggle: mobileToggle(true),
+      });
+
+      const [firstPanelLink] = within(
+        screen.getByTestId(MOBILE_PANEL_TEST_ID),
+      ).getAllByRole('link');
+
+      expect(firstPanelLink).toHaveAccessibleName(MOCK_HEADER_ACTION.label);
+    });
+
     it('keeps a bar-placed action out of the open panel', () => {
       setup({
         action: {

@@ -299,7 +299,7 @@ Slots:
 ### PrimaryNavigation — `components/molecules/primary-navigation/primary-navigation.tsx`
 
 The site's main menu, where readers reach its top-level pages and their sub-pages.
-Props: links: INavItem[] · action?: TPrimaryNavigationAction · children?: TCompoundChildren<typeof PrimaryNavigationParts> · groupName?: string · ariaLabel?: string · linkAs?: TAnchorElementType · mobileToggle?: TPrimaryNavigationMobileToggleProps · layout?: TPrimaryNavigationVariants['layout'] · submenuStyle?: TPrimaryNavigationItemProps['submenuStyle'] _(extends IWithClassName, IWithDataTestId)_
+Props: links: INavItem[] · action?: TPrimaryNavigationAction · children?: TCompoundChildren<typeof PrimaryNavigationParts> · groupName?: string · linkAs?: TAnchorElementType · mobileToggle?: TPrimaryNavigationMobileToggleProps · layout?: TPrimaryNavigationVariants['layout'] · submenuStyle?: TPrimaryNavigationItemProps['submenuStyle'] _(extends IWithClassName, IWithDataTestId)_
 Variants: collapsible: (boolean) · layout: HEADER_LAYOUT.CLASSIC|HEADER_LAYOUT.LINKS_BESIDE_BRAND|HEADER_LAYOUT.CENTRED_LINKS|HEADER_LAYOUT.TWO_ROWS|HEADER_LAYOUT.CENTRED_BRAND|HEADER_LAYOUT.MENU_BUTTON
 
 Slots:

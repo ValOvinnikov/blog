@@ -55,7 +55,6 @@ export type TPrimaryNavigationProps = IWithClassName &
     action?: TPrimaryNavigationAction;
     children?: TCompoundChildren<typeof PrimaryNavigationParts>;
     groupName?: string;
-    ariaLabel?: string;
     linkAs?: TAnchorElementType;
     mobileToggle?: TPrimaryNavigationMobileToggleProps;
     layout?: TPrimaryNavigationVariants['layout'];
@@ -68,7 +67,6 @@ const PrimaryNavigationRoot = ({
   action,
   children,
   groupName,
-  ariaLabel = 'Primary',
   className,
   dataTestId,
   linkAs,
@@ -91,7 +89,7 @@ const PrimaryNavigationRoot = ({
 
   return (
     <nav
-      aria-label={ariaLabel}
+      aria-label="Primary"
       className={root({ class: className })}
       data-testid={dataTestId}
     >

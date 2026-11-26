@@ -34,7 +34,6 @@ export const primaryNavigationActionVariants = tv({
     },
   ],
   defaultVariants: {
-    style: HEADER_ACTION_STYLE.FILLED,
     isInPanel: false,
   },
 });
