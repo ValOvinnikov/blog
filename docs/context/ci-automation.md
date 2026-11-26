@@ -374,6 +374,20 @@ and runner size. Note the flag sits on `turbo run` directly: pnpm forwards
 `pnpm test -- --concurrency=2` verbatim, so the `--` would hand the flag to
 vitest, not turbo.
 
+**Each suite turbo runs also caps its own Vitest workers** (#8111). Vitest's
+default in a single run is one worker fewer than the machine's cores, so two
+suites side by side asked for nearly twice the cores, and the per-test
+timeout, CI's per-file test budget and cloud sessions' memory all absorbed
+the contention. `configs/vitest/preset.ts` now sets `maxWorkers` to the
+machine's available parallelism divided by `TURBO_TEST_CONCURRENCY` (2, which
+must match the `--concurrency` above), but only when `TURBO_HASH` is set —
+turbo sets it in every task it spawns. So root `pnpm test`, `pnpm verify`,
+CI's Test step and Deploy Development's Test step share the cores between
+the two suites, while a lone `pnpm --filter <pkg> test` keeps Vitest's
+default and runs no slower. `@shinefold/insight` and `@shinefold/utils` sit
+below the preset in the graph and keep their own configs; their suites are
+small enough not to matter.
+
 **Both test steps print what went into each Turbo hash.** CI's Test job and
 Deploy Development's Test step set `TURBO_RUN_SUMMARY`, and the step after
 each, "Turbo test hash inputs" (`scripts/print-turbo-hash-inputs.sh`), prints

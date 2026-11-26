@@ -128,7 +128,9 @@ or a `mockReset()` that only returns a fake to its default.
   `pool: 'threads'`; the `jsdom` project runs on `pool: 'vmThreads'` with
   `vmMemoryLimit` and the `configs/vitest/vm-web-streams.ts` setup file, so
   each file gets a fresh `window` and its own `vi.mock`s. Pools are set per
-  project; `maxWorkers` never is (Vitest throws when projects disagree).
+  project; `maxWorkers` never is (Vitest throws when projects disagree) —
+  the preset sets it once, and only under turbo
+  (`docs/context/ci-automation.md`).
   Each app's setup also fails any test during which React reports an act
   warning.
 - **`packages/ui`** — merges the preset with jsdom and `src/test-setup.ts`,
