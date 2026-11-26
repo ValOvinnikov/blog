@@ -3,7 +3,8 @@ import { ICON_REGISTRY } from '@platform/components/shared/icon/icon-registry';
 import {
   itemKeyed,
   labelsOf,
-  OPERATOR_CONFIGURATION_KEYS,
+  CONFIGURATION_KEYS,
+  NO_PLAN_PAGE,
   tNavSections as t,
   translated,
 } from '@platform/testing/layout/nav-sections';
@@ -84,7 +85,12 @@ describe(tenantNavSections, () => {
   let platform: TSidebarNavSection;
 
   beforeEach(() => {
-    const sections = tenantNavSections(t, MOCK_TENANT_ID, MOCK_TENANT_NAME);
+    const sections = tenantNavSections(
+      t,
+      MOCK_TENANT_ID,
+      MOCK_TENANT_NAME,
+      EVERY_PLAN_PAGE,
+    );
     tenant = sections[0]!;
     content = sections[1]!;
     configuration = sections[2]!;
@@ -123,9 +129,20 @@ describe(tenantNavSections, () => {
     expect(rest).toEqual([]);
   });
 
-  it('lists every Configuration destination, Look through Email', () => {
-    expect(labelsOf(configuration)).toEqual(
-      translated(OPERATOR_CONFIGURATION_KEYS),
+  it('lists every Configuration destination, Look through Subscribers', () => {
+    expect(labelsOf(configuration)).toEqual(translated(CONFIGURATION_KEYS));
+  });
+
+  it('omits only Subscribers for a site whose plan has no Newsletter', () => {
+    const [, , closed] = tenantNavSections(
+      t,
+      MOCK_TENANT_ID,
+      MOCK_TENANT_NAME,
+      NO_PLAN_PAGE,
+    );
+
+    expect(labelsOf(closed!)).toEqual(
+      translated(CONFIGURATION_KEYS.filter((key) => key !== 'subscribers')),
     );
   });
 
@@ -138,6 +155,7 @@ describe(tenantNavSections, () => {
     ['domain', adminRoutes.tenantDomain(MOCK_TENANT_ID)],
     ['signIn', adminRoutes.tenantSignIn(MOCK_TENANT_ID)],
     ['email', adminRoutes.email(MOCK_TENANT_ID)],
+    ['subscribers', adminRoutes.tenantSubscribers(MOCK_TENANT_ID)],
   ])('links Configuration %s to the tenant page', (key, href) => {
     const item = itemKeyed(configuration, key);
 
@@ -205,7 +223,12 @@ describe('nav section icons', () => {
   it('registers a glyph for every icon a nav item references', () => {
     const items = [
       ...operatorNavSections(t, ADMIN_ROLE.SUPERADMIN),
-      ...tenantNavSections(t, MOCK_TENANT_ID, MOCK_TENANT_NAME),
+      ...tenantNavSections(
+        t,
+        MOCK_TENANT_ID,
+        MOCK_TENANT_NAME,
+        EVERY_PLAN_PAGE,
+      ),
       ...dashboardNavSections(t, EVERY_PLAN_PAGE),
     ].flatMap((section) => section.items);
 

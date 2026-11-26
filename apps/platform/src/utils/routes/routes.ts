@@ -74,6 +74,10 @@ export const adminRoutes = {
   languages: (tenantId: string) => `/tenants/${tenantId}/languages`,
   email: (tenantId: string) => `/tenants/${tenantId}/email`,
   leads: (tenantId: string) => `/tenants/${tenantId}/leads`,
+  tenantSubscribers: (tenantId: string, page = 1) =>
+    page > 1
+      ? `/tenants/${tenantId}/subscribers?page=${page}`
+      : `/tenants/${tenantId}/subscribers`,
   tenantTeam: (tenantId: string) => `/tenants/${tenantId}/team`,
   tenantActivity: (tenantId: string, page = 1) =>
     page > 1

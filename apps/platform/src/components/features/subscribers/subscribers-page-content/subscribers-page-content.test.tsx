@@ -81,6 +81,7 @@ const setup = customRenderAsync(SubscribersPageContent, {
   tenant,
   viewer: ownerViewer,
   page: 1,
+  pageHref: adminRoutes.dashboardSubscribers,
   movedUpCeiling: undefined,
 });
 
@@ -235,6 +236,19 @@ describe(`<${SubscribersPageContent.name}/>`, () => {
       'href',
       adminRoutes.dashboardSubscribers(3),
     );
+  });
+
+  it('links the neighbouring page through the page link it is given', async () => {
+    const pageHref = (page: number) =>
+      adminRoutes.tenantSubscribers(MOCK_TENANT_ID, page);
+    loadWith({ page: 2, totalPages: 3 });
+    await setup({ page: 2, pageHref, viewer: operatorViewer });
+
+    const nextLinks = screen.getAllByRole('link', {
+      name: tPagination('next'),
+    });
+
+    expect(nextLinks[0]).toHaveAttribute('href', pageHref(3));
   });
 
   it('shows the off note while sending is off', async () => {

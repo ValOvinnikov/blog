@@ -4,6 +4,7 @@ import { resolveGatedDashboardTenant } from '@platform/server/auth/resolve-gated
 import { pageMetadata } from '@platform/server/page-metadata/page-metadata';
 import { renderTenantScopedPage } from '@platform/server/tenant-pages/render-tenant-scoped-page';
 import { parsePage } from '@platform/utils/pagination/pagination';
+import { adminRoutes } from '@platform/utils/routes/routes';
 import type { Metadata } from 'next';
 
 type TProps = {
@@ -30,6 +31,7 @@ export default async function DashboardSubscribersPage({
         tenant,
         viewer,
         page: parsePage(page),
+        pageHref: adminRoutes.dashboardSubscribers,
         movedUpCeiling: movedUp ? Number(movedUp) : undefined,
       }),
   );

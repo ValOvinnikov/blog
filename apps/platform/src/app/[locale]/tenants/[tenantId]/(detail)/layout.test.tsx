@@ -11,6 +11,7 @@ import {
   mockReadyTenant,
 } from '@platform/testing/tenants/fixtures';
 import { noEntitlementGrantQueries } from '@platform/testing/tenants/no-entitlement-grant-queries';
+import { TENANT_PLAN } from '@shinefold/config';
 
 import TenantDetailLayout from './layout';
 
@@ -87,5 +88,26 @@ describe(`<${TenantDetailLayout.name}/>`, () => {
 
       expect(tenantDomain).not.toBeInTheDocument();
     });
+
+    it('shows no Subscribers entry for a site whose plan has no Newsletter', () => {
+      const subscribersLink = screen.queryByRole('link', {
+        name: navSections.subscribers,
+      });
+
+      expect(subscribersLink).not.toBeInTheDocument();
+    });
+  });
+
+  it('shows Subscribers in the sidebar for a site whose plan has Newsletter', async () => {
+    getTenantByIdMock.mockResolvedValue(
+      mockReadyTenant({ plan: TENANT_PLAN.GROWTH }),
+    );
+    await setup();
+
+    const subscribersLink = screen.getByRole('link', {
+      name: navSections.subscribers,
+    });
+
+    expect(subscribersLink).toBeVisible();
   });
 });

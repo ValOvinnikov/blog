@@ -6,7 +6,10 @@ import {
   type TTenantNavHrefs,
 } from '@platform/utils/configuration-nav-items/configuration-nav-items';
 import type { TLooseTranslator } from '@platform/utils/loose-translator/loose-translator';
-import { EVERY_PLAN_PAGE } from '@platform/utils/plan-page-access/plan-page-access';
+import {
+  EVERY_PLAN_PAGE,
+  type TPlanPageAccess,
+} from '@platform/utils/plan-page-access/plan-page-access';
 import { adminRoutes } from '@platform/utils/routes/routes';
 import { studioNavItem } from '@platform/utils/studio-nav-item/studio-nav-item';
 import { superAdminNavItems } from '@platform/utils/super-admin-nav-items/super-admin-nav-items';
@@ -43,6 +46,7 @@ export const tenantNavSections = (
   t: TLooseTranslator,
   tenantId: string,
   tenantName: string,
+  { subscribers }: Pick<TPlanPageAccess, 'subscribers'>,
 ): TSidebarNavSection[] => {
   const platform = {
     label: t('badgePlatform'),
@@ -59,6 +63,7 @@ export const tenantNavSections = (
     signIn: adminRoutes.tenantSignIn(tenantId),
     email: adminRoutes.email(tenantId),
     studio: adminRoutes.tenantStudio(tenantId),
+    subscribers: adminRoutes.tenantSubscribers(tenantId),
   };
 
   return [
@@ -78,7 +83,10 @@ export const tenantNavSections = (
     },
     {
       label: t('configurationSectionLabel'),
-      items: configurationNavItems(t, hrefs, EVERY_PLAN_PAGE),
+      items: configurationNavItems(t, hrefs, {
+        ...EVERY_PLAN_PAGE,
+        subscribers,
+      }),
     },
     {
       label: t('accountSectionLabel'),

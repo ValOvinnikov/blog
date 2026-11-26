@@ -32,6 +32,7 @@ code:
   - apps/worker/src/utils/owner-email/owner-newsletter-*/**
   - apps/worker/src/utils/owner-email/owner-newsletter-*.ts
   - apps/platform/src/app/[locale]/dashboard/(tenant)/subscribers/**
+  - apps/platform/src/app/[locale]/tenants/[tenantId]/(detail)/subscribers/**
   - apps/platform/src/components/features/subscribers/**
   - apps/platform/src/server/subscribers/**
   - apps/platform/src/utils/subscriber-limits/**
@@ -63,7 +64,7 @@ An editor places a Newsletter Signup module on a page; a reader enters an email 
 - `/[locale]/newsletter/[result]` — the confirm or unsubscribe outcome (`NEWSLETTER_RESULT`: confirmed, unsubscribed, or an invalid, failed or unavailable link) in the site's layout, theme and the link's language, with a link home; `noindex`.
 - `/[locale]/account` — the Newsletter section (see [reader-account](./reader-account.md)).
 - **Platform** — the Features toggle, the Email page's `NEWSLETTER_CONFIRMATION` template, and the Subscribers page below.
-- **Platform, `/dashboard/subscribers`** — for a site whose plan (with grants) includes Newsletter, opened by its owner or an operator; an editor, and a Free or Starter site, get neither the page nor its sidebar entry. The operator tree (`/tenants/[tenantId]`) has no Subscribers entry: operators reach the page from the dashboard. It shows:
+- **Platform, `/dashboard/subscribers` and `/tenants/[tenantId]/subscribers`** — for a site whose plan (with grants) includes Newsletter: the owner and an operator managing their own site open it from the dashboard, and every admin and super admin opens any site's from its tenant view, where the entry sits beside Leads; an editor, and a Free or Starter site, get neither the page nor its sidebar entry, and the route is not found. Each route pages its own list. It shows:
   - the confirmed count and Export CSV (`exportSubscribersAction`: every confirmed subscriber as `email,confirmed_at`, UTC ISO times, newest first, named `subscribers-{first label of the platform address, else the main address}-{UTC day}.csv`; disabled with no subscribers);
   - at most one notice, in this order: the operator pause (`newsletter_paused_at` set, or the reputation at `STOP`), over the band, out of this month's emails, near the band, near the emails (80%), then "After moving up" when the `MOVED_UP` search param names the band the site is now on. A paused notice names the newest post skipped for its reason since the last sent post (`getLatestSkippedNewsletterPost`), or drops that sentence. The move-up button (`MoveUpBand`) shows for the owner only, and only with a catalogue price for the site's stored interval and currency; on the 25,000 band the note reads "You're on the largest band.";
   - the subscriber-band and emails-this-month cards, each a meter with a note that is muted below 80%, warning from 80% and error-toned only while its own paused notice shows ("paused" uses the worker gate's rules: over the band is more subscribers than the ceiling, out of emails is more subscribers than the emails left);

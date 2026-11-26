@@ -3,7 +3,6 @@ import { Card } from '@platform/components/shared/card';
 import { Pagination } from '@platform/components/shared/pagination';
 import type { TSubscribersPageData } from '@platform/server/subscribers/load-subscribers-page';
 import { DAY_MONTH_SHORT_UTC } from '@platform/utils/date-format-options/date-format-options';
-import { adminRoutes } from '@platform/utils/routes/routes';
 import { toSubscribersRange } from '@platform/utils/subscribers-range/subscribers-range';
 import { useFormatter, useTranslations } from 'next-intl';
 
@@ -12,11 +11,13 @@ import { subscribersPhoneListVariants } from './subscribers-phone-list-variants'
 export type TSubscribersPhoneListProps = {
   tenantId: string;
   data: Pick<TSubscribersPageData, 'list' | 'page' | 'totalPages'>;
+  pageHref: (page: number) => string;
 };
 
 export const SubscribersPhoneList = ({
   tenantId,
   data,
+  pageHref,
 }: TSubscribersPhoneListProps) => {
   const t = useTranslations('subscribersPage.list');
   const format = useFormatter();
@@ -64,7 +65,7 @@ export const SubscribersPhoneList = ({
         <Pagination
           page={page}
           totalPages={totalPages}
-          pageHref={adminRoutes.dashboardSubscribers}
+          pageHref={pageHref}
           hasStatus={false}
           isUnavailableStepHidden={true}
         />

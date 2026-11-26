@@ -32,6 +32,20 @@ describe('adminRoutes', () => {
     );
   });
 
+  describe('tenantSubscribers', () => {
+    it('links the first page with no page parameter', () => {
+      expect(adminRoutes.tenantSubscribers(MOCK_TENANT_ID)).toBe(
+        `/tenants/${MOCK_TENANT_ID}/subscribers`,
+      );
+    });
+
+    it('carries a later page', () => {
+      expect(adminRoutes.tenantSubscribers(MOCK_TENANT_ID, 2)).toBe(
+        `/tenants/${MOCK_TENANT_ID}/subscribers?page=2`,
+      );
+    });
+  });
+
   describe('tenants', () => {
     it('leaves the default visibility, sort and search out of the URL', () => {
       const href = adminRoutes.tenants({

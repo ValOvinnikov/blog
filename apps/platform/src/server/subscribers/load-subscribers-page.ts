@@ -12,7 +12,6 @@ import {
 } from '@platform/utils/move-up-offer/move-up-offer';
 import { resolveTotalPages } from '@platform/utils/pagination/pagination';
 import type { TPlatformTenant } from '@platform/utils/platform-tenant/platform-tenant';
-import { adminRoutes } from '@platform/utils/routes/routes';
 import {
   toSubscriberLimits,
   type TSubscriberLimits,
@@ -70,10 +69,15 @@ const readOffer = async (
     ? moveUpOfferFor(tenant, await queries.stripeCatalogue.listStripePrices())
     : undefined;
 
+export type TSubscribersPageQuery = {
+  page: number;
+  pageHref: (page: number) => string;
+  movedUpCeiling: TMaybeUndefined<number>;
+};
+
 export const loadSubscribersPage = async (
   tenant: TPlatformTenant,
-  page: number,
-  movedUpCeiling: TMaybeUndefined<number>,
+  { page, pageHref, movedUpCeiling }: TSubscribersPageQuery,
 ): Promise<TSubscribersPageData> => {
   const { id, subscriberBandCeiling } = tenant;
   const [list, limits, emailNewPosts, stop] = await Promise.all([
@@ -89,7 +93,7 @@ export const loadSubscribersPage = async (
     page,
     total: list.total,
     pageSize: SUBSCRIBERS_PAGE_SIZE,
-    pageHref: adminRoutes.dashboardSubscribers,
+    pageHref,
   });
   const subscriberLimits = toSubscriberLimits({
     limits,
