@@ -303,7 +303,7 @@ export const SquarePhotosNextToSidebar: TStory = {
     (Story) => (
       <LandingPageLayout
         topBlock={null}
-        sectionNavigation={mockLandingSectionNavigation()}
+        navigation={{ sectionNavigation: mockLandingSectionNavigation() }}
       >
         <Story />
       </LandingPageLayout>

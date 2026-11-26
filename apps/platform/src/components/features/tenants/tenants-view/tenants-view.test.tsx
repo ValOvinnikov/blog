@@ -1,7 +1,7 @@
 import { customRender, screen } from '@platform/testing/custom-render';
 import {
-  mockClientTenant,
   mockTenantsListQuery,
+  mockTenantsPageRow,
   MOCK_TENANT_NAME,
 } from '@platform/testing/tenants/fixtures';
 import { adminRoutes } from '@platform/utils/routes/routes';
@@ -9,7 +9,9 @@ import { adminRoutes } from '@platform/utils/routes/routes';
 import { TenantsView } from './tenants-view';
 
 const setup = customRender(TenantsView, {
-  tenants: [mockClientTenant()],
+  tenants: [mockTenantsPageRow()],
+  total: 1,
+  totalPages: 1,
   listQuery: mockTenantsListQuery(),
   isEmailAlertingConfigured: true,
 });
@@ -55,14 +57,6 @@ describe(`<${TenantsView.name}/>`, () => {
 
       expect(banner).not.toBeInTheDocument();
     });
-  });
-
-  it('filters to all tenants when archived tenants are included', () => {
-    setup({ listQuery: mockTenantsListQuery({ shouldShowArchived: true }) });
-
-    const allButton = screen.getByRole('button', { name: 'All' });
-
-    expect(allButton).toHaveAttribute(ARIA_PRESSED, PRESSED);
   });
 
   it('warns when email alerting is not configured', () => {

@@ -41,6 +41,7 @@ export const adminRoutes = {
     shouldShowArchived = false,
     sort = DEFAULT_TENANTS_SORT,
     search = '',
+    page = 1,
   }: Partial<TTenantsListQuery> = {}) => {
     const params = new URLSearchParams();
     if (shouldShowArchived) params.set('archived', ARCHIVED_PARAM_ON);
@@ -52,6 +53,7 @@ export const adminRoutes = {
       params.set('direction', sort.direction);
     }
     if (search) params.set('q', search);
+    if (page > 1) params.set('page', String(page));
     const query = params.toString();
     return query ? `/tenants?${query}` : '/tenants';
   },

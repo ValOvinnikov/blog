@@ -8,6 +8,7 @@ import {
 import { queries } from '@shinefold/db';
 import { errorResult, okResult } from '@shinefold/utils';
 import { toOutcome } from '@shinefold/utils/to-outcome';
+import { CACHE_CONTROL, CACHE_CONTROL_HEADER } from '@web/constants/http';
 import { resolveNewsletterLinkLocale } from '@web/server/newsletter/newsletter-link-locale/newsletter-link-locale';
 import { resolveWritableTenant } from '@web/server/tenant/write-gate/write-gate';
 import { MOCK_CONFIRMATION_TOKEN } from '@web/testing/server/newsletter/fixtures';
@@ -67,7 +68,9 @@ describe(GET, () => {
 
     expect(response.status).toBe(HTTP_STATUS.SEE_OTHER);
     expect(response.headers.get('location')).toBe(MOCK_CONFIRMED_LOCATION);
-    expect(response.headers.get('cache-control')).toBe('private, no-store');
+    expect(response.headers.get(CACHE_CONTROL_HEADER)).toBe(
+      CACHE_CONTROL.PRIVATE_NO_STORE,
+    );
     expect(confirmSubscriberMock).toHaveBeenCalledWith(
       MOCK_TENANT_ID,
       MOCK_CONFIRMATION_TOKEN,

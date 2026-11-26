@@ -4,6 +4,7 @@ import {
   TENANT_PLAN,
   TENANT_SORT_COLUMN,
 } from '@shinefold/config/constants';
+import type { TTenantsPageRow } from '@shinefold/db/queries/tenants/tenants-page-row';
 import * as schema from '@shinefold/db/schema';
 import type { TTenant } from '@shinefold/db/schema/tenants';
 import { insertTestTenant } from '@shinefold/db/testing/fixtures';
@@ -21,7 +22,7 @@ import {
   MOCK_SECOND_EXTRA_DOMAIN,
 } from '@shinefold/db/testing/tenants/tenant-list-fixtures';
 
-import { listTenantsPage, type TTenantsPageRow } from './list-tenants-page';
+import { listTenantsPage } from './list-tenants-page';
 
 vi.mock('@shinefold/db/client');
 
