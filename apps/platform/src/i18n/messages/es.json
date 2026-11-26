@@ -312,7 +312,9 @@
     },
     "manage": "Gestionar",
     "manageAriaLabel": "Gestionar {tenantName}",
-    "matchedDomain": "Coincide con {domain}"
+    "matchedDomain": "Coincide con {domain}",
+    "showing": "{from, number}–{to, number} de {count, number} {count, plural, one {cliente} other {clientes}}",
+    "count": "{count, plural, one {# cliente} other {# clientes}}"
   },
   "tenantsSearch": {
     "label": "Buscar clientes",
