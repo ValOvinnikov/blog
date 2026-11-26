@@ -8,6 +8,10 @@ import {
   mockStripePrice,
   MOCK_EURO_AMOUNT,
 } from '@shinefold/db/testing/stripe-catalogue/fixtures';
+import {
+  MOCK_ONE_HIGHLIGHT_PIECES,
+  toHeadingWords,
+} from '@shinefold/ui/testing/heading-pieces';
 import type { Meta, StoryObj } from '@storybook/nextjs-vite';
 import { MOCK_CTA_ACTIONS } from '@web/testing/modules/cta/fixtures';
 import {
@@ -165,6 +169,15 @@ export const WithFootnoteAndActions: TStory = {
 
 export const CenterAligned: TStory = {
   args: { contentAlignment: CONTENT_ALIGNMENT.CENTER },
+};
+
+export const HighlightedHeading: TStory = {
+  args: {
+    headingBlock: mockHeadingBlock({
+      heading: toHeadingWords(MOCK_ONE_HIGHLIGHT_PIECES),
+      headingPieces: MOCK_ONE_HIGHLIGHT_PIECES,
+    }),
+  },
 };
 
 export const Secondary: TStory = {

@@ -22,8 +22,11 @@ export const ModuleHeading = ({
   level,
   align,
 }: IModuleHeadingProps) => {
-  const { heading, supportingText } = headingBlock;
+  const { heading, headingPieces, supportingText } = headingBlock;
   const s = moduleHeadingVariants({ align });
+  const headingContent = headingPieces
+    ? { pieces: headingPieces }
+    : { children: heading };
 
   return (
     <div className={s.wrapper()}>
@@ -32,9 +35,8 @@ export const ModuleHeading = ({
         id={id}
         visual={TEXT_ROLE.SECTION_TITLE}
         className={s.heading()}
-      >
-        {heading}
-      </Heading>
+        {...headingContent}
+      />
       {supportingText && (
         <Text textRole={TEXT_ROLE.INTRO} className={s.supportingText()}>
           {supportingText}

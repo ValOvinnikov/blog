@@ -1,5 +1,10 @@
 import { faker } from '@faker-js/faker';
 import { BRAND_VARIANT, HERO_VARIANT } from '@shinefold/config';
+import {
+  MOCK_HIGHLIGHTED_PHRASE,
+  MOCK_ONE_HIGHLIGHT_PIECES,
+  toHeadingWords,
+} from '@shinefold/ui/testing/heading-pieces';
 import { customRender, screen } from '@web/testing/custom-render';
 import {
   MOCK_CTA_PRIMARY_ACTION,
@@ -20,7 +25,7 @@ const setup = customRender(HeroModuleShell, {
   brandVariant: BRAND_VARIANT.PRIMARY,
   presentation: mockHeroPresentation(),
   eyebrow: undefined,
-  title: MOCK_TITLE,
+  title: { heading: MOCK_TITLE },
   excerpt: undefined,
   layout: undefined,
   ctaButtons: [],
@@ -61,6 +66,37 @@ describe(`<${HeroModuleShell.name}/>`, () => {
       const image = screen.queryByRole('img');
 
       expect(image).not.toBeInTheDocument();
+    });
+  });
+
+  describe('with a highlighted title', () => {
+    const highlightedTitle = toHeadingWords(MOCK_ONE_HIGHLIGHT_PIECES);
+
+    beforeEach(() => {
+      setup({
+        title: {
+          heading: highlightedTitle,
+          headingPieces: MOCK_ONE_HIGHLIGHT_PIECES,
+        },
+      });
+    });
+
+    it('renders the highlighted phrase inside the top-level heading', () => {
+      const heading = screen.getByRole('heading', { level: 1 });
+      const phrase = screen.getByText(MOCK_HIGHLIGHTED_PHRASE);
+
+      expect(heading).toContainElement(phrase);
+    });
+
+    it('names the heading and the section with the plain words', () => {
+      const heading = screen.getByRole('heading', {
+        level: 1,
+        name: highlightedTitle,
+      });
+      const section = screen.getByRole('region', { name: highlightedTitle });
+
+      expect(heading).toBeVisible();
+      expect(section).toBeVisible();
     });
   });
 

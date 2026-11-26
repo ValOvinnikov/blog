@@ -39,7 +39,7 @@ export const HeroProfileModuleView = ({
     layout,
   } = module;
   const { variant } = presentation;
-  const { heading, supportingText } = headingBlock;
+  const { supportingText } = headingBlock;
   const isBanner = variant === HERO_VARIANT.BANNER;
 
   return (
@@ -47,7 +47,7 @@ export const HeroProfileModuleView = ({
       brandVariant={brandVariant}
       presentation={presentation}
       eyebrow={eyebrow}
-      title={heading}
+      title={headingBlock}
       excerpt={supportingText}
       layout={layout}
       dataTestId={`hero-profile-module-${id}`}
