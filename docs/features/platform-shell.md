@@ -99,7 +99,13 @@ URLs carry no locale prefix (next-intl `localePrefix: 'never'`).
   "Show less", and it opens collapsed on every load. On a phone the tiles are
   one row that swipes sideways, with no "Show all". Pinning and unpinning
   update the toggle and the tiles at once and keep the page, sort and search;
-  a save that fails is undone on screen with a toast. A pinned tenant keeps
+  a save that fails is undone on screen with a toast. A saved change is
+  announced to assistive technology ("Pinned <name>" / "Unpinned <name>"), and
+  the section heading reads as "N pinned tenants". When a tile's own unpin
+  button removes it, keyboard focus moves to the next tile's unpin button,
+  else the previous one's, else the table's search field; collapsing never
+  leaves focus on a hidden tile. One Server Action, `setTenantPinAction`,
+  saves both directions. A pinned tenant keeps
   its normal place in the table. An archived one has no tile; its pin is
   kept, so the tile returns if the tenant is restored.
 - **Operator tenant view**: `/tenants/{id}` and its Look, Voice, Features,
