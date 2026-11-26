@@ -1,6 +1,7 @@
 import { TenantsView } from '@platform/components/features/tenants/tenants-view';
 import { requireAdmin } from '@platform/server/auth/require-admin';
 import { pageMetadata } from '@platform/server/page-metadata/page-metadata';
+import { loadPinnedTenants } from '@platform/server/tenants/load-pinned-tenants';
 import { loadTenantsPage } from '@platform/server/tenants/load-tenants-page';
 import {
   parseTenantsListQuery,
@@ -19,14 +20,18 @@ type TProps = {
 };
 
 export default async function TenantsPage({ searchParams }: TProps) {
-  await requireAdmin();
+  const admin = await requireAdmin();
 
   const listQuery = parseTenantsListQuery(await searchParams);
-  const { rows, total, totalPages } = await loadTenantsPage(listQuery);
+  const [{ rows, total, totalPages }, pinnedTenants] = await Promise.all([
+    loadTenantsPage(listQuery),
+    loadPinnedTenants(admin.id),
+  ]);
 
   return (
     <TenantsView
       tenants={rows}
+      pinnedTenants={pinnedTenants}
       total={total}
       totalPages={totalPages}
       listQuery={listQuery}

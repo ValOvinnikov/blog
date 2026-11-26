@@ -316,6 +316,14 @@
     "showing": "{from, number}–{to, number} of {count, number} {count, plural, one {tenant} other {tenants}}",
     "count": "{count, plural, one {# tenant} other {# tenants}}"
   },
+  "pinnedTenants": {
+    "title": "Pinned",
+    "showAll": "Show all {count}",
+    "showLess": "Show less",
+    "pinAriaLabel": "Pin {name}",
+    "unpinAriaLabel": "Unpin {name}",
+    "saveFailed": "Couldn’t save the pin for {name}. Try again."
+  },
   "tenantsSearch": {
     "label": "Search tenants",
     "hint": "Name or domain.",

@@ -10,6 +10,7 @@ import { TenantsView } from './tenants-view';
 
 const setup = customRender(TenantsView, {
   tenants: [mockTenantsPageRow()],
+  pinnedTenants: [],
   total: 1,
   totalPages: 1,
   listQuery: mockTenantsListQuery(),

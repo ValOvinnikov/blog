@@ -316,6 +316,14 @@
     "showing": "{from, number}–{to, number} sur {count, number} {count, plural, one {locataire} other {locataires}}",
     "count": "{count, plural, one {# locataire} other {# locataires}}"
   },
+  "pinnedTenants": {
+    "title": "Épinglés",
+    "showAll": "Tout afficher ({count})",
+    "showLess": "Afficher moins",
+    "pinAriaLabel": "Épingler {name}",
+    "unpinAriaLabel": "Désépingler {name}",
+    "saveFailed": "Impossible d’enregistrer l’épingle de {name}. Réessayez."
+  },
   "tenantsSearch": {
     "label": "Rechercher des locataires",
     "hint": "Nom ou domaine.",

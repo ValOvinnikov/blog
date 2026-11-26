@@ -316,6 +316,14 @@
     "showing": "{from, number}–{to, number} de {count, number} {count, plural, one {cliente} other {clientes}}",
     "count": "{count, plural, one {# cliente} other {# clientes}}"
   },
+  "pinnedTenants": {
+    "title": "Fijados",
+    "showAll": "Mostrar los {count}",
+    "showLess": "Mostrar menos",
+    "pinAriaLabel": "Fijar {name}",
+    "unpinAriaLabel": "Dejar de fijar {name}",
+    "saveFailed": "No se pudo guardar el fijado de {name}. Vuelve a intentarlo."
+  },
   "tenantsSearch": {
     "label": "Buscar clientes",
     "hint": "Nombre o dominio.",

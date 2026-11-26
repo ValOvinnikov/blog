@@ -316,6 +316,14 @@
     "showing": "{from, number}–{to, number} van {count, number} {count, plural, one {tenant} other {tenants}}",
     "count": "{count, plural, one {# tenant} other {# tenants}}"
   },
+  "pinnedTenants": {
+    "title": "Vastgezet",
+    "showAll": "Toon alle {count}",
+    "showLess": "Toon minder",
+    "pinAriaLabel": "{name} vastzetten",
+    "unpinAriaLabel": "{name} losmaken",
+    "saveFailed": "De pin van {name} kon niet worden opgeslagen. Probeer het opnieuw."
+  },
   "tenantsSearch": {
     "label": "Tenants zoeken",
     "hint": "Naam of domein.",

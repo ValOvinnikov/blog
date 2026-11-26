@@ -1,6 +1,6 @@
 import 'server-only';
 
-import { TENANT_LOG } from '@platform/constants/tenant';
+import { TENANT_LOG, TENANTS_LIST_ROUTE } from '@platform/constants/tenant';
 import { recordAuditEvent } from '@platform/server/audit/record-audit-event';
 import type { TOwnerAccessRequestResult } from '@platform/server/owner-access/request-owner-access';
 import { revalidateSiteConfig } from '@platform/server/site-config/revalidate-site-config';
@@ -24,8 +24,6 @@ import type { TTenant } from '@shinefold/db/schema/tenants';
 import { isUndefined } from '@shinefold/utils/primitives';
 import { revalidatePath } from 'next/cache';
 import { after } from 'next/server';
-
-const TENANTS_LIST_ROUTE = '/[locale]/(operator)/tenants';
 
 type TTenantDetailsUpdate = Extract<
   TUpdateTenantDetailsResult,
