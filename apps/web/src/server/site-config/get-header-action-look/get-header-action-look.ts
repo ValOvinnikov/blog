@@ -1,14 +1,10 @@
-import type {
-  THeaderActionPhonePlacement,
-  THeaderActionStyle,
-} from '@shinefold/config';
+import type { TPrimaryNavigationAction } from '@shinefold/ui/components/molecules/primary-navigation';
 import { HEADER_ACTION_LOG } from '@web/constants/header-action';
 import { getSiteConfigWithPreset } from '@web/server/site-config/get-site-config-with-preset/get-site-config-with-preset';
 
-type THeaderActionLook = {
-  style: THeaderActionStyle;
-  phonePlacement: THeaderActionPhonePlacement;
-};
+export type THeaderActionLook = Required<
+  Pick<TPrimaryNavigationAction, 'style' | 'phonePlacement'>
+>;
 
 export const getHeaderActionLook = async (
   tenant?: string,

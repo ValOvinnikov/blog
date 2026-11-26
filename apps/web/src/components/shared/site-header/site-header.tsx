@@ -1,6 +1,6 @@
 import { getEnabledOAuthProviderIds } from '@shinefold/auth/utils/oauth-providers/oauth-providers';
 import { ACCOUNT_PHONE_PLACEMENT, CAPABILITY } from '@shinefold/config';
-import { service } from '@shinefold/service';
+import { service, type TNavigation } from '@shinefold/service';
 import { Header } from '@shinefold/ui/components/organisms/header';
 import { BrandLockupLink } from '@web/components/shared/brand-lockup-link';
 import { LanguageSwitcher } from '@web/components/shared/language-switcher';
@@ -26,6 +26,12 @@ import { logger } from '@web/utils/logger/logger';
 
 import { AuthMenu } from './components/auth-menu/auth-menu';
 import { StickyHeaderFrame } from './components/sticky-header-frame/sticky-header-frame';
+
+const EMPTY_NAVIGATION: TNavigation = {
+  items: [],
+  headerAction: undefined,
+  tagline: undefined,
+};
 
 export const SiteHeader = async () => {
   const {
@@ -69,12 +75,14 @@ export const SiteHeader = async () => {
     });
   }
 
-  const navItems = navResult.ok ? navResult.data.items : [];
-  const tagline = navResult.ok ? navResult.data.tagline : undefined;
-  const headerAction = navResult.ok ? navResult.data.headerAction : undefined;
+  const {
+    items: navItems,
+    tagline,
+    headerAction,
+    showLanguageSwitcher,
+  } = navResult.ok ? navResult.data : EMPTY_NAVIGATION;
   const { layout, submenuStyle, barStyle, background } = headerStyle;
-  const hasLanguageSwitcher =
-    navResult.ok && navResult.data.showLanguageSwitcher === true;
+  const hasLanguageSwitcher = showLanguageSwitcher === true;
   const oauthProviderIds = getEnabledOAuthProviderIds(siteOAuthCredentials);
   const hasAccountInPhoneMenu =
     accountControl.phonePlacement === ACCOUNT_PHONE_PLACEMENT.MENU;
