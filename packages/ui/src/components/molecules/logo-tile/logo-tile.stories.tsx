@@ -6,9 +6,9 @@ import {
   EveryBrandBand,
   focusLastLink,
 } from '@shinefold/ui/testing/brand-bands';
-import { objectKeys } from '@shinefold/utils/primitives';
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import type { ReactNode } from 'react';
+import { keys } from 'remeda';
 
 import { LogoTile, type TLogoTileProps } from './logo-tile';
 import { logoTileVariants } from './logo-tile-variants';
@@ -24,7 +24,7 @@ const meta = {
   argTypes: {
     isInteractive: {
       control: 'select',
-      options: objectKeys(logoTileVariants.variants.isInteractive),
+      options: keys(logoTileVariants.variants.isInteractive),
     },
   },
   args: {

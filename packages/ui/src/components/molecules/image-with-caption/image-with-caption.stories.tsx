@@ -1,9 +1,11 @@
 import { IMAGE_LAYOUT } from '@shinefold/config';
-import { objectKeys } from '@shinefold/utils/primitives';
 import type { Meta, StoryObj } from '@storybook/react-vite';
+import { keys } from 'remeda';
 
 import { ImageWithCaption } from './image-with-caption';
 import { imageWithCaptionVariants } from './image-with-caption-variants';
+
+const WIDE_FRAME_CLASS = 'aspect-video w-full';
 
 const FillImage = () => (
   <img
@@ -27,7 +29,7 @@ const meta = {
   argTypes: {
     layout: {
       control: 'select',
-      options: objectKeys(imageWithCaptionVariants.variants.layout),
+      options: keys(imageWithCaptionVariants.variants.layout),
     },
   },
   args: {
@@ -55,7 +57,7 @@ export const FullBleed: TStory = {
 };
 
 export const FullBleedWideDesktop: TStory = {
-  args: { layout: IMAGE_LAYOUT.FULL_BLEED, className: 'aspect-video w-full' },
+  args: { layout: IMAGE_LAYOUT.FULL_BLEED, className: WIDE_FRAME_CLASS },
   globals: { viewport: 'wideDesktop' },
 };
 
@@ -72,7 +74,7 @@ const wrappedCopy = (
 );
 
 export const FloatLeft: TStory = {
-  args: { layout: IMAGE_LAYOUT.FLOAT_LEFT, className: 'aspect-video w-full' },
+  args: { layout: IMAGE_LAYOUT.FLOAT_LEFT, className: WIDE_FRAME_CLASS },
   render: (args) => (
     <div>
       <ImageWithCaption {...args} />
@@ -82,7 +84,7 @@ export const FloatLeft: TStory = {
 };
 
 export const FloatRight: TStory = {
-  args: { layout: IMAGE_LAYOUT.FLOAT_RIGHT, className: 'aspect-video w-full' },
+  args: { layout: IMAGE_LAYOUT.FLOAT_RIGHT, className: WIDE_FRAME_CLASS },
   render: (args) => (
     <div>
       <ImageWithCaption {...args} />

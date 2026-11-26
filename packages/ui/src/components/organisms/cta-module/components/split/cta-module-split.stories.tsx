@@ -12,8 +12,8 @@ import {
   mockCtaImage,
   mockCtaSlots,
 } from '@shinefold/ui/testing/organisms/cta-module/fixtures';
-import { objectKeys } from '@shinefold/utils/primitives';
 import type { Meta, StoryObj } from '@storybook/react-vite';
+import { keys } from 'remeda';
 
 const MEMBERSHIP_PITCH =
   'Members keep the archive open and ad-free, and get early access to new pieces.';
@@ -47,15 +47,15 @@ const meta = {
     },
     contentPosition: {
       control: 'select',
-      options: objectKeys(ctaModuleVariants.variants.position),
+      options: keys(ctaModuleVariants.variants.position),
     },
     contentAlignment: {
       control: 'select',
-      options: objectKeys(ctaModuleVariants.variants.alignment),
+      options: keys(ctaModuleVariants.variants.alignment),
     },
     mobileMediaOrder: {
       control: 'select',
-      options: objectKeys(ctaModuleVariants.variants.mobileMediaOrder),
+      options: keys(ctaModuleVariants.variants.mobileMediaOrder),
     },
   },
   args: {

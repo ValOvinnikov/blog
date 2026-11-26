@@ -14,8 +14,8 @@ import {
 } from '@shinefold/ui/testing/busy-styles';
 import { ButtonShapes } from '@shinefold/ui/testing/button-shapes';
 import { ReducedMotion } from '@shinefold/ui/testing/reduced-motion';
-import { objectKeys } from '@shinefold/utils/primitives';
 import type { Meta, StoryObj } from '@storybook/react-vite';
+import { keys } from 'remeda';
 import { within } from 'storybook/test';
 
 import { Button } from './button';
@@ -28,11 +28,11 @@ const meta: Meta<typeof Button> = {
   argTypes: {
     variant: {
       control: 'select',
-      options: objectKeys(buttonVariants.variants.variant),
+      options: keys(buttonVariants.variants.variant),
     },
     size: {
       control: 'select',
-      options: objectKeys(buttonVariants.variants.size),
+      options: keys(buttonVariants.variants.size),
     },
     busyStyle: {
       control: 'select',
@@ -179,7 +179,7 @@ export const Busy: TStory = {
   },
 };
 
-const BUTTON_VARIANTS = objectKeys(buttonVariants.variants.variant);
+const BUTTON_VARIANTS = keys(buttonVariants.variants.variant);
 
 const BusyStyles = () => (
   <div className="flex flex-col gap-4">

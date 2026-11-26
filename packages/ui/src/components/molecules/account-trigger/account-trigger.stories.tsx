@@ -1,7 +1,7 @@
 import { ACCOUNT_BUTTON_STYLE } from '@shinefold/config';
 import { HeaderControlShapes } from '@shinefold/ui/testing/header-control-shapes';
-import { objectKeys } from '@shinefold/utils/primitives';
 import type { Meta, StoryObj } from '@storybook/react-vite';
+import { keys } from 'remeda';
 import { fn } from 'storybook/test';
 
 import { AccountTrigger } from './account-trigger';
@@ -22,7 +22,7 @@ const meta = {
   argTypes: {
     appearance: {
       control: 'select',
-      options: objectKeys(accountTriggerVariants.variants.appearance),
+      options: keys(accountTriggerVariants.variants.appearance),
     },
   },
   args: {

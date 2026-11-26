@@ -1,6 +1,7 @@
+import { MEDIA_RATIO } from '@shinefold/config';
 import { mediaFrameVariants } from '@shinefold/ui/components/atoms/media-frame/media-frame-variants';
-import { objectKeys } from '@shinefold/utils/primitives';
 import type { Meta, StoryObj } from '@storybook/react-vite';
+import { keys } from 'remeda';
 
 import { ConsentPlaceholder } from './consent-placeholder';
 
@@ -14,7 +15,7 @@ const meta = {
     allowLabel: 'Allow YouTube',
     settingsLabel: 'Cookie settings',
     scopeNote: 'Applies to every video, map and booking widget on this site.',
-    ratio: 'video',
+    ratio: MEDIA_RATIO.VIDEO,
     onAllow: () => {},
     onOpenSettings: () => {},
     className: 'w-96',
@@ -22,7 +23,7 @@ const meta = {
   argTypes: {
     ratio: {
       control: 'select',
-      options: objectKeys(mediaFrameVariants.variants.ratio),
+      options: keys(mediaFrameVariants.variants.ratio),
     },
   },
 } satisfies Meta<typeof ConsentPlaceholder>;

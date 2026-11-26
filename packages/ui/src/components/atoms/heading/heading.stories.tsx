@@ -5,8 +5,8 @@ import {
   MOCK_ONE_HIGHLIGHT_PIECES,
   MOCK_TWO_HIGHLIGHT_PIECES,
 } from '@shinefold/ui/testing/heading-pieces';
-import { objectKeys } from '@shinefold/utils/primitives';
 import type { Meta, StoryObj } from '@storybook/react-vite';
+import { keys } from 'remeda';
 
 import { Heading } from './heading';
 import { headingVariants } from './heading-variants';
@@ -18,7 +18,7 @@ const meta: Meta<typeof Heading> = {
   argTypes: {
     visual: {
       control: 'select',
-      options: objectKeys(headingVariants.variants.visual),
+      options: keys(headingVariants.variants.visual),
     },
     level: {
       control: 'select',

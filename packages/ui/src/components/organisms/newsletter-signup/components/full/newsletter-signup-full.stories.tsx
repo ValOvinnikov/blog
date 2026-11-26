@@ -15,8 +15,8 @@ import {
   SPINNER_VARIANTS,
 } from '@shinefold/ui/testing/busy-styles';
 import { makeNewsletterSignupForm } from '@shinefold/ui/testing/organisms/newsletter-signup/fixtures';
-import { objectKeys } from '@shinefold/utils/primitives';
 import type { Meta, StoryObj } from '@storybook/react-vite';
+import { keys } from 'remeda';
 
 faker.seed(123);
 
@@ -41,7 +41,7 @@ const meta = {
   argTypes: {
     align: {
       control: 'select',
-      options: objectKeys(newsletterSignupVariants.variants.align),
+      options: keys(newsletterSignupVariants.variants.align),
     },
   },
   args: {

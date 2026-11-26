@@ -19,8 +19,8 @@ import {
   MOCK_TWO_HIGHLIGHT_PIECES,
   toHeadingWords,
 } from '@shinefold/ui/testing/heading-pieces';
-import { objectKeys } from '@shinefold/utils/primitives';
 import type { Meta, StoryObj } from '@storybook/react-vite';
+import { keys } from 'remeda';
 
 import { Hero } from './hero';
 import { heroVariants } from './hero-variants';
@@ -110,11 +110,11 @@ const meta = {
   argTypes: {
     variant: {
       control: 'select',
-      options: objectKeys(heroVariants.variants.variant),
+      options: keys(heroVariants.variants.variant),
     },
     tone: {
       control: 'select',
-      options: objectKeys(BRAND_VARIANT),
+      options: keys(BRAND_VARIANT),
     },
   },
   args: {

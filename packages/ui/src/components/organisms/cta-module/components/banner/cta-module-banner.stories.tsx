@@ -13,8 +13,8 @@ import {
   mockCtaImage,
   mockCtaSlots,
 } from '@shinefold/ui/testing/organisms/cta-module/fixtures';
-import { objectKeys } from '@shinefold/utils/primitives';
 import type { Meta, StoryObj } from '@storybook/react-vite';
+import { keys } from 'remeda';
 
 const BANNER_COPY = {
   eyebrow: 'Get the book',
@@ -37,19 +37,19 @@ const meta = {
     },
     contentPosition: {
       control: 'select',
-      options: objectKeys(ctaModuleVariants.variants.position),
+      options: keys(ctaModuleVariants.variants.position),
     },
     contentAlignment: {
       control: 'select',
-      options: objectKeys(ctaModuleVariants.variants.alignment),
+      options: keys(ctaModuleVariants.variants.alignment),
     },
     spacingTop: {
       control: 'select',
-      options: objectKeys(SPACING_SCALE),
+      options: keys(SPACING_SCALE),
     },
     spacingBottom: {
       control: 'select',
-      options: objectKeys(SPACING_SCALE),
+      options: keys(SPACING_SCALE),
     },
   },
   args: {
@@ -129,8 +129,8 @@ export const PositionBySpacing: TStory = {
   parameters: { layout: 'fullscreen' },
   render: (args) => (
     <div className="flex flex-col gap-10">
-      {objectKeys(ctaModuleVariants.variants.position).map((position) =>
-        objectKeys(SPACING_SCALE).map((spacing) => (
+      {keys(ctaModuleVariants.variants.position).map((position) =>
+        keys(SPACING_SCALE).map((spacing) => (
           <CtaModule.Banner
             key={`${position}-${spacing}`}
             {...args}
@@ -150,8 +150,8 @@ export const MismatchedPositionAndAlignment: TStory = {
   parameters: { layout: 'fullscreen' },
   render: (args) => (
     <div className="flex flex-col gap-10">
-      {objectKeys(ctaModuleVariants.variants.position).map((position) =>
-        objectKeys(ctaModuleVariants.variants.alignment)
+      {keys(ctaModuleVariants.variants.position).map((position) =>
+        keys(ctaModuleVariants.variants.alignment)
           .filter((alignment) => alignment !== position)
           .map((alignment) => (
             <CtaModule.Banner

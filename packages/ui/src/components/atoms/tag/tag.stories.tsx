@@ -1,6 +1,6 @@
 import { ButtonShapes } from '@shinefold/ui/testing/button-shapes';
-import { objectKeys } from '@shinefold/utils/primitives';
 import type { Meta, StoryObj } from '@storybook/react-vite';
+import { keys } from 'remeda';
 
 import { Tag } from './tag';
 import { tagVariants } from './tag-variants';
@@ -12,7 +12,7 @@ const meta: Meta<typeof Tag> = {
   argTypes: {
     variant: {
       control: 'select',
-      options: objectKeys(tagVariants.variants.variant),
+      options: keys(tagVariants.variants.variant),
     },
   },
 };

@@ -1,6 +1,6 @@
 import { buttonVariants } from '@shinefold/ui/components/atoms/button/button-variants';
-import { objectKeys } from '@shinefold/utils/primitives';
 import type { Meta, StoryObj } from '@storybook/react-vite';
+import { keys } from 'remeda';
 
 import { LinkButton } from './link-button';
 
@@ -11,7 +11,7 @@ const meta: Meta<typeof LinkButton> = {
   argTypes: {
     size: {
       control: 'select',
-      options: objectKeys(buttonVariants.variants.size),
+      options: keys(buttonVariants.variants.size),
     },
   },
   args: {

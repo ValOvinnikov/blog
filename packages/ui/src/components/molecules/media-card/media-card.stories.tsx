@@ -18,8 +18,8 @@ import {
   InCardStyle,
 } from '@shinefold/ui/testing/card-styles';
 import { inNarrowColumn, threeAcross } from '@shinefold/ui/testing/card-widths';
-import { objectKeys } from '@shinefold/utils/primitives';
 import type { Meta, StoryObj } from '@storybook/react-vite';
+import { keys } from 'remeda';
 
 import { MediaCard } from './media-card';
 import { mediaCardVariants } from './media-card-variants';
@@ -63,7 +63,7 @@ const meta = {
   argTypes: {
     align: {
       control: 'select',
-      options: objectKeys(mediaCardVariants.variants.align),
+      options: keys(mediaCardVariants.variants.align),
     },
   },
   args: {

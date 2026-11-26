@@ -50,6 +50,7 @@
     "prettier": "catalog:",
     "react": "catalog:",
     "react-dom": "catalog:",
+    "remeda": "catalog:",
     "storybook": "catalog:",
     "typescript": "catalog:",
     "vite-plugin-svgr": "catalog:",

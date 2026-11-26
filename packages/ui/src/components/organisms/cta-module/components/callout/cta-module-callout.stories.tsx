@@ -8,8 +8,8 @@ import {
   mockCtaImage,
   mockCtaSlots,
 } from '@shinefold/ui/testing/organisms/cta-module/fixtures';
-import { objectKeys } from '@shinefold/utils/primitives';
 import type { Meta, StoryObj } from '@storybook/react-vite';
+import { keys } from 'remeda';
 
 const CALLOUT_COPY = {
   eyebrow: 'Newsletter',
@@ -30,7 +30,7 @@ const meta = {
     },
     contentAlignment: {
       control: 'select',
-      options: objectKeys(ctaModuleVariants.variants.alignment),
+      options: keys(ctaModuleVariants.variants.alignment),
     },
   },
   args: {

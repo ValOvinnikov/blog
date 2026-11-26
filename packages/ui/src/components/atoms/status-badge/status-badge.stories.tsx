@@ -1,5 +1,5 @@
-import { objectKeys } from '@shinefold/utils/primitives';
 import type { Meta, StoryObj } from '@storybook/react-vite';
+import { keys } from 'remeda';
 
 import { StatusBadge } from './status-badge';
 import { statusBadgeVariants } from './status-badge-variants';
@@ -11,7 +11,7 @@ const meta = {
   argTypes: {
     tone: {
       control: 'select',
-      options: objectKeys(statusBadgeVariants.variants.tone),
+      options: keys(statusBadgeVariants.variants.tone),
     },
   },
   args: {

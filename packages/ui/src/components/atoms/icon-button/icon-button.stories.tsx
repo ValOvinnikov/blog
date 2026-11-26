@@ -9,9 +9,9 @@ import { Icon } from '@shinefold/ui/components/atoms/icon';
 import { EveryBrandBand } from '@shinefold/ui/testing/brand-bands';
 import { ButtonShapes } from '@shinefold/ui/testing/button-shapes';
 import { HeaderControlShapes } from '@shinefold/ui/testing/header-control-shapes';
-import { objectKeys } from '@shinefold/utils/primitives';
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import type { CSSProperties } from 'react';
+import { keys } from 'remeda';
 import { within } from 'storybook/test';
 
 import { IconButton } from './icon-button';
@@ -24,7 +24,7 @@ const meta = {
   argTypes: {
     variant: {
       control: 'select',
-      options: objectKeys(iconButtonVariants.variants.variant),
+      options: keys(iconButtonVariants.variants.variant),
     },
   },
   args: {

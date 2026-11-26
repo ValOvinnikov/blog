@@ -1,5 +1,6 @@
-import { objectKeys } from '@shinefold/utils/primitives';
+import { MEDIA_RATIO } from '@shinefold/config';
 import type { Meta, StoryObj } from '@storybook/react-vite';
+import { keys } from 'remeda';
 
 import { MediaFrame } from './media-frame';
 import { mediaFrameVariants } from './media-frame-variants';
@@ -23,18 +24,18 @@ const meta = {
   component: MediaFrame,
   tags: ['autodocs'],
   args: {
-    ratio: 'video',
+    ratio: MEDIA_RATIO.VIDEO,
     className: 'w-96',
     children: <FillImage />,
   },
   argTypes: {
     ratio: {
       control: 'select',
-      options: objectKeys(mediaFrameVariants.variants.ratio),
+      options: keys(mediaFrameVariants.variants.ratio),
     },
     shape: {
       control: 'select',
-      options: objectKeys(mediaFrameVariants.variants.shape),
+      options: keys(mediaFrameVariants.variants.shape),
     },
   },
 } satisfies Meta<typeof MediaFrame>;
@@ -49,15 +50,15 @@ export const Square: TStory = {
 };
 
 export const Portrait: TStory = {
-  args: { ratio: 'portrait', className: 'w-48' },
+  args: { ratio: MEDIA_RATIO.PORTRAIT, className: 'w-48' },
 };
 
 export const Classic: TStory = {
-  args: { ratio: 'classic', className: 'w-96' },
+  args: { ratio: MEDIA_RATIO.CLASSIC, className: 'w-96' },
 };
 
 export const Vertical: TStory = {
-  args: { ratio: 'vertical', className: 'w-48' },
+  args: { ratio: MEDIA_RATIO.VERTICAL, className: 'w-48' },
 };
 
 export const Circle: TStory = {

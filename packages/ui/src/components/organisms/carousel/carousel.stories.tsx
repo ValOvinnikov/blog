@@ -1,7 +1,7 @@
 import { faker } from '@faker-js/faker';
 import { CONTENT_ALIGNMENT } from '@shinefold/config';
-import { objectKeys } from '@shinefold/utils/primitives';
 import type { Meta, StoryObj } from '@storybook/react-vite';
+import { keys } from 'remeda';
 
 import { Carousel } from './carousel';
 import { carouselVariants } from './carousel-variants';
@@ -74,11 +74,11 @@ const meta = {
   argTypes: {
     slideSize: {
       control: 'select',
-      options: objectKeys(carouselVariants.variants.slideSize),
+      options: keys(carouselVariants.variants.slideSize),
     },
     contentAlignment: {
       control: 'select',
-      options: objectKeys(carouselVariants.variants.alignment),
+      options: keys(carouselVariants.variants.alignment),
     },
   },
   args: {
