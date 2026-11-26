@@ -14,6 +14,8 @@ import {
   FONT_CHOICE,
   FOOTER_LAYOUT,
   FOOTER_SURFACE,
+  HEADER_ACTION_PHONE_PLACEMENT,
+  HEADER_ACTION_STYLE,
   HEADER_BAR_STYLE,
   HEADER_CONTROL_SHAPE,
   HEADER_CONTROL_STYLE,
@@ -41,12 +43,7 @@ const hueSchema = z.number().int().min(HUE_MIN).max(HUE_MAX);
 
 const hexColorSchema = z.string().trim().refine(isHexColor);
 
-// A field absent from the input is left untouched on `UPDATE` and takes the
-// preset's value on `INSERT`: Look and Voice save separately, and a plan may
-// keep a Look field from being written. The nullable fields accept an
-// explicit `null` to clear them, since `undefined` alone can't express
-// "unset this". A Voice save replaces the map of each locale it
-// carries (even with `{}`) and leaves every other locale's map untouched.
+// An absent field is left untouched on `UPDATE` and takes the preset's value on `INSERT`.
 export const updateSiteConfigInputSchema = z.object({
   preset: z.enum(PRESET_ID),
   accentHue: hueSchema.optional(),
@@ -59,6 +56,8 @@ export const updateSiteConfigInputSchema = z.object({
   cardStyle: z.enum(CARD_STYLE).optional(),
   headerControlStyle: z.enum(HEADER_CONTROL_STYLE).optional(),
   headerControlShape: z.enum(HEADER_CONTROL_SHAPE).optional(),
+  headerActionStyle: z.enum(HEADER_ACTION_STYLE).optional(),
+  headerActionPhonePlacement: z.enum(HEADER_ACTION_PHONE_PLACEMENT).optional(),
   accountButtonStyle: z.enum(ACCOUNT_BUTTON_STYLE).optional(),
   accountPanelStyle: z.enum(ACCOUNT_PANEL_STYLE).optional(),
   accountPhonePlacement: z.enum(ACCOUNT_PHONE_PLACEMENT).optional(),

@@ -14,6 +14,8 @@ import {
   FONT_CHOICE,
   FOOTER_LAYOUT,
   FOOTER_SURFACE,
+  HEADER_ACTION_PHONE_PLACEMENT,
+  HEADER_ACTION_STYLE,
   HEADER_BAR_STYLE,
   HEADER_CONTROL_SHAPE,
   HEADER_CONTROL_STYLE,
@@ -62,6 +64,8 @@ const STORED_LOOK: TLook = {
   cardStyle: CARD_STYLE.ACCENT_BAR,
   headerControlStyle: HEADER_CONTROL_STYLE.PLAIN,
   headerControlShape: HEADER_CONTROL_SHAPE.SQUARE,
+  headerActionStyle: HEADER_ACTION_STYLE.OUTLINED,
+  headerActionPhonePlacement: HEADER_ACTION_PHONE_PLACEMENT.BAR,
   accountButtonStyle: ACCOUNT_BUTTON_STYLE.CIRCLE,
   accountPanelStyle: ACCOUNT_PANEL_STYLE.HUB,
   accountPhonePlacement: ACCOUNT_PHONE_PLACEMENT.MENU,
@@ -119,6 +123,8 @@ describe(toEffectiveLookWithin, () => {
       cardStyle: CARD_STYLE.OUTLINED,
       headerControlStyle: HEADER_CONTROL_STYLE.OUTLINED,
       headerControlShape: HEADER_CONTROL_SHAPE.ROUND,
+      headerActionStyle: HEADER_ACTION_STYLE.FILLED,
+      headerActionPhonePlacement: HEADER_ACTION_PHONE_PLACEMENT.MENU,
       accountButtonStyle: ACCOUNT_BUTTON_STYLE.PILL,
       accountPanelStyle: ACCOUNT_PANEL_STYLE.CARD,
       accountPhonePlacement: ACCOUNT_PHONE_PLACEMENT.BAR,
@@ -153,13 +159,26 @@ describe(toEffectiveLookWithin, () => {
     [TENANT_PLAN.FREE, FREE],
     [TENANT_PLAN.STARTER, STARTER],
   ] as const)(
-    'renders Reader chooses on %s whatever colour mode is stored',
+    "returns Reader chooses and the preset's header action on %s whatever is stored",
     (_, entitlements) => {
-      const { preset, colorMode } = STORED_LOOK;
+      const {
+        preset,
+        colorMode,
+        headerActionStyle,
+        headerActionPhonePlacement,
+      } = STORED_LOOK;
 
       expect(
-        toEffectiveLookWithin({ preset, colorMode }, entitlements),
-      ).toEqual({ preset, colorMode: COLOR_MODE.READER });
+        toEffectiveLookWithin(
+          { preset, colorMode, headerActionStyle, headerActionPhonePlacement },
+          entitlements,
+        ),
+      ).toEqual({
+        preset,
+        colorMode: COLOR_MODE.READER,
+        headerActionStyle: HEADER_ACTION_STYLE.FILLED,
+        headerActionPhonePlacement: HEADER_ACTION_PHONE_PLACEMENT.MENU,
+      });
     },
   );
 

@@ -39,18 +39,26 @@ export const TenantsTableRow = ({ tenant }: TTenantsTableRowProps) => {
   const tPlan = useTranslations('planNames');
   const locale = useLocale();
   const { tname, lines, name, domain, actions } = tenantsTableRowVariants();
+  const {
+    name: tenantName,
+    primaryDomain,
+    plan,
+    status,
+    createdAt,
+    matchedDomain,
+  } = tenant;
 
   return (
     <DataTableShell.Row>
       <DataTableShell.Cell column={TENANT_SORT_COLUMN.NAME}>
         <div className={tname()}>
-          <Avatar name={tenant.name} variant={AVATAR_VARIANT.TABLE} />
+          <Avatar name={tenantName} variant={AVATAR_VARIANT.TABLE} />
           <div className={lines()}>
-            <div className={name()}>{tenant.name}</div>
-            <div className={domain()}>{tenant.primaryDomain}</div>
-            {tenant.matchedDomain && (
+            <div className={name()}>{tenantName}</div>
+            <div className={domain()}>{primaryDomain}</div>
+            {matchedDomain && (
               <div className={domain()}>
-                {t('matchedDomain', { domain: tenant.matchedDomain })}
+                {t('matchedDomain', { domain: matchedDomain })}
               </div>
             )}
           </div>
@@ -58,17 +66,17 @@ export const TenantsTableRow = ({ tenant }: TTenantsTableRowProps) => {
       </DataTableShell.Cell>
       <DataTableShell.Cell column={TENANT_SORT_COLUMN.PLAN}>
         <StatusBadge tone={BADGE_TONE.PLAN} hasDot={false}>
-          {tPlan(tenant.plan)}
+          {tPlan(plan)}
         </StatusBadge>
       </DataTableShell.Cell>
       <DataTableShell.Cell column={TENANT_SORT_COLUMN.STATUS}>
-        <StatusBadge tone={tenantStatusTone(tenant.status)}>
-          {t(`status.${tenant.status}`)}
+        <StatusBadge tone={tenantStatusTone(status)}>
+          {t(`status.${status}`)}
         </StatusBadge>
       </DataTableShell.Cell>
       <DataTableShell.Cell column={TENANT_SORT_COLUMN.CREATED}>
-        <time dateTime={tenant.createdAt.toISOString()}>
-          {formatDate(tenant.createdAt, locale)}
+        <time dateTime={createdAt.toISOString()}>
+          {formatDate(createdAt, locale)}
         </time>
       </DataTableShell.Cell>
       <DataTableShell.Cell column={DATA_TABLE_COLUMN.ACTIONS}>
@@ -78,7 +86,7 @@ export const TenantsTableRow = ({ tenant }: TTenantsTableRowProps) => {
             href={tenantManageHref(tenant)}
             variant={BUTTON_VARIANT.SECONDARY}
             size={SIZE.SM}
-            ariaLabel={t('manageAriaLabel', { tenantName: tenant.name })}
+            ariaLabel={t('manageAriaLabel', { tenantName })}
             hasArrow={true}
           >
             {t('manage')}
