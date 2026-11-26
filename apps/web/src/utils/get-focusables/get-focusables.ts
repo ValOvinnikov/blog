@@ -8,8 +8,7 @@ const isInsideClosedDetails = (element: Element): boolean => {
   if (!closedDetails) return false;
 
   const isOwnSummary =
-    // eslint-disable-next-line shinefold-touched/prefer-shared-constant -- the <summary> element, not TWITTER_CARD.SUMMARY
-    element.matches('summary') && element.parentElement === closedDetails;
+    closedDetails.querySelector(':scope > summary') === element;
   return isOwnSummary ? isInsideClosedDetails(closedDetails) : true;
 };
 
