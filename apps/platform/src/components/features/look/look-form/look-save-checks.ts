@@ -45,8 +45,7 @@ export const lookInvalidControls = (
 
   return {
     ids: invalid.map((field) => fieldIds[field]),
-    revealFirst: () => {
-      if (first) revealInvalidField(CHECKED_ROWS[first]);
-    },
+    revealFirst: () =>
+      revealInvalidField(first ? CHECKED_ROWS[first] : LOOK_ROW.BRAND),
   };
 };
