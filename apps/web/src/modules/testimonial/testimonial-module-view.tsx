@@ -9,8 +9,9 @@ import { TestimonialCard } from '@web/modules/testimonial/components/testimonial
 import { TestimonialCarousel } from '@web/modules/testimonial/components/testimonial-carousel/testimonial-carousel';
 import { isLoneLastInRow } from '@web/utils/is-lone-last-in-row';
 import { moduleGridActionsVariants } from '@web/utils/module-grid-actions-variants';
-import { toCardAlign, toCenterOrLeftAlignment } from '@web/utils/to-card-align';
+import { toCardAlign } from '@web/utils/to-card-align';
 import { toCardGridColumns } from '@web/utils/to-card-grid-columns';
+import { toCenterOrLeftAlignment } from '@web/utils/to-center-or-left-alignment';
 import { toTestimonialGridColumns } from '@web/utils/to-testimonial-grid-columns';
 
 import { testimonialModuleViewVariants } from './testimonial-module-view-variants';

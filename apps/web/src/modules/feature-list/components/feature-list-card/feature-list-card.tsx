@@ -16,6 +16,7 @@ import {
   SQUARE_IMAGE_SIZE,
   WIDE_IMAGE_HEIGHT,
 } from '@web/utils/media-card-image-size';
+import type { TCardAlign } from '@web/utils/to-card-align';
 
 const CARD_IMAGE_SHAPE_TO_MEDIA_SHAPE: Record<
   TCardImageShape,
@@ -30,7 +31,7 @@ const CARD_IMAGE_SHAPE_TO_MEDIA_SHAPE: Record<
 export interface IFeatureListCardProps extends IWithDataTestId {
   item: TFeatureListItem;
   imageShape: TCardImageShape;
-  align: 'left' | 'center';
+  align: TCardAlign;
   imageSizes: string;
   headingLevel: THeadingLevel;
   hasAnyImage?: boolean;

@@ -1,5 +1,6 @@
 'use client';
 
+import type { TMaybeNull } from '@shinefold/config';
 import { hasLength, isNull } from '@shinefold/utils/primitives';
 import { useEffect, useState } from 'react';
 
@@ -7,8 +8,8 @@ import { useEffect, useState } from 'react';
  * `ids` need not be deduped or memoized by the caller — a fresh array
  * reference each render is safe.
  */
-export const useActiveHeadingId = (ids: string[]): string | null => {
-  const [activeId, setActiveId] = useState<string | null>(null);
+export const useActiveHeadingId = (ids: string[]): TMaybeNull<string> => {
+  const [activeId, setActiveId] = useState<TMaybeNull<string>>(null);
   const idsKey = ids.join('|');
 
   useEffect(() => {

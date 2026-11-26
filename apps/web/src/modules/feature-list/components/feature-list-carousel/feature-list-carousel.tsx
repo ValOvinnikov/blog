@@ -9,12 +9,13 @@ import type { TFeatureListItem } from '@shinefold/service';
 import type { ICarouselProps } from '@shinefold/ui/components/organisms/carousel';
 import { LabelledCarousel } from '@web/components/shared/labelled-carousel';
 import { FeatureListCard } from '@web/modules/feature-list/components/feature-list-card/feature-list-card';
+import type { TCardAlign } from '@web/utils/to-card-align';
 
 export interface IFeatureListCarouselProps
   extends IWithClassName, IWithDataTestId {
   items: TFeatureListItem[];
   imageShape: TCardImageShape;
-  align: 'left' | 'center';
+  align: TCardAlign;
   imageSizes: string;
   title: string;
   contentAlignment?: ICarouselProps<TFeatureListItem>['contentAlignment'];

@@ -31,12 +31,6 @@ const toVoicePortableText = (
   value: string | TVoicePortableText,
 ): TVoicePortableText => (isString(value) ? wrapVoiceText(value) : value);
 
-/**
- * Resolves every RICH voice field to its stored override, or the catalog
- * default at its registry path wrapped as a single paragraph when no
- * override exists — the shared source `resolveTenantMessages` and
- * `getVoiceRich` both build their RICH values from.
- */
 export const resolveVoiceRichFields = (
   overrides: Record<string, string | TVoicePortableText>,
   baseMessages: Record<string, unknown>,

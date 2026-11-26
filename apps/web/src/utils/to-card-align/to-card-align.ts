@@ -4,14 +4,8 @@ import {
   type TMaybeUndefined,
 } from '@shinefold/config';
 
-export const toCenterOrLeftAlignment = (
-  alignment: TMaybeUndefined<TContentAlignment>,
-): Extract<TContentAlignment, 'LEFT' | 'CENTER'> =>
-  alignment === CONTENT_ALIGNMENT.CENTER
-    ? CONTENT_ALIGNMENT.CENTER
-    : CONTENT_ALIGNMENT.LEFT;
+export type TCardAlign = 'center' | 'left';
 
 export const toCardAlign = (
   alignment: TMaybeUndefined<TContentAlignment>,
-): 'center' | 'left' =>
-  alignment === CONTENT_ALIGNMENT.CENTER ? 'center' : 'left';
+): TCardAlign => (alignment === CONTENT_ALIGNMENT.CENTER ? 'center' : 'left');

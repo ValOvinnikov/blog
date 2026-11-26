@@ -1,1 +1,1 @@
-export { toCardAlign, toCenterOrLeftAlignment } from './to-card-align';
+export { type TCardAlign, toCardAlign } from './to-card-align';

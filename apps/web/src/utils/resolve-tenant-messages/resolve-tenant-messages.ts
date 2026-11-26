@@ -38,9 +38,7 @@ const setAtPath = (
   }
 
   const child = target[key];
-  const childObject = isPlainObject(child)
-    ? (child as Record<string, unknown>)
-    : {};
+  const childObject = isPlainObject(child) ? child : {};
 
   return { ...target, [key]: setAtPath(childObject, rest, value) };
 };

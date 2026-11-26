@@ -15,6 +15,7 @@ import { SanityImage } from '@web/components/shared/sanity-image';
 import { SmartLink } from '@web/components/shared/smart-link';
 import { SocialLinks } from '@web/components/shared/social-links';
 import { CIRCLE_IMAGE_SIZE } from '@web/utils/media-card-image-size';
+import type { TCardAlign } from '@web/utils/to-card-align';
 
 import {
   teamMemberCardAvatarFallbackVariants,
@@ -27,7 +28,7 @@ const CAPPED_SQUARE_IMAGE_SIZE = 384;
 export interface ITeamMemberCardProps extends IWithClassName, IWithDataTestId {
   member: TTeamMember;
   imageShape: TTeamModule['imageShape'];
-  align: 'left' | 'center';
+  align: TCardAlign;
 }
 
 export const TeamMemberCard = ({
