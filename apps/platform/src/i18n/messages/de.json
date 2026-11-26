@@ -316,6 +316,17 @@
     "showing": "{from, number}–{to, number} von {count, number} {count, plural, one {Mandant} other {Mandanten}}",
     "count": "{count, plural, one {# Mandant} other {# Mandanten}}"
   },
+  "pinnedTenants": {
+    "title": "Angeheftet",
+    "titleAccessible": "{count, plural, one {# angehefteter Mandant} other {# angeheftete Mandanten}}",
+    "showAll": "Alle {count} anzeigen",
+    "showLess": "Weniger anzeigen",
+    "pinAriaLabel": "{name} anheften",
+    "unpinAriaLabel": "Anheftung von {name} aufheben",
+    "pinnedAnnouncement": "{name} angeheftet",
+    "unpinnedAnnouncement": "Anheftung von {name} aufgehoben",
+    "saveFailed": "Die Anheftung von {name} konnte nicht gespeichert werden. Versuchen Sie es erneut."
+  },
   "tenantsSearch": {
     "label": "Mandanten suchen",
     "hint": "Name oder Domain.",

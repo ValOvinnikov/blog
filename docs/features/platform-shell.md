@@ -86,6 +86,28 @@ URLs carry no locale prefix (next-intl `localePrefix: 'never'`).
   status, created date and a 44px-tall Manage. A long name or domain is cut
   with an ellipsis. Sorting is offered from `md` up only, where the table
   keeps its columns.
+- **Pinned tenants**, on `/tenants`: each operator keeps their own pins, and
+  nobody else sees them. Every row of a tenant that is not archived has a pin
+  toggle left of Manage ("Pin <name>" / "Unpin <name>", exposing its pressed
+  state); an archived tenant's row has none. The operator's
+  pins show as tiles in a "Pinned" section between the page header and the
+  table, absent when there are none: avatar, name, primary domain, plan and
+  status, in name order, whatever the table's page, sort or search. A tile
+  opens the same destination as that tenant's Manage button and carries its
+  own unpin button. Collapsed, the section is exactly one row of tiles; when
+  the pins do not fit, "Show all N" expands it to a wrapping grid and becomes
+  "Show less", and it opens collapsed on every load. On a phone the tiles are
+  one row that swipes sideways, with no "Show all". Pinning and unpinning
+  update the toggle and the tiles at once and keep the page, sort and search;
+  a save that fails is undone on screen with a toast. A saved change is
+  announced to assistive technology ("Pinned <name>" / "Unpinned <name>"), and
+  the section heading reads as "N pinned tenants". When a tile's own unpin
+  button removes it, keyboard focus moves to the next tile's unpin button,
+  else the previous one's, else the table's search field; collapsing never
+  leaves focus on a hidden tile. One Server Action, `setTenantPinAction`,
+  saves both directions. A pinned tenant keeps
+  its normal place in the table. An archived one has no tile; its pin is
+  kept, so the tile returns if the tenant is restored.
 - **Operator tenant view**: `/tenants/{id}` and its Look, Voice, Features,
   Languages, Domain, Email, Studio, Provisioning, Danger zone and Help pages.
   The sidebar shows the Platform section plus the tenant's own sections, ending
@@ -217,7 +239,9 @@ save still settles as the form's generic server error.
 ## Data
 
 - Neon: `admins` (role), `memberships` and `tenants`, read through
-  `@shinefold/db` queries; nothing is written except the cookies below.
+  `@shinefold/db` queries; the only table written is `pinned_tenants`, one
+  row per operator and pinned tenant (`queries.pinnedTenants`), alongside the
+  cookies below.
 - Cookies: `platform-active-tenant` (httpOnly, 30 days, set only by the
   select-tenant route), `platform-sidebar-collapsed` (client-written, one
   year; read server-side for the first render), `platform-theme` (the

@@ -5,6 +5,7 @@ import { FormField } from '@platform/components/shared/form-field';
 import { Icon } from '@platform/components/shared/icon';
 import { TextInput } from '@platform/components/shared/text-input';
 import { BUTTON_VARIANT } from '@platform/constants/button';
+import { TENANTS_SEARCH_INPUT_ID } from '@platform/constants/tenant';
 import type { TTenantsListQuery } from '@platform/utils/tenants-list-query/tenants-list-query';
 import { ICONS, SIZE } from '@shinefold/config';
 import { useTranslations } from 'next-intl';
@@ -36,7 +37,11 @@ export const TenantsSearch = ({ listQuery }: TTenantsSearchProps) => {
 
   return (
     <form role="search" className={root()} onSubmit={handleSubmit}>
-      <FormField label={t('label')} hint={t('hint')}>
+      <FormField
+        label={t('label')}
+        hint={t('hint')}
+        control={{ id: TENANTS_SEARCH_INPUT_ID }}
+      >
         <div className={control()}>
           <TextInput
             ref={inputRef}
