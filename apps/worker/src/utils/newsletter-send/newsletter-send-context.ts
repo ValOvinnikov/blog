@@ -7,6 +7,8 @@ import type { TFontChoice, TLocaleIsoCode } from '@shinefold/config/constants';
 import type { TMaybeUndefined } from '@shinefold/config/types';
 import { getEmailConfig } from '@shinefold/db/queries/email-config';
 import { getSiteConfig } from '@shinefold/db/queries/site-config';
+import { getTenantEntitlements } from '@shinefold/db/queries/tenant-entitlement-grants';
+import { toEffectiveLookWithin } from '@shinefold/db/utils/effective-look/effective-look';
 import { applyTenantSenderName, isValidEmailAddress } from '@shinefold/email';
 import { DEFAULT_NEWSLETTER_FROM_ADDRESS } from '@worker/constants/newsletter-send';
 import { loadTenant } from '@worker/units/run-reported-step';
@@ -46,8 +48,9 @@ export async function loadNewsletterSendContext(
     throw new FatalError(`Tenant "${tenantId}" has no site config.`);
   }
   const { name, locale } = tenant;
-  const { preset, accentHue, logoHue, headingFont, bodyFont } = siteConfig;
-  const brandInput = { preset, accentHue, logoHue };
+  const { preset, accentHue, logoHue, buttonColor, headingFont, bodyFont } =
+    toEffectiveLookWithin(siteConfig, await getTenantEntitlements(tenant));
+  const brandInput = { preset, accentHue, logoHue, buttonColor };
   const replyToAddress = emailConfig?.replyToAddress;
 
   return {
