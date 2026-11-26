@@ -4,12 +4,16 @@ import {
   SITE_MESSAGES_BY_LOCALE,
   type TLocaleIsoCode,
 } from '@shinefold/config';
-import { CACHE_CONTROL, ROBOTS_DIRECTIVE } from '@web/constants/http';
+import {
+  CACHE_CONTROL,
+  CACHE_CONTROL_HEADER,
+  ROBOTS_DIRECTIVE,
+} from '@web/constants/http';
 import { escapeXml } from '@web/utils/escape-xml';
 import { NextResponse } from 'next/server';
 
 const UNAVAILABLE_HEADERS = {
-  'Cache-Control': CACHE_CONTROL.PRIVATE_NO_STORE,
+  [CACHE_CONTROL_HEADER]: CACHE_CONTROL.PRIVATE_NO_STORE,
   'X-Robots-Tag': ROBOTS_DIRECTIVE.NOINDEX,
 };
 

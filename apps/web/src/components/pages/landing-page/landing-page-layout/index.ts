@@ -1,1 +1,4 @@
-export { LandingPageLayout } from './landing-page-layout';
+export {
+  LandingPageLayout,
+  type ILandingPageLayoutProps,
+} from './landing-page-layout';

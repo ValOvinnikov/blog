@@ -1,5 +1,10 @@
 import { TEXT_ROLE } from '@shinefold/config';
 import { HEADING_LEVELS } from '@shinefold/ui/lib/react';
+import { EveryBrandBand } from '@shinefold/ui/testing/brand-bands';
+import {
+  MOCK_ONE_HIGHLIGHT_PIECES,
+  MOCK_TWO_HIGHLIGHT_PIECES,
+} from '@shinefold/ui/testing/heading-pieces';
 import { objectKeys } from '@shinefold/utils/primitives';
 import type { Meta, StoryObj } from '@storybook/react-vite';
 
@@ -70,4 +75,34 @@ export const InArticleHierarchy: TStory = {
       </Heading>
     </div>
   ),
+};
+
+export const OneHighlightOnEveryBrandBand: TStory = {
+  args: {
+    level: 2,
+    visual: TEXT_ROLE.SECTION_TITLE,
+    pieces: MOCK_ONE_HIGHLIGHT_PIECES,
+  },
+  render: (args) => (
+    <EveryBrandBand>{() => <Heading {...args} />}</EveryBrandBand>
+  ),
+};
+
+export const OneHighlightOnEveryBrandBandDark: TStory = {
+  ...OneHighlightOnEveryBrandBand,
+  globals: { theme: 'dark' },
+};
+
+export const TwoHighlightsOnEveryBrandBand: TStory = {
+  ...OneHighlightOnEveryBrandBand,
+  args: {
+    level: 2,
+    visual: TEXT_ROLE.SECTION_TITLE,
+    pieces: MOCK_TWO_HIGHLIGHT_PIECES,
+  },
+};
+
+export const TwoHighlightsOnEveryBrandBandDark: TStory = {
+  ...TwoHighlightsOnEveryBrandBand,
+  globals: { theme: 'dark' },
 };

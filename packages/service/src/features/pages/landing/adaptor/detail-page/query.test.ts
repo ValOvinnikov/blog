@@ -41,6 +41,7 @@ const MOCK_LEGACY_SLUG = mockSlug();
 const MOCK_SECTION_SLUG = mockSlug();
 const MOCK_FAQ_SLUG = mockSlug();
 const MOCK_ANSWERS_SLUG = mockSlug();
+const MOCK_ANSWERS_NL_SLUG = mockSlug();
 const MOCK_SIDEBAR_TITLE = faker.lorem.words(2);
 const MOCK_FAQ_PATH = `${MOCK_SECTION_SLUG}/${MOCK_FAQ_SLUG}`;
 const MOCK_ANSWERS_PATH = `${MOCK_FAQ_PATH}/${MOCK_ANSWERS_SLUG}`;
@@ -335,6 +336,10 @@ describe('landingPageQuery', () => {
         language: NL,
       }),
       mockLandingDocument(MOCK_ANSWERS_SLUG, { parent: MOCK_FAQ_SLUG }),
+      mockLandingDocument(MOCK_ANSWERS_NL_SLUG, {
+        parent: MOCK_FAQ_SLUG,
+        language: NL,
+      }),
     ];
 
     function mockChainEntry(
@@ -349,6 +354,7 @@ describe('landingPageQuery', () => {
         sectionNavigation: false,
         sectionNavigationTitle: null,
         showPreviousNextLinks: true,
+        showSubPagesInNavigation: false,
         children: null,
         ...overrides,
       };
@@ -397,7 +403,7 @@ describe('landingPageQuery', () => {
       ]);
     });
 
-    it("returns a section root's children in drag order, in the page's language", async () => {
+    it("returns a section root's pages in drag order, in the page's language", async () => {
       expect(
         await runAtPath(dataset, [MOCK_SECTION_SLUG, MOCK_FAQ_SLUG]),
       ).toHaveProperty('sectionChain', [
@@ -416,6 +422,19 @@ describe('landingPageQuery', () => {
       expect(await runAtPath(switchedOff, [MOCK_SECTION_SLUG])).toHaveProperty(
         'sectionChain',
         [{ ...sectionRootEntry, showPreviousNextLinks: false }],
+      );
+    });
+
+    it("returns a section root's sub-pages switch as stored", async () => {
+      const switchedOn = dataset.map((document) =>
+        document._id === MOCK_SECTION_SLUG
+          ? { ...document, showSubPagesInNavigation: true }
+          : document,
+      );
+
+      expect(await runAtPath(switchedOn, [MOCK_SECTION_SLUG])).toHaveProperty(
+        'sectionChain',
+        [{ ...sectionRootEntry, showSubPagesInNavigation: true }],
       );
     });
   });

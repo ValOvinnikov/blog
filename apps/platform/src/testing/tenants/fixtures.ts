@@ -10,13 +10,14 @@ import {
 import type { TTenantOwnerMembership } from '@shinefold/db/queries/memberships';
 import type { TTenant } from '@shinefold/db/schema/tenants';
 
-import { mockReadyTenant, mockTenant } from './mock-tenant';
+import { mockTenant } from './mock-tenant';
 import { MOCK_TENANT_DOMAIN, MOCK_TENANT_NAME } from './tenant-identity';
 
 export * from './entitlement-grants';
 export * from './mock-tenant';
 export * from './provisioning-steps';
 export * from './tenant-identity';
+export * from './tenants-page-row';
 
 export const MOCK_TENANT_URL = `https://${MOCK_TENANT_DOMAIN}`;
 export const MOCK_VERCEL_A_RECORD = '76.76.21.21';
@@ -62,16 +63,13 @@ export const mockClientTenant = (
   overrides: Partial<TTenant> = {},
 ): TClientTenant => toClientTenant(mockTenant(overrides));
 
-export const mockReadyClientTenant = (
-  overrides: Partial<TTenant> = {},
-): TClientTenant => toClientTenant(mockReadyTenant(overrides));
-
 export const mockTenantsListQuery = (
   overrides: Partial<TTenantsListQuery> = {},
 ): TTenantsListQuery => ({
   shouldShowArchived: false,
   sort: DEFAULT_TENANTS_SORT,
   search: '',
+  page: 1,
   ...overrides,
 });
 

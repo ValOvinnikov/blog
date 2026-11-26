@@ -12,7 +12,7 @@ function descendants(levels: number): string {
 }
 
 function node(scope: string): string {
-  return `${scope}{ ${PAGE_FIELDS}, "sectionNavigation": coalesce(sectionNavigation, false), sectionNavigationTitle, "showPreviousNextLinks": coalesce(showPreviousNextLinks, true), "children": select(sectionNavigation == true => ${descendants(LANDING_PAGE_MAX_DEPTH - 1)}) }`;
+  return `${scope}{ ${PAGE_FIELDS}, "sectionNavigation": coalesce(sectionNavigation, false), sectionNavigationTitle, "showPreviousNextLinks": coalesce(showPreviousNextLinks, true), "showSubPagesInNavigation": coalesce(showSubPagesInNavigation, false), "children": select(sectionNavigation == true => ${descendants(LANDING_PAGE_MAX_DEPTH - 1)}) }`;
 }
 
 const scopes = Array.from({ length: LANDING_PAGE_MAX_DEPTH }, (_, hops) =>
@@ -44,6 +44,7 @@ export const landingPageSectionChainParser = z.array(
     sectionNavigation: z.boolean(),
     sectionNavigationTitle: z.string().nullable(),
     showPreviousNextLinks: z.boolean(),
+    showSubPagesInNavigation: z.boolean(),
     children: z.array(sectionTreePageParser).nullable(),
   }),
 );
