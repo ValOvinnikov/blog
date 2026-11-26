@@ -4,28 +4,17 @@ import {
   DISPLAY_MODE,
 } from '@shinefold/config';
 import type { Meta, StoryObj } from '@storybook/nextjs-vite';
+import {
+  MOCK_DESIGN_SYSTEM_POST_ITEM,
+  MOCK_TYPESCRIPT_POST_ITEM,
+  mockWithPlaceholderImage,
+  postCardsArgTypes,
+} from '@web/testing/modules/post-cards/fixtures';
 import { mockPostListItem } from '@web/testing/modules/post-list/fixtures';
 import { mockHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
 import { MOCK_OUTLINED_BRAND_TINT_SECTION } from '@web/testing/shared/section-appearance/fixtures';
 
 import { PostFeaturedModuleView } from './post-featured-module-view';
-
-const leadItem = mockPostListItem({
-  id: 'post-1',
-  href: '/blog/building-a-design-system',
-  title: 'Building a Design System from Scratch',
-  excerpt:
-    'A step-by-step guide to building a scalable, token-driven design system using Tailwind CSS.',
-  topic: { title: 'Design systems' },
-});
-
-const secondItem = mockPostListItem({
-  id: 'post-2',
-  href: '/blog/typescript-tips',
-  title: 'TypeScript Tips for 2026',
-  excerpt: 'A collection of practical TypeScript patterns.',
-  topic: { title: 'TypeScript' },
-});
 
 const thirdItem = mockPostListItem({
   id: 'post-3',
@@ -35,35 +24,19 @@ const thirdItem = mockPostListItem({
   topic: { title: 'Accessibility' },
 });
 
-const placeholderImage = (alt: string) => (
-  // eslint-disable-next-line @next/next/no-img-element -- Storybook placeholder image, not a production asset; next/image would be wrong here
-  <img src="https://placehold.co/640x360" alt={alt} />
-);
-
-const withImage = <T extends { title: string }>(item: T) => ({
-  ...item,
-  image: placeholderImage(item.title),
-});
-
 const meta = {
   title: 'Modules/PostFeaturedModule',
   component: PostFeaturedModuleView,
   tags: ['autodocs'],
   parameters: { layout: 'fullscreen' },
   argTypes: {
-    contentAlignment: {
-      control: 'select',
-      options: [CONTENT_ALIGNMENT.LEFT, CONTENT_ALIGNMENT.CENTER],
-    },
-    displayMode: {
-      control: 'select',
-      options: Object.values(DISPLAY_MODE),
-    },
+    contentAlignment: postCardsArgTypes.contentAlignment,
+    displayMode: postCardsArgTypes.displayMode,
   },
   args: {
     section: { brandVariant: BRAND_VARIANT.PRIMARY, layout: undefined },
     headingBlock: mockHeadingBlock({ heading: 'Featured' }),
-    items: [leadItem, secondItem, thirdItem],
+    items: [MOCK_DESIGN_SYSTEM_POST_ITEM, MOCK_TYPESCRIPT_POST_ITEM, thirdItem],
     contentAlignment: undefined,
     titleId: 'featured-posts-title',
     dataTestId: 'post-featured-module-featured-1',
@@ -77,11 +50,19 @@ type TStory = StoryObj<typeof meta>;
 export const Default: TStory = {};
 
 export const LeadWithSingleTail: TStory = {
-  args: { hasImages: true, items: [leadItem, secondItem].map(withImage) },
+  args: {
+    hasImages: true,
+    items: [MOCK_DESIGN_SYSTEM_POST_ITEM, MOCK_TYPESCRIPT_POST_ITEM].map(
+      mockWithPlaceholderImage,
+    ),
+  },
 };
 
 export const LeadOnly: TStory = {
-  args: { hasImages: true, items: [leadItem].map(withImage) },
+  args: {
+    hasImages: true,
+    items: [MOCK_DESIGN_SYSTEM_POST_ITEM].map(mockWithPlaceholderImage),
+  },
 };
 
 export const Secondary: TStory = {
@@ -94,7 +75,7 @@ export const OutlinedOnBrandTint: TStory = {
 
 export const LeadWithSingleTailOutlinedOnBrandTint: TStory = {
   args: {
-    items: [leadItem, secondItem],
+    items: [MOCK_DESIGN_SYSTEM_POST_ITEM, MOCK_TYPESCRIPT_POST_ITEM],
     section: MOCK_OUTLINED_BRAND_TINT_SECTION,
   },
 };
@@ -114,7 +95,7 @@ export const CarouselFitsLeft: TStory = {
   args: {
     displayMode: DISPLAY_MODE.CAROUSEL,
     contentAlignment: CONTENT_ALIGNMENT.LEFT,
-    items: [leadItem, secondItem],
+    items: [MOCK_DESIGN_SYSTEM_POST_ITEM, MOCK_TYPESCRIPT_POST_ITEM],
   },
 };
 
@@ -122,7 +103,7 @@ export const CarouselFitsCenter: TStory = {
   args: {
     displayMode: DISPLAY_MODE.CAROUSEL,
     contentAlignment: CONTENT_ALIGNMENT.CENTER,
-    items: [leadItem, secondItem],
+    items: [MOCK_DESIGN_SYSTEM_POST_ITEM, MOCK_TYPESCRIPT_POST_ITEM],
   },
 };
 
@@ -137,6 +118,10 @@ export const PhoneCarouselOverflowsCenter: TStory = {
 export const WithImages: TStory = {
   args: {
     hasImages: true,
-    items: [leadItem, secondItem, thirdItem].map(withImage),
+    items: [
+      MOCK_DESIGN_SYSTEM_POST_ITEM,
+      MOCK_TYPESCRIPT_POST_ITEM,
+      thirdItem,
+    ].map(mockWithPlaceholderImage),
   },
 };

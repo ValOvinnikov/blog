@@ -9,7 +9,7 @@ import { errorResult, okResult } from '@shinefold/utils';
 import { POST_LIST_LOG } from '@web/constants/post-list';
 import { getVoiceRich } from '@web/server/site-config/get-voice-rich/get-voice-rich';
 import { customRenderAsync, screen } from '@web/testing/custom-render';
-import { mockSanityImage } from '@web/testing/modules/hero/fixtures';
+import { testPostCardsImagesContract } from '@web/testing/modules/post-cards/post-cards-images-contract';
 import { mockPostListModuleData } from '@web/testing/modules/post-list/fixtures';
 import { ARIA_LABELLEDBY_ATTRIBUTE } from '@web/testing/shared/aria/constants';
 import { MOCK_ERROR } from '@web/testing/shared/error/fixtures';
@@ -199,28 +199,14 @@ describe(`<${PostListModule.name}/>`, () => {
     expect(emptyMessage).toBeVisible();
   });
 
-  it.each([
-    { showImages: true, imageCount: 1 },
-    { showImages: false, imageCount: 0 },
-  ])(
-    'renders $imageCount post images when showImages is $showImages',
-    async ({ showImages, imageCount }) => {
+  testPostCardsImagesContract({
+    setup,
+    resolvePosts: (source) => {
       getPostListMock.mockResolvedValue(
-        okResult(
-          mockPostListModuleData({
-            posts: [{ ...MOCK_POST, heroImage: mockSanityImage() }],
-            showImages,
-          }),
-        ),
+        okResult(mockPostListModuleData(source)),
       );
-
-      await setup();
-
-      const images = screen.queryAllByRole('img');
-
-      expect(images).toHaveLength(imageCount);
     },
-  );
+  });
 
   it.each([{ kind: 'blog', archive: undefined }, ...MOCK_ARCHIVE_CASES])(
     'labels the $kind region with its heading',

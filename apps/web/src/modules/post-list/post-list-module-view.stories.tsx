@@ -5,7 +5,11 @@ import {
 } from '@shinefold/config';
 import type { Meta, StoryObj } from '@storybook/nextjs-vite';
 import { TopicChipList } from '@web/components/shared/topic-chip-list';
-import { mockPostListItem } from '@web/testing/modules/post-list/fixtures';
+import {
+  MOCK_POST_CARD_ITEMS,
+  mockWithPlaceholderImage,
+  postCardsArgTypes,
+} from '@web/testing/modules/post-cards/fixtures';
 import { mockHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
 import { MOCK_OUTLINED_BRAND_TINT_SECTION } from '@web/testing/shared/section-appearance/fixtures';
 import {
@@ -16,24 +20,6 @@ import {
 
 import { PostListModuleView } from './post-list-module-view';
 
-const items = [
-  mockPostListItem({
-    id: 'post-1',
-    href: '/blog/building-a-design-system',
-    title: 'Building a Design System from Scratch',
-    excerpt:
-      'A step-by-step guide to building a scalable, token-driven design system using Tailwind CSS.',
-    topic: { title: 'Design systems' },
-  }),
-  mockPostListItem({
-    id: 'post-2',
-    href: '/blog/typescript-tips',
-    title: 'TypeScript Tips for 2026',
-    excerpt: 'A collection of practical TypeScript patterns.',
-    topic: { title: 'TypeScript' },
-  }),
-];
-
 const topics = [MOCK_ENGINEERING_TOPIC, MOCK_SECOND_TOPIC, MOCK_THIRD_TOPIC];
 
 const meta = {
@@ -41,17 +27,12 @@ const meta = {
   component: PostListModuleView,
   tags: ['autodocs'],
   parameters: { layout: 'fullscreen' },
-  argTypes: {
-    contentAlignment: {
-      control: 'select',
-      options: [CONTENT_ALIGNMENT.LEFT, CONTENT_ALIGNMENT.CENTER],
-    },
-  },
+  argTypes: { contentAlignment: postCardsArgTypes.contentAlignment },
   args: {
     section: { brandVariant: BRAND_VARIANT.PRIMARY, layout: undefined },
     grid: { columns: undefined, showImages: false },
     headingBlock: mockHeadingBlock({ heading: 'Latest posts' }),
-    items,
+    items: MOCK_POST_CARD_ITEMS,
     contentAlignment: undefined,
     titleId: 'post-list-title',
     dataTestId: 'post-list-module-post-list-1',
@@ -75,10 +56,12 @@ export const TwoColumns: TStory = {
 export const FourColumns: TStory = {
   args: {
     grid: { columns: GRID_COLUMNS.FOUR, showImages: false },
-    items: [...items, ...items].map((item, index) => ({
-      ...item,
-      id: `post-${index + 1}`,
-    })),
+    items: [...MOCK_POST_CARD_ITEMS, ...MOCK_POST_CARD_ITEMS].map(
+      (item, index) => ({
+        ...item,
+        id: `post-${index + 1}`,
+      }),
+    ),
   },
 };
 
@@ -121,17 +104,9 @@ export const WithPagination: TStory = {
   },
 };
 
-const placeholderImage = (alt: string) => (
-  // eslint-disable-next-line @next/next/no-img-element -- Storybook placeholder image, not a production asset; next/image would be wrong here
-  <img src="https://placehold.co/640x360" alt={alt} />
-);
-
 export const WithImages: TStory = {
   args: {
     grid: { columns: undefined, showImages: true },
-    items: items.map((item) => ({
-      ...item,
-      image: placeholderImage(item.title),
-    })),
+    items: MOCK_POST_CARD_ITEMS.map(mockWithPlaceholderImage),
   },
 };

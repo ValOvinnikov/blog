@@ -5,53 +5,26 @@ import {
   GRID_COLUMNS,
 } from '@shinefold/config';
 import type { Meta, StoryObj } from '@storybook/nextjs-vite';
-import { mockPostListItem } from '@web/testing/modules/post-list/fixtures';
+import {
+  MOCK_POST_CARD_ITEMS,
+  mockWithPlaceholderImage,
+  postCardsArgTypes,
+} from '@web/testing/modules/post-cards/fixtures';
 import { mockHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
 import { MOCK_OUTLINED_BRAND_TINT_SECTION } from '@web/testing/shared/section-appearance/fixtures';
 
 import { PostRelatedModuleView } from './post-related-module-view';
-
-const items = [
-  mockPostListItem({
-    id: 'post-1',
-    href: '/blog/building-a-design-system',
-    title: 'Building a Design System from Scratch',
-    excerpt:
-      'A step-by-step guide to building a scalable, token-driven design system using Tailwind CSS.',
-    topic: { title: 'Design systems' },
-  }),
-  mockPostListItem({
-    id: 'post-2',
-    href: '/blog/typescript-tips',
-    title: 'TypeScript Tips for 2026',
-    excerpt: 'A collection of practical TypeScript patterns.',
-    topic: { title: 'TypeScript' },
-  }),
-];
 
 const meta = {
   title: 'Modules/PostRelatedModule',
   component: PostRelatedModuleView,
   tags: ['autodocs'],
   parameters: { layout: 'fullscreen' },
-  argTypes: {
-    columns: {
-      control: 'select',
-      options: [GRID_COLUMNS.TWO, GRID_COLUMNS.THREE, GRID_COLUMNS.FOUR],
-    },
-    contentAlignment: {
-      control: 'select',
-      options: [CONTENT_ALIGNMENT.LEFT, CONTENT_ALIGNMENT.CENTER],
-    },
-    displayMode: {
-      control: 'select',
-      options: Object.values(DISPLAY_MODE),
-    },
-  },
+  argTypes: postCardsArgTypes,
   args: {
     section: { brandVariant: BRAND_VARIANT.PRIMARY, layout: undefined },
     headingBlock: mockHeadingBlock({ heading: 'Related reading' }),
-    items,
+    items: MOCK_POST_CARD_ITEMS,
     contentAlignment: undefined,
     titleId: 'related-posts-title',
     dataTestId: 'post-related-module-post-related-1',
@@ -91,17 +64,9 @@ export const CenterAligned: TStory = {
   args: { contentAlignment: CONTENT_ALIGNMENT.CENTER },
 };
 
-const placeholderImage = (alt: string) => (
-  // eslint-disable-next-line @next/next/no-img-element -- Storybook placeholder image, not a production asset; next/image would be wrong here
-  <img src="https://placehold.co/640x360" alt={alt} />
-);
-
 export const WithImages: TStory = {
   args: {
     hasImages: true,
-    items: items.map((item) => ({
-      ...item,
-      image: placeholderImage(item.title),
-    })),
+    items: MOCK_POST_CARD_ITEMS.map(mockWithPlaceholderImage),
   },
 };

@@ -1,7 +1,7 @@
 import { service } from '@shinefold/service';
 import { hasLength } from '@shinefold/utils/primitives';
 import { POST_LATEST_LOG } from '@web/constants/post-latest';
-import { getPostCardsSection } from '@web/server/post-cards/get-post-cards-section/get-post-cards-section';
+import { getPostCardsViewProps } from '@web/server/post-cards/get-post-cards-view-props/get-post-cards-view-props';
 import { getRequestContext } from '@web/server/request-context/request-context';
 import { logger } from '@web/utils/logger/logger';
 
@@ -26,34 +26,20 @@ export const PostLatestModule = async ({ id }: IPostLatestModuleProps) => {
     return null;
   }
 
-  const {
-    brandVariant,
-    headingBlock,
-    layout,
-    contentAlignment,
-    showImages,
-    displayMode,
-    columns,
-  } = result.data;
+  const { showImages, displayMode, columns } = result.data;
+  const viewProps = await getPostCardsViewProps(tenantId, result.data, {
+    titleId: `latest-posts-${id}`,
+    dataTestId: `post-latest-module-${id}`,
+  });
 
-  const { items, appearance } = await getPostCardsSection(
-    tenantId,
-    result.data,
-  );
-
-  if (!hasLength(items)) return null;
+  if (!hasLength(viewProps.items)) return null;
 
   return (
     <PostLatestModuleView
-      section={{ brandVariant, layout, appearance }}
-      headingBlock={headingBlock}
-      items={items}
+      {...viewProps}
       columns={columns}
-      contentAlignment={contentAlignment}
       hasImages={showImages}
       displayMode={displayMode}
-      titleId={`latest-posts-${id}`}
-      dataTestId={`post-latest-module-${id}`}
     />
   );
 };
