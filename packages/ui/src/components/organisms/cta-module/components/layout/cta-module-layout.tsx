@@ -4,7 +4,11 @@ import {
   type TBrandVariant,
   TEXT_ROLE,
 } from '@shinefold/config';
-import { Heading } from '@shinefold/ui/components/atoms/heading';
+import {
+  Heading,
+  type THeadingText,
+  resolveHeadingPieces,
+} from '@shinefold/ui/components/atoms/heading';
 import { CtaModuleSlotParts } from '@shinefold/ui/components/organisms/cta-module/cta-module-slot-parts';
 import type {
   TCtaModuleBannerStyles,
@@ -17,11 +21,11 @@ import {
 import { cloneElement, Fragment } from 'react';
 
 export type TCtaModuleLayoutProps = IWithClassName &
-  IWithDataTestId & {
+  IWithDataTestId &
+  THeadingText & {
     tone: TBrandVariant;
     styles: TCtaModuleStyles;
     bannerStyles?: TCtaModuleBannerStyles;
-    heading: string;
     headingId?: string;
     children?: TCompoundChildren<typeof CtaModuleSlotParts>;
   };
@@ -32,6 +36,7 @@ export const CtaModuleLayout = ({
   styles: s,
   bannerStyles: banner,
   heading,
+  headingPieces,
   headingId,
   children,
   className,
@@ -61,9 +66,8 @@ export const CtaModuleLayout = ({
             level={2}
             visual={TEXT_ROLE.SECTION_TITLE}
             className={s.heading({ class: banner?.title() })}
-          >
-            {heading}
-          </Heading>
+            pieces={resolveHeadingPieces({ heading, headingPieces })}
+          />
           {Text &&
             cloneElement(Text, {
               className: s.text({

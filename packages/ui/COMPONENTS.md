@@ -423,9 +423,9 @@ A page-builder call-to-action in three layouts — `Split`, `Banner` and `Callou
 
 Compound component:
 
-- **CtaModule.Split** — A call-to-action card with its copy beside its image. Props: tone: TBrandVariant · heading: string · headingId?: string · contentPosition?: TContentAlignment · contentAlignment?: TContentAlignment · mobileMediaOrder?: TMediaOrder · children?: TCompoundChildren<typeof CtaModuleSlotParts> _(extends IWithClassName, IWithDataTestId)_
-- **CtaModule.Banner** — A full-bleed call-to-action band with its copy over a photo. Props: tone: TBrandVariant · heading: string · headingId?: string · contentPosition?: TContentAlignment · contentAlignment?: TContentAlignment · spacingTop?: TSpacingScale · spacingBottom?: TSpacingScale · children?: TCompoundChildren<typeof CtaModuleSlotParts> _(extends IWithClassName, IWithDataTestId)_
-- **CtaModule.Callout** — A call-to-action card with its image above its copy. Props: tone: TBrandVariant · heading: string · headingId?: string · contentAlignment?: TContentAlignment · children?: TCompoundChildren<typeof CtaModuleSlotParts> _(extends IWithClassName, IWithDataTestId)_
+- **CtaModule.Split** — A call-to-action card with its copy beside its image. Props: tone: TBrandVariant · headingId?: string · contentPosition?: TContentAlignment · contentAlignment?: TContentAlignment · mobileMediaOrder?: TMediaOrder · children?: TCompoundChildren<typeof CtaModuleSlotParts> _(extends IWithClassName, IWithDataTestId, THeadingText)_
+- **CtaModule.Banner** — A full-bleed call-to-action band with its copy over a photo. Props: tone: TBrandVariant · headingId?: string · contentPosition?: TContentAlignment · contentAlignment?: TContentAlignment · spacingTop?: TSpacingScale · spacingBottom?: TSpacingScale · children?: TCompoundChildren<typeof CtaModuleSlotParts> _(extends IWithClassName, IWithDataTestId, THeadingText)_
+- **CtaModule.Callout** — A call-to-action card with its image above its copy. Props: tone: TBrandVariant · headingId?: string · contentAlignment?: TContentAlignment · children?: TCompoundChildren<typeof CtaModuleSlotParts> _(extends IWithClassName, IWithDataTestId, THeadingText)_
 - **CtaModule.Eyebrow** — The label slot above a `CtaModule` heading. Props: children?: ReactNode _(extends IWithClassName, IWithDataTestId)_
 - **CtaModule.Text** — The copy slot under a `CtaModule` heading: a plain supporting line, then rich content set as prose. Props: supportingText?: string · children?: ReactNode _(extends IWithClassName)_
 - **CtaModule.Actions** — The row a `CtaModule` lays its buttons and links out in. Props: children?: ReactNode _(extends IWithClassName, IWithDataTestId)_
@@ -473,7 +473,7 @@ Slots:
 ### Hero — `components/organisms/hero/hero.tsx`
 
 The page-top band every hero kind renders, where a page states what it is.
-Props: title: THeroTitle · titleId: string · eyebrow?: string · excerpt?: string · variant?: THeroVariant · layout?: THeroLayout · tone: TBrandVariant · children?: TCompoundChildren<typeof HeroParts> _(extends IWithClassName, IWithDataTestId)_
+Props: title: THeadingText · titleId: string · eyebrow?: string · excerpt?: string · variant?: THeroVariant · layout?: THeroLayout · tone: TBrandVariant · children?: TCompoundChildren<typeof HeroParts> _(extends IWithClassName, IWithDataTestId)_
 Variants: variant: HERO_VARIANT.SPLIT|HERO_VARIANT.STACKED|HERO_VARIANT.BANNER · hasMedia: (boolean) · position: CONTENT_ALIGNMENT.LEFT|CONTENT_ALIGNMENT.CENTER|CONTENT_ALIGNMENT.RIGHT · alignment: CONTENT_ALIGNMENT.LEFT|CONTENT_ALIGNMENT.CENTER|CONTENT_ALIGNMENT.RIGHT · mediaOrder: MEDIA_ORDER.FIRST|MEDIA_ORDER.LAST
 
 Slots:
