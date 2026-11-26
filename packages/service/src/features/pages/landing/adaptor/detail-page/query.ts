@@ -15,6 +15,7 @@ import { seoFragment } from '@shinefold/service/shared/fragments/seo/seo';
 import { translationsQuery } from '@shinefold/service/shared/localization/page-translations/translations';
 import type { TRawModule } from '@shinefold/service/shared/transformers/module/to-module';
 import type { TPageQueryParams } from '@shinefold/service/shared/types/page/page-query-params';
+import type { InferResultType } from 'groqd';
 
 export const landingPageQuery = q
   .parameters<TPageQueryParams & { path: string }>()
@@ -57,3 +58,7 @@ export const landingPageQuery = q
     translations: translationsQuery,
   }))
   .nullable(true);
+
+export type TRawLandingPage = NonNullable<
+  InferResultType<typeof landingPageQuery>
+>;

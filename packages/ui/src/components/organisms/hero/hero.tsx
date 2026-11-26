@@ -3,6 +3,7 @@ import {
   type IWithDataTestId,
   type TBrandVariant,
   type TContentAlignment,
+  type THeadingBlock,
   type THeroVariant,
   type TLayout,
   type TMediaOrder,
@@ -41,9 +42,11 @@ export type THeroLayout = Pick<TLayout, 'spacingTop' | 'spacingBottom'> & {
   mediaOrder?: TMediaOrder;
 };
 
+export type THeroTitle = Pick<THeadingBlock, 'heading' | 'headingPieces'>;
+
 export type THeroProps = IWithClassName &
   IWithDataTestId & {
-    title: string;
+    title: THeroTitle;
     titleId: string;
     eyebrow?: string;
     excerpt?: string;
