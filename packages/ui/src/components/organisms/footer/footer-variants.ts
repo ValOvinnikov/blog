@@ -1,5 +1,5 @@
-import { FOOTER_LAYOUT, FOOTER_SURFACE } from '@shinefold/config';
-import { tv } from '@shinefold/ui/lib/styling';
+import { FOOTER_LAYOUT, FOOTER_SURFACE, TEXT_ROLE } from '@shinefold/config';
+import { tv, TYPOGRAPHY } from '@shinefold/ui/lib/styling';
 import type { VariantProps } from 'tailwind-variants';
 
 export const footerVariants = tv({
@@ -8,7 +8,8 @@ export const footerVariants = tv({
     inner: [
       'flex flex-col gap-10',
       'mx-auto w-full max-w-page min-w-0 px-gutter py-10',
-      'font-mono text-label text-muted',
+      TYPOGRAPHY[TEXT_ROLE.CAPTION],
+      'text-muted',
     ],
     main: ['grid min-w-0 gap-10'],
     brand: ['flex min-w-0 flex-col gap-4'],

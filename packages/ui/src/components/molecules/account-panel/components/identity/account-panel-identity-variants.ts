@@ -7,7 +7,7 @@ export const accountPanelIdentityVariants = tv({
     avatar: [],
     text: ['min-w-0'],
     name: ['truncate', TYPOGRAPHY[TEXT_ROLE.CARD_TITLE]],
-    email: ['truncate', 'font-mono text-meta text-muted'],
+    email: ['truncate', TYPOGRAPHY[TEXT_ROLE.META], 'text-muted'],
   },
   variants: {
     appearance: {

@@ -1,9 +1,10 @@
-import { tv } from '@shinefold/ui/lib/styling';
+import { TEXT_ROLE } from '@shinefold/config';
+import { tv, TYPOGRAPHY } from '@shinefold/ui/lib/styling';
 
 export const accountPanelTileVariants = tv({
   slots: {
     icon: ['text-brand-primary'],
     title: ['font-semibold in-aria-[current=page]:font-bold'],
-    description: ['font-mono text-meta text-muted'],
+    description: [TYPOGRAPHY[TEXT_ROLE.META], 'text-muted'],
   },
 });

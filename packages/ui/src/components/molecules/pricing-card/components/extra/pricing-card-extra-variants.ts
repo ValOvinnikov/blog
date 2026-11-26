@@ -1,5 +1,6 @@
-import { tv } from '@shinefold/ui/lib/styling';
+import { TEXT_ROLE } from '@shinefold/config';
+import { tv, TYPOGRAPHY } from '@shinefold/ui/lib/styling';
 
 export const pricingCardExtraVariants = tv({
-  base: ['text-lead', 'text-muted'],
+  base: [TYPOGRAPHY[TEXT_ROLE.CARD_BODY]],
 });

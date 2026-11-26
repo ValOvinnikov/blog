@@ -1,5 +1,5 @@
-import { ACCOUNT_BUTTON_STYLE } from '@shinefold/config';
-import { HEADER_CONTROL, tv } from '@shinefold/ui/lib/styling';
+import { ACCOUNT_BUTTON_STYLE, TEXT_ROLE } from '@shinefold/config';
+import { HEADER_CONTROL, tv, TYPOGRAPHY } from '@shinefold/ui/lib/styling';
 import type { VariantProps } from 'tailwind-variants';
 
 export const accountTriggerVariants = tv({
@@ -15,7 +15,8 @@ export const accountTriggerVariants = tv({
     ],
     labels: [
       'inline-grid justify-items-start',
-      'font-mono text-label whitespace-nowrap',
+      TYPOGRAPHY[TEXT_ROLE.CAPTION],
+      'text-current whitespace-nowrap',
     ],
     label: ['col-start-1 row-start-1'],
     spareLabel: ['invisible col-start-1 row-start-1'],
