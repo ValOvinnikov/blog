@@ -1,4 +1,4 @@
-import { withShinefoldPreset } from '@shinefold/ui/testing/shinefold-preset';
+import { SHINEFOLD_PRESET_STORY } from '@shinefold/ui/testing/shinefold-preset';
 import type { Meta, StoryObj } from '@storybook/react-vite';
 
 import { Eyebrow } from './eyebrow';
@@ -26,10 +26,10 @@ export const AsTopicLink: TStory = {
 
 export const ShinefoldPreset: TStory = {
   ...Default,
-  decorators: [withShinefoldPreset],
+  ...SHINEFOLD_PRESET_STORY,
 };
 
 export const AsTopicLinkShinefoldPreset: TStory = {
   ...AsTopicLink,
-  decorators: [withShinefoldPreset],
+  ...SHINEFOLD_PRESET_STORY,
 };

@@ -1,4 +1,4 @@
-import { BRAND_VARIANT, COLOR_SCHEME, SIZE } from '@shinefold/config';
+import { BRAND_VARIANT, SIZE } from '@shinefold/config';
 import {
   MOCK_BLACK_HEX,
   MOCK_YELLOW_HEX,
@@ -13,6 +13,10 @@ import {
   SPINNER_VARIANTS,
 } from '@shinefold/ui/testing/busy-styles';
 import { ButtonShapes } from '@shinefold/ui/testing/button-shapes';
+import {
+  ColorSchemeFrames,
+  IN_OWN_IFRAME,
+} from '@shinefold/ui/testing/color-scheme-frames';
 import { ReducedMotion } from '@shinefold/ui/testing/reduced-motion';
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { keys } from 'remeda';
@@ -137,27 +141,19 @@ export const OnBrandPrimaryBackgroundFocused: TStory = {
 };
 
 const ButtonColor = ({ color }: { color: string }) => (
-  <div className="flex flex-col gap-6">
-    <style>{formatButtonStyleBlock(deriveButtonColors({ color }))}</style>
-    {Object.values(COLOR_SCHEME).map((scheme) => (
-      <div
-        key={scheme}
-        className={scheme === COLOR_SCHEME.DARK ? 'dark' : undefined}
-      >
-        <EveryBrandBand>
-          {() => (
-            <>
-              <Button variant="primary">Continue</Button>
-              <Button variant="ghost">Continue</Button>
-            </>
-          )}
-        </EveryBrandBand>
-      </div>
-    ))}
-  </div>
+  <ColorSchemeFrames
+    css={formatButtonStyleBlock(deriveButtonColors({ color }))}
+  >
+    <EveryBrandBand>
+      {() => (
+        <>
+          <Button variant="primary">Continue</Button>
+          <Button variant="ghost">Continue</Button>
+        </>
+      )}
+    </EveryBrandBand>
+  </ColorSchemeFrames>
 );
-
-const IN_OWN_IFRAME = { docs: { story: { inline: false } } };
 
 export const BrightButtonColor: TStory = {
   name: 'Bright button colour on every band, light and dark',

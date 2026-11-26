@@ -7,7 +7,7 @@ import {
   type TTimelineMarkerStyle,
   type TTimelineOrientation,
 } from '@shinefold/config';
-import { withShinefoldPreset } from '@shinefold/ui/testing/shinefold-preset';
+import { SHINEFOLD_PRESET_STORY } from '@shinefold/ui/testing/shinefold-preset';
 import type { Decorator, Meta, StoryObj } from '@storybook/react-vite';
 import { keys } from 'remeda';
 
@@ -237,5 +237,5 @@ export const LongTextItem: TStory = {
 
 export const NumberedVerticalShinefoldPreset: TStory = {
   ...NumberedVertical,
-  decorators: [withShinefoldPreset],
+  ...SHINEFOLD_PRESET_STORY,
 };

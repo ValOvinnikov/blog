@@ -1,6 +1,6 @@
 import { faker } from '@faker-js/faker';
 import { ASIDE_KIND } from '@shinefold/config';
-import { withShinefoldPreset } from '@shinefold/ui/testing/shinefold-preset';
+import { SHINEFOLD_PRESET_STORY } from '@shinefold/ui/testing/shinefold-preset';
 import type { Meta, StoryObj } from '@storybook/react-vite';
 
 import { Aside } from './aside';
@@ -61,5 +61,5 @@ export const InArticleBody: TStory = {
 
 export const ShinefoldPreset: TStory = {
   ...InArticleBody,
-  decorators: [withShinefoldPreset],
+  ...SHINEFOLD_PRESET_STORY,
 };

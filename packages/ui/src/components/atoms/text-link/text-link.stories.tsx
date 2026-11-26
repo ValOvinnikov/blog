@@ -2,7 +2,7 @@ import { faker } from '@faker-js/faker';
 import { ICONS, SIZE } from '@shinefold/config';
 import { Icon } from '@shinefold/ui/components/atoms/icon';
 import { focusLastLink } from '@shinefold/ui/testing/brand-bands';
-import { withShinefoldPreset } from '@shinefold/ui/testing/shinefold-preset';
+import { SHINEFOLD_PRESET_STORY } from '@shinefold/ui/testing/shinefold-preset';
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import type { AnchorHTMLAttributes } from 'react';
 import { keys } from 'remeda';
@@ -142,10 +142,10 @@ export const StretchedFocused: TStory = {
 export const ProseShinefoldPreset: TStory = {
   ...ProseDescendersAndWrapping,
   name: 'Prose, Shinefold preset',
-  decorators: [withShinefoldPreset],
+  ...SHINEFOLD_PRESET_STORY,
 };
 
 export const QuietShinefoldPreset: TStory = {
   ...Quiet,
-  decorators: [withShinefoldPreset],
+  ...SHINEFOLD_PRESET_STORY,
 };

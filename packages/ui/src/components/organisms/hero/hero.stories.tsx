@@ -19,7 +19,7 @@ import {
   MOCK_TWO_HIGHLIGHT_PIECES,
   toHeadingWords,
 } from '@shinefold/ui/testing/heading-pieces';
-import { withShinefoldPreset } from '@shinefold/ui/testing/shinefold-preset';
+import { SHINEFOLD_PRESET_STORY } from '@shinefold/ui/testing/shinefold-preset';
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { keys } from 'remeda';
 
@@ -789,5 +789,5 @@ export const TitleHighlightsOnEveryBrandBandDark: TStory = {
 
 export const StackedContentAlignmentCenterShinefoldPreset: TStory = {
   ...StackedContentAlignmentCenter,
-  decorators: [withShinefoldPreset],
+  ...SHINEFOLD_PRESET_STORY,
 };

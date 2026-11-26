@@ -5,7 +5,7 @@ import {
   MOCK_ONE_HIGHLIGHT_PIECES,
   MOCK_TWO_HIGHLIGHT_PIECES,
 } from '@shinefold/ui/testing/heading-pieces';
-import { withShinefoldPreset } from '@shinefold/ui/testing/shinefold-preset';
+import { SHINEFOLD_PRESET_STORY } from '@shinefold/ui/testing/shinefold-preset';
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { keys } from 'remeda';
 
@@ -110,5 +110,5 @@ export const TwoHighlightsOnEveryBrandBandDark: TStory = {
 
 export const ShinefoldPreset: TStory = {
   ...H2,
-  decorators: [withShinefoldPreset],
+  ...SHINEFOLD_PRESET_STORY,
 };
