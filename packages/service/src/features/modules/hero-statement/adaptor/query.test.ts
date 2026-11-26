@@ -2,7 +2,7 @@ import { faker } from '@faker-js/faker';
 import { BRAND_VARIANT, HERO_VARIANT } from '@shinefold/config';
 import { LOCALE_ISO_CODES } from '@shinefold/config/constants';
 import { MOCK_HERO_MODULE_ID } from '@shinefold/service/testing/pages/fixtures';
-import { evaluateGroqExpression } from '@shinefold/service/testing/shared/groq';
+import { evaluateModuleQuery } from '@shinefold/service/testing/shared/groq';
 import {
   MOCK_IMAGE_ASSET_DOCUMENT,
   mockLocalizedHeadingBlock,
@@ -62,15 +62,12 @@ const MOCK_HERO_DOCUMENT = {
   }),
 };
 
-async function runHero(document: Record<string, unknown>, locale: string) {
-  const raw = await evaluateGroqExpression(
-    heroStatementModuleQuery.query,
+function runHero(document: Record<string, unknown>, locale: string) {
+  return evaluateModuleQuery(
+    heroStatementModuleQuery,
     [document, MOCK_IMAGE_ASSET_DOCUMENT],
-    undefined,
-    { id: MOCK_HERO_MODULE_ID, locale, defaultLocale: EN },
+    { id: MOCK_HERO_MODULE_ID, locale },
   );
-
-  return heroStatementModuleQuery.parse(raw);
 }
 
 describe('heroStatementModuleQuery', () => {

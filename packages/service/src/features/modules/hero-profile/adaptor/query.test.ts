@@ -3,7 +3,7 @@ import { BRAND_VARIANT, HERO_VARIANT } from '@shinefold/config';
 import { LOCALE_ISO_CODES } from '@shinefold/config/constants';
 import { MOCK_HERO_MODULE_ID } from '@shinefold/service/testing/pages/fixtures';
 import { mockReference } from '@shinefold/service/testing/shared/fixtures';
-import { evaluateGroqExpression } from '@shinefold/service/testing/shared/groq';
+import { evaluateModuleQuery } from '@shinefold/service/testing/shared/groq';
 import {
   mockLocalizedHeadingBlock,
   mockLocalizedStrings,
@@ -40,15 +40,11 @@ const MOCK_HERO_DOCUMENT = {
   author: mockReference(MOCK_PERSON._id),
 };
 
-async function runHero(document: Record<string, unknown>, locale: string) {
-  const raw = await evaluateGroqExpression(
-    heroProfileModuleQuery.query,
-    [document, MOCK_PERSON],
-    undefined,
-    { id: MOCK_HERO_MODULE_ID, locale, defaultLocale: EN },
-  );
-
-  return heroProfileModuleQuery.parse(raw);
+function runHero(document: Record<string, unknown>, locale: string) {
+  return evaluateModuleQuery(heroProfileModuleQuery, [document, MOCK_PERSON], {
+    id: MOCK_HERO_MODULE_ID,
+    locale,
+  });
 }
 
 describe('heroProfileModuleQuery', () => {

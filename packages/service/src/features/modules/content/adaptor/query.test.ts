@@ -12,7 +12,7 @@ import {
   mockRawBodyImageBlock,
   mockRawExternalLinkDocument,
 } from '@shinefold/service/testing/shared/fixtures';
-import { evaluateGroqExpression } from '@shinefold/service/testing/shared/groq';
+import { evaluateModuleQuery } from '@shinefold/service/testing/shared/groq';
 import {
   MOCK_DUTCH_TEXT,
   MOCK_ENGLISH_TEXT,
@@ -36,15 +36,11 @@ const MOCK_CONTENT_DOCUMENT = {
   }),
 };
 
-async function runContent(locale: string) {
-  const raw = await evaluateGroqExpression(
-    contentModuleQuery.query,
-    [MOCK_CONTENT_DOCUMENT],
-    undefined,
-    { id: MOCK_CONTENT_MODULE_ID, locale, defaultLocale: EN },
-  );
-
-  return contentModuleQuery.parse(raw);
+function runContent(locale: string) {
+  return evaluateModuleQuery(contentModuleQuery, [MOCK_CONTENT_DOCUMENT], {
+    id: MOCK_CONTENT_MODULE_ID,
+    locale,
+  });
 }
 
 describe('contentModuleQuery', () => {

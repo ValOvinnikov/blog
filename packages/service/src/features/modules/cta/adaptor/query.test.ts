@@ -2,7 +2,7 @@ import { faker } from '@faker-js/faker';
 import { BRAND_VARIANT, CTA_VARIANT } from '@shinefold/config';
 import { LOCALE_ISO_CODES } from '@shinefold/config/constants';
 import { mockRawCtaModule } from '@shinefold/service/testing/modules/fixtures';
-import { evaluateGroqExpression } from '@shinefold/service/testing/shared/groq';
+import { evaluateModuleQuery } from '@shinefold/service/testing/shared/groq';
 import {
   MOCK_DUTCH_TEXT,
   MOCK_ENGLISH_TEXT,
@@ -73,15 +73,12 @@ const MOCK_CTA_DOCUMENT = {
   }),
 };
 
-async function runCta(document: Record<string, unknown>, locale: string) {
-  const raw = await evaluateGroqExpression(
-    ctaModuleQuery.query,
+function runCta(document: Record<string, unknown>, locale: string) {
+  return evaluateModuleQuery(
+    ctaModuleQuery,
     [document, MOCK_IMAGE_ASSET_DOCUMENT],
-    undefined,
-    { id: MOCK_CTA_ID, locale, defaultLocale: EN },
+    { id: MOCK_CTA_ID, locale },
   );
-
-  return ctaModuleQuery.parse(raw);
 }
 
 describe('ctaModuleQuery', () => {
