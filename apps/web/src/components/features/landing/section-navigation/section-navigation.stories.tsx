@@ -4,7 +4,7 @@ import {
   mockLandingSectionNavigation,
   MOCK_SECTION_PRICING_PLANS_TITLE,
 } from '@web/testing/pages/landing-page/fixtures';
-import { userEvent, within } from 'storybook/test';
+import { openMobileSelector } from '@web/testing/shared/sidebar-nav/open-mobile-selector';
 
 import { SectionNavigation } from './section-navigation';
 
@@ -60,12 +60,7 @@ export const NestedSection: TStory = {
 export const NestedSectionMobileOpen: TStory = {
   ...NestedSection,
   globals: { viewport: 'mobile' },
-  play: async ({ canvasElement }) => {
-    const canvas = within(canvasElement);
-    await userEvent.click(
-      canvas.getByRole('button', { name: /Profile hero layouts/ }),
-    );
-  },
+  play: openMobileSelector(/Profile hero layouts/),
 };
 
 export const Grouped: TStory = {
@@ -75,12 +70,5 @@ export const Grouped: TStory = {
 export const GroupedMobileOpen: TStory = {
   ...Grouped,
   globals: { viewport: 'mobile' },
-  play: async ({ canvasElement }) => {
-    const canvas = within(canvasElement);
-    await userEvent.click(
-      canvas.getByRole('button', {
-        name: new RegExp(MOCK_SECTION_PRICING_PLANS_TITLE),
-      }),
-    );
-  },
+  play: openMobileSelector(new RegExp(MOCK_SECTION_PRICING_PLANS_TITLE)),
 };

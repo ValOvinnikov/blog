@@ -1,3 +1,4 @@
+import type { TMaybeUndefined } from '@shinefold/config';
 import type {
   TSidebarNavAriaCurrent,
   TSidebarNavLink,
@@ -6,15 +7,13 @@ import { SmartLink } from '@web/components/shared/smart-link';
 
 interface ISidebarNavLinkProps {
   link: TSidebarNavLink;
-  isActive: boolean;
-  ariaCurrent: TSidebarNavAriaCurrent;
+  ariaCurrent: TMaybeUndefined<TSidebarNavAriaCurrent>;
   className: string;
   onNavigate?: () => void;
 }
 
 export const SidebarNavLink = ({
   link: { href, label },
-  isActive,
   ariaCurrent,
   className,
   onNavigate,
@@ -22,7 +21,7 @@ export const SidebarNavLink = ({
   <SmartLink
     href={href}
     className={className}
-    aria-current={isActive ? ariaCurrent : undefined}
+    aria-current={ariaCurrent}
     onClick={onNavigate}
   >
     {label}

@@ -1,6 +1,6 @@
 'use client';
 
-import type { TMaybeUndefined } from '@shinefold/config';
+import type { IWithClassName, TMaybeUndefined } from '@shinefold/config';
 import { SidebarNavBackLink } from '@web/components/shared/sidebar-nav/components/sidebar-nav-back-link/sidebar-nav-back-link';
 import { SidebarNavList } from '@web/components/shared/sidebar-nav/components/sidebar-nav-list/sidebar-nav-list';
 import { usePopover } from '@web/hooks/use-popover';
@@ -13,22 +13,20 @@ import type {
   TSidebarNavItem,
 } from './types';
 
-interface ISidebarNavProps {
+interface ISidebarNavProps extends IWithClassName {
   items: TSidebarNavItem[];
-  activeKey: TMaybeUndefined<string>;
+  activeHref: TMaybeUndefined<string>;
   label: string;
   ariaCurrent: TSidebarNavAriaCurrent;
   backLink?: TSidebarNavBackLink;
   hasRootItem?: boolean;
-  className?: string;
 }
 
 const s = sidebarNavVariants();
 
-/** Matches `activeKey` against each item's and sub-item's `href`. */
 export const SidebarNav = ({
   items,
-  activeKey,
+  activeHref,
   label,
   ariaCurrent,
   backLink,
@@ -46,7 +44,7 @@ export const SidebarNav = ({
   });
   const activeItem = items
     .flatMap((item) => [item, ...(item.subItems ?? [])])
-    .find(({ href }) => href === activeKey);
+    .find(({ href }) => href === activeHref);
 
   return (
     <nav aria-labelledby={labelId} className={s.root({ class: className })}>

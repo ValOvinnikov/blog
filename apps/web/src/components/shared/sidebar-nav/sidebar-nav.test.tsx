@@ -7,6 +7,7 @@ import {
   within,
 } from '@web/testing/custom-render';
 import { ARIA_EXPANDED } from '@web/testing/shared/aria/constants';
+import { KEY_ESCAPE } from '@web/testing/shared/keyboard/constants';
 import {
   MOCK_SIDEBAR_NAV_GROUP_CURRENT_ITEM,
   MOCK_SIDEBAR_NAV_GROUP_ITEM,
@@ -26,7 +27,7 @@ const PRICING_LABEL = MOCK_SIDEBAR_NAV_PRICING_ITEM.label;
 
 const setup = customRender(SidebarNav, {
   items: MOCK_SIDEBAR_NAV_ITEMS,
-  activeKey: MOCK_SIDEBAR_NAV_PRICING_ITEM.href,
+  activeHref: MOCK_SIDEBAR_NAV_PRICING_ITEM.href,
   label: MOCK_SIDEBAR_NAV_LABEL,
   ariaCurrent: 'page',
 });
@@ -77,7 +78,7 @@ describe(`<${SidebarNav.name}/>`, () => {
       expect(hrefs).toEqual(MOCK_SIDEBAR_NAV_ITEMS.map(({ href }) => href));
     });
 
-    it('marks only the item whose href matches activeKey with aria-current', () => {
+    it('marks only the item whose href matches activeHref with aria-current', () => {
       const activeLink = screen.getByRole('link', { name: PRICING_LABEL });
       const currentLinks = screen
         .getAllByRole('link')
@@ -131,7 +132,7 @@ describe(`<${SidebarNav.name}/>`, () => {
       });
 
       it('closes the mobile disclosure on Escape', async () => {
-        await user.keyboard('{Escape}');
+        await user.keyboard(KEY_ESCAPE);
 
         const links = screen.getAllByRole('link');
 
@@ -176,7 +177,7 @@ describe(`<${SidebarNav.name}/>`, () => {
 
   describe('without a matching active item', () => {
     beforeEach(() => {
-      setup({ activeKey: undefined });
+      setup({ activeHref: undefined });
     });
 
     it('marks no item current', () => {
@@ -192,7 +193,7 @@ describe(`<${SidebarNav.name}/>`, () => {
     beforeEach(() => {
       setup({
         items: MOCK_SIDEBAR_NAV_GROUPED_ITEMS,
-        activeKey: MOCK_SIDEBAR_NAV_GROUP_CURRENT_ITEM.href,
+        activeHref: MOCK_SIDEBAR_NAV_GROUP_CURRENT_ITEM.href,
       });
     });
 

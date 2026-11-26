@@ -1,5 +1,5 @@
 import type { TMaybeUndefined } from '@shinefold/config';
-import { SidebarNavLink } from '@web/components/shared/sidebar-nav/components/sidebar-nav-link/sidebar-nav-link';
+import { SidebarNavLink } from '@web/components/shared/sidebar-nav/components/sidebar-nav-list/components/sidebar-nav-link/sidebar-nav-link';
 import type {
   TSidebarNavAriaCurrent,
   TSidebarNavItem,
@@ -36,8 +36,7 @@ export const SidebarNavList = ({
         <li key={item.href}>
           <SidebarNavLink
             link={item}
-            isActive={isActive}
-            ariaCurrent={ariaCurrent}
+            ariaCurrent={isActive ? ariaCurrent : undefined}
             className={s.link({
               isActive,
               isNested,
@@ -55,8 +54,7 @@ export const SidebarNavList = ({
                   <li key={subItem.href}>
                     <SidebarNavLink
                       link={subItem}
-                      isActive={isSubItemActive}
-                      ariaCurrent={ariaCurrent}
+                      ariaCurrent={isSubItemActive ? ariaCurrent : undefined}
                       className={s.link({
                         isActive: isSubItemActive,
                         isRoot: false,

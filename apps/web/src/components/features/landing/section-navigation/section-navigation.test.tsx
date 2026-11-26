@@ -1,7 +1,7 @@
 import { faker } from '@faker-js/faker';
 import { routes, SITE_MESSAGES } from '@shinefold/config';
 import { ARIA_CURRENT } from '@shinefold/ui/testing/aria';
-import { customRender, screen, within } from '@web/testing/custom-render';
+import { customRender, screen } from '@web/testing/custom-render';
 import {
   mockGroupedLandingSectionNavigation,
   mockLandingSectionNavigation,
@@ -186,29 +186,6 @@ describe(`<${SectionNavigation.name}/>`, () => {
       ]);
     });
 
-    it("nests the group's pages in a list under its title", () => {
-      const groupItem = screen
-        .getAllByRole('listitem')
-        .find((item) => within(item).queryByRole('list'));
-
-      const groupLinks = within(groupItem!)
-        .getAllByRole('link')
-        .map((link) => link.textContent);
-      const nestedLinks = within(within(groupItem!).getByRole('list'))
-        .getAllByRole('link')
-        .map((link) => link.textContent);
-
-      expect(groupLinks).toEqual([
-        MOCK_SECTION_PRICING_TITLE,
-        MOCK_SECTION_PRICING_PLANS_TITLE,
-        MOCK_SECTION_PRICING_TIERS_TITLE,
-      ]);
-      expect(nestedLinks).toEqual([
-        MOCK_SECTION_PRICING_PLANS_TITLE,
-        MOCK_SECTION_PRICING_TIERS_TITLE,
-      ]);
-    });
-
     it('marks the sub-page as current and not its group', () => {
       const currentLinks = screen
         .getAllByRole('link')
@@ -216,14 +193,6 @@ describe(`<${SectionNavigation.name}/>`, () => {
         .map((link) => link.textContent);
 
       expect(currentLinks).toEqual([MOCK_SECTION_PRICING_PLANS_TITLE]);
-    });
-
-    it('names the current sub-page on the mobile selector', () => {
-      const selector = screen.getByRole('button', {
-        name: `${NAV_NAME} ${MOCK_SECTION_PRICING_PLANS_TITLE}`,
-      });
-
-      expect(selector).toBeVisible();
     });
   });
 });

@@ -1,4 +1,4 @@
-import { routes } from '@shinefold/config';
+import { routes, type IWithClassName } from '@shinefold/config';
 import type {
   TLandingBreadcrumb,
   TLandingSectionNavigation,
@@ -9,15 +9,14 @@ import {
 } from '@web/components/shared/sidebar-nav';
 import { useTranslations } from 'next-intl';
 
-export type TSectionNavigationProps = {
+interface ISectionNavigationProps extends IWithClassName {
   sectionNavigation: TLandingSectionNavigation;
-  className?: string;
-};
+}
 
 export const SectionNavigation = ({
   sectionNavigation,
   className,
-}: TSectionNavigationProps) => {
+}: ISectionNavigationProps) => {
   const t = useTranslations('sectionNavigation');
   const { title: sectionTitle, root, pages, parentSection } = sectionNavigation;
   const toLink = ({ title, path }: TLandingBreadcrumb) => ({
@@ -47,7 +46,7 @@ export const SectionNavigation = ({
     <SidebarNav
       className={className}
       items={items}
-      activeKey={currentPage && routes.landingPage(currentPage.path)}
+      activeHref={currentPage && routes.landingPage(currentPage.path)}
       label={sectionTitle ?? t('label')}
       ariaCurrent="page"
       backLink={backLink}

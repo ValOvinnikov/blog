@@ -10,6 +10,7 @@ import {
   MOCK_SIDEBAR_NAV_NESTED_ITEMS,
   MOCK_SIDEBAR_NAV_PRICING_ITEM,
 } from '@web/testing/shared/sidebar-nav/fixtures';
+import { openMobileSelector } from '@web/testing/shared/sidebar-nav/open-mobile-selector';
 import { userEvent, within } from 'storybook/test';
 
 import { SidebarNav } from './sidebar-nav';
@@ -21,7 +22,7 @@ const meta = {
   parameters: { layout: 'padded' },
   args: {
     items: MOCK_SIDEBAR_NAV_ITEMS,
-    activeKey: MOCK_SIDEBAR_NAV_PRICING_ITEM.href,
+    activeHref: MOCK_SIDEBAR_NAV_PRICING_ITEM.href,
     label: MOCK_SIDEBAR_NAV_LABEL,
     ariaCurrent: 'page',
     hasRootItem: true,
@@ -31,23 +32,16 @@ const meta = {
 export default meta;
 type TStory = StoryObj<typeof meta>;
 
-const openMobileSelector =
-  (name: RegExp | string): TStory['play'] =>
-  async ({ canvasElement }) => {
-    const canvas = within(canvasElement);
-    await userEvent.click(canvas.getByRole('button', { name }));
-  };
-
 export const Desktop: TStory = {};
 
 export const DesktopRootActive: TStory = {
-  args: { activeKey: '/modules' },
+  args: { activeHref: '/modules' },
 };
 
 export const DesktopNestedSection: TStory = {
   args: {
     items: MOCK_SIDEBAR_NAV_NESTED_ITEMS,
-    activeKey: '/modules/blog-hero/split-left',
+    activeHref: '/modules/blog-hero/split-left',
     label: 'Blog hero layouts',
     backLink: MOCK_SIDEBAR_NAV_BACK_LINK,
   },
@@ -56,14 +50,14 @@ export const DesktopNestedSection: TStory = {
 export const DesktopGrouped: TStory = {
   args: {
     items: MOCK_SIDEBAR_NAV_GROUPED_ITEMS,
-    activeKey: MOCK_SIDEBAR_NAV_GROUP_CURRENT_ITEM.href,
+    activeHref: MOCK_SIDEBAR_NAV_GROUP_CURRENT_ITEM.href,
   },
 };
 
 export const DesktopPostContents: TStory = {
   args: {
     items: MOCK_SIDEBAR_NAV_CONTENTS_ITEMS,
-    activeKey: '#configuration',
+    activeHref: '#configuration',
     label: 'Contents',
     ariaCurrent: 'location',
     hasRootItem: false,
@@ -71,7 +65,7 @@ export const DesktopPostContents: TStory = {
 };
 
 export const DesktopPostContentsNestedActive: TStory = {
-  args: { ...DesktopPostContents.args, activeKey: '#prerequisites' },
+  args: { ...DesktopPostContents.args, activeHref: '#prerequisites' },
 };
 
 export const DesktopItemHover: TStory = {
