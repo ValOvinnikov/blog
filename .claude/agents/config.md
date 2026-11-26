@@ -173,12 +173,18 @@ the change that would create it". What the helper needs decides its folder:
   names it: `src/utils/<name>/` in the apps, `db`, `auth` and `email`;
   `shared/<kind>/<domain>/` in `service`; grouped by kind in `studio`;
   `src/lib/` in `ui`.
-- `@shinefold/utils/primitives` already holds these — use them, never the cast:
-  - `isOneOf(values, value)` (`arrays.ts`) narrows a string to one of a
-    const's values, never `values.includes(x as T)`;
-  - `mapKeysToRecord(keys, fn)` (`objects.ts`) builds a record from a key
-    list, never `as Record<K, V>`;
-  - `objectKeys(x)` (`objects.ts`), never `Object.keys(x) as`.
+- `isOneOf(values, value)` (`@shinefold/utils/primitives`, `arrays.ts`)
+  narrows a string to one of a const's values, never
+  `values.includes(x as T)`.
+- A generic object or array transform comes from `remeda`, declared from the
+  pnpm catalog in the workspace that uses it, and `@shinefold/utils` never
+  wraps one. Use it, never the cast:
+  - `fromKeys(keys, fn)` builds a record from a key list, never
+    `as Record<K, V>`;
+  - `keys(x)` / `entries(x)`, never `Object.keys(x) as` /
+    `Object.entries(x) as`;
+  - `mapValues`, `mapToObj`, `indexBy` and `groupBy` before an
+    `Object.fromEntries(… .map(…))` chain.
 - A one-line idiom never gets a helper: `?? []`, `.length > 0`,
   `?? undefined`, `?? ''`, `!value?.trim()`, `value?.trim() || undefined`,
   `parts.filter(Boolean).join(' ') || undefined`.
