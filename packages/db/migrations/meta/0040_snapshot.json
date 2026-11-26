@@ -1,5 +1,5 @@
 {
-  "id": "930432a2-934a-4049-9046-18485fc174c8",
+  "id": "93dd5c54-39de-4fd0-a514-41c975a26649",
   "prevId": "ad0e827c-86d0-46ac-a392-70ec50761fea",
   "version": "7",
   "dialect": "postgresql",
@@ -1788,6 +1788,78 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
+    "public.pinned_tenants": {
+      "name": "pinned_tenants",
+      "schema": "",
+      "columns": {
+        "admin_id": {
+          "name": "admin_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "tenant_id": {
+          "name": "tenant_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "pinned_at": {
+          "name": "pinned_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {
+        "pinned_tenants_tenant_id_idx": {
+          "name": "pinned_tenants_tenant_id_idx",
+          "columns": [
+            {
+              "expression": "tenant_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "pinned_tenants_admin_id_admins_id_fk": {
+          "name": "pinned_tenants_admin_id_admins_id_fk",
+          "tableFrom": "pinned_tenants",
+          "tableTo": "admins",
+          "columnsFrom": ["admin_id"],
+          "columnsTo": ["id"],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "pinned_tenants_tenant_id_tenants_id_fk": {
+          "name": "pinned_tenants_tenant_id_tenants_id_fk",
+          "tableFrom": "pinned_tenants",
+          "tableTo": "tenants",
+          "columnsFrom": ["tenant_id"],
+          "columnsTo": ["id"],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {
+        "pinned_tenants_admin_id_tenant_id_pk": {
+          "name": "pinned_tenants_admin_id_tenant_id_pk",
+          "columns": ["admin_id", "tenant_id"]
+        }
+      },
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
     "public.settings_features": {
       "name": "settings_features",
       "schema": "",
@@ -1986,20 +2058,6 @@
           "primaryKey": false,
           "notNull": true,
           "default": "'ROUND'"
-        },
-        "header_action_style": {
-          "name": "header_action_style",
-          "type": "header_action_style",
-          "primaryKey": false,
-          "notNull": true,
-          "default": "'FILLED'"
-        },
-        "header_action_phone_placement": {
-          "name": "header_action_phone_placement",
-          "type": "header_action_phone_placement",
-          "primaryKey": false,
-          "notNull": true,
-          "default": "'MENU'"
         },
         "header_layout": {
           "name": "header_layout",
@@ -3606,16 +3664,6 @@
       "name": "footer_surface",
       "schema": "public",
       "values": ["FULL_WIDTH", "CARD"]
-    },
-    "public.header_action_phone_placement": {
-      "name": "header_action_phone_placement",
-      "schema": "public",
-      "values": ["BAR", "MENU"]
-    },
-    "public.header_action_style": {
-      "name": "header_action_style",
-      "schema": "public",
-      "values": ["FILLED", "OUTLINED", "PLAIN"]
     },
     "public.header_background": {
       "name": "header_background",
