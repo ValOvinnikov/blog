@@ -1,6 +1,7 @@
 import { queries } from '@shinefold/db';
+import { getRequestTenantId } from '@web/server/tenant/request-tenant/request-tenant';
 
-// Import this before the module under test: the fakes register when this file runs.
+// These fakes register when this file runs, so a test takes their handles from here, never from the faked modules.
 vi.mock('@web/server/tenant/request-tenant/request-tenant');
 vi.mock(
   '@web/server/settings-features/get-tenant-entitlements/get-tenant-entitlements',
@@ -18,6 +19,4 @@ vi.mock(
 
 export const getSiteConfigMock = vi.mocked(queries.siteConfig.getSiteConfig);
 
-beforeEach(() => {
-  getSiteConfigMock.mockReset();
-});
+export const getRequestTenantIdMock = vi.mocked(getRequestTenantId);
