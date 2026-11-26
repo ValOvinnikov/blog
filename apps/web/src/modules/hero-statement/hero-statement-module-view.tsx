@@ -21,14 +21,14 @@ export const HeroStatementModuleView = ({
     footnote,
     layout,
   } = module;
-  const { heading, supportingText } = headingBlock;
+  const { supportingText } = headingBlock;
 
   return (
     <HeroModuleShell
       brandVariant={brandVariant}
       presentation={presentation}
       eyebrow={eyebrow}
-      title={heading}
+      title={headingBlock}
       excerpt={supportingText}
       layout={layout}
       dataTestId={`hero-statement-module-${id}`}

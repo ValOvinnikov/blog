@@ -1,3 +1,8 @@
+import {
+  MOCK_HIGHLIGHTED_PHRASE,
+  MOCK_ONE_HIGHLIGHT_PIECES,
+  toHeadingWords,
+} from '@shinefold/ui/testing/heading-pieces';
 import { customRender, screen } from '@web/testing/custom-render';
 import { MOCK_POST_LIST_HEADING } from '@web/testing/modules/post-list/fixtures';
 import {
@@ -59,5 +64,22 @@ describe(`<${ModuleHeading.name}/>`, () => {
     const supportingText = screen.getByText(MOCK_LATEST_POSTS_SUPPORTING_TEXT);
 
     expect(supportingText).toBeVisible();
+  });
+
+  it('renders the highlighted phrase inside the heading named by its plain words', () => {
+    const highlightedHeading = toHeadingWords(MOCK_ONE_HIGHLIGHT_PIECES);
+    setup({
+      headingBlock: mockHeadingBlock({
+        heading: highlightedHeading,
+        headingPieces: MOCK_ONE_HIGHLIGHT_PIECES,
+      }),
+    });
+
+    const heading = screen.getByRole('heading', {
+      level: 2,
+      name: highlightedHeading,
+    });
+
+    expect(heading).toContainElement(screen.getByText(MOCK_HIGHLIGHTED_PHRASE));
   });
 });
