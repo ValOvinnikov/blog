@@ -64,12 +64,13 @@ describe(toPersonalDataExportCsv, () => {
 
     const [, ...rows] = toRows(csv);
 
-    expect(rows).toEqual([`${LEADING_CELLS},${false}`]);
+    expect(rows).toEqual([`${LEADING_CELLS},${false},`]);
   });
 
   it('lists a reader account without bookmarks as a single row', () => {
     const csv = toPersonalDataExportCsv({
       ...mockEmptyPersonalDataExport(),
+      isDataHeld: true,
       readerAccount: mockPersonalDataReaderAccount({ bookmarks: [] }),
     });
 

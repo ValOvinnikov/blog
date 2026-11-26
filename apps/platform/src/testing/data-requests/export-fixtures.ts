@@ -7,7 +7,7 @@ import {
 } from '@platform/testing/data-requests/fixtures';
 import type { TPersonalDataMatches } from '@shinefold/db/queries/personal-data/find-personal-data';
 
-const NO_PERSONAL_DATA = {
+const MOCK_EMPTY_PERSONAL_DATA = {
   subscribers: [],
   leads: [],
   membershipInvites: [],
@@ -19,7 +19,7 @@ const NO_PERSONAL_DATA = {
 } satisfies Omit<TPersonalDataMatches, 'emailIndex'>;
 
 export const mockEmptyPersonalDataMatches = (): TPersonalDataMatches =>
-  mockPersonalDataMatches(NO_PERSONAL_DATA);
+  mockPersonalDataMatches(MOCK_EMPTY_PERSONAL_DATA);
 
 export const mockPersonalDataExport = (): TPersonalDataExport => {
   const {
@@ -51,6 +51,6 @@ export const mockPersonalDataExport = (): TPersonalDataExport => {
 
 export const mockEmptyPersonalDataExport = (): TPersonalDataExport => ({
   ...mockPersonalDataExport(),
-  ...NO_PERSONAL_DATA,
+  ...MOCK_EMPTY_PERSONAL_DATA,
   isDataHeld: false,
 });

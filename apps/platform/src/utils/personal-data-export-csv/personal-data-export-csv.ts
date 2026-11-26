@@ -93,6 +93,6 @@ export const toPersonalDataExportCsv = (data: TPersonalDataExport): string => {
 
   return toCsv([
     [...HEADER_COLUMNS, KIND_COLUMN, ...fieldColumns],
-    ...(hasLength(rows) ? rows : [header]),
+    ...(hasLength(rows) ? rows : [[...header, undefined]]),
   ]);
 };
