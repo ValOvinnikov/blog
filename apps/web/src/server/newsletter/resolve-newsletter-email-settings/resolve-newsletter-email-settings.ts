@@ -9,6 +9,7 @@ import {
   isValidEmailAddress,
   type TPortableTextContent,
 } from '@shinefold/email';
+import { NEWSLETTER_LOG } from '@web/constants/newsletter';
 import { resolveNewsletterFromAddress } from '@web/server/newsletter/newsletter-from-address/newsletter-from-address';
 import { logger } from '@web/utils/logger/logger';
 
@@ -46,7 +47,7 @@ const getEmailConfigSafely = async (tenantId: string) => {
   try {
     return await queries.emailConfig.getEmailConfig(tenantId);
   } catch (error) {
-    logger.warn('newsletter_email_settings.email_config_fetch_failed', {
+    logger.warn(NEWSLETTER_LOG.EMAIL_CONFIG_FETCH_FAILED, {
       tenantId,
       error,
     });
@@ -65,7 +66,7 @@ const getEmailTemplateSafely = async (
       locale,
     );
   } catch (error) {
-    logger.warn('newsletter_email_settings.email_template_fetch_failed', {
+    logger.warn(NEWSLETTER_LOG.EMAIL_TEMPLATE_FETCH_FAILED, {
       tenantId,
       error,
     });
@@ -95,7 +96,7 @@ export const resolveNewsletterEmailSettings = async (
       : undefined;
 
   if (replyToAddress && !replyTo) {
-    logger.warn('newsletter_email_settings.reply_to_invalid', { tenantId });
+    logger.warn(NEWSLETTER_LOG.REPLY_TO_INVALID, { tenantId });
   }
 
   return {

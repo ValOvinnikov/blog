@@ -7,6 +7,7 @@ import {
 } from '@shinefold/config';
 import { queries } from '@shinefold/db';
 import { toOutcome } from '@shinefold/utils/to-outcome';
+import { ACCOUNT_LOG } from '@web/constants/account';
 import { auth } from '@web/server/auth/auth';
 import { logger } from '@web/utils/logger/logger';
 
@@ -27,10 +28,10 @@ export const deleteAccountAction = async (): Promise<TDeleteAccountResult> => {
     if (result.error === ERROR_CODE.DB_HOLDS_PLATFORM_ROLE) {
       return toOutcome(ACTION_OUTCOME.BLOCKED);
     }
-    logger.error('account.delete_failed', { error: result.error });
+    logger.error(ACCOUNT_LOG.DELETE_FAILED, { error: result.error });
     return SERVER_ERROR;
   } catch (error) {
-    logger.error('account.delete_failed', { error });
+    logger.error(ACCOUNT_LOG.DELETE_FAILED, { error });
     return SERVER_ERROR;
   }
 };

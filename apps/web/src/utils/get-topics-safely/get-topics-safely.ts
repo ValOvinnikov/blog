@@ -3,6 +3,7 @@ import {
   type TTenantSanityContext,
   type TTopicsList,
 } from '@shinefold/service';
+import { TOPIC_LOG } from '@web/constants/topic';
 import { logger } from '@web/utils/logger/logger';
 
 /**
@@ -16,7 +17,7 @@ export const getTopicsSafely = async (
   const result = await service.entities.topics.v1.getTopics(tenant);
 
   if (!result.ok) {
-    logger.error('topics.fetch_failed', { error: result.error });
+    logger.error(TOPIC_LOG.LIST_FETCH_FAILED, { error: result.error });
     return [];
   }
 

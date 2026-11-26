@@ -8,6 +8,8 @@ import {
 import { queries } from '@shinefold/db';
 import { errorResult, okResult } from '@shinefold/utils';
 import { toOutcome } from '@shinefold/utils/to-outcome';
+import { CACHE_CONTROL } from '@web/constants/http';
+import { NEWSLETTER_LOG } from '@web/constants/newsletter';
 import { resolveNewsletterLinkLocale } from '@web/server/newsletter/newsletter-link-locale/newsletter-link-locale';
 import { resolveWritableTenant } from '@web/server/tenant/write-gate/write-gate';
 import { MOCK_CONFIRMATION_TOKEN } from '@web/testing/server/newsletter/fixtures';
@@ -67,7 +69,9 @@ describe(GET, () => {
 
     expect(response.status).toBe(HTTP_STATUS.SEE_OTHER);
     expect(response.headers.get('location')).toBe(MOCK_CONFIRMED_LOCATION);
-    expect(response.headers.get('cache-control')).toBe('private, no-store');
+    expect(response.headers.get('cache-control')).toBe(
+      CACHE_CONTROL.PRIVATE_NO_STORE,
+    );
     expect(confirmSubscriberMock).toHaveBeenCalledWith(
       MOCK_TENANT_ID,
       MOCK_CONFIRMATION_TOKEN,
@@ -158,7 +162,7 @@ describe(GET, () => {
 
     expect(response.headers.get('location')).toBe(MOCK_FAILED_LOCATION);
     expect(vi.mocked(logger.error)).toHaveBeenCalledWith(
-      'newsletter.confirm_failed',
+      NEWSLETTER_LOG.CONFIRM_FAILED,
       { error: MOCK_ERROR },
     );
   });

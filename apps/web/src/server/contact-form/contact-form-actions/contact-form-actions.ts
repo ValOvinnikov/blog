@@ -9,7 +9,9 @@ import {
 } from '@shinefold/config';
 import { queries, type schema } from '@shinefold/db';
 import type { TTenant } from '@shinefold/db/schema/tenants';
+import { isString } from '@shinefold/utils/primitives';
 import { toOutcome } from '@shinefold/utils/to-outcome';
+import { CONTACT_FORM_LOG } from '@web/constants/contact-form';
 import type { TFieldErrorReason } from '@web/constants/field-error';
 import { sendContactNotification } from '@web/server/contact-form/contact-notification-send/contact-notification-send';
 import { createPublicWriteGuard } from '@web/server/rate-limit/public-write-guard/public-write-guard';
@@ -44,21 +46,18 @@ export type TSubmitContactResult = TActionResult<
   TFieldErrorReason
 >;
 
-const SUBMIT_BLOCKED_EVENT = 'contact_form.submit_blocked';
-
 const BLOCKED = toOutcome(ACTION_OUTCOME.BLOCKED);
 const SERVER_ERROR = toOutcome(ACTION_OUTCOME.SERVER_ERROR);
 
 const { isBotOrUnverified, isRateLimited } = createPublicWriteGuard({
   name: 'contact-form-submit',
-  blockedEvent: SUBMIT_BLOCKED_EVENT,
+  blockedEvent: CONTACT_FORM_LOG.SUBMIT_BLOCKED,
   windowMs: 10 * 60_000,
   maxRequests: 5,
 });
 
 // A server action's arguments arrive from the network, whatever their declared type.
-const asText = (value: unknown): string =>
-  typeof value === 'string' ? value : '';
+const asText = (value: unknown): string => (isString(value) ? value : '');
 
 const toSourcePath = (sourcePath: string): string =>
   sourcePath.startsWith('/') &&
@@ -77,7 +76,7 @@ const storeLead = async (
   try {
     return await queries.leads.createLead(input);
   } catch (error) {
-    logger.error('contact_form.lead_store_failed', { error });
+    logger.error(CONTACT_FORM_LOG.LEAD_STORE_FAILED, { error });
     return undefined;
   }
 };
@@ -90,20 +89,20 @@ export const submitContactMessage = async (
   if (await isBotOrUnverified()) return BLOCKED;
 
   if (asText(input.website)) {
-    logger.warn(SUBMIT_BLOCKED_EVENT, { reason: 'honeypot' });
+    logger.warn(CONTACT_FORM_LOG.SUBMIT_BLOCKED, { reason: 'honeypot' });
     return BLOCKED;
   }
 
   const tenant = await resolveRequestTenant();
   if (!tenant) {
-    logger.error('contact_form.tenant_unresolved');
+    logger.error(CONTACT_FORM_LOG.TENANT_UNRESOLVED);
     return SERVER_ERROR;
   }
 
   if (await isRateLimited(tenant.id)) return BLOCKED;
 
   if (!(await isContactFormOpen(tenant))) {
-    logger.warn(SUBMIT_BLOCKED_EVENT, { reason: 'unavailable' });
+    logger.warn(CONTACT_FORM_LOG.SUBMIT_BLOCKED, { reason: 'unavailable' });
     return BLOCKED;
   }
 
@@ -132,7 +131,7 @@ export const submitContactMessage = async (
   try {
     await sendContactNotification(leadInput);
   } catch (error) {
-    logger.error('contact_form.notification_send_failed', {
+    logger.error(CONTACT_FORM_LOG.NOTIFICATION_SEND_FAILED, {
       leadId: lead.id,
       error,
     });

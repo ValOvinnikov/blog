@@ -6,6 +6,7 @@ import {
   routes,
 } from '@shinefold/config';
 import { errorResult, okResult } from '@shinefold/utils';
+import { HOME_PAGE_LOG } from '@web/constants/home-page';
 import { JSON_LD_SCRIPT_TEST_ID } from '@web/constants/json-ld';
 import { CtaModule } from '@web/modules/cta/cta-module';
 import { getRequestContext } from '@web/server/request-context/request-context';
@@ -86,7 +87,7 @@ describe(`<${HomePage.name}/>`, () => {
       await expect(setup()).rejects.toBe(MOCK_ERROR);
 
       expect(vi.mocked(logger.error)).toHaveBeenCalledWith(
-        'home_page.fetch_failed',
+        HOME_PAGE_LOG.PAGE_FETCH_FAILED,
         { error: MOCK_ERROR },
       );
     });
@@ -117,18 +118,32 @@ describe(`<${HomePage.name}/>`, () => {
     expect(vi.mocked(notFound)).not.toHaveBeenCalled();
   });
 
-  it('renders the page heading inside main when the page has no hero', async () => {
-    resolveHomePageWith();
+  describe('with a page that has no hero, modules or FAQs', () => {
+    beforeEach(async () => {
+      resolveHomePageWith();
 
-    await setup();
-
-    const main = screen.getByRole('main');
-    const heading = within(main).getByRole('heading', {
-      level: 1,
-      name: MOCK_HEADING,
+      await setup();
     });
 
-    expect(heading).toBeVisible();
+    it('renders the page heading inside main when the page has no hero', () => {
+      const main = screen.getByRole('main');
+      const heading = within(main).getByRole('heading', {
+        level: 1,
+        name: MOCK_HEADING,
+      });
+
+      expect(heading).toBeVisible();
+    });
+
+    it('forwards the request context Sanity context to getHomePage', () => {
+      expect(getHomePageMock).toHaveBeenCalledWith(MOCK_TENANT_SANITY_CONTEXT);
+    });
+
+    it('renders no FAQPage JSON-LD when the page has no FAQ questions', () => {
+      const script = screen.queryByTestId(JSON_LD_SCRIPT_TEST_ID);
+
+      expect(script).not.toBeInTheDocument();
+    });
   });
 
   it('renders the hero and the modules inside main', async () => {
@@ -158,24 +173,6 @@ describe(`<${HomePage.name}/>`, () => {
       { id: ctaModule.id, context: { homePage: { id: MOCK_HOME_PAGE_ID } } },
       undefined,
     );
-  });
-
-  it('forwards the request context Sanity context to getHomePage', async () => {
-    resolveHomePageWith();
-
-    await setup();
-
-    expect(getHomePageMock).toHaveBeenCalledWith(MOCK_TENANT_SANITY_CONTEXT);
-  });
-
-  it('renders no FAQPage JSON-LD when the page has no FAQ questions', async () => {
-    resolveHomePageWith();
-
-    await setup();
-
-    const script = screen.queryByTestId(JSON_LD_SCRIPT_TEST_ID);
-
-    expect(script).not.toBeInTheDocument();
   });
 
   it('renders the FAQPage JSON-LD when the page has FAQ questions', async () => {

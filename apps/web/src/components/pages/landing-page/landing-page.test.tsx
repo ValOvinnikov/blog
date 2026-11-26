@@ -4,6 +4,7 @@ import { NEXT_NAVIGATION_ERROR } from '@shinefold/config/constants';
 import { service, type TLandingPage } from '@shinefold/service';
 import { ARIA_CURRENT } from '@shinefold/ui/testing/aria';
 import { errorResult, okResult } from '@shinefold/utils';
+import { LANDING_PAGE_LOG } from '@web/constants/landing-page';
 import { permanentRedirect } from '@web/i18n/navigation';
 import {
   customRenderServerAsync,
@@ -137,10 +138,13 @@ describe(`<${LandingPage.name}/>`, () => {
     getPageMock.mockResolvedValueOnce(errorResult(MOCK_ERROR));
 
     await expect(setup()).rejects.toBe(MOCK_ERROR);
-    expect(logger.error).toHaveBeenCalledWith('landing_page.fetch_failed', {
-      path: MOCK_LANDING_PATH,
-      error: MOCK_ERROR,
-    });
+    expect(logger.error).toHaveBeenCalledWith(
+      LANDING_PAGE_LOG.PAGE_FETCH_FAILED,
+      {
+        path: MOCK_LANDING_PATH,
+        error: MOCK_ERROR,
+      },
+    );
   });
 
   it('renders the page heading and supporting text inside main', async () => {

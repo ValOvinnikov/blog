@@ -1,5 +1,6 @@
 import { REDIRECT_STATUS, type TMaybeUndefined } from '@shinefold/config';
 import type { TResult } from '@shinefold/utils';
+import { LANDING_PAGE_LOG } from '@web/constants/landing-page';
 import { permanentRedirect, redirect } from '@web/i18n/navigation';
 import { getLandingRedirect } from '@web/server/landing/get-landing-redirect/get-landing-redirect';
 import { getRequestContext } from '@web/server/request-context/request-context';
@@ -14,7 +15,7 @@ export const redirectMovedLandingPage = async <T>(
   const landingRedirect = await getLandingRedirect(path);
 
   if (!landingRedirect.ok) {
-    logger.error('landing_redirect.fetch_failed', {
+    logger.error(LANDING_PAGE_LOG.REDIRECT_FETCH_FAILED, {
       path,
       error: landingRedirect.error,
     });

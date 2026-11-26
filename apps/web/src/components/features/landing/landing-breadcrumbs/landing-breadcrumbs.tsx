@@ -6,6 +6,7 @@ import {
 import { BreadcrumbBar } from '@web/components/shared/breadcrumb-bar';
 import { JsonLd } from '@web/components/shared/json-ld';
 import { SmartLink } from '@web/components/shared/smart-link';
+import { LANDING_PAGE_LOG } from '@web/constants/landing-page';
 import { getLandingPage } from '@web/server/landing/get-landing-page/get-landing-page';
 import { getHomeBreadcrumb } from '@web/server/site-settings/get-home-breadcrumb/get-home-breadcrumb';
 import { buildBreadcrumbListSchema } from '@web/utils/build-breadcrumb-list-schema';
@@ -24,7 +25,7 @@ export const LandingBreadcrumbs = async ({
   const result = await getLandingPage(path);
   const page = guardPageLoaderResult(
     result,
-    'landing_breadcrumbs.fetch_failed',
+    LANDING_PAGE_LOG.BREADCRUMBS_FETCH_FAILED,
     { path },
   );
   const { headingBlock, sectionNavigation } = page;
