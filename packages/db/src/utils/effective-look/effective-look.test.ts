@@ -159,13 +159,26 @@ describe(toEffectiveLookWithin, () => {
     [TENANT_PLAN.FREE, FREE],
     [TENANT_PLAN.STARTER, STARTER],
   ] as const)(
-    'renders Reader chooses on %s whatever colour mode is stored',
+    "returns Reader chooses and the preset's header action on %s whatever is stored",
     (_, entitlements) => {
-      const { preset, colorMode } = STORED_LOOK;
+      const {
+        preset,
+        colorMode,
+        headerActionStyle,
+        headerActionPhonePlacement,
+      } = STORED_LOOK;
 
       expect(
-        toEffectiveLookWithin({ preset, colorMode }, entitlements),
-      ).toEqual({ preset, colorMode: COLOR_MODE.READER });
+        toEffectiveLookWithin(
+          { preset, colorMode, headerActionStyle, headerActionPhonePlacement },
+          entitlements,
+        ),
+      ).toEqual({
+        preset,
+        colorMode: COLOR_MODE.READER,
+        headerActionStyle: HEADER_ACTION_STYLE.FILLED,
+        headerActionPhonePlacement: HEADER_ACTION_PHONE_PLACEMENT.MENU,
+      });
     },
   );
 
@@ -177,28 +190,6 @@ describe(toEffectiveLookWithin, () => {
       { preset, headingFont: FONT_CHOICE.FRAUNCES, extra },
     );
   });
-
-  it.each([
-    [TENANT_PLAN.FREE, FREE],
-    [TENANT_PLAN.STARTER, STARTER],
-  ] as const)(
-    "returns the preset's header action style and phone placement on %s",
-    (_, entitlements) => {
-      const { preset, headerActionStyle, headerActionPhonePlacement } =
-        STORED_LOOK;
-
-      expect(
-        toEffectiveLookWithin(
-          { preset, headerActionStyle, headerActionPhonePlacement },
-          entitlements,
-        ),
-      ).toEqual({
-        preset,
-        headerActionStyle: HEADER_ACTION_STYLE.FILLED,
-        headerActionPhonePlacement: HEADER_ACTION_PHONE_PLACEMENT.MENU,
-      });
-    },
-  );
 
   it.each([LOOK_FIELD.BUTTON_COLOR, LOOK_FIELD.BUTTON_COLOR_DARK])(
     'returns no %s on Starter without its grant',

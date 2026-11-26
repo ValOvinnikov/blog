@@ -43,12 +43,7 @@ const hueSchema = z.number().int().min(HUE_MIN).max(HUE_MAX);
 
 const hexColorSchema = z.string().trim().refine(isHexColor);
 
-// A field absent from the input is left untouched on `UPDATE` and takes the
-// preset's value on `INSERT`: Look and Voice save separately, and a plan may
-// keep a Look field from being written. The nullable fields accept an
-// explicit `null` to clear them, since `undefined` alone can't express
-// "unset this". A Voice save replaces the map of each locale it
-// carries (even with `{}`) and leaves every other locale's map untouched.
+// An absent field is left untouched on `UPDATE` and takes the preset's value on `INSERT`.
 export const updateSiteConfigInputSchema = z.object({
   preset: z.enum(PRESET_ID),
   accentHue: hueSchema.optional(),
