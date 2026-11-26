@@ -1,6 +1,6 @@
 import { getEnabledOAuthProviderIds } from '@shinefold/auth/utils/oauth-providers/oauth-providers';
 import { ACCOUNT_PHONE_PLACEMENT, CAPABILITY } from '@shinefold/config';
-import { service } from '@shinefold/service';
+import { service, type TNavigation } from '@shinefold/service';
 import { Header } from '@shinefold/ui/components/organisms/header';
 import { BrandLockupLink } from '@web/components/shared/brand-lockup-link';
 import { LanguageSwitcher } from '@web/components/shared/language-switcher';
@@ -17,6 +17,7 @@ import {
 import { getAccountControl } from '@web/server/site-config/get-account-control/get-account-control';
 import { getBrandLogos } from '@web/server/site-config/get-brand-logos/get-brand-logos';
 import { getBrandName } from '@web/server/site-config/get-brand-name/get-brand-name';
+import { getHeaderActionLook } from '@web/server/site-config/get-header-action-look/get-header-action-look';
 import { getHeaderStyle } from '@web/server/site-config/get-header-style/get-header-style';
 import { getLanguageSwitcherStyle } from '@web/server/site-config/get-language-switcher-style/get-language-switcher-style';
 import { getLockedColorScheme } from '@web/server/site-config/get-locked-color-scheme/get-locked-color-scheme';
@@ -25,6 +26,12 @@ import { logger } from '@web/utils/logger/logger';
 
 import { AuthMenu } from './components/auth-menu/auth-menu';
 import { StickyHeaderFrame } from './components/sticky-header-frame/sticky-header-frame';
+
+const EMPTY_NAVIGATION: TNavigation = {
+  items: [],
+  headerAction: undefined,
+  tagline: undefined,
+};
 
 export const SiteHeader = async () => {
   const {
@@ -45,6 +52,7 @@ export const SiteHeader = async () => {
     brandName,
     accountControl,
     headerStyle,
+    headerActionLook,
     siteOAuthCredentials,
     lockedColorScheme,
   ] = await Promise.all([
@@ -56,6 +64,7 @@ export const SiteHeader = async () => {
     getBrandName({ tenantId, tenantName }),
     getAccountControl(siteConfigTenant),
     getHeaderStyle(siteConfigTenant),
+    getHeaderActionLook(siteConfigTenant),
     getSiteOAuthCredentials(tenantId),
     getLockedColorScheme(siteConfigTenant),
   ]);
@@ -66,11 +75,14 @@ export const SiteHeader = async () => {
     });
   }
 
-  const navItems = navResult.ok ? navResult.data.items : [];
-  const tagline = navResult.ok ? navResult.data.tagline : undefined;
+  const {
+    items: navItems,
+    tagline,
+    headerAction,
+    showLanguageSwitcher,
+  } = navResult.ok ? navResult.data : EMPTY_NAVIGATION;
   const { layout, submenuStyle, barStyle, background } = headerStyle;
-  const hasLanguageSwitcher =
-    navResult.ok && navResult.data.showLanguageSwitcher === true;
+  const hasLanguageSwitcher = showLanguageSwitcher === true;
   const oauthProviderIds = getEnabledOAuthProviderIds(siteOAuthCredentials);
   const hasAccountInPhoneMenu =
     accountControl.phonePlacement === ACCOUNT_PHONE_PLACEMENT.MENU;
@@ -89,6 +101,14 @@ export const SiteHeader = async () => {
         </Header.Brand>
         <SiteNavigation
           links={navItems}
+          action={
+            headerAction && {
+              label: headerAction.label,
+              href: headerAction.href,
+              target: headerAction.target,
+              ...headerActionLook,
+            }
+          }
           layout={layout}
           submenuStyle={submenuStyle}
           panelActions={

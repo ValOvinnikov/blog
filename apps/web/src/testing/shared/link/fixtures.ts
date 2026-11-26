@@ -6,7 +6,7 @@ const mockFaker = createMockFaker(61057);
 const [HOME_LABEL, BLOG_LABEL, ABOUT_LABEL, TOPICS_LABEL] =
   mockFaker.helpers.uniqueArray(mockFaker.lorem.word, 4);
 
-const mockNavLink = (label: string, href: string): ILink => ({
+export const mockNavLink = (label: string, href: string): ILink => ({
   label,
   href,
   target: undefined,

@@ -5,6 +5,7 @@ import type { TNavigationItem } from '@shinefold/service';
 import {
   type INavItem,
   PrimaryNavigation,
+  type TPrimaryNavigationAction,
 } from '@shinefold/ui/components/molecules/primary-navigation';
 import { hasArrayGotItems, isUndefined } from '@shinefold/utils/primitives';
 import { SmartLink } from '@web/components/shared/smart-link';
@@ -24,6 +25,7 @@ import { siteNavigationVariants } from './site-navigation-variants';
 
 type TSiteNavigationProps = {
   links: TNavigationItem[];
+  action?: TPrimaryNavigationAction;
   layout?: THeaderLayout;
   submenuStyle?: THeaderSubmenuStyle;
   actions?: ReactNode;
@@ -60,6 +62,7 @@ const toNavItem = (
 
 export const SiteNavigation = ({
   links,
+  action,
   layout,
   submenuStyle,
   actions,
@@ -99,6 +102,7 @@ export const SiteNavigation = ({
     <div ref={containerRef} className={siteNavigationVariants()}>
       <PrimaryNavigation
         links={items}
+        action={action}
         layout={layout}
         submenuStyle={submenuStyle}
         groupName={groupName}

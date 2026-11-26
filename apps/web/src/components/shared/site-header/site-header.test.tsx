@@ -3,6 +3,7 @@ import {
   ACCOUNT_PHONE_PLACEMENT,
   BRAND_VARIANT,
   COLOR_SCHEME,
+  HEADER_ACTION_PHONE_PLACEMENT,
   LOCALE_ISO_CODES,
   SITE_MESSAGES,
 } from '@shinefold/config';
@@ -21,6 +22,7 @@ import {
 import { getAccountControl } from '@web/server/site-config/get-account-control/get-account-control';
 import { getBrandLogos } from '@web/server/site-config/get-brand-logos/get-brand-logos';
 import { getBrandName } from '@web/server/site-config/get-brand-name/get-brand-name';
+import { getHeaderActionLook } from '@web/server/site-config/get-header-action-look/get-header-action-look';
 import { getHeaderStyle } from '@web/server/site-config/get-header-style/get-header-style';
 import { getLockedColorScheme } from '@web/server/site-config/get-locked-color-scheme/get-locked-color-scheme';
 import { customRenderAsync, screen, within } from '@web/testing/custom-render';
@@ -28,6 +30,11 @@ import { MOCK_SITE_OAUTH_CREDENTIALS } from '@web/testing/server/auth/site-oauth
 import { MOCK_ACCOUNT_CONTROL } from '@web/testing/shared/account-control/fixtures';
 import { ARIA_EXPANDED } from '@web/testing/shared/aria/constants';
 import { MOCK_ERROR } from '@web/testing/shared/error/fixtures';
+import {
+  MOCK_EXTERNAL_HEADER_ACTION_LINK,
+  MOCK_HEADER_ACTION_LINK,
+  MOCK_HEADER_ACTION_LOOK,
+} from '@web/testing/shared/header-action/fixtures';
 import { MOCK_HEADER_STYLE } from '@web/testing/shared/header-style/fixtures';
 import {
   KEY_ARROW_DOWN,
@@ -78,6 +85,10 @@ vi.mock('@web/server/site-config/get-brand-name/get-brand-name');
 vi.mock('@web/server/site-config/get-header-style/get-header-style');
 
 vi.mock(
+  '@web/server/site-config/get-header-action-look/get-header-action-look',
+);
+
+vi.mock(
   '@web/server/site-config/get-locked-color-scheme/get-locked-color-scheme',
 );
 
@@ -124,22 +135,23 @@ const MOCK_READER = {
 
 const setup = customRenderAsync(SiteHeader, {});
 
-const TOGGLE_NAVIGATION_MENU = 'Toggle navigation menu';
 const THEME_TOGGLE_NAME = /Switch to/;
 const DISCLOSURE_SUMMARY_SELECTOR = 'details > summary';
 const LANGUAGE_ENGLISH = 'Language: English';
 const DRAWER_ACTIONS_TEST_ID = 'primary-navigation-drawer-actions';
 const MOBILE_PANEL_TEST_ID = 'primary-navigation-mobile-panel';
 const PANEL_ACTIONS_TEST_ID = 'primary-navigation-panel-actions';
-const SIGN_IN = 'Sign in';
-const ACCOUNT = 'Account';
-const CONTINUE_WITH_GITHUB = 'Continue with GitHub';
 const MOCK_ACCOUNT_IN_PHONE_MENU = {
   ...MOCK_ACCOUNT_CONTROL,
   phonePlacement: ACCOUNT_PHONE_PLACEMENT.MENU,
 };
-const HOME_LINK_NAME = 'Home';
+const { toggleMenu: TOGGLE_NAVIGATION_MENU } = SITE_MESSAGES.siteNavigation;
+const { ariaLabel: HOME_LINK_NAME } = SITE_MESSAGES.brandLockupLink;
 const {
+  signIn: SIGN_IN,
+  accountHeading: ACCOUNT,
+  continueWithGithub: CONTINUE_WITH_GITHUB,
+  continueWithGoogle: CONTINUE_WITH_GOOGLE,
   myBookmarks: MY_BOOKMARKS,
   accountSettings: ACCOUNT_SETTINGS,
   accountMenuAriaLabel: ACCOUNT_MENU,
@@ -270,6 +282,93 @@ describe(`<${SiteHeader.name}/>`, () => {
       const tagline = screen.queryByText(MOCK_HEADER_TAGLINE);
 
       expect(tagline).not.toBeInTheDocument();
+    });
+  });
+
+  describe('the header action', () => {
+    const queryActionLink = () =>
+      within(screen.getByRole('banner')).queryByRole('link', {
+        name: MOCK_HEADER_ACTION_LINK.label,
+      });
+
+    it('shows the header action from the navigation settings', async () => {
+      getNavigationMock.mockResolvedValue(
+        okResult({ items: [], headerAction: MOCK_HEADER_ACTION_LINK }),
+      );
+
+      await setup();
+
+      expect(queryActionLink()).toBeVisible();
+    });
+
+    it.each([
+      {
+        phonePlacement: HEADER_ACTION_PHONE_PLACEMENT.MENU,
+        isInPhoneMenu: true,
+      },
+      {
+        phonePlacement: HEADER_ACTION_PHONE_PLACEMENT.BAR,
+        isInPhoneMenu: false,
+      },
+    ])(
+      "places the action by the tenant's Look, $phonePlacement on phones",
+      async ({ phonePlacement, isInPhoneMenu }) => {
+        vi.mocked(getHeaderActionLook).mockResolvedValueOnce({
+          ...MOCK_HEADER_ACTION_LOOK,
+          phonePlacement,
+        });
+        getNavigationMock.mockResolvedValue(
+          okResult({
+            items: [MOCK_BLOG_LINK],
+            headerAction: MOCK_HEADER_ACTION_LINK,
+          }),
+        );
+        await setup();
+        await openPhoneMenu();
+
+        const mobilePanel = screen.getByTestId(MOBILE_PANEL_TEST_ID);
+        const panelAction = within(mobilePanel).queryByRole('link', {
+          name: MOCK_HEADER_ACTION_LINK.label,
+        });
+
+        expect(Boolean(panelAction)).toBe(isInPhoneMenu);
+        expect(vi.mocked(getHeaderActionLook)).toHaveBeenCalledWith(
+          MOCK_REQUEST_CONTEXT.tenantId,
+        );
+      },
+    );
+
+    it('opens an external action in a new tab', async () => {
+      getNavigationMock.mockResolvedValue(
+        okResult({
+          items: [],
+          headerAction: MOCK_EXTERNAL_HEADER_ACTION_LINK,
+        }),
+      );
+
+      await setup();
+
+      expect(queryActionLink()).toHaveAttribute(
+        'target',
+        MOCK_EXTERNAL_HEADER_ACTION_LINK.target,
+      );
+    });
+
+    it.each([
+      {
+        case: 'a site with no header action',
+        result: okResult({ items: [], headerAction: undefined }),
+      },
+      {
+        case: 'a failed navigation read',
+        result: errorResult(MOCK_ERROR),
+      },
+    ])('shows no action for $case', async ({ result }) => {
+      getNavigationMock.mockResolvedValue(result);
+
+      await setup();
+
+      expect(queryActionLink()).not.toBeInTheDocument();
     });
   });
 
@@ -731,7 +830,7 @@ describe(`<${SiteHeader.name}/>`, () => {
       name: CONTINUE_WITH_GITHUB,
     });
     const googleButton = within(panel).queryByRole('button', {
-      name: 'Continue with Google',
+      name: CONTINUE_WITH_GOOGLE,
     });
 
     expect(githubButton).toBeVisible();
