@@ -1,3 +1,4 @@
+import { availableParallelism } from 'node:os';
 import { fileURLToPath } from 'node:url';
 
 import react from '@vitejs/plugin-react';
@@ -16,6 +17,14 @@ const SERVER_ONLY_STUB_ALIAS = {
   replacement: fileURLToPath(new URL('./server-only-stub.ts', import.meta.url)),
 };
 
+// Must match `--concurrency` on root `pnpm test` and CI's Test step, the suites turbo runs side by side.
+const TURBO_TEST_CONCURRENCY = 2;
+
+const isTurboTask = process.env['TURBO_HASH'] !== undefined;
+
+const turboShareOfCores = () =>
+  Math.max(1, Math.floor(availableParallelism() / TURBO_TEST_CONCURRENCY));
+
 const preset = defineConfig({
   plugins: [react()],
   resolve: { alias: [FAKER_EN_ALIAS, SERVER_ONLY_STUB_ALIAS] },
@@ -28,6 +37,7 @@ const preset = defineConfig({
     unstubGlobals: true,
     unstubEnvs: true,
     reporters: ['default', ['json', { outputFile: '.vitest/timings.json' }]],
+    ...(isTurboTask && { maxWorkers: turboShareOfCores() }),
     // Vitest's 5000ms default is crossed by real render-work tests (1.3-1.9s)
     // under root `pnpm test`'s parallel-turbo contention across packages.
     testTimeout: 20_000,
