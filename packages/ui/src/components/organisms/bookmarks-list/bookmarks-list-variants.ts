@@ -1,4 +1,5 @@
-import { tv } from '@shinefold/ui/lib/styling';
+import { TEXT_ROLE } from '@shinefold/config';
+import { tv, TYPOGRAPHY } from '@shinefold/ui/lib/styling';
 
 export const bookmarksListVariants = tv({
   slots: {
@@ -9,7 +10,7 @@ export const bookmarksListVariants = tv({
       'border-b border-dashed border-divider py-[0.28rem]',
     ],
     date: ['text-subtle'],
-    hint: ['mt-2 text-label text-subtle'],
+    hint: ['mt-2', TYPOGRAPHY[TEXT_ROLE.CAPTION]],
     emptyMessage: ['text-copy text-muted'],
   },
 });

@@ -1,8 +1,10 @@
+import { TEXT_ROLE } from '@shinefold/config';
 import {
   FOCUS_RING,
   MENU_ROW,
   TRANSITION_COLORS,
   tv,
+  TYPOGRAPHY,
 } from '@shinefold/ui/lib/styling';
 import type { VariantProps } from 'tailwind-variants';
 
@@ -19,7 +21,8 @@ export const popoverMenuItemVariants = tv({
     variant: {
       bordered: [
         'justify-start rounded-button border border-border-strong bg-surface px-3.5 py-2',
-        'font-mono text-label text-text',
+        TYPOGRAPHY[TEXT_ROLE.CAPTION],
+        'text-text',
         'hover:border-brand-primary hover:bg-surface hover:text-brand-primary',
       ],
       outlined: [

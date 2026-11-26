@@ -1,4 +1,5 @@
-import { tv } from '@shinefold/ui/lib/styling';
+import { TEXT_ROLE } from '@shinefold/config';
+import { tv, TYPOGRAPHY } from '@shinefold/ui/lib/styling';
 
 export const footerGroupVariants = tv({
   slots: {
@@ -7,7 +8,8 @@ export const footerGroupVariants = tv({
       'group-data-[layout=CENTRED]/footer:contents',
     ],
     heading: [
-      'font-mono text-label font-medium uppercase tracking-label text-text',
+      TYPOGRAPHY[TEXT_ROLE.LABEL],
+      'text-text',
       'group-data-[layout=CENTRED]/footer:sr-only',
     ],
     list: [

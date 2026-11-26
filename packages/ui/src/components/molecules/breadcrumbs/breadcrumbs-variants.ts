@@ -1,10 +1,11 @@
-import { tv } from '@shinefold/ui/lib/styling';
+import { TEXT_ROLE } from '@shinefold/config';
+import { tv, TYPOGRAPHY } from '@shinefold/ui/lib/styling';
 
 export const breadcrumbsVariants = tv({
   slots: {
     list: [
       'flex flex-nowrap items-center gap-x-1 min-w-0',
-      'font-mono text-label text-subtle',
+      TYPOGRAPHY[TEXT_ROLE.CAPTION],
       'list-none p-0 m-0',
     ],
     item: [

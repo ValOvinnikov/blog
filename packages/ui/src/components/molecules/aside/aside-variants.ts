@@ -1,4 +1,5 @@
-import { tv } from '@shinefold/ui/lib/styling';
+import { TEXT_ROLE } from '@shinefold/config';
+import { tv, TYPOGRAPHY } from '@shinefold/ui/lib/styling';
 
 export const asideVariants = tv({
   slots: {
@@ -8,6 +9,6 @@ export const asideVariants = tv({
       'bg-surface-2 surface-nested',
     ],
     label: ['mb-2'],
-    body: ['font-read text-prose text-muted'],
+    body: [TYPOGRAPHY[TEXT_ROLE.INTRO]],
   },
 });
