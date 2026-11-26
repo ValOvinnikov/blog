@@ -1,13 +1,16 @@
 import { TENANTS_PAGE_SIZE } from '@platform/constants/tenant';
 import messages from '@platform/i18n/messages/en.json';
-import { customRender, screen } from '@platform/testing/custom-render';
+import { screen } from '@platform/testing/custom-render';
 import { makeEnTranslator } from '@platform/testing/en-translator';
 import { mockLocaleRouterPush } from '@platform/testing/mock-locale-router';
+import { pinLabelsFor } from '@platform/testing/pinned-tenants/pin-labels';
+import { customRenderInPinnedTenants } from '@platform/testing/pinned-tenants/render-in-pinned-tenants';
 import {
+  mockOtherTenantsPageRow,
   mockTenantsListQuery,
   mockTenantsPageRow,
+  MOCK_ARCHIVED_AT,
   MOCK_CUSTOM_DOMAIN,
-  MOCK_OTHER_TENANT_DOMAIN,
   MOCK_OTHER_TENANT_ID,
   MOCK_OTHER_TENANT_NAME,
   MOCK_TENANT_CREATED_AT,
@@ -16,21 +19,22 @@ import {
   MOCK_TENANT_ID,
   MOCK_TENANT_SLUG,
 } from '@platform/testing/tenants/fixtures';
+import {
+  mockOtherPinnedTenant,
+  mockPinnedTenant,
+} from '@platform/testing/tenants/pinned-tenant';
 import { adminRoutes } from '@platform/utils/routes/routes';
 import { SORT_DIRECTION, TENANT_SORT_COLUMN } from '@shinefold/config';
 import { TENANT_PLAN } from '@shinefold/config/constants';
-import {
-  TENANT_PROVISIONING_STATUS,
-  TENANT_STATUS,
-} from '@shinefold/db/constants';
-import type { TTenantsPageRow } from '@shinefold/db/queries/tenants/tenants-page-row';
+import { TENANT_STATUS } from '@shinefold/db/constants';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
 
 import { TenantsTable } from './tenants-table';
 
 vi.mock('@platform/i18n/navigation');
+vi.mock('@platform/server/tenants/set-tenant-pin-action');
 
-const setup = customRender(TenantsTable, {
+const setup = customRenderInPinnedTenants(TenantsTable, {
   tenants: [mockTenantsPageRow()],
   total: 1,
   totalPages: 1,
@@ -38,22 +42,27 @@ const setup = customRender(TenantsTable, {
   toolbar: null,
 });
 
-const otherTenant = (overrides: Partial<TTenantsPageRow> = {}) =>
-  mockTenantsPageRow({
-    id: MOCK_OTHER_TENANT_ID,
-    name: MOCK_OTHER_TENANT_NAME,
-    primaryDomain: MOCK_OTHER_TENANT_DOMAIN,
-    ...overrides,
-  });
-
-const MANAGE_TENANT = `Manage ${MOCK_TENANT_NAME}`;
-const MANAGE_OTHER_TENANT = `Manage ${MOCK_OTHER_TENANT_NAME}`;
+const tTable = makeEnTranslator('tenantsTable');
+const tPlan = makeEnTranslator('planNames');
+const tView = makeEnTranslator('tenantsView');
+const tPagination = makeEnTranslator('pagination');
+const TENANT_LABELS = pinLabelsFor(MOCK_TENANT_NAME);
+const MANAGE_TENANT = tTable('manageAriaLabel', {
+  tenantName: MOCK_TENANT_NAME,
+});
+const MANAGE_OTHER_TENANT = tTable('manageAriaLabel', {
+  tenantName: MOCK_OTHER_TENANT_NAME,
+});
+const FREE_PLAN = tPlan(TENANT_PLAN.FREE);
+const ACTIVE_STATUS = tTable(`status.${TENANT_STATUS.ACTIVE}`);
+const CREATED_ON = 'Apr 2, 2026';
 const ARIA_SORT = 'aria-sort';
-const TENANT_COLUMN = 'Tenant';
-const CREATED_COLUMN = 'Created';
-const PLAN_COLUMN = 'Plan';
-const MATCHED_HINT = `Matched on ${MOCK_CUSTOM_DOMAIN}`;
-const MATCHED_LABEL = /^Matched on /;
+const TENANT_COLUMN = tTable('columnTenant');
+const CREATED_COLUMN = tTable('columnCreated');
+const PLAN_COLUMN = tTable('columnPlan');
+const MATCHED_HINT = tTable('matchedDomain', { domain: MOCK_CUSTOM_DOMAIN });
+const MATCHED_LABEL = new RegExp(`^${tTable('matchedDomain', { domain: '' })}`);
+const MOCK_TWO_TENANTS = [mockTenantsPageRow(), mockOtherTenantsPageRow()];
 const MOCK_NO_TENANTS = { tenants: [], total: 0 };
 const MOCK_TOTAL = 168;
 const MOCK_TOTAL_PAGES = 7;
@@ -67,15 +76,13 @@ const MOCK_FILTERED_QUERY = mockTenantsListQuery({
   search: MOCK_TENANT_SLUG,
   page: MOCK_MIDDLE_PAGE,
 });
-const tTable = makeEnTranslator('tenantsTable');
-const tPagination = makeEnTranslator('pagination');
 
 describe(`<${TenantsTable.name}/>`, () => {
   it("shows each tenant's name, domain, plan and status", () => {
     setup({
       tenants: [
         mockTenantsPageRow(),
-        otherTenant({
+        mockOtherTenantsPageRow({
           plan: TENANT_PLAN.GROWTH,
           status: TENANT_STATUS.SUSPENDED,
         }),
@@ -84,11 +91,13 @@ describe(`<${TenantsTable.name}/>`, () => {
 
     const tenantName = screen.getByText(MOCK_TENANT_NAME);
     const tenantDomain = screen.getByText(MOCK_TENANT_DOMAIN);
-    const freePlan = screen.getByText('Free');
-    const activeStatus = screen.getByText('Active');
+    const freePlan = screen.getByText(FREE_PLAN);
+    const activeStatus = screen.getByText(ACTIVE_STATUS);
     const otherName = screen.getByText(MOCK_OTHER_TENANT_NAME);
-    const growthPlan = screen.getByText('Growth');
-    const suspendedStatus = screen.getByText('Suspended');
+    const growthPlan = screen.getByText(tPlan(TENANT_PLAN.GROWTH));
+    const suspendedStatus = screen.getByText(
+      tTable(`status.${TENANT_STATUS.SUSPENDED}`),
+    );
 
     expect(tenantName).toBeVisible();
     expect(tenantDomain).toBeVisible();
@@ -99,42 +108,62 @@ describe(`<${TenantsTable.name}/>`, () => {
     expect(suspendedStatus).toBeVisible();
   });
 
-  it('links a ready tenant to its overview page', () => {
-    setup({ tenants: [mockTenantsPageRow(), otherTenant()] });
-
-    const tenantLink = screen.getByRole('link', { name: MANAGE_TENANT });
-    const otherLink = screen.getByRole('link', { name: MANAGE_OTHER_TENANT });
-
-    expect(tenantLink).toHaveAttribute('href', `/tenants/${MOCK_TENANT_ID}`);
-    expect(otherLink).toHaveAttribute(
-      'href',
-      `/tenants/${MOCK_OTHER_TENANT_ID}`,
-    );
-  });
-
-  it('links a not-yet-ready tenant to its provisioning page', () => {
-    setup({
-      tenants: [
-        mockTenantsPageRow({
-          provisioningStatus: TENANT_PROVISIONING_STATUS.PROVISIONING,
-        }),
-        otherTenant({
-          provisioningStatus: TENANT_PROVISIONING_STATUS.FAILED,
-        }),
-      ],
-    });
+  it("links each tenant's Manage button to its manage page", () => {
+    setup({ tenants: MOCK_TWO_TENANTS });
 
     const tenantLink = screen.getByRole('link', { name: MANAGE_TENANT });
     const otherLink = screen.getByRole('link', { name: MANAGE_OTHER_TENANT });
 
     expect(tenantLink).toHaveAttribute(
       'href',
-      `/tenants/${MOCK_TENANT_ID}/provisioning`,
+      adminRoutes.tenantOverview(MOCK_TENANT_ID),
     );
     expect(otherLink).toHaveAttribute(
       'href',
-      `/tenants/${MOCK_OTHER_TENANT_ID}/provisioning`,
+      adminRoutes.tenantOverview(MOCK_OTHER_TENANT_ID),
     );
+  });
+
+  it('gives an archived tenant no pin toggle but keeps its Manage link', () => {
+    setup(
+      {
+        tenants: [mockTenantsPageRow({ deprovisionedAt: MOCK_ARCHIVED_AT })],
+      },
+      {
+        pinnedTenants: [
+          mockPinnedTenant({ deprovisionedAt: MOCK_ARCHIVED_AT }),
+        ],
+      },
+    );
+
+    const pinToggle = screen.queryByRole('button', {
+      name: TENANT_LABELS.pinLabel,
+    });
+    const unpinToggle = screen.queryByRole('button', {
+      name: TENANT_LABELS.unpinLabel,
+    });
+    const manageLink = screen.getByRole('link', { name: MANAGE_TENANT });
+
+    expect(pinToggle).not.toBeInTheDocument();
+    expect(unpinToggle).not.toBeInTheDocument();
+    expect(manageLink).toBeVisible();
+  });
+
+  it('gives each row a pin toggle named for its tenant', () => {
+    setup(
+      { tenants: MOCK_TWO_TENANTS },
+      { pinnedTenants: [mockOtherPinnedTenant()] },
+    );
+
+    const pinToggle = screen.getByRole('button', {
+      name: TENANT_LABELS.pinLabel,
+    });
+    const unpinToggle = screen.getByRole('button', {
+      name: pinLabelsFor(MOCK_OTHER_TENANT_NAME).unpinLabel,
+    });
+
+    expect(pinToggle).not.toBePressed();
+    expect(unpinToggle).toBePressed();
   });
 
   describe('with one ready tenant', () => {
@@ -143,10 +172,10 @@ describe(`<${TenantsTable.name}/>`, () => {
     });
 
     it('names the table region and the actions column', () => {
-      const region = screen.getByRole('region', { name: 'Tenants' });
+      const region = screen.getByRole('region', { name: tView('title') });
       const table = screen.getByRole('table');
       const actionsHeader = screen.getByRole('columnheader', {
-        name: 'Actions',
+        name: tTable('columnActions'),
       });
 
       expect(region).toContainElement(table);
@@ -154,19 +183,23 @@ describe(`<${TenantsTable.name}/>`, () => {
     });
 
     it('labels each stacked cell with its column for phones', () => {
-      const planCell = screen.getByRole('cell', { name: 'Plan Free' });
-      const statusCell = screen.getByRole('cell', { name: 'Status Active' });
+      const planCell = screen.getByRole('cell', {
+        name: `${PLAN_COLUMN} ${FREE_PLAN}`,
+      });
+      const statusCell = screen.getByRole('cell', {
+        name: `${tTable('columnStatus')} ${ACTIVE_STATUS}`,
+      });
       const createdCell = screen.getByRole('cell', {
-        name: 'Created Apr 2, 2026',
+        name: `${CREATED_COLUMN} ${CREATED_ON}`,
       });
 
-      expect(planCell).toBeInTheDocument();
-      expect(statusCell).toBeInTheDocument();
-      expect(createdCell).toBeInTheDocument();
+      expect(planCell).toBeVisible();
+      expect(statusCell).toBeVisible();
+      expect(createdCell).toBeVisible();
     });
 
     it('renders the created date as a machine-readable time', () => {
-      const createdTime = screen.getByText('Apr 2, 2026');
+      const createdTime = screen.getByText(CREATED_ON);
 
       expect(createdTime).toHaveAttribute(
         'dateTime',
@@ -179,7 +212,7 @@ describe(`<${TenantsTable.name}/>`, () => {
     setup({
       tenants: [
         mockTenantsPageRow({ matchedDomain: MOCK_CUSTOM_DOMAIN }),
-        otherTenant(),
+        mockOtherTenantsPageRow(),
       ],
       listQuery: mockTenantsListQuery({ search: MOCK_CUSTOM_DOMAIN }),
     });
@@ -194,7 +227,7 @@ describe(`<${TenantsTable.name}/>`, () => {
   it('shows an empty state when there are no tenants', () => {
     setup(MOCK_NO_TENANTS);
 
-    const emptyMessage = screen.getByText('No tenants yet.');
+    const emptyMessage = screen.getByText(tTable('empty'));
     const table = screen.queryByRole('table');
 
     expect(emptyMessage).toBeVisible();
@@ -208,7 +241,7 @@ describe(`<${TenantsTable.name}/>`, () => {
     });
 
     const emptyMessage = screen.getByText(
-      `No tenants match “${MOCK_TENANT_SLUG}”.`,
+      tTable('noMatches', { search: MOCK_TENANT_SLUG }),
     );
 
     expect(emptyMessage).toBeVisible();
@@ -218,7 +251,7 @@ describe(`<${TenantsTable.name}/>`, () => {
     describe('on a middle page of a long list', () => {
       beforeEach(() => {
         setup({
-          tenants: [mockTenantsPageRow(), otherTenant()],
+          tenants: MOCK_TWO_TENANTS,
           total: MOCK_TOTAL,
           totalPages: MOCK_TOTAL_PAGES,
           listQuery: MOCK_FILTERED_QUERY,
@@ -309,11 +342,13 @@ describe(`<${TenantsTable.name}/>`, () => {
 
     describe('with everything on one page', () => {
       beforeEach(() => {
-        setup({ tenants: [mockTenantsPageRow(), otherTenant()], total: 2 });
+        setup({ tenants: MOCK_TWO_TENANTS, total: MOCK_TWO_TENANTS.length });
       });
 
       it('shows only the count', () => {
-        const count = screen.getByText(tTable('count', { count: 2 }));
+        const count = screen.getByText(
+          tTable('count', { count: MOCK_TWO_TENANTS.length }),
+        );
 
         expect(count).toBeVisible();
       });

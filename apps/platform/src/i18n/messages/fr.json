@@ -316,6 +316,17 @@
     "showing": "{from, number}–{to, number} sur {count, number} {count, plural, one {locataire} other {locataires}}",
     "count": "{count, plural, one {# locataire} other {# locataires}}"
   },
+  "pinnedTenants": {
+    "title": "Épinglés",
+    "titleAccessible": "{count, plural, one {# locataire épinglé} other {# locataires épinglés}}",
+    "showAll": "Tout afficher ({count})",
+    "showLess": "Afficher moins",
+    "pinAriaLabel": "Épingler {name}",
+    "unpinAriaLabel": "Désépingler {name}",
+    "pinnedAnnouncement": "{name} épinglé",
+    "unpinnedAnnouncement": "{name} désépinglé",
+    "saveFailed": "Impossible d’enregistrer l’épingle de {name}. Réessayez."
+  },
   "tenantsSearch": {
     "label": "Rechercher des locataires",
     "hint": "Nom ou domaine.",
@@ -781,6 +792,10 @@
     "followsAccent": "suit l'accent",
     "hueValue": "teinte {hue}°"
   },
+  "buttonColorField": {
+    "hexLabel": "Hex",
+    "pickerAriaLabel": "Choisir une couleur"
+  },
   "lookForm": {
     "heading": "Apparence",
     "subtitle": "Personnalisez ce site. L'aperçu montre vos modifications — rien n'est en ligne avant d'enregistrer.",
@@ -1010,7 +1025,7 @@
       "MENU": "Dans le menu"
     },
     "buttonsHeading": "Boutons",
-    "buttonsDescription": "La forme des boutons, leur aspect pendant qu'ils travaillent, et l'indicateur de chargement qu'ils affichent.",
+    "buttonsDescription": "La forme et la couleur des boutons, leur aspect pendant qu'ils travaillent, et l'indicateur de chargement qu'ils affichent.",
     "buttonsWhileWorkingHeading": "Pendant le travail",
     "buttonShapeLabel": "Forme",
     "buttonShapeDescription": "Coins des boutons et des étiquettes.",
@@ -1019,6 +1034,15 @@
       "ROUNDED": "Arrondie",
       "PILL": "Pilule"
     },
+    "buttonColorLabel": "Couleur des boutons",
+    "buttonColorDescription": "Le remplissage des boutons pleins, et des boutons à contour au survol. Les libellés passent au blanc ou au noir pour rester lisibles.",
+    "buttonColorFollowAccent": "Suit l'accent",
+    "buttonColorDarkLabel": "Couleur des boutons sur fond sombre",
+    "buttonColorDarkDescription": "Utilisée sur les bandes sombres et en mode sombre. Si elle suit, elle est calculée à partir de la couleur des boutons.",
+    "buttonColorDarkFollow": "Suit la couleur des boutons",
+    "buttonColorInvalid": "Saisissez une couleur hexadécimale, comme #1a73e8.",
+    "buttonColorFaint": "Les boutons sont pâles sur {grounds}, les lecteurs risquent de ne pas les voir.",
+    "buttonColorFaintGround": "{skin} en {scheme, select, DARK {mode sombre} other {mode clair}}",
     "busyButtonStyleLabel": "Pendant le traitement",
     "busyButtonStyleDescription": "Ce qu'un bouton affiche pendant un enregistrement ou un envoi. Il garde sa place et ses couleurs pleines.",
     "busyButtonStyleOptionLabel": {
@@ -2735,6 +2759,8 @@
       "footerBackground": "Arrière-plan du pied de page",
       "footerSurface": "Surface du pied de page",
       "cookieSettingsButton": "Bouton des paramètres des cookies",
+      "buttonColor": "Couleur des boutons",
+      "buttonColorDark": "Couleur des boutons sur fond sombre",
       "brandName": "Nom de la marque",
       "logoAssetUrl": "Image du logo",
       "logoDarkAssetUrl": "Image du logo pour le mode sombre",

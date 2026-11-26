@@ -316,6 +316,17 @@
     "showing": "{from, number}–{to, number} von {count, number} {count, plural, one {Mandant} other {Mandanten}}",
     "count": "{count, plural, one {# Mandant} other {# Mandanten}}"
   },
+  "pinnedTenants": {
+    "title": "Angeheftet",
+    "titleAccessible": "{count, plural, one {# angehefteter Mandant} other {# angeheftete Mandanten}}",
+    "showAll": "Alle {count} anzeigen",
+    "showLess": "Weniger anzeigen",
+    "pinAriaLabel": "{name} anheften",
+    "unpinAriaLabel": "Anheftung von {name} aufheben",
+    "pinnedAnnouncement": "{name} angeheftet",
+    "unpinnedAnnouncement": "Anheftung von {name} aufgehoben",
+    "saveFailed": "Die Anheftung von {name} konnte nicht gespeichert werden. Versuchen Sie es erneut."
+  },
   "tenantsSearch": {
     "label": "Mandanten suchen",
     "hint": "Name oder Domain.",
@@ -781,6 +792,10 @@
     "followsAccent": "folgt Akzent",
     "hueValue": "Farbton {hue}°"
   },
+  "buttonColorField": {
+    "hexLabel": "Hex",
+    "pickerAriaLabel": "Farbe wählen"
+  },
   "lookForm": {
     "heading": "Erscheinungsbild",
     "subtitle": "Gestalte diese Website. Die Vorschau zeigt deine Änderungen — live ist erst, was du speicherst.",
@@ -1010,7 +1025,7 @@
       "MENU": "Im Menü"
     },
     "buttonsHeading": "Schaltflächen",
-    "buttonsDescription": "Wie Schaltflächen geformt sind, wie sie aussehen, während sie arbeiten, und welchen Spinner sie zeigen.",
+    "buttonsDescription": "Wie Schaltflächen geformt und gefärbt sind, wie sie aussehen, während sie arbeiten, und welchen Spinner sie zeigen.",
     "buttonsWhileWorkingHeading": "Während der Arbeit",
     "buttonShapeLabel": "Form",
     "buttonShapeDescription": "Ecken von Schaltflächen und Tags.",
@@ -1019,6 +1034,15 @@
       "ROUNDED": "Abgerundet",
       "PILL": "Pille"
     },
+    "buttonColorLabel": "Schaltflächenfarbe",
+    "buttonColorDescription": "Die Füllung gefüllter Schaltflächen und umrandeter Schaltflächen beim Darüberfahren. Beschriftungen werden weiß oder schwarz, damit sie lesbar bleiben.",
+    "buttonColorFollowAccent": "Folgt dem Akzent",
+    "buttonColorDarkLabel": "Schaltflächenfarbe auf dunklem Hintergrund",
+    "buttonColorDarkDescription": "Gilt auf dunklen Bändern und im dunklen Modus. Folgt sie, wird sie aus der Schaltflächenfarbe abgeleitet.",
+    "buttonColorDarkFollow": "Folgt der Schaltflächenfarbe",
+    "buttonColorInvalid": "Geben Sie eine Hex-Farbe ein, etwa #1a73e8.",
+    "buttonColorFaint": "Schaltflächen sind auf {grounds} blass, Leser übersehen sie dort leicht.",
+    "buttonColorFaintGround": "{skin} im {scheme, select, DARK {dunklen Modus} other {hellen Modus}}",
     "busyButtonStyleLabel": "Bei Beschäftigung",
     "busyButtonStyleDescription": "Was eine Schaltfläche beim Speichern oder Senden zeigt. Sie behält ihren Platz und bleibt in voller Farbe.",
     "busyButtonStyleOptionLabel": {
@@ -2735,6 +2759,8 @@
       "footerBackground": "Fußzeilen-Hintergrund",
       "footerSurface": "Fußzeilen-Fläche",
       "cookieSettingsButton": "Schaltfläche für Cookie-Einstellungen",
+      "buttonColor": "Schaltflächenfarbe",
+      "buttonColorDark": "Schaltflächenfarbe auf dunklem Hintergrund",
       "brandName": "Markenname",
       "logoAssetUrl": "Logo-Bild",
       "logoDarkAssetUrl": "Logo-Bild für den Dunkelmodus",

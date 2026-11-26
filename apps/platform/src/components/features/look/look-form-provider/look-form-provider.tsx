@@ -3,6 +3,7 @@
 import type { TLookCard } from '@platform/constants/look-card';
 import type { TPreviewDevice } from '@platform/constants/preview';
 import type { TBrandAssetKind } from '@platform/utils/brand-asset-limits/brand-asset-limits';
+import type { TButtonColorField } from '@platform/utils/button-colors/button-colors';
 import type {
   TLookFormFieldSetter,
   TLookFormValues,
@@ -29,6 +30,7 @@ export type TLookFormContext = {
   accentHueFieldId: string;
   isBrandNameTooLong: boolean;
   brandNameFieldId: string;
+  buttonColorFieldIds: Record<TButtonColorField, string>;
   shownBrandName: string;
   repickKinds: readonly TBrandAssetKind[];
   brandAssetFieldIds: Record<TBrandAssetKind, string>;

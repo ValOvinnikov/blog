@@ -1,4 +1,3 @@
-import { faker } from '@faker-js/faker';
 import {
   toClientTenant,
   type TClientTenant,
@@ -21,9 +20,6 @@ export * from './tenants-page-row';
 
 export const MOCK_TENANT_URL = `https://${MOCK_TENANT_DOMAIN}`;
 export const MOCK_VERCEL_A_RECORD = '76.76.21.21';
-export const MOCK_OTHER_TENANT_ID = faker.string.uuid();
-export const MOCK_OTHER_TENANT_NAME = 'Globex Corp.';
-export const MOCK_OTHER_TENANT_DOMAIN = 'globex.example.org';
 export const MOCK_SITE_NAME = 'Northwind Field Notes';
 export const MOCK_CUSTOM_DOMAIN = 'northwind.example.dev';
 export const MOCK_CUSTOM_DOMAIN_URL = `https://${MOCK_CUSTOM_DOMAIN}`;

@@ -316,6 +316,17 @@
     "showing": "{from, number}–{to, number} van {count, number} {count, plural, one {tenant} other {tenants}}",
     "count": "{count, plural, one {# tenant} other {# tenants}}"
   },
+  "pinnedTenants": {
+    "title": "Vastgezet",
+    "titleAccessible": "{count, plural, one {# vastgezette tenant} other {# vastgezette tenants}}",
+    "showAll": "Toon alle {count}",
+    "showLess": "Toon minder",
+    "pinAriaLabel": "{name} vastzetten",
+    "unpinAriaLabel": "{name} losmaken",
+    "pinnedAnnouncement": "{name} vastgezet",
+    "unpinnedAnnouncement": "{name} losgemaakt",
+    "saveFailed": "De pin van {name} kon niet worden opgeslagen. Probeer het opnieuw."
+  },
   "tenantsSearch": {
     "label": "Tenants zoeken",
     "hint": "Naam of domein.",
@@ -781,6 +792,10 @@
     "followsAccent": "volgt accent",
     "hueValue": "tint {hue}°"
   },
+  "buttonColorField": {
+    "hexLabel": "Hex",
+    "pickerAriaLabel": "Kies een kleur"
+  },
   "lookForm": {
     "heading": "Uiterlijk",
     "subtitle": "Geef deze site een eigen stijl. De voorbeeldweergave toont je wijzigingen — niets is live tot je opslaat.",
@@ -1010,7 +1025,7 @@
       "MENU": "In het menu"
     },
     "buttonsHeading": "Knoppen",
-    "buttonsDescription": "Hoe knoppen zijn gevormd, hoe ze eruitzien terwijl ze bezig zijn, en welke spinner ze tonen.",
+    "buttonsDescription": "Hoe knoppen zijn gevormd en gekleurd, hoe ze eruitzien terwijl ze bezig zijn, en welke spinner ze tonen.",
     "buttonsWhileWorkingHeading": "Tijdens het werk",
     "buttonShapeLabel": "Vorm",
     "buttonShapeDescription": "Hoeken van knoppen en labels.",
@@ -1019,6 +1034,15 @@
       "ROUNDED": "Afgerond",
       "PILL": "Pil"
     },
+    "buttonColorLabel": "Knopkleur",
+    "buttonColorDescription": "De vulling van gevulde knoppen, en van omlijnde knoppen bij aanwijzen. Labels worden wit of zwart zodat ze leesbaar blijven.",
+    "buttonColorFollowAccent": "Volgt het accent",
+    "buttonColorDarkLabel": "Knopkleur op donkere achtergronden",
+    "buttonColorDarkDescription": "Gebruikt op donkere banden en in de donkere modus. Volgt hij, dan wordt hij afgeleid van de knopkleur.",
+    "buttonColorDarkFollow": "Volgt de knopkleur",
+    "buttonColorInvalid": "Voer een hexkleur in, zoals #1a73e8.",
+    "buttonColorFaint": "Knoppen zijn vaag op {grounds}, dus lezers kunnen ze daar missen.",
+    "buttonColorFaintGround": "{skin} in de {scheme, select, DARK {donkere modus} other {lichte modus}}",
     "busyButtonStyleLabel": "Tijdens het werken",
     "busyButtonStyleDescription": "Wat een knop toont tijdens opslaan of verzenden. Hij behoudt zijn plek en blijft in volle kleur.",
     "busyButtonStyleOptionLabel": {
@@ -2735,6 +2759,8 @@
       "footerBackground": "Achtergrond van de voettekst",
       "footerSurface": "Oppervlak van de voettekst",
       "cookieSettingsButton": "Knop voor cookie-instellingen",
+      "buttonColor": "Knopkleur",
+      "buttonColorDark": "Knopkleur op donkere achtergronden",
       "brandName": "Merknaam",
       "logoAssetUrl": "Logoafbeelding",
       "logoDarkAssetUrl": "Logoafbeelding voor donkere modus",

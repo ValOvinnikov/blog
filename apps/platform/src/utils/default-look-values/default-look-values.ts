@@ -62,6 +62,8 @@ export type TLookFormValues = {
   busyButtonStyle: TBusyButtonStyle;
   spinnerStyle: TSpinnerStyle;
   buttonShape: TButtonShape;
+  buttonColor: TMaybeUndefined<string>;
+  buttonColorDark: TMaybeUndefined<string>;
   footerLayout: TFooterLayout;
   footerBackground: TBrandVariant;
   footerSurface: TFooterSurface;
@@ -82,6 +84,8 @@ export type TLookFormFieldSetter = <K extends keyof TLookFormValues>(
 export const defaultLookFormValues = (): TLookFormValues => ({
   ...presetSiteConfig(PRESET_ID.CONSOLE),
   logoHue: undefined,
+  buttonColor: undefined,
+  buttonColorDark: undefined,
   languageSwitcherStyle: LANGUAGE_SWITCHER_STYLE.MENU_CODE,
   colorMode: COLOR_MODE.READER,
   brandName: '',

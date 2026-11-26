@@ -76,6 +76,8 @@ export const savedLookValues = (overrides: Partial<TLookFormValues> = {}) => {
     busyButtonStyle: defaults.busyButtonStyle,
     spinnerStyle: defaults.spinnerStyle,
     buttonShape: defaults.buttonShape,
+    buttonColor: null,
+    buttonColorDark: null,
     footerLayout: defaults.footerLayout,
     footerBackground: defaults.footerBackground,
     footerSurface: defaults.footerSurface,

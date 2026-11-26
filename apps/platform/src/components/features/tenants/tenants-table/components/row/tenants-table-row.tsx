@@ -7,13 +7,14 @@ import { BADGE_TONE } from '@platform/constants/badge-tone';
 import { BUTTON_VARIANT } from '@platform/constants/button';
 import { DATA_TABLE_COLUMN } from '@platform/constants/data-table';
 import { formatDate } from '@platform/utils/format-date/format-date';
-import { adminRoutes } from '@platform/utils/routes/routes';
+import { isArchivedTenant } from '@platform/utils/pinned-tenants/pinned-tenants';
 import { tenantStatusTone } from '@platform/utils/status-tone/status-tone';
+import { tenantManageHref } from '@platform/utils/tenant-manage-href/tenant-manage-href';
 import { SIZE, TENANT_SORT_COLUMN } from '@shinefold/config';
-import { TENANT_PROVISIONING_STATUS } from '@shinefold/db/constants';
 import type { TTenantsPageRow } from '@shinefold/db/queries/tenants/tenants-page-row';
 import { useLocale, useTranslations } from 'next-intl';
 
+import { PinTenantToggle } from './components/pin-toggle/pin-tenant-toggle';
 import { tenantsTableRowVariants } from './tenants-table-row-variants';
 
 export type TTenantsTableTenant = Pick<
@@ -24,6 +25,7 @@ export type TTenantsTableTenant = Pick<
   | 'plan'
   | 'status'
   | 'provisioningStatus'
+  | 'deprovisionedAt'
   | 'createdAt'
   | 'matchedDomain'
 >;
@@ -32,16 +34,11 @@ export type TTenantsTableRowProps = {
   tenant: TTenantsTableTenant;
 };
 
-const manageHrefFor = (tenant: TTenantsTableTenant): string =>
-  tenant.provisioningStatus === TENANT_PROVISIONING_STATUS.READY
-    ? adminRoutes.tenantOverview(tenant.id)
-    : adminRoutes.tenantProvisioning(tenant.id);
-
 export const TenantsTableRow = ({ tenant }: TTenantsTableRowProps) => {
   const t = useTranslations('tenantsTable');
   const tPlan = useTranslations('planNames');
   const locale = useLocale();
-  const { tname, lines, name, domain } = tenantsTableRowVariants();
+  const { tname, lines, name, domain, actions } = tenantsTableRowVariants();
 
   return (
     <DataTableShell.Row>
@@ -75,15 +72,18 @@ export const TenantsTableRow = ({ tenant }: TTenantsTableRowProps) => {
         </time>
       </DataTableShell.Cell>
       <DataTableShell.Cell column={DATA_TABLE_COLUMN.ACTIONS}>
-        <LinkButton
-          href={manageHrefFor(tenant)}
-          variant={BUTTON_VARIANT.SECONDARY}
-          size={SIZE.SM}
-          ariaLabel={t('manageAriaLabel', { tenantName: tenant.name })}
-          hasArrow={true}
-        >
-          {t('manage')}
-        </LinkButton>
+        <div className={actions()}>
+          {!isArchivedTenant(tenant) && <PinTenantToggle tenant={tenant} />}
+          <LinkButton
+            href={tenantManageHref(tenant)}
+            variant={BUTTON_VARIANT.SECONDARY}
+            size={SIZE.SM}
+            ariaLabel={t('manageAriaLabel', { tenantName: tenant.name })}
+            hasArrow={true}
+          >
+            {t('manage')}
+          </LinkButton>
+        </div>
       </DataTableShell.Cell>
     </DataTableShell.Row>
   );

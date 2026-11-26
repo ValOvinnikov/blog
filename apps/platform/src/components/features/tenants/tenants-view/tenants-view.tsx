@@ -1,5 +1,7 @@
 import { ArchivedTenantsToggle } from '@platform/components/features/tenants/archived-tenants-toggle';
 import { EmailAlertsBanner } from '@platform/components/features/tenants/email-alerts-banner';
+import { PinnedTenants } from '@platform/components/features/tenants/pinned-tenants';
+import { PinnedTenantsProvider } from '@platform/components/features/tenants/pinned-tenants-provider';
 import { TenantsSearch } from '@platform/components/features/tenants/tenants-search';
 import {
   TenantsTable,
@@ -11,6 +13,7 @@ import { PageHeader } from '@platform/components/shared/page-header';
 import { BUTTON_VARIANT } from '@platform/constants/button';
 import { FOCUS_RING_GROUND } from '@platform/constants/focus-ring';
 import { ICON_SIZE } from '@platform/constants/icon';
+import type { TPinnedTenant } from '@platform/utils/pinned-tenants/pinned-tenants';
 import { adminRoutes } from '@platform/utils/routes/routes';
 import type { TTenantsListQuery } from '@platform/utils/tenants-list-query/tenants-list-query';
 import { ICONS } from '@shinefold/config';
@@ -20,6 +23,7 @@ import { tenantsViewVariants } from './tenants-view-variants';
 
 export type TTenantsViewProps = {
   tenants: TTenantsTableTenant[];
+  pinnedTenants: TPinnedTenant[];
   total: number;
   totalPages: number;
   listQuery: TTenantsListQuery;
@@ -28,6 +32,7 @@ export type TTenantsViewProps = {
 
 export const TenantsView = ({
   tenants,
+  pinnedTenants,
   total,
   totalPages,
   listQuery,
@@ -53,18 +58,21 @@ export const TenantsView = ({
         }
       />
       {!isEmailAlertingConfigured && <EmailAlertsBanner />}
-      <TenantsTable
-        tenants={tenants}
-        total={total}
-        totalPages={totalPages}
-        listQuery={listQuery}
-        toolbar={
-          <>
-            <TenantsSearch listQuery={listQuery} />
-            <ArchivedTenantsToggle listQuery={listQuery} />
-          </>
-        }
-      />
+      <PinnedTenantsProvider pinnedTenants={pinnedTenants}>
+        <PinnedTenants />
+        <TenantsTable
+          tenants={tenants}
+          total={total}
+          totalPages={totalPages}
+          listQuery={listQuery}
+          toolbar={
+            <>
+              <TenantsSearch listQuery={listQuery} />
+              <ArchivedTenantsToggle listQuery={listQuery} />
+            </>
+          }
+        />
+      </PinnedTenantsProvider>
     </div>
   );
 };

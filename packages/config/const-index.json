@@ -11172,6 +11172,14 @@
         "file": "apps/platform/src/constants/tenant.ts"
       }
     ],
+    "tenants.pin_failed": [
+      {
+        "ref": "TENANT_LOG.PIN_FAILED",
+        "scope": "app:platform",
+        "from": "@platform/constants/tenant",
+        "file": "apps/platform/src/constants/tenant.ts"
+      }
+    ],
     "tenants.plan_change_email_failed": [
       {
         "ref": "TENANT_LOG.PLAN_CHANGE_EMAIL_FAILED",
@@ -11303,6 +11311,14 @@
     "tenant.suspension_save_failed": [
       {
         "ref": "TENANT_LOG.SUSPENSION_SAVE_FAILED",
+        "scope": "app:platform",
+        "from": "@platform/constants/tenant",
+        "file": "apps/platform/src/constants/tenant.ts"
+      }
+    ],
+    "tenants.unpin_failed": [
+      {
+        "ref": "TENANT_LOG.UNPIN_FAILED",
         "scope": "app:platform",
         "from": "@platform/constants/tenant",
         "file": "apps/platform/src/constants/tenant.ts"

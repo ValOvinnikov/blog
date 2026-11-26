@@ -31,6 +31,8 @@ export const toUpdateLookInput = (
   busyButtonStyle: values.busyButtonStyle,
   spinnerStyle: values.spinnerStyle,
   buttonShape: values.buttonShape,
+  buttonColor: values.buttonColor ?? null,
+  buttonColorDark: values.buttonColorDark ?? null,
   footerLayout: values.footerLayout,
   footerBackground: values.footerBackground,
   footerSurface: values.footerSurface,

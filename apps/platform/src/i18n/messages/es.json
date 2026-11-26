@@ -316,6 +316,17 @@
     "showing": "{from, number}–{to, number} de {count, number} {count, plural, one {cliente} other {clientes}}",
     "count": "{count, plural, one {# cliente} other {# clientes}}"
   },
+  "pinnedTenants": {
+    "title": "Fijados",
+    "titleAccessible": "{count, plural, one {# cliente fijado} other {# clientes fijados}}",
+    "showAll": "Mostrar los {count}",
+    "showLess": "Mostrar menos",
+    "pinAriaLabel": "Fijar {name}",
+    "unpinAriaLabel": "Dejar de fijar {name}",
+    "pinnedAnnouncement": "{name} fijado",
+    "unpinnedAnnouncement": "{name} ya no está fijado",
+    "saveFailed": "No se pudo guardar el fijado de {name}. Vuelve a intentarlo."
+  },
   "tenantsSearch": {
     "label": "Buscar clientes",
     "hint": "Nombre o dominio.",
@@ -781,6 +792,10 @@
     "followsAccent": "sigue el acento",
     "hueValue": "tono {hue}°"
   },
+  "buttonColorField": {
+    "hexLabel": "Hex",
+    "pickerAriaLabel": "Elegir un color"
+  },
   "lookForm": {
     "heading": "Aspecto",
     "subtitle": "Personaliza este sitio. La vista previa muestra tus cambios — nada se publica hasta que guardes.",
@@ -1010,7 +1025,7 @@
       "MENU": "En el menú"
     },
     "buttonsHeading": "Botones",
-    "buttonsDescription": "Qué forma tienen los botones, cómo se ven mientras trabajan y el indicador de carga que muestran.",
+    "buttonsDescription": "Qué forma y color tienen los botones, cómo se ven mientras trabajan y el indicador de carga que muestran.",
     "buttonsWhileWorkingHeading": "Mientras trabaja",
     "buttonShapeLabel": "Forma",
     "buttonShapeDescription": "Esquinas de los botones y las etiquetas.",
@@ -1019,6 +1034,15 @@
       "ROUNDED": "Redondeada",
       "PILL": "Píldora"
     },
+    "buttonColorLabel": "Color de los botones",
+    "buttonColorDescription": "El relleno de los botones rellenos, y de los botones con contorno al pasar el cursor. Las etiquetas pasan a blanco o negro para seguir siendo legibles.",
+    "buttonColorFollowAccent": "Sigue el acento",
+    "buttonColorDarkLabel": "Color de los botones sobre fondos oscuros",
+    "buttonColorDarkDescription": "Se usa en franjas oscuras y en el modo oscuro. Si sigue, se calcula a partir del color de los botones.",
+    "buttonColorDarkFollow": "Sigue el color de los botones",
+    "buttonColorInvalid": "Introduce un color hexadecimal, como #1a73e8.",
+    "buttonColorFaint": "Los botones se ven tenues en {grounds}, así que los lectores pueden pasarlos por alto.",
+    "buttonColorFaintGround": "{skin} en {scheme, select, DARK {modo oscuro} other {modo claro}}",
     "busyButtonStyleLabel": "Mientras trabaja",
     "busyButtonStyleDescription": "Qué muestra un botón mientras guarda o envía. Conserva su sitio y su color completo.",
     "busyButtonStyleOptionLabel": {
@@ -2735,6 +2759,8 @@
       "footerBackground": "Fondo del pie de página",
       "footerSurface": "Superficie del pie de página",
       "cookieSettingsButton": "Botón de configuración de cookies",
+      "buttonColor": "Color de los botones",
+      "buttonColorDark": "Color de los botones sobre fondos oscuros",
       "brandName": "Nombre de la marca",
       "logoAssetUrl": "Imagen del logotipo",
       "logoDarkAssetUrl": "Imagen del logotipo para el modo oscuro",

@@ -1,13 +1,13 @@
 'use client';
 
+import { LookFollowSwitch } from '@platform/components/features/look/look-follow-switch';
 import { accentSwatchVariants } from '@platform/components/shared/accent-swatch/accent-swatch-variants';
 import { HueSlider } from '@platform/components/shared/hue-slider';
-import { Switch } from '@platform/components/shared/switch';
 import { buildLogoPreviewTokens } from '@platform/utils/theme-preview-tokens/theme-preview-tokens';
 import { SIZE, type TMaybeUndefined } from '@shinefold/config';
 import { isUndefined } from '@shinefold/utils/primitives';
 import { useTranslations } from 'next-intl';
-import { useId, type AriaAttributes } from 'react';
+import type { AriaAttributes } from 'react';
 
 import { logoHueFieldVariants } from './logo-hue-field-variants';
 
@@ -20,7 +20,6 @@ export type TLogoHueFieldProps = {
   'aria-describedby'?: AriaAttributes['aria-describedby'];
 };
 
-// A slider pre-set to the accent hue could not tell "follows accent" from a deliberate match, so following is a state of its own.
 export const LogoHueField = ({
   accentHue,
   logoHue,
@@ -30,8 +29,6 @@ export const LogoHueField = ({
   'aria-describedby': ariaDescribedBy,
 }: TLogoHueFieldProps) => {
   const t = useTranslations('logoHueField');
-  const captionId = useId();
-  const followAccentHue = t('followAccentHue');
   const follows = isUndefined(logoHue);
   const resolvedHue = logoHue ?? accentHue;
   const tones = buildLogoPreviewTokens(resolvedHue, false);
@@ -42,33 +39,21 @@ export const LogoHueField = ({
     tones: tonesSlot,
     tone,
     hueValue,
-    switchRow,
-    readout,
   } = logoHueFieldVariants();
 
   return (
     <div className={root()}>
-      <div className={switchRow()}>
-        <Switch
-          aria={
-            growthBadgeId
-              ? {
-                  labelledBy: `${captionId} ${growthBadgeId}`,
-                  describedBy: ariaDescribedBy,
-                }
-              : { label: followAccentHue, describedBy: ariaDescribedBy }
-          }
-          isChecked={follows}
-          onCheckedChange={(checked) =>
-            onChange(checked ? undefined : accentHue)
-          }
-          labels={{ caption: followAccentHue, captionId }}
-          isLocked={isLocked}
-        />
-        {isLocked && follows && (
-          <span className={readout()}>{t('followsAccent')}</span>
-        )}
-      </div>
+      <LookFollowSwitch
+        label={t('followAccentHue')}
+        isFollowing={follows}
+        onFollowChange={(checked) => onChange(checked ? undefined : accentHue)}
+        lock={{
+          isLocked,
+          growthBadgeId,
+          describedBy: ariaDescribedBy,
+        }}
+        lockedReadout={t('followsAccent')}
+      />
 
       {!follows && (
         <div className={hueField()}>

@@ -1,6 +1,8 @@
-import { faker } from '@faker-js/faker';
+import { createMockFaker } from '@platform/testing/mock-faker';
 
-export const MOCK_TENANT_ID = faker.string.uuid();
+const mockFaker = createMockFaker(8061);
+
+export const MOCK_TENANT_ID = mockFaker.string.uuid();
 export const MOCK_TENANT_NAME = 'Acme Inc.';
 export const MOCK_TENANT_SLUG = 'acme';
 export const MOCK_TENANT_ROOT_DOMAIN = 'example.com';
@@ -9,3 +11,7 @@ export const MOCK_MARKETING_HOST = `marketing.${MOCK_TENANT_ROOT_DOMAIN}`;
 export const MOCK_MARKETING_SITE_URL = `https://${MOCK_MARKETING_HOST}`;
 export const MOCK_SANITY_PROJECT_ID = 'proj-1';
 export const MOCK_TENANT_CREATED_AT = new Date('2026-04-02T00:00:00.000Z');
+export const MOCK_OTHER_TENANT_ID = mockFaker.string.uuid();
+export const MOCK_OTHER_TENANT_NAME = 'Globex Corp.';
+export const MOCK_OTHER_TENANT_DOMAIN = 'globex.example.org';
+export const MOCK_MALFORMED_TENANT_ID = mockFaker.lorem.slug();

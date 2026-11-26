@@ -78,6 +78,7 @@ export const TENANT_LOG = {
   DOMAIN_AVAILABILITY_INVALID_DOMAIN:
     'tenants.domain_availability_invalid_domain',
   OWNER_INVITE_EMAIL_FAILED: 'tenants.owner_invite_email_failed',
+  PIN_FAILED: 'tenants.pin_failed',
   PLAN_CHANGE_EMAIL_FAILED: 'tenants.plan_change_email_failed',
   PLAN_CHANGE_EMAIL_OWNER_MISSING: 'tenants.plan_change_email_owner_missing',
   PLAN_CHANGE_EMAIL_UNCONFIGURED: 'tenants.plan_change_email_unconfigured',
@@ -95,6 +96,7 @@ export const TENANT_LOG = {
   SUSPENSION_EMAIL_REPLY_TO_MISSING: 'tenant.suspension_email_reply_to_missing',
   SUSPENSION_EMAIL_UNCONFIGURED: 'tenant.suspension_email_unconfigured',
   SUSPENSION_SAVE_FAILED: 'tenant.suspension_save_failed',
+  UNPIN_FAILED: 'tenants.unpin_failed',
   UPDATE_DETAILS_AUDIT_FAILED: 'tenants.update_details_audit_failed',
   UPDATE_DETAILS_FAILED: 'tenants.update_details_failed',
   UPDATE_LANGUAGES_AUDIT_FAILED: 'tenants.update_languages_audit_failed',
@@ -112,3 +114,9 @@ export type TTenantVisibility = TValueOf<typeof TENANT_VISIBILITY>;
 export const TENANTS_SEARCH_DEBOUNCE_MS = 300;
 
 export const TENANTS_PAGE_SIZE = 25;
+
+const TENANTS_LIST_ROUTE = '/[locale]/(operator)/tenants';
+
+export const TENANTS_LIST_PURGE_ARGS = [TENANTS_LIST_ROUTE, 'page'] as const;
+
+export const TENANTS_SEARCH_INPUT_ID = 'tenants-search-input';
