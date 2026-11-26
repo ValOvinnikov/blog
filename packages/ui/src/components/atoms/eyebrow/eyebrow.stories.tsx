@@ -1,3 +1,4 @@
+import { withShinefoldPreset } from '@shinefold/ui/testing/shinefold-preset';
 import type { Meta, StoryObj } from '@storybook/react-vite';
 
 import { Eyebrow } from './eyebrow';
@@ -21,4 +22,14 @@ export const TopicLabel: TStory = {
 
 export const AsTopicLink: TStory = {
   args: { children: 'Engineering', href: '/topics/engineering' },
+};
+
+export const ShinefoldPreset: TStory = {
+  ...Default,
+  decorators: [withShinefoldPreset],
+};
+
+export const AsTopicLinkShinefoldPreset: TStory = {
+  ...AsTopicLink,
+  decorators: [withShinefoldPreset],
 };

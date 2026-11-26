@@ -18,6 +18,7 @@ import {
   InCardStyle,
 } from '@shinefold/ui/testing/card-styles';
 import { inNarrowColumn, threeAcross } from '@shinefold/ui/testing/card-widths';
+import { withShinefoldPreset } from '@shinefold/ui/testing/shinefold-preset';
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { keys } from 'remeda';
 
@@ -662,4 +663,9 @@ export const CenterAligned: TStory = {
       </>
     ),
   },
+};
+
+export const IconMediaShinefoldPreset: TStory = {
+  ...IconMedia,
+  decorators: [withShinefoldPreset],
 };

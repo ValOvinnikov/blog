@@ -1,6 +1,6 @@
 import { TEXT_ROLE, type TTextRole } from '@shinefold/config';
 
-const TITLE = 'font-display font-heading text-text';
+const TITLE = 'font-display font-heading text-heading';
 const SUBTLE_MONO = 'font-mono text-text-subtle';
 
 export const TYPOGRAPHY: Record<TTextRole, string> = {
@@ -23,7 +23,7 @@ export const TYPOGRAPHY: Record<TTextRole, string> = {
   [TEXT_ROLE.CARD_BODY]: 'font-read text-lead text-text-muted',
   [TEXT_ROLE.META]: `${SUBTLE_MONO} text-meta`,
   [TEXT_ROLE.EYEBROW]:
-    'font-mono text-label font-medium uppercase tracking-eyebrow text-brand-primary',
+    'font-mono text-label font-medium uppercase tracking-eyebrow text-eyebrow-text',
   [TEXT_ROLE.LABEL]:
     'font-mono text-label font-medium uppercase tracking-label',
   [TEXT_ROLE.FOOTNOTE]: 'font-read text-caption text-text-subtle',

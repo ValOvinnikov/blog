@@ -24,8 +24,10 @@ export const pricingCardVariants = tv({
     isHighlighted: {
       true: {
         root: [
-          'border-brand-primary',
-          '[--item-border-width:1px] [--item-accent-brand-share:100%] [--item-shadow:var(--shadow-card)]',
+          'border-tier-highlight-border',
+          // Important, or item-card's own ::after rule keeps painting the accent bar in --brand-primary over the tier border.
+          'after:border-l-tier-highlight-border!',
+          '[--item-border-width:var(--tier-highlight-border-width)] [--item-accent-brand-share:100%] [--item-shadow:var(--shadow-card)]',
         ],
       },
       false: {},

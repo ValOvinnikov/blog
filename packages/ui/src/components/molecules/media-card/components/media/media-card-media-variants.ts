@@ -2,7 +2,7 @@ import { tv } from '@shinefold/ui/lib/styling';
 import type { VariantProps } from 'tailwind-variants';
 
 const TINTED_FILL = [
-  'bg-media-fill text-brand-primary',
+  'bg-feature-icon-tile text-feature-icon-glyph',
   'group-hover:bg-transparent group-focus-within:bg-transparent',
 ];
 
