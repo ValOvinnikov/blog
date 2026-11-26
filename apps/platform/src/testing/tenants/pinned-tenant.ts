@@ -13,9 +13,9 @@ import { mockTenantsPageRow } from './tenants-page-row';
 
 const mockFaker = createMockFaker(8079);
 
-export const MOCK_THIRD_TENANT_ID = mockFaker.string.uuid();
-export const MOCK_THIRD_TENANT_NAME = 'Initech Ltd.';
-export const MOCK_THIRD_TENANT_DOMAIN = 'initech.example.net';
+const MOCK_THIRD_TENANT_ID = mockFaker.string.uuid();
+const MOCK_THIRD_TENANT_NAME = 'Initech Ltd.';
+const MOCK_THIRD_TENANT_DOMAIN = 'initech.example.net';
 
 export const mockPinnedTenant = (
   overrides: Partial<TPinnedTenant> = {},
