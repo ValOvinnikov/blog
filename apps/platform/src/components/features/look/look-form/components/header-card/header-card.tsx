@@ -20,6 +20,7 @@ import { useTranslations } from 'next-intl';
 
 import { AccountFields } from './components/account-fields/account-fields';
 import { BackgroundFields } from './components/background-fields/background-fields';
+import { HeaderActionFields } from './components/header-action-fields/header-action-fields';
 import { HeaderControlShapeField } from './components/header-control-shape-field/header-control-shape-field';
 import { HeaderControlStyleField } from './components/header-control-style-field/header-control-style-field';
 import { NavLinkStyleField } from './components/nav-link-style-field/nav-link-style-field';
@@ -120,6 +121,8 @@ export const HeaderCard = ({ summary }: THeaderCardProps) => {
       <HeaderControlStyleField />
 
       <HeaderControlShapeField />
+
+      <HeaderActionFields />
 
       <AccountFields />
     </LookCard>

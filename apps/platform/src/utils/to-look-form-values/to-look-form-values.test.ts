@@ -42,6 +42,8 @@ describe(toLookFormValues, () => {
       cardStyle: MOCK_SITE_CONFIG.cardStyle,
       headerControlStyle: MOCK_SITE_CONFIG.headerControlStyle,
       headerControlShape: MOCK_SITE_CONFIG.headerControlShape,
+      headerActionStyle: MOCK_SITE_CONFIG.headerActionStyle,
+      headerActionPhonePlacement: MOCK_SITE_CONFIG.headerActionPhonePlacement,
       headerLayout: MOCK_SITE_CONFIG.headerLayout,
       headerSubmenuStyle: MOCK_SITE_CONFIG.headerSubmenuStyle,
       headerBarStyle: MOCK_SITE_CONFIG.headerBarStyle,

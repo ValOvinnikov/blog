@@ -931,6 +931,19 @@
       "ROUNDED": "Las esquinas siguen el ajuste de Esquinas del sitio",
       "SQUARE": "Esquinas rectas"
     },
+    "headerActionStyleLabel": "Estilo de la acción de la cabecera",
+    "headerActionStyleDescription": "Cómo se dibuja el enlace de acción de la cabecera. Relleno y Con contorno toman el color y la forma de los botones.",
+    "headerActionStyleOptionLabel": {
+      "FILLED": "Relleno",
+      "OUTLINED": "Con contorno",
+      "PLAIN": "Enlace sencillo"
+    },
+    "headerActionPhonePlacementLabel": "En teléfonos",
+    "headerActionPhonePlacementDescription": "Dónde va la acción de la cabecera en teléfonos: en la barra junto al botón del menú, o arriba del todo en el menú.",
+    "headerActionPhonePlacementOptionLabel": {
+      "BAR": "En la barra",
+      "MENU": "Arriba en el menú"
+    },
     "languageSwitcherLabel": "Selector de idioma",
     "languageSwitcherStyleLabel": "Estilo",
     "languageSwitcherDescription": "Cómo se ve el selector de idioma en escritorio, en el encabezado y el pie de página.",
@@ -1110,6 +1123,11 @@
       "ONLY": "Botón de cookies flotante",
       "SHOWN": "Enlace y botón de cookies"
     },
+    "headerActionStyleSummary": {
+      "FILLED": "Acción rellena",
+      "OUTLINED": "Acción con contorno",
+      "PLAIN": "Acción como enlace"
+    },
     "summaryOneLanguage": "Un idioma"
   },
   "previewModeControl": {
@@ -1170,6 +1188,7 @@
     "themeToggleDark": "Cambiar al tema oscuro",
     "themeToggleLight": "Cambiar al tema claro",
     "menuButton": "Menú",
+    "headerAction": "Contactar",
     "readerStateAriaLabel": "Lector",
     "readerSignedOut": "Sin sesión",
     "readerSignedIn": "Con sesión",
@@ -2739,6 +2758,8 @@
       "cardStyle": "Estilo de tarjeta",
       "headerControlStyle": "Botones de la cabecera",
       "headerControlShape": "Forma de los botones de la cabecera",
+      "headerActionStyle": "Estilo de la acción de la cabecera",
+      "headerActionPhonePlacement": "Posición de la acción de la cabecera en teléfonos",
       "accountButtonStyle": "Botón de la cuenta",
       "accountPanelStyle": "Panel de la cuenta",
       "accountPhonePlacement": "Posición de la cuenta en teléfonos",

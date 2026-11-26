@@ -53,5 +53,19 @@ export const useHeaderDraftFields = () => {
       display: ({ headerControlShape }: TLookFormValues) =>
         t(`headerControlShapeOptionLabel.${headerControlShape}`),
     },
+    {
+      id: 'headerActionStyle',
+      label: t('headerActionStyleLabel'),
+      display: ({ headerActionStyle }: TLookFormValues) =>
+        t(`headerActionStyleOptionLabel.${headerActionStyle}`),
+    },
+    {
+      id: 'headerActionPhonePlacement',
+      label: t('headerActionPhonePlacementLabel'),
+      display: ({ headerActionPhonePlacement }: TLookFormValues) =>
+        t(
+          `headerActionPhonePlacementOptionLabel.${headerActionPhonePlacement}`,
+        ),
+    },
   ];
 };

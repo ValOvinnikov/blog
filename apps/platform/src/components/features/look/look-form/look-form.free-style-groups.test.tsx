@@ -20,6 +20,23 @@ vi.mock('@platform/server/site-config/clear-brand-asset-action');
 
 const { lookForm: LOOK_FORM } = messages;
 
+const LOCKED_AT_DEFAULT = 'shows $group locked at its default';
+
+const HEADER_ACTION_GROUPS = [
+  {
+    row: LOOK_ROW.HEADER,
+    group: LOOK_FORM.headerActionStyleLabel,
+    current: LOOK_FORM.headerActionStyleOptionLabel.FILLED,
+    other: LOOK_FORM.headerActionStyleOptionLabel.PLAIN,
+  },
+  {
+    row: LOOK_ROW.HEADER,
+    group: LOOK_FORM.headerActionPhonePlacementLabel,
+    current: LOOK_FORM.headerActionPhonePlacementOptionLabel.MENU,
+    other: LOOK_FORM.headerActionPhonePlacementOptionLabel.BAR,
+  },
+];
+
 describe(`<${LookForm.name}/>`, () => {
   let user: UserEvent;
 
@@ -69,7 +86,18 @@ describe(`<${LookForm.name}/>`, () => {
         current: LOOK_FORM.accountPhonePlacementOptionLabel.BAR,
         other: LOOK_FORM.accountPhonePlacementOptionLabel.MENU,
       },
-    ])('shows $group locked at its default', async (lockedGroup) => {
+      ...HEADER_ACTION_GROUPS,
+    ])(LOCKED_AT_DEFAULT, async (lockedGroup) => {
+      await expectStyleGroupLockedAtDefault(user, lockedGroup);
+    });
+  });
+
+  describe('on Starter', () => {
+    beforeEach(() => {
+      setupLookForm(withLookPlan(TENANT_PLAN.STARTER));
+    });
+
+    it.each(HEADER_ACTION_GROUPS)(LOCKED_AT_DEFAULT, async (lockedGroup) => {
       await expectStyleGroupLockedAtDefault(user, lockedGroup);
     });
   });
