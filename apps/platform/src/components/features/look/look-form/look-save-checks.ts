@@ -3,7 +3,8 @@ import { isBrandNameTooLong } from '@platform/utils/brand-name/brand-name';
 import { isButtonColorInvalid } from '@platform/utils/button-colors/button-colors';
 import type { TLookFormValues } from '@platform/utils/default-look-values/default-look-values';
 import { isAccentHueAccessible } from '@shinefold/config';
-import { hasArrayGotItems, objectKeys } from '@shinefold/utils/primitives';
+import { hasArrayGotItems } from '@shinefold/utils/primitives';
+import { keys } from 'remeda';
 
 export type TCheckedField =
   'accentHue' | 'buttonColor' | 'buttonColorDark' | 'brandName';
@@ -29,7 +30,7 @@ const listInvalidFields = ({
     buttonColorDark: isButtonColorInvalid(buttonColorDark),
     brandName: isBrandNameTooLong(brandName),
   };
-  return objectKeys(CHECKED_ROWS).filter((field) => isInvalid[field]);
+  return keys(CHECKED_ROWS).filter((field) => isInvalid[field]);
 };
 
 export const canSaveLook = (values: TCheckedValues) =>

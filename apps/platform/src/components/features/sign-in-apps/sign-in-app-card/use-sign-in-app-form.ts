@@ -11,10 +11,11 @@ import {
   isOutcomeSuccess,
   type TMaybeUndefined,
 } from '@shinefold/config';
-import { hasLength, objectKeys } from '@shinefold/utils/primitives';
+import { hasLength } from '@shinefold/utils/primitives';
 import { useRouter } from 'next/navigation';
 import { useTranslations } from 'next-intl';
 import { useState, useTransition } from 'react';
+import { keys } from 'remeda';
 
 import {
   useSignInAppFields,
@@ -68,7 +69,7 @@ export const useSignInAppForm = (tenantId: string, app: TSignInAppView) => {
       return true;
     }
     const invalidFields = isOutcomeInvalid(result)
-      ? objectKeys(result.fieldErrors)
+      ? keys(result.fieldErrors)
       : [];
     if (hasLength(invalidFields)) {
       showErrors(invalidFields);

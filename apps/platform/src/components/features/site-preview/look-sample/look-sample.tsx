@@ -26,8 +26,8 @@ import {
 } from '@shinefold/config';
 import { Heading } from '@shinefold/ui/components/atoms/heading';
 import { Text } from '@shinefold/ui/components/atoms/text';
-import { objectKeys } from '@shinefold/utils/primitives';
 import { useTranslations } from 'next-intl';
+import { keys } from 'remeda';
 
 import { lookSampleVariants } from './look-sample-variants';
 
@@ -102,7 +102,7 @@ export const LookSample = ({
         <LookSampleQuote />
         <LookSampleCta />
       </div>
-      {objectKeys(SKIN_REGISTRY).map((skin) => (
+      {keys(SKIN_REGISTRY).map((skin) => (
         <LookSampleBand key={skin} skin={skin} />
       ))}
       <LookSampleBanner />
