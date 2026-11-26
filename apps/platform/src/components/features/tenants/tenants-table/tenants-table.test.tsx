@@ -23,7 +23,7 @@ import {
   TENANT_PROVISIONING_STATUS,
   TENANT_STATUS,
 } from '@shinefold/db/constants';
-import type { TTenantsPageRow } from '@shinefold/db/queries/tenants/list-tenants-page/list-tenants-page';
+import type { TTenantsPageRow } from '@shinefold/db/queries/tenants/tenants-page-row';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
 
 import { TenantsTable } from './tenants-table';
