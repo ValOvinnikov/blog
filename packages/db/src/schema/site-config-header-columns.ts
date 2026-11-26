@@ -1,5 +1,7 @@
 import {
   BRAND_VARIANT,
+  HEADER_ACTION_PHONE_PLACEMENT,
+  HEADER_ACTION_STYLE,
   HEADER_BAR_STYLE,
   HEADER_CONTROL_SHAPE,
   HEADER_CONTROL_STYLE,
@@ -10,6 +12,8 @@ import {
 
 import {
   breadcrumbBackgroundEnum,
+  headerActionPhonePlacementEnum,
+  headerActionStyleEnum,
   headerBackgroundEnum,
   headerBarStyleEnum,
   headerControlShapeEnum,
@@ -26,6 +30,14 @@ export const siteConfigHeaderColumns = {
   headerControlShape: headerControlShapeEnum('header_control_shape')
     .notNull()
     .default(HEADER_CONTROL_SHAPE.ROUND),
+  headerActionStyle: headerActionStyleEnum('header_action_style')
+    .notNull()
+    .default(HEADER_ACTION_STYLE.FILLED),
+  headerActionPhonePlacement: headerActionPhonePlacementEnum(
+    'header_action_phone_placement',
+  )
+    .notNull()
+    .default(HEADER_ACTION_PHONE_PLACEMENT.MENU),
   headerLayout: headerLayoutEnum('header_layout')
     .notNull()
     .default(HEADER_LAYOUT.CLASSIC),

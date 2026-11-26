@@ -70,6 +70,12 @@
         "scope": "config",
         "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/account-control.ts"
+      },
+      {
+        "ref": "HEADER_ACTION_PHONE_PLACEMENT.BAR",
+        "scope": "config",
+        "from": "@shinefold/config/constants",
+        "file": "packages/config/src/constants/header-action.ts"
       }
     ],
     "MENU": [
@@ -78,6 +84,12 @@
         "scope": "config",
         "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/account-control.ts"
+      },
+      {
+        "ref": "HEADER_ACTION_PHONE_PLACEMENT.MENU",
+        "scope": "config",
+        "from": "@shinefold/config/constants",
+        "file": "packages/config/src/constants/header-action.ts"
       },
       {
         "ref": "ICONS.MENU",
@@ -1044,6 +1056,12 @@
         "file": "packages/config/src/constants/card-style.ts"
       },
       {
+        "ref": "HEADER_ACTION_STYLE.OUTLINED",
+        "scope": "config",
+        "from": "@shinefold/config/constants",
+        "file": "packages/config/src/constants/header-action.ts"
+      },
+      {
         "ref": "HEADER_CONTROL_STYLE.OUTLINED",
         "scope": "config",
         "from": "@shinefold/config/constants",
@@ -1056,6 +1074,12 @@
         "scope": "config",
         "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/card-style.ts"
+      },
+      {
+        "ref": "HEADER_ACTION_STYLE.FILLED",
+        "scope": "config",
+        "from": "@shinefold/config/constants",
+        "file": "packages/config/src/constants/header-action.ts"
       }
     ],
     "RAISED": [
@@ -1072,6 +1096,12 @@
         "scope": "config",
         "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/card-style.ts"
+      },
+      {
+        "ref": "HEADER_ACTION_STYLE.PLAIN",
+        "scope": "config",
+        "from": "@shinefold/config/constants",
+        "file": "packages/config/src/constants/header-action.ts"
       },
       {
         "ref": "HEADER_CONTROL_STYLE.PLAIN",

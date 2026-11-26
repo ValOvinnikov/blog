@@ -147,6 +147,11 @@ Every key/value const an agent should reuse before writing a literal. The
 
 - **GRID_COLUMNS**: `TWO`, `THREE`, `FOUR`
 
+### `@shinefold/config/constants` — `packages/config/src/constants/header-action.ts`
+
+- **HEADER_ACTION_STYLE**: `FILLED`, `OUTLINED`, `PLAIN`
+- **HEADER_ACTION_PHONE_PLACEMENT**: `BAR`, `MENU`
+
 ### `@shinefold/config/constants` — `packages/config/src/constants/header-control-shape.ts`
 
 - **HEADER_CONTROL_SHAPE**: `ROUND`, `ROUNDED`, `SQUARE`

@@ -17,6 +17,10 @@ import type {
   TFooterLayout,
   TFooterSurface,
 } from './footer-layout';
+import type {
+  THeaderActionPhonePlacement,
+  THeaderActionStyle,
+} from './header-action';
 import type { THeaderControlShape } from './header-control-shape';
 import type { THeaderControlStyle } from './header-control-style';
 import type {
@@ -102,6 +106,8 @@ export type TPresetBundle = {
   cardStyle: TCardStyle;
   headerControlStyle: THeaderControlStyle;
   headerControlShape: THeaderControlShape;
+  headerActionStyle: THeaderActionStyle;
+  headerActionPhonePlacement: THeaderActionPhonePlacement;
   accountButtonStyle: TAccountButtonStyle;
   accountPanelStyle: TAccountPanelStyle;
   accountPhonePlacement: TAccountPhonePlacement;

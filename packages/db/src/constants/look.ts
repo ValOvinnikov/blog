@@ -14,6 +14,8 @@ export const LOOK_FIELD = {
   CARD_STYLE: 'cardStyle',
   HEADER_CONTROL_STYLE: 'headerControlStyle',
   HEADER_CONTROL_SHAPE: 'headerControlShape',
+  HEADER_ACTION_STYLE: 'headerActionStyle',
+  HEADER_ACTION_PHONE_PLACEMENT: 'headerActionPhonePlacement',
   ACCOUNT_BUTTON_STYLE: 'accountButtonStyle',
   ACCOUNT_PANEL_STYLE: 'accountPanelStyle',
   ACCOUNT_PHONE_PLACEMENT: 'accountPhonePlacement',

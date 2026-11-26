@@ -13,6 +13,10 @@ import {
   FOOTER_LAYOUT,
   FOOTER_SURFACE,
 } from './footer-layout';
+import {
+  HEADER_ACTION_PHONE_PLACEMENT,
+  HEADER_ACTION_STYLE,
+} from './header-action';
 import { HEADER_CONTROL_SHAPE } from './header-control-shape';
 import { HEADER_CONTROL_STYLE } from './header-control-style';
 import {
@@ -42,6 +46,8 @@ export const CONSOLE_BUNDLE: TPresetBundle = {
   cardStyle: CARD_STYLE.ACCENT_BAR,
   headerControlStyle: HEADER_CONTROL_STYLE.OUTLINED,
   headerControlShape: HEADER_CONTROL_SHAPE.ROUND,
+  headerActionStyle: HEADER_ACTION_STYLE.FILLED,
+  headerActionPhonePlacement: HEADER_ACTION_PHONE_PLACEMENT.MENU,
   accountButtonStyle: ACCOUNT_BUTTON_STYLE.PILL,
   accountPanelStyle: ACCOUNT_PANEL_STYLE.CARD,
   accountPhonePlacement: ACCOUNT_PHONE_PLACEMENT.BAR,

@@ -13,6 +13,8 @@ import {
   FONT_CHOICE,
   FOOTER_LAYOUT,
   FOOTER_SURFACE,
+  HEADER_ACTION_PHONE_PLACEMENT,
+  HEADER_ACTION_STYLE,
   HEADER_BAR_STYLE,
   HEADER_CONTROL_SHAPE,
   HEADER_CONTROL_STYLE,
@@ -52,6 +54,16 @@ export const headerControlStyleEnum = pgEnum(
 export const headerControlShapeEnum = pgEnum(
   'header_control_shape',
   HEADER_CONTROL_SHAPE,
+);
+
+export const headerActionStyleEnum = pgEnum(
+  'header_action_style',
+  HEADER_ACTION_STYLE,
+);
+
+export const headerActionPhonePlacementEnum = pgEnum(
+  'header_action_phone_placement',
+  HEADER_ACTION_PHONE_PLACEMENT,
 );
 
 export const accountButtonStyleEnum = pgEnum(
