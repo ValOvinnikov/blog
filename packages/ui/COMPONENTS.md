@@ -430,7 +430,7 @@ Compound component:
 - **CtaModule.Text** — The copy slot under a `CtaModule` heading: a plain supporting line, then rich content set as prose. Props: supportingText?: string · children?: ReactNode _(extends IWithClassName)_
 - **CtaModule.Actions** — The row a `CtaModule` lays its buttons and links out in. Props: children?: ReactNode _(extends IWithClassName, IWithDataTestId)_
 - **CtaModule.Footnote** — The fine-print line an organism sets under its actions. Props: children?: ReactNode _(extends IWithClassName, IWithDataTestId)_
-- **CtaModule.Media** — The image slot of a `CtaModule`; framed at 16:9 in a card, unframed behind a banner's copy. Props: isFramed?: boolean · children?: ReactNode _(extends IWithClassName, IWithDataTestId)_
+- **CtaModule.Media** — The image slot of a `CtaModule`. Props: isFramed?: boolean · children?: ReactNode _(extends IWithClassName, IWithDataTestId)_
 
 ### Dialog — `components/organisms/dialog/dialog.tsx`
 

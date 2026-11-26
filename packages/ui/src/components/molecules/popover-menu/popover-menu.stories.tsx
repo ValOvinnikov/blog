@@ -30,12 +30,14 @@ type TShareMenuProps = IWithChildren & {
   isOpen: boolean;
   panelId: string;
   shouldOpenFromStartOnPhone?: boolean;
+  onTriggerClick?: () => void;
 };
 
 const ShareMenu = ({
   isOpen,
   panelId,
   shouldOpenFromStartOnPhone,
+  onTriggerClick,
   children,
 }: TShareMenuProps) => (
   <>
@@ -43,6 +45,7 @@ const ShareMenu = ({
       ariaLabel="Open menu"
       isOpen={isOpen}
       panelId={panelId}
+      onClick={onTriggerClick}
     >
       <Icon name={ICONS.SHARE} size={SIZE.SM} />
     </PopoverMenu.Trigger>
@@ -62,18 +65,10 @@ const InteractiveDemo = () => {
 
   return (
     <PopoverMenu>
-      <PopoverMenu.Trigger
-        ariaLabel="Open menu"
+      <ShareMenu
         isOpen={isOpen}
         panelId="popover-menu-panel"
-        onClick={() => setIsOpen((current) => !current)}
-      >
-        <Icon name={ICONS.SHARE} size={SIZE.SM} />
-      </PopoverMenu.Trigger>
-      <PopoverMenu.Panel
-        id="popover-menu-panel"
-        isOpen={isOpen}
-        ariaLabel="Menu"
+        onTriggerClick={() => setIsOpen((current) => !current)}
       >
         <PopoverMenu.Item
           icon={<Icon name={ICONS.EXTERNAL_LINK} size={SIZE.SM} />}
@@ -87,7 +82,7 @@ const InteractiveDemo = () => {
         <PopoverMenu.Item as="a" href={MOCK_SHARE_URL}>
           Share on LinkedIn
         </PopoverMenu.Item>
-      </PopoverMenu.Panel>
+      </ShareMenu>
     </PopoverMenu>
   );
 };

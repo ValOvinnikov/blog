@@ -12,7 +12,7 @@ export type TCtaModuleMediaProps = IWithClassName &
     children?: ReactNode;
   };
 
-/** The image slot of a `CtaModule`; framed at 16:9 in a card, unframed behind a banner's copy. */
+/** The image slot of a `CtaModule`. */
 export const CtaModuleMedia = ({
   isFramed = true,
   className,

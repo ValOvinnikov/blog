@@ -16,13 +16,14 @@ const meta = {
 export default meta;
 type TStory = StoryObj<typeof meta>;
 
+const MOCK_HOME_ITEM = { label: 'Home', href: '/' };
 const MOCK_TOPIC_HREF = '/topics/engineering';
 const MOCK_POST_HREF = '/blog/example-post';
 
 export const Default: TStory = {
   args: {
     items: [
-      { label: 'Home', href: '/' },
+      MOCK_HOME_ITEM,
       { label: faker.commerce.department(), href: MOCK_TOPIC_HREF },
       { label: faker.lorem.sentence(4), href: MOCK_POST_HREF },
     ],
@@ -32,7 +33,7 @@ export const Default: TStory = {
 export const TwoLevels: TStory = {
   args: {
     items: [
-      { label: 'Home', href: '/' },
+      MOCK_HOME_ITEM,
       { label: faker.commerce.department(), href: '/topics/design' },
     ],
   },
@@ -41,7 +42,7 @@ export const TwoLevels: TStory = {
 export const LongTrail: TStory = {
   args: {
     items: [
-      { label: 'Home', href: '/' },
+      MOCK_HOME_ITEM,
       { label: 'Blog', href: '/blog' },
       { label: faker.commerce.department(), href: '/topics/architecture' },
       { label: faker.lorem.words(3), href: '/tag/systems' },
@@ -55,7 +56,7 @@ export const Truncated: TStory = {
   args: {
     className: 'max-w-[280px]',
     items: [
-      { label: 'Home', href: '/' },
+      MOCK_HOME_ITEM,
       { label: faker.commerce.department(), href: MOCK_TOPIC_HREF },
       { label: faker.lorem.sentence(8), href: MOCK_POST_HREF },
     ],

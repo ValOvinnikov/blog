@@ -1,5 +1,6 @@
 import { faker } from '@faker-js/faker';
 import { FORM_STATUS, ICONS } from '@shinefold/config';
+import { ARIA_DISABLED } from '@shinefold/ui/testing/aria';
 import { customRender, screen } from '@shinefold/ui/testing/custom-render';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
 
@@ -31,7 +32,6 @@ const MOCK_GOOGLE = {
   label: faker.lorem.words(3),
   pendingLabel: faker.lorem.words(4),
 };
-const ARIA_DISABLED = 'aria-disabled';
 const MOCK_EMAIL = faker.internet.email();
 const MOCK_ERROR = faker.lorem.sentence();
 const INVALID_EMAIL = faker.lorem.word();
