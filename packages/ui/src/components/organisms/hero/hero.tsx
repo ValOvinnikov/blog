@@ -3,13 +3,13 @@ import {
   type IWithDataTestId,
   type TBrandVariant,
   type TContentAlignment,
-  type THeadingBlock,
   type THeroVariant,
   type TLayout,
   type TMediaOrder,
 } from '@shinefold/config';
 import { Eyebrow } from '@shinefold/ui/components/atoms/eyebrow';
 import { Footnote } from '@shinefold/ui/components/atoms/footnote';
+import type { THeadingText } from '@shinefold/ui/components/atoms/heading';
 import { HERO_TEST_ID } from '@shinefold/ui/constants/hero';
 import {
   mapCompoundSlots,
@@ -42,11 +42,9 @@ export type THeroLayout = Pick<TLayout, 'spacingTop' | 'spacingBottom'> & {
   mediaOrder?: TMediaOrder;
 };
 
-export type THeroTitle = Pick<THeadingBlock, 'heading' | 'headingPieces'>;
-
 export type THeroProps = IWithClassName &
   IWithDataTestId & {
-    title: THeroTitle;
+    title: THeadingText;
     titleId: string;
     eyebrow?: string;
     excerpt?: string;

@@ -7,6 +7,7 @@ import {
   type TContentAlignment,
   type TSpacingScale,
 } from '@shinefold/config';
+import type { THeadingText } from '@shinefold/ui/components/atoms/heading';
 import { CtaModuleLayout } from '@shinefold/ui/components/organisms/cta-module/components/layout/cta-module-layout';
 import type { CtaModuleSlotParts } from '@shinefold/ui/components/organisms/cta-module/cta-module-slot-parts';
 import { ctaModuleVariants } from '@shinefold/ui/components/organisms/cta-module/cta-module-variants';
@@ -14,9 +15,9 @@ import type { TCompoundChildren } from '@shinefold/ui/lib/react';
 import { bannerVariants } from '@shinefold/ui/lib/styling';
 
 export type TCtaModuleBannerProps = IWithClassName &
-  IWithDataTestId & {
+  IWithDataTestId &
+  THeadingText & {
     tone: TBrandVariant;
-    heading: string;
     headingId?: string;
     contentPosition?: TContentAlignment;
     contentAlignment?: TContentAlignment;
@@ -29,6 +30,7 @@ export type TCtaModuleBannerProps = IWithClassName &
 export const CtaModuleBanner = ({
   tone,
   heading,
+  headingPieces,
   headingId,
   contentPosition = CONTENT_ALIGNMENT.LEFT,
   contentAlignment = CONTENT_ALIGNMENT.LEFT,
@@ -51,6 +53,7 @@ export const CtaModuleBanner = ({
       spacingBottom,
     })}
     heading={heading}
+    headingPieces={headingPieces}
     headingId={headingId}
     className={className}
     dataTestId={dataTestId}

@@ -9,6 +9,7 @@ import { PreviewFrame } from '@platform/components/shared/preview-frame';
 import { DEVICE_FRAME_FIT } from '@platform/constants/device-frame';
 import { MEDIA_QUERY } from '@platform/constants/media-query';
 import { PREVIEW_HEADING_LAYOUT } from '@platform/constants/preview';
+import { withPresetButtonColor } from '@platform/utils/button-colors/button-colors';
 import type { TLookFollowTarget } from '@platform/utils/look-follow-target/look-follow-target';
 import { toSampleFooterStyle } from '@platform/utils/sample-footer-style/sample-footer-style';
 import { buildSitePreviewTheme } from '@platform/utils/theme-preview-tokens/theme-preview-tokens';
@@ -62,7 +63,7 @@ export const LookPreview = ({
     isShown,
   });
   const { onHandScroll } = follow;
-  const theme = buildSitePreviewTheme(values, isDark);
+  const theme = buildSitePreviewTheme(withPresetButtonColor(values), isDark);
   const footer = toSampleFooterStyle(values, hasCookieBanner);
 
   const solos = (

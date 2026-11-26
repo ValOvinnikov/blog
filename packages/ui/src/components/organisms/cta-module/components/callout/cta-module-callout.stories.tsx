@@ -3,6 +3,10 @@ import { CtaModule } from '@shinefold/ui/components/organisms/cta-module';
 import { ctaModuleVariants } from '@shinefold/ui/components/organisms/cta-module/cta-module-variants';
 import { CardStyles } from '@shinefold/ui/testing/card-styles';
 import {
+  MOCK_ONE_HIGHLIGHT_PIECES,
+  toHeadingWords,
+} from '@shinefold/ui/testing/heading-pieces';
+import {
   MOCK_CTA_PRIMARY_AND_INLINE_LINK,
   MOCK_CTA_PRIMARY_ONLY,
   mockCtaImage,
@@ -51,6 +55,22 @@ export const Default: TStory = {
       image: mockCtaImage('callout-default'),
     }),
   },
+};
+
+export const HighlightedHeading: TStory = {
+  args: {
+    heading: toHeadingWords(MOCK_ONE_HIGHLIGHT_PIECES),
+    headingPieces: MOCK_ONE_HIGHLIGHT_PIECES,
+    children: mockCtaSlots({
+      ...CALLOUT_COPY,
+      image: mockCtaImage('callout-highlighted-heading'),
+    }),
+  },
+};
+
+export const HighlightedHeadingDark: TStory = {
+  ...HighlightedHeading,
+  globals: { theme: 'dark' },
 };
 
 export const Centered: TStory = {

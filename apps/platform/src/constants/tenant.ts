@@ -113,7 +113,7 @@ export type TTenantVisibility = TValueOf<typeof TENANT_VISIBILITY>;
 
 export const TENANTS_SEARCH_DEBOUNCE_MS = 300;
 
-export const TENANTS_PAGE_SIZE = 25;
+export const TENANTS_PAGE_SIZE = 10;
 
 const TENANTS_LIST_ROUTE = '/[locale]/(operator)/tenants';
 

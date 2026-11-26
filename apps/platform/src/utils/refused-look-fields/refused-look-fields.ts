@@ -1,10 +1,10 @@
 import type { TBrandAssetKind } from '@platform/utils/brand-asset-limits/brand-asset-limits';
 import type { TLookFormValues } from '@platform/utils/default-look-values/default-look-values';
+import { toLookFormValuesWithin } from '@platform/utils/look-form-values/look-form-values';
 import { LOOK_FIELD } from '@shinefold/db/constants';
 import {
   isLookFieldWithin,
   isPresetWithin,
-  toEffectiveLookWithin,
 } from '@shinefold/db/utils/effective-look/effective-look';
 import type { TTenantEntitlements } from '@shinefold/db/utils/resolve-tenant-entitlements/resolve-tenant-entitlements';
 
@@ -16,7 +16,7 @@ export const listRefusedLookFields = (
   stored: TLookFormValues,
   entitlements: Pick<TTenantEntitlements, 'lookFields' | 'unlockedPresets'>,
 ): (keyof TLookChoices)[] => {
-  const shown = toEffectiveLookWithin(
+  const shown = toLookFormValuesWithin(
     { ...stored, preset: submitted.preset },
     entitlements,
   );

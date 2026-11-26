@@ -1037,6 +1037,7 @@
     "buttonColorLabel": "Button colour",
     "buttonColorDescription": "The fill of filled buttons, and of outlined buttons on hover. Labels turn white or black to stay readable.",
     "buttonColorFollowAccent": "Follows the accent",
+    "buttonColorFollowPreset": "Follows the preset",
     "buttonColorDarkLabel": "Button colour on dark backgrounds",
     "buttonColorDarkDescription": "Used on dark bands and in dark mode. Left to follow, it is worked out from the button colour.",
     "buttonColorDarkFollow": "Follows the button colour",

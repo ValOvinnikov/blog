@@ -3,11 +3,11 @@ import { PoweredByMarkProvider } from '@platform/context/powered-by-mark-provide
 import type { TPlatformViewer } from '@platform/server/auth/platform-viewer';
 import { getEnabledCapabilities } from '@platform/server/settings-features/get-enabled-capabilities';
 import { toGrantTarget } from '@platform/utils/grant-target/grant-target';
+import { toLookFormValuesWithin } from '@platform/utils/look-form-values/look-form-values';
 import type { TPlatformTenant } from '@platform/utils/platform-tenant/platform-tenant';
 import { lookFormValuesOrDefaults } from '@platform/utils/to-look-form-values/to-look-form-values';
 import { CAPABILITY } from '@shinefold/config';
 import { queries } from '@shinefold/db';
-import { toEffectiveLookWithin } from '@shinefold/db/utils/effective-look/effective-look';
 
 export type TLookPageContentProps = {
   tenant: TPlatformTenant;
@@ -46,7 +46,7 @@ export const LookPageContent = async ({
           unlockedPresets: tenant.entitlements.unlockedPresets,
           archivedAt: tenant.archivedAt,
         }}
-        initialValues={toEffectiveLookWithin(
+        initialValues={toLookFormValuesWithin(
           lookFormValuesOrDefaults(siteConfig),
           tenant.entitlements,
         )}

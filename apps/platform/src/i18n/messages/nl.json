@@ -1037,6 +1037,7 @@
     "buttonColorLabel": "Knopkleur",
     "buttonColorDescription": "De vulling van gevulde knoppen, en van omlijnde knoppen bij aanwijzen. Labels worden wit of zwart zodat ze leesbaar blijven.",
     "buttonColorFollowAccent": "Volgt het accent",
+    "buttonColorFollowPreset": "Volgt de voorinstelling",
     "buttonColorDarkLabel": "Knopkleur op donkere achtergronden",
     "buttonColorDarkDescription": "Gebruikt op donkere banden en in de donkere modus. Volgt hij, dan wordt hij afgeleid van de knopkleur.",
     "buttonColorDarkFollow": "Volgt de knopkleur",

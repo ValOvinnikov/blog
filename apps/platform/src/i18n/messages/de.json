@@ -1037,6 +1037,7 @@
     "buttonColorLabel": "Schaltflächenfarbe",
     "buttonColorDescription": "Die Füllung gefüllter Schaltflächen und umrandeter Schaltflächen beim Darüberfahren. Beschriftungen werden weiß oder schwarz, damit sie lesbar bleiben.",
     "buttonColorFollowAccent": "Folgt dem Akzent",
+    "buttonColorFollowPreset": "Folgt der Vorlage",
     "buttonColorDarkLabel": "Schaltflächenfarbe auf dunklem Hintergrund",
     "buttonColorDarkDescription": "Gilt auf dunklen Bändern und im dunklen Modus. Folgt sie, wird sie aus der Schaltflächenfarbe abgeleitet.",
     "buttonColorDarkFollow": "Folgt der Schaltflächenfarbe",

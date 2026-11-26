@@ -1037,6 +1037,7 @@
     "buttonColorLabel": "Couleur des boutons",
     "buttonColorDescription": "Le remplissage des boutons pleins, et des boutons à contour au survol. Les libellés passent au blanc ou au noir pour rester lisibles.",
     "buttonColorFollowAccent": "Suit l'accent",
+    "buttonColorFollowPreset": "Suit le préréglage",
     "buttonColorDarkLabel": "Couleur des boutons sur fond sombre",
     "buttonColorDarkDescription": "Utilisée sur les bandes sombres et en mode sombre. Si elle suit, elle est calculée à partir de la couleur des boutons.",
     "buttonColorDarkFollow": "Suit la couleur des boutons",
