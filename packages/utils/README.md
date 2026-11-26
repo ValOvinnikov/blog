@@ -23,7 +23,7 @@ logic it needs without inheriting framework baggage.
 - `encryption/` — `encryptSecret` / `decryptSecret`.
 - `merge/` — `deepMergePartial`, `TDeepPartial<T>`.
 - `pagination/` — `toTotalPages`.
-- `primitives/` — `objectKeys`, `toTitleCase`.
+- `primitives/` — `toTitleCase`, `toOptions`, `isPlainObject`.
 - `reading-time/` — `toReadingTimeMinutes`.
 - `result/` — `TResult<T, E>` and its builders `okResult` / `errorResult`.
 

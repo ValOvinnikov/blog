@@ -1,5 +1,9 @@
-import { CONTENT_ALIGNMENT, NEWSLETTER_VARIANT } from '@shinefold/config';
-import { tv } from '@shinefold/ui/lib/styling';
+import {
+  CONTENT_ALIGNMENT,
+  NEWSLETTER_VARIANT,
+  TEXT_ROLE,
+} from '@shinefold/config';
+import { tv, TYPOGRAPHY } from '@shinefold/ui/lib/styling';
 import type { VariantProps } from 'tailwind-variants';
 
 export const newsletterSignupVariants = tv({
@@ -11,7 +15,8 @@ export const newsletterSignupVariants = tv({
     trustCues: [
       'flex flex-col gap-2 md:flex-row md:flex-wrap md:items-center md:gap-4',
       'm-0 list-none p-0',
-      'font-mono text-label text-muted',
+      TYPOGRAPHY[TEXT_ROLE.CAPTION],
+      'text-muted',
     ],
     trustCue: ['inline-flex items-center gap-1.5'],
     trustCueIcon: ['shrink-0 text-muted'],

@@ -1,9 +1,11 @@
+import { TEXT_ROLE } from '@shinefold/config';
 import {
   FOCUS_RING,
   LINK_UNDERLINE_AT_REST,
   LINK_UNDERLINE_EMPHASIS,
   TRANSITION_COLORS,
   tv,
+  TYPOGRAPHY,
 } from '@shinefold/ui/lib/styling';
 import type { VariantProps } from 'tailwind-variants';
 
@@ -24,7 +26,7 @@ export const textLinkVariants = tv({
       nav: {
         root: [
           'inline-flex items-center gap-x-1.5 no-underline',
-          'font-mono text-meta',
+          TYPOGRAPHY[TEXT_ROLE.META],
         ],
       },
       quiet: { root: ['no-underline'] },

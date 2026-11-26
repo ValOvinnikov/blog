@@ -1,9 +1,10 @@
-import { tv } from '@shinefold/ui/lib/styling';
+import { TEXT_ROLE } from '@shinefold/config';
+import { tv, TYPOGRAPHY } from '@shinefold/ui/lib/styling';
 
 export const taxonomyCardPostsVariants = tv({
   slots: {
     root: ['mt-1 flex flex-col gap-2 border-t border-divider pt-3'],
-    label: ['m-0 font-mono text-meta text-subtle'],
+    label: ['m-0', TYPOGRAPHY[TEXT_ROLE.META]],
     list: ['m-0 flex list-none flex-col gap-1 p-0'],
     link: ['relative z-10 block truncate font-display text-copy'],
   },

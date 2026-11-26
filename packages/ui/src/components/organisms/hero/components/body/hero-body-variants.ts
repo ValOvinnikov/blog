@@ -1,9 +1,9 @@
-import { CONTENT_ALIGNMENT } from '@shinefold/config';
-import { tv } from '@shinefold/ui/lib/styling';
+import { CONTENT_ALIGNMENT, TEXT_ROLE } from '@shinefold/config';
+import { tv, TYPOGRAPHY } from '@shinefold/ui/lib/styling';
 import type { VariantProps } from 'tailwind-variants';
 
 export const heroBodyVariants = tv({
-  base: ['mt-5 text-prose leading-[1.6]', '[&>*+*]:mt-4'],
+  base: ['mt-5', TYPOGRAPHY[TEXT_ROLE.BODY], '[&>*+*]:mt-4'],
   variants: {
     contentAlignment: {
       [CONTENT_ALIGNMENT.LEFT]: ['text-left'],

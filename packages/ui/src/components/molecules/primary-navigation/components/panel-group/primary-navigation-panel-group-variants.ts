@@ -1,5 +1,6 @@
+import { TEXT_ROLE } from '@shinefold/config';
 import { PANEL_LINK } from '@shinefold/ui/components/molecules/primary-navigation/primary-navigation-variants';
-import { tv } from '@shinefold/ui/lib/styling';
+import { tv, TYPOGRAPHY } from '@shinefold/ui/lib/styling';
 
 export const primaryNavigationPanelGroupVariants = tv({
   slots: {
@@ -7,7 +8,8 @@ export const primaryNavigationPanelGroupVariants = tv({
     summary: [
       ...PANEL_LINK,
       'cursor-pointer list-none justify-between',
-      'font-mono text-meta text-muted',
+      TYPOGRAPHY[TEXT_ROLE.META],
+      'text-muted',
       'group-open:bg-surface-2',
       '[&::-webkit-details-marker]:hidden',
     ],
