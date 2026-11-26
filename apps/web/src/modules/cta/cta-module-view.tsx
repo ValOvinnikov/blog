@@ -31,9 +31,14 @@ export const CtaModuleView = ({ id, module }: ICtaModuleViewProps) => {
     footnote,
     layout,
   } = module;
-  const { heading, supportingText } = headingBlock;
+  const { heading, headingPieces, supportingText } = headingBlock;
   const isBanner = variant === CTA_VARIANT.BANNER;
-  const card = { tone: brandVariant, heading, headingId: titleId };
+  const card = {
+    tone: brandVariant,
+    heading,
+    headingPieces,
+    headingId: titleId,
+  };
 
   const slots = (
     <>

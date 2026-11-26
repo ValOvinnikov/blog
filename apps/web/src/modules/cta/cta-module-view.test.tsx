@@ -1,4 +1,9 @@
 import { CTA_VARIANT } from '@shinefold/config';
+import {
+  MOCK_HIGHLIGHTED_PHRASE,
+  MOCK_ONE_HIGHLIGHT_PIECES,
+  toHeadingWords,
+} from '@shinefold/ui/testing/heading-pieces';
 import { customRender, screen } from '@web/testing/custom-render';
 import {
   MOCK_CTA_ACTIONS,
@@ -8,6 +13,7 @@ import {
   MOCK_CTA_SECONDARY_ACTION,
   mockCtaModuleData,
 } from '@web/testing/modules/cta/fixtures';
+import { mockHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
 
 import { CtaModuleView } from './cta-module-view';
 
@@ -107,4 +113,22 @@ describe(`<${CtaModuleView.name}/>`, () => {
       expect(heading).toBeVisible();
     },
   );
+
+  it('draws the highlighted phrase inside a heading named by its plain words', () => {
+    const highlightedHeading = toHeadingWords(MOCK_ONE_HIGHLIGHT_PIECES);
+    setup({
+      module: mockCtaModuleData({
+        headingBlock: mockHeadingBlock({
+          heading: highlightedHeading,
+          headingPieces: MOCK_ONE_HIGHLIGHT_PIECES,
+        }),
+      }),
+    });
+
+    const region = screen.getByRole('region', { name: highlightedHeading });
+    const heading = screen.getByRole('heading', { level: 2 });
+
+    expect(region).toBeVisible();
+    expect(heading).toContainElement(screen.getByText(MOCK_HIGHLIGHTED_PHRASE));
+  });
 });
