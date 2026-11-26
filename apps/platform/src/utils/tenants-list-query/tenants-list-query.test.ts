@@ -9,6 +9,7 @@ import {
 } from './tenants-list-query';
 
 const MOCK_INVALID_PARAM = 'NOT_A_SORT';
+const MOCK_PAGE = 3;
 
 describe(parseTenantsListQuery, () => {
   it('reads an empty query as active tenants, newest first, unsearched', () => {
@@ -21,15 +22,17 @@ describe(parseTenantsListQuery, () => {
         direction: SORT_DIRECTION.DESCENDING,
       },
       search: '',
+      page: 1,
     });
   });
 
-  it('reads the archived flag, sort and trimmed search', () => {
+  it('reads the archived flag, sort, trimmed search and page', () => {
     const query = parseTenantsListQuery({
       archived: ARCHIVED_PARAM_ON,
       sort: TENANT_SORT_COLUMN.STATUS,
       direction: SORT_DIRECTION.ASCENDING,
       q: ` ${MOCK_TENANT_SLUG} `,
+      page: String(MOCK_PAGE),
     });
 
     expect(query).toEqual({
@@ -39,6 +42,7 @@ describe(parseTenantsListQuery, () => {
         direction: SORT_DIRECTION.ASCENDING,
       },
       search: MOCK_TENANT_SLUG,
+      page: MOCK_PAGE,
     });
   });
 
@@ -55,12 +59,22 @@ describe(parseTenantsListQuery, () => {
     },
   );
 
+  it.each([undefined, MOCK_INVALID_PARAM, '0', '-2', '1.5'])(
+    'falls back to the first page for the page %j',
+    (page) => {
+      const query = parseTenantsListQuery({ page });
+
+      expect(query.page).toBe(1);
+    },
+  );
+
   it('reads the first value of a repeated parameter', () => {
     const query = parseTenantsListQuery({
       archived: [ARCHIVED_PARAM_ON, ''],
       sort: [TENANT_SORT_COLUMN.PLAN, TENANT_SORT_COLUMN.NAME],
       direction: [SORT_DIRECTION.ASCENDING],
       q: [MOCK_TENANT_SLUG, MOCK_INVALID_PARAM],
+      page: [String(MOCK_PAGE), '1'],
     });
 
     expect(query).toEqual({
@@ -70,6 +84,7 @@ describe(parseTenantsListQuery, () => {
         direction: SORT_DIRECTION.ASCENDING,
       },
       search: MOCK_TENANT_SLUG,
+      page: MOCK_PAGE,
     });
   });
 

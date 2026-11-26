@@ -281,6 +281,13 @@
       "when": 1795646105518,
       "tag": "0039_sad_scourge",
       "breakpoints": true
+    },
+    {
+      "idx": 40,
+      "version": "7",
+      "when": 1795650136993,
+      "tag": "0040_jittery_moonstone",
+      "breakpoints": true
     }
   ]
 }
