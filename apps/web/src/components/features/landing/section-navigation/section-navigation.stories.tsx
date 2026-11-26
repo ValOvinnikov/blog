@@ -1,6 +1,10 @@
 import type { Meta, StoryObj } from '@storybook/nextjs-vite';
-import { mockLandingSectionNavigation } from '@web/testing/pages/landing-page/fixtures';
-import { userEvent, within } from 'storybook/test';
+import {
+  mockGroupedLandingSectionNavigation,
+  mockLandingSectionNavigation,
+  MOCK_SECTION_PRICING_PLANS_TITLE,
+} from '@web/testing/pages/landing-page/fixtures';
+import { openMobileSelector } from '@web/testing/shared/sidebar-nav/open-mobile-selector';
 
 import { SectionNavigation } from './section-navigation';
 
@@ -56,10 +60,15 @@ export const NestedSection: TStory = {
 export const NestedSectionMobileOpen: TStory = {
   ...NestedSection,
   globals: { viewport: 'mobile' },
-  play: async ({ canvasElement }) => {
-    const canvas = within(canvasElement);
-    await userEvent.click(
-      canvas.getByRole('button', { name: /Profile hero layouts/ }),
-    );
-  },
+  play: openMobileSelector(/Profile hero layouts/),
+};
+
+export const Grouped: TStory = {
+  args: { sectionNavigation: mockGroupedLandingSectionNavigation() },
+};
+
+export const GroupedMobileOpen: TStory = {
+  ...Grouped,
+  globals: { viewport: 'mobile' },
+  play: openMobileSelector(new RegExp(MOCK_SECTION_PRICING_PLANS_TITLE)),
 };

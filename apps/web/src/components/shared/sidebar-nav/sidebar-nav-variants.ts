@@ -21,15 +21,6 @@ export const sidebarNavVariants = tv({
       'mb-6',
       'lg:hidden',
     ],
-    backLink: [
-      'mb-4 flex w-fit items-center gap-1.5 rounded-md',
-      'font-mono text-caption text-subtle no-underline',
-      'transition-colors duration-base ease-smooth',
-      'hover:text-text',
-      'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary',
-      'focus-visible:ring-offset-2 focus-visible:ring-offset-ambient',
-    ],
-    backArrow: ['size-3.5 shrink-0 rotate-180'],
     title: [
       'mb-4 block',
       'font-display font-medium text-lg leading-tight tracking-tight-card text-text',
@@ -64,47 +55,10 @@ export const sidebarNavVariants = tv({
       'bg-primary border-b border-border shadow-lg',
       'max-h-[70vh] overflow-y-auto p-4',
     ],
-    list: [
-      'flex flex-col gap-0.5',
-      'border-l border-border',
-      'font-mono text-copy',
-      'm-0 list-none p-0',
-    ],
-    // `-ml-px` lays the 2px bar over the list's 1px rail rather than beside it.
-    link: [
-      '-ml-px block rounded-r-md border-l-2 border-transparent',
-      'py-1 pr-2 pl-3 text-subtle no-underline',
-      'transition-colors duration-base ease-smooth',
-      'hover:border-border-strong hover:text-text',
-      'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary',
-      'focus-visible:ring-offset-2 focus-visible:ring-offset-ambient',
-    ],
   },
   variants: {
     open: {
       true: { chevron: ['-rotate-135'] },
     },
-    inPanel: {
-      true: { link: ['flex items-center py-2'] },
-    },
-    isNested: {
-      true: { link: ['pl-6'] },
-    },
-    // Declared before `isActive` so the active colour wins over a root item's `text-text`.
-    isRoot: {
-      true: { link: ['font-semibold text-text'] },
-    },
-    // Last, so its hover classes win: hovering the current item leaves it unchanged.
-    isActive: {
-      true: {
-        link: [
-          'border-brand-primary text-brand-primary',
-          'hover:border-brand-primary hover:text-brand-primary',
-        ],
-      },
-    },
   },
-  compoundVariants: [
-    { isActive: true, isRoot: false, class: { link: ['font-medium'] } },
-  ],
 });

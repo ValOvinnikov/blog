@@ -1,47 +1,38 @@
 'use client';
 
-import { ICONS, type TMaybeUndefined } from '@shinefold/config';
-import { Icon } from '@shinefold/ui/components/atoms/icon';
-import { SmartLink } from '@web/components/shared/smart-link';
+import type { IWithClassName, TMaybeUndefined } from '@shinefold/config';
+import { SidebarNavBackLink } from '@web/components/shared/sidebar-nav/components/sidebar-nav-back-link/sidebar-nav-back-link';
+import { SidebarNavList } from '@web/components/shared/sidebar-nav/components/sidebar-nav-list/sidebar-nav-list';
 import { usePopover } from '@web/hooks/use-popover';
 import { useId } from 'react';
 
 import { sidebarNavVariants } from './sidebar-nav-variants';
+import type {
+  TSidebarNavAriaCurrent,
+  TSidebarNavBackLink,
+  TSidebarNavItem,
+} from './types';
 
-export type TSidebarNavItem = {
-  label: string;
-  href: string;
-  level: 1 | 2;
-};
-
-type TSidebarNavBackLink = {
-  label: string;
-  href: string;
-  ariaLabel: string;
-};
-
-type TSidebarNavProps = {
+interface ISidebarNavProps extends IWithClassName {
   items: TSidebarNavItem[];
-  activeKey: TMaybeUndefined<string>;
+  activeHref: TMaybeUndefined<string>;
   label: string;
-  ariaCurrent: 'location' | 'page';
+  ariaCurrent: TSidebarNavAriaCurrent;
   backLink?: TSidebarNavBackLink;
   hasRootItem?: boolean;
-  className?: string;
-};
+}
 
 const s = sidebarNavVariants();
 
-/** Matches `activeKey` against each item's `href`. */
 export const SidebarNav = ({
   items,
-  activeKey,
+  activeHref,
   label,
   ariaCurrent,
   backLink,
   hasRootItem = false,
   className,
-}: TSidebarNavProps) => {
+}: ISidebarNavProps) => {
   const labelId = useId();
   const mobileLabelId = useId();
   const currentItemId = useId();
@@ -51,53 +42,23 @@ export const SidebarNav = ({
     trapFocus: false,
     closeOnFocusOut: true,
   });
-  const activeItem = items.find(({ href }) => href === activeKey);
-
-  const renderBackLink = (onNavigate?: () => void) =>
-    backLink && (
-      <SmartLink
-        href={backLink.href}
-        className={s.backLink()}
-        aria-label={backLink.ariaLabel}
-        onClick={onNavigate}
-      >
-        <Icon name={ICONS.ARROW} className={s.backArrow()} />
-        {backLink.label}
-      </SmartLink>
-    );
-
-  // A click leaves focus on the link, so `closeOnFocusOut` never fires and `onNavigate` closes the panel instead.
-  const renderList = (onNavigate?: () => void, inPanel = false) => (
-    <ol className={s.list({ inPanel })}>
-      {items.map((item) => {
-        const isActive = item === activeItem;
-        const isNested = item.level === 2;
-        const isRoot = hasRootItem && !isNested;
-
-        return (
-          <li key={item.href}>
-            <SmartLink
-              href={item.href}
-              className={s.link({ isActive, isNested, isRoot, inPanel })}
-              aria-current={isActive ? ariaCurrent : undefined}
-              onClick={onNavigate}
-            >
-              {item.label}
-            </SmartLink>
-          </li>
-        );
-      })}
-    </ol>
-  );
+  const activeItem = items
+    .flatMap((item) => [item, ...(item.subItems ?? [])])
+    .find(({ href }) => href === activeHref);
 
   return (
     <nav aria-labelledby={labelId} className={s.root({ class: className })}>
       <div className={s.desktop()}>
-        {renderBackLink()}
+        {backLink && <SidebarNavBackLink backLink={backLink} />}
         <h2 id={labelId} className={s.title()}>
           {label}
         </h2>
-        {renderList()}
+        <SidebarNavList
+          items={items}
+          activeItem={activeItem}
+          ariaCurrent={ariaCurrent}
+          hasRootItem={hasRootItem}
+        />
       </div>
 
       <div className={s.mobile()}>
@@ -121,9 +82,19 @@ export const SidebarNav = ({
           </button>
         </div>
         <div ref={panelRef} id={panelId} hidden={!open} className={s.panel()}>
-          {renderBackLink(close)}
+          {/* A click leaves focus on the link, so `closeOnFocusOut` never fires and `onNavigate` closes the panel instead. */}
+          {backLink && (
+            <SidebarNavBackLink backLink={backLink} onNavigate={close} />
+          )}
           <h2 className={s.title()}>{label}</h2>
-          {renderList(close, true)}
+          <SidebarNavList
+            items={items}
+            activeItem={activeItem}
+            ariaCurrent={ariaCurrent}
+            hasRootItem={hasRootItem}
+            isInPanel={true}
+            onNavigate={close}
+          />
         </div>
       </div>
     </nav>

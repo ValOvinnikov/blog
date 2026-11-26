@@ -1,34 +1,41 @@
-import { routes } from '@shinefold/config';
-import type { TLandingSectionNavigation } from '@shinefold/service';
+import { routes, type IWithClassName } from '@shinefold/config';
+import type {
+  TLandingBreadcrumb,
+  TLandingSectionNavigation,
+} from '@shinefold/service';
 import {
   SidebarNav,
   type TSidebarNavItem,
 } from '@web/components/shared/sidebar-nav';
 import { useTranslations } from 'next-intl';
 
-export type TSectionNavigationProps = {
+interface ISectionNavigationProps extends IWithClassName {
   sectionNavigation: TLandingSectionNavigation;
-  className?: string;
-};
+}
 
 export const SectionNavigation = ({
   sectionNavigation,
   className,
-}: TSectionNavigationProps) => {
+}: ISectionNavigationProps) => {
   const t = useTranslations('sectionNavigation');
   const { title: sectionTitle, root, pages, parentSection } = sectionNavigation;
-  const sectionPages = [
-    { ...root, level: 1 as const },
-    ...pages.map((page) => ({ ...page, level: 2 as const })),
+  const toLink = ({ title, path }: TLandingBreadcrumb) => ({
+    label: title,
+    href: routes.landingPage(path),
+  });
+  const items: TSidebarNavItem[] = [
+    { ...toLink(root), level: 1 },
+    ...pages.map((page) => ({
+      ...toLink(page),
+      level: 2 as const,
+      subItems: page.pages?.map(toLink),
+    })),
   ];
-  const items: TSidebarNavItem[] = sectionPages.map(
-    ({ title, path, level }) => ({
-      label: title,
-      href: routes.landingPage(path),
-      level,
-    }),
-  );
-  const currentPage = sectionPages.find(({ isCurrent }) => isCurrent);
+  // A group is marked current when the current page sits inside it, so the last match is the page itself.
+  const currentPage = [
+    root,
+    ...pages.flatMap((page) => [page, ...(page.pages ?? [])]),
+  ].findLast(({ isCurrent }) => isCurrent);
   const backLink = parentSection && {
     label: parentSection.title,
     href: routes.landingPage(parentSection.path),
@@ -39,7 +46,7 @@ export const SectionNavigation = ({
     <SidebarNav
       className={className}
       items={items}
-      activeKey={currentPage && routes.landingPage(currentPage.path)}
+      activeHref={currentPage && routes.landingPage(currentPage.path)}
       label={sectionTitle ?? t('label')}
       ariaCurrent="page"
       backLink={backLink}
