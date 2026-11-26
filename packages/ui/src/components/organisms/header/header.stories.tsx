@@ -1,5 +1,7 @@
 import {
   BRAND_VARIANT,
+  HEADER_ACTION_PHONE_PLACEMENT,
+  HEADER_ACTION_STYLE,
   HEADER_BAR_STYLE,
   HEADER_LAYOUT,
   HEADER_SUBMENU_STYLE,
@@ -11,6 +13,7 @@ import { BrandLockup } from '@shinefold/ui/components/molecules/brand-lockup';
 import {
   type INavItem,
   PrimaryNavigation,
+  type TPrimaryNavigationAction,
 } from '@shinefold/ui/components/molecules/primary-navigation';
 import type { Decorator, Meta, StoryObj } from '@storybook/react-vite';
 import { useState } from 'react';
@@ -49,14 +52,25 @@ const navLinks: INavItem[] = [
   { href: '/about', label: 'About' },
 ];
 
+const headerAction: TPrimaryNavigationAction = {
+  href: '/contact',
+  label: 'Book a call',
+};
+
+type TSiteHeaderProps = THeaderProps & {
+  submenuStyle?: THeaderSubmenuStyle;
+  isMenuOpen?: boolean;
+  links?: INavItem[];
+  action?: TPrimaryNavigationAction;
+};
+
 const SiteHeader = ({
   submenuStyle,
   isMenuOpen: isInitiallyOpen = false,
+  links = navLinks,
+  action,
   ...args
-}: THeaderProps & {
-  submenuStyle?: THeaderSubmenuStyle;
-  isMenuOpen?: boolean;
-}) => {
+}: TSiteHeaderProps) => {
   const [isMenuOpen, setIsMenuOpen] = useState(isInitiallyOpen);
 
   return (
@@ -70,7 +84,8 @@ const SiteHeader = ({
         </a>
       </Header.Brand>
       <PrimaryNavigation
-        links={navLinks}
+        links={links}
+        action={action}
         layout={args.layout}
         submenuStyle={submenuStyle}
         mobileToggle={{
@@ -91,12 +106,7 @@ const SiteHeader = ({
   );
 };
 
-const AllTones = (
-  args: THeaderProps & {
-    isMenuOpen?: boolean;
-    submenuStyle?: THeaderSubmenuStyle;
-  },
-) => (
+const AllTones = (args: TSiteHeaderProps) => (
   <div className="flex flex-col gap-8">
     {Object.values(BRAND_VARIANT).map((tone) => (
       <div
@@ -291,4 +301,91 @@ export const PhoneMenuOpenSkinsDark: TStory = {
   globals: { viewport: 'phone', theme: 'dark' },
   args: { layout: HEADER_LAYOUT.CLASSIC },
   render: (args) => <AllTones {...args} isMenuOpen={true} />,
+};
+
+export const ActionFilled: TStory = {
+  args: { layout: HEADER_LAYOUT.CLASSIC },
+  render: (args) => (
+    <SiteHeader
+      {...args}
+      action={{ ...headerAction, style: HEADER_ACTION_STYLE.FILLED }}
+    />
+  ),
+};
+
+export const ActionOutlined: TStory = {
+  args: { layout: HEADER_LAYOUT.CLASSIC },
+  render: (args) => (
+    <SiteHeader
+      {...args}
+      action={{ ...headerAction, style: HEADER_ACTION_STYLE.OUTLINED }}
+    />
+  ),
+};
+
+export const ActionPlainLink: TStory = {
+  args: { layout: HEADER_LAYOUT.CLASSIC },
+  render: (args) => (
+    <SiteHeader
+      {...args}
+      action={{ ...headerAction, style: HEADER_ACTION_STYLE.PLAIN }}
+    />
+  ),
+};
+
+export const ActionInEveryLayout: TStory = {
+  render: (args) => (
+    <div className="flex flex-col gap-8">
+      {Object.values(HEADER_LAYOUT).map((layout) => (
+        <SiteHeader
+          key={layout}
+          {...args}
+          layout={layout}
+          action={headerAction}
+        />
+      ))}
+    </div>
+  ),
+};
+
+export const ActionSkins: TStory = {
+  args: { layout: HEADER_LAYOUT.CLASSIC },
+  render: (args) => <AllTones {...args} action={headerAction} />,
+};
+
+export const PhoneActionInBar: TStory = {
+  globals: { viewport: 'phone' },
+  args: { layout: HEADER_LAYOUT.CLASSIC },
+  render: (args) => (
+    <SiteHeader
+      {...args}
+      action={{
+        ...headerAction,
+        phonePlacement: HEADER_ACTION_PHONE_PLACEMENT.BAR,
+      }}
+    />
+  ),
+};
+
+export const PhoneActionInMenu: TStory = {
+  globals: { viewport: 'phone' },
+  args: { layout: HEADER_LAYOUT.CLASSIC },
+  render: (args) => (
+    <SiteHeader
+      {...args}
+      isMenuOpen={true}
+      action={{
+        ...headerAction,
+        phonePlacement: HEADER_ACTION_PHONE_PLACEMENT.MENU,
+      }}
+    />
+  ),
+};
+
+export const PhoneMenuHoldsOnlyAction: TStory = {
+  globals: { viewport: 'phone' },
+  args: { layout: HEADER_LAYOUT.CLASSIC },
+  render: (args) => (
+    <SiteHeader {...args} links={[]} isMenuOpen={true} action={headerAction} />
+  ),
 };
