@@ -655,6 +655,22 @@ file` are all denied alike) — an earlier version only handled the
     had used to dodge that refusal and which once re-ran a stale query file
     left by an earlier dispatch, removing an issue dependency.
     `board-keeper-graphql-guard.test.sh` pins the deny/allow matrix.
+  - `neon-dev-branch-guard.sh` — `PreToolUse` hook on every MCP tool
+    (`mcp__.*`), wired globally. The Neon MCP server's id is a uuid, so the
+    hook matches on the tool-name suffix and keeps the guarded list and the
+    development branch id in the script. A branch-writing call (`run_sql`,
+    `run_sql_transaction`, `explain_sql_statement`, branch resets, restores
+    and deletes, migration and query-tuning apply, database and role writes,
+    Neon Auth and Data API provisioning) passes only when every branch field
+    it carries (`branch_id`, `parent_branch_id`, `target_branch_id`) is the
+    development branch; a call with none is denied, because Neon then uses
+    the default branch, which is production. `delete_project` and
+    `set_default_branch` are denied outright. It fails closed: a guarded call
+    it cannot parse (no `jq`, malformed input) exits 2. `list_*`,
+    `describe_*` and `get_*` tools pass, and so do endpoint tools, which name
+    an endpoint rather than a branch — so `get_connection_string` can still
+    hand out production credentials; the `CLAUDE.md` rule covers that, the
+    hook does not. `neon-dev-branch-guard.test.sh` pins the deny/allow matrix.
 - **Repo-specific ESLint rules** (`configs/eslint/`) — `no-prop-spread.js`,
   `boolean-prop-prefix.js`, `no-class-assertions.js`, `no-nested-query.js`,
   `prefer-before-each.js` and `text-input-textarea-accessible-name.js` are the repo's hand-written rules

@@ -706,6 +706,13 @@ migration is not live on dev until someone dispatches a deploy. Deploying is hum
 - Run a `db:migrate` against the shared/production Neon branch by hand — same
   human-gated stance as `sanity deploy` and production content migrations
   (`.claude/agents/db.md`'s "Migrations" section); local/dev applies are fine.
+- Run Neon MCP SQL or any branch-writing Neon tool (`run_sql`,
+  `run_sql_transaction`, resets, restores, migrations) anywhere but the
+  `development` branch, `br-curly-wildflower-za0la71g` in project
+  `muddy-morning-49047000`; every such call passes `branch_id` explicitly. A
+  call without one runs on the default branch `main` (`br-old-salad-zapbn0xi`),
+  which is production. Schema changes still go through Drizzle migrations,
+  never ad-hoc SQL; `neon-dev-branch-guard.sh` denies the rest.
 - Push or open a PR without explicit approval for that specific action.
   (Committing needs no approval — commit freely as work reaches a coherent
   state.)
