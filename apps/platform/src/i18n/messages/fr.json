@@ -318,10 +318,13 @@
   },
   "pinnedTenants": {
     "title": "Épinglés",
+    "titleAccessible": "{count, plural, one {# locataire épinglé} other {# locataires épinglés}}",
     "showAll": "Tout afficher ({count})",
     "showLess": "Afficher moins",
     "pinAriaLabel": "Épingler {name}",
     "unpinAriaLabel": "Désépingler {name}",
+    "pinnedAnnouncement": "{name} épinglé",
+    "unpinnedAnnouncement": "{name} désépinglé",
     "saveFailed": "Impossible d’enregistrer l’épingle de {name}. Réessayez."
   },
   "tenantsSearch": {

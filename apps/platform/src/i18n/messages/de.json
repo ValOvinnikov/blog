@@ -318,10 +318,13 @@
   },
   "pinnedTenants": {
     "title": "Angeheftet",
+    "titleAccessible": "{count, plural, one {# angehefteter Mandant} other {# angeheftete Mandanten}}",
     "showAll": "Alle {count} anzeigen",
     "showLess": "Weniger anzeigen",
     "pinAriaLabel": "{name} anheften",
     "unpinAriaLabel": "Anheftung von {name} aufheben",
+    "pinnedAnnouncement": "{name} angeheftet",
+    "unpinnedAnnouncement": "Anheftung von {name} aufgehoben",
     "saveFailed": "Die Anheftung von {name} konnte nicht gespeichert werden. Versuchen Sie es erneut."
   },
   "tenantsSearch": {

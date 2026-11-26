@@ -1,9 +1,9 @@
-import type { TPinTenantActionResult } from '@platform/server/tenants/pin-tenant-action';
+import type { TSetTenantPinActionResult } from '@platform/server/tenants/set-tenant-pin-action';
 import { ACTION_OUTCOME } from '@shinefold/config';
 import { toOutcome } from '@shinefold/utils/to-outcome';
 
 export const holdSave = () => {
-  const save = Promise.withResolvers<TPinTenantActionResult>();
+  const save = Promise.withResolvers<TSetTenantPinActionResult>();
 
   return {
     promise: save.promise,

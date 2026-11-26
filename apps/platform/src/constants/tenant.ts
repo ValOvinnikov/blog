@@ -116,3 +116,7 @@ export const TENANTS_SEARCH_DEBOUNCE_MS = 300;
 export const TENANTS_PAGE_SIZE = 25;
 
 export const TENANTS_LIST_ROUTE = '/[locale]/(operator)/tenants';
+
+export const TENANTS_LIST_PURGE_ARGS = [TENANTS_LIST_ROUTE, 'page'] as const;
+
+export const TENANTS_SEARCH_INPUT_ID = 'tenants-search-input';

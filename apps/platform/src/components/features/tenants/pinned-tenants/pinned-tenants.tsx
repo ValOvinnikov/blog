@@ -15,36 +15,50 @@ import { useId, useState } from 'react';
 import { PinnedTenantTile } from './components/tile/pinned-tenant-tile';
 import { pinnedTenantsVariants } from './pinned-tenants-variants';
 import { useFirstRowCount } from './use-first-row-count';
+import { usePinnedTilesFocus } from './use-pinned-tiles-focus';
 
 export const PinnedTenants = () => {
   const t = useTranslations('pinnedTenants');
-  const { pinnedTenants } = usePinnedTenants();
   const [isExpanded, setIsExpanded] = useState(false);
   const listId = useId();
+  const { title, accessibleTitle, count, list } = pinnedTenantsVariants({
+    isExpanded,
+  });
+  const { pinnedTenants } = usePinnedTenants();
   const { listRef, firstRowCount } = useFirstRowCount(pinnedTenants.length);
-  const { title, count, list } = pinnedTenantsVariants({ isExpanded });
+  const firstRow = firstRowCount ?? pinnedTenants.length;
+  const { unpin, unpinButtonRef, toggleRef } = usePinnedTilesFocus({
+    listRef,
+    firstRow,
+    isExpanded,
+  });
 
   if (!hasLength(pinnedTenants)) {
     return null;
   }
 
   const total = pinnedTenants.length;
-  const firstRow = firstRowCount ?? total;
   const hasOverflow = firstRow < total;
 
   return (
     <Card>
       <Card.Header
         title={
-          <span className={title()}>
-            <Icon name={ICONS.PIN} size={ICON_SIZE.MD} />
-            {t('title')}
-            <span className={count()}>{total}</span>
-          </span>
+          <>
+            <span aria-hidden="true" className={title()}>
+              <Icon name={ICONS.PIN} size={ICON_SIZE.MD} />
+              {t('title')}
+              <span className={count()}>{total}</span>
+            </span>
+            <span className={accessibleTitle()}>
+              {t('titleAccessible', { count: total })}
+            </span>
+          </>
         }
         actions={
           hasOverflow && (
             <Button
+              ref={toggleRef}
               variant={BUTTON_VARIANT.SECONDARY}
               size={SIZE.SM}
               focusGround={FOCUS_RING_GROUND.SURFACE_HEAD}
@@ -64,6 +78,8 @@ export const PinnedTenants = () => {
               key={tenant.id}
               tenant={tenant}
               isInert={!isExpanded && index >= firstRow}
+              onUnpin={() => unpin(tenant)}
+              unpinButtonRef={unpinButtonRef(tenant.id)}
             />
           ))}
         </ul>

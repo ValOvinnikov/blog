@@ -1,4 +1,3 @@
-import { usePinnedTenants } from '@platform/components/features/tenants/pinned-tenants-provider';
 import { Avatar } from '@platform/components/shared/avatar';
 import { IconSoloButton } from '@platform/components/shared/icon-solo-button';
 import { StatusBadge } from '@platform/components/shared/status-badge';
@@ -10,50 +9,56 @@ import { tenantStatusTone } from '@platform/utils/status-tone/status-tone';
 import { tenantManageHref } from '@platform/utils/tenant-manage-href/tenant-manage-href';
 import { ICONS } from '@shinefold/config';
 import { useTranslations } from 'next-intl';
+import type { Ref } from 'react';
 
 import { pinnedTenantTileVariants } from './pinned-tenant-tile-variants';
 
 export type TPinnedTenantTileProps = {
   tenant: TPinnedTenant;
   isInert: boolean;
+  onUnpin: () => void;
+  unpinButtonRef: Ref<HTMLButtonElement>;
 };
 
 export const PinnedTenantTile = ({
   tenant,
   isInert,
+  onUnpin,
+  unpinButtonRef,
 }: TPinnedTenantTileProps) => {
   const t = useTranslations('pinnedTenants');
   const tTable = useTranslations('tenantsTable');
   const tPlan = useTranslations('planNames');
-  const { setPinned } = usePinnedTenants();
+  const { name: tenantName, primaryDomain, plan, status } = tenant;
   const { root, link, header, lines, name, domain, badges, unpin } =
     pinnedTenantTileVariants();
-  const unpinLabel = t('unpinAriaLabel', { name: tenant.name });
+  const unpinLabel = t('unpinAriaLabel', { name: tenantName });
 
   return (
     <li className={root()} inert={isInert}>
       <Link href={tenantManageHref(tenant)} className={link()}>
         <span className={header()}>
-          <Avatar name={tenant.name} variant={AVATAR_VARIANT.TABLE} />
+          <Avatar name={tenantName} variant={AVATAR_VARIANT.TABLE} />
           <span className={lines()}>
-            <span className={name()}>{tenant.name}</span>
-            <span className={domain()}>{tenant.primaryDomain}</span>
+            <span className={name()}>{tenantName}</span>
+            <span className={domain()}>{primaryDomain}</span>
           </span>
         </span>
         <span className={badges()}>
           <StatusBadge tone={BADGE_TONE.PLAN} hasDot={false}>
-            {tPlan(tenant.plan)}
+            {tPlan(plan)}
           </StatusBadge>
-          <StatusBadge tone={tenantStatusTone(tenant.status)}>
-            {tTable(`status.${tenant.status}`)}
+          <StatusBadge tone={tenantStatusTone(status)}>
+            {tTable(`status.${status}`)}
           </StatusBadge>
         </span>
       </Link>
       <IconSoloButton
+        ref={unpinButtonRef}
         ariaLabel={unpinLabel}
         tooltip={unpinLabel}
         icon={ICONS.PIN}
-        onClick={() => setPinned(tenant, false)}
+        onClick={onUnpin}
         isTooltipEndAligned={true}
         className={unpin()}
       />

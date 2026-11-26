@@ -1,6 +1,9 @@
 import 'server-only';
 
-import { TENANT_LOG, TENANTS_LIST_ROUTE } from '@platform/constants/tenant';
+import {
+  TENANT_LOG,
+  TENANTS_LIST_PURGE_ARGS,
+} from '@platform/constants/tenant';
 import { recordAuditEvent } from '@platform/server/audit/record-audit-event';
 import type { TOwnerAccessRequestResult } from '@platform/server/owner-access/request-owner-access';
 import { revalidateSiteConfig } from '@platform/server/site-config/revalidate-site-config';
@@ -65,7 +68,7 @@ export const completeTenantDetailsUpdate = async (
   previousTenant: TTenant,
 ): Promise<TTenantDetailsSaved> => {
   await revalidateSiteConfig(tenantId);
-  revalidatePath(TENANTS_LIST_ROUTE, 'page');
+  revalidatePath(...TENANTS_LIST_PURGE_ARGS);
   after(() => onTenantPlanChange(tenantId, previousTenant.plan, tenant.plan));
   const studioReinvite = await reinviteIfOwnerChanged(
     tenant,

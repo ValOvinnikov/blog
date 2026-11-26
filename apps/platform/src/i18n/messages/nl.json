@@ -318,10 +318,13 @@
   },
   "pinnedTenants": {
     "title": "Vastgezet",
+    "titleAccessible": "{count, plural, one {# vastgezette tenant} other {# vastgezette tenants}}",
     "showAll": "Toon alle {count}",
     "showLess": "Toon minder",
     "pinAriaLabel": "{name} vastzetten",
     "unpinAriaLabel": "{name} losmaken",
+    "pinnedAnnouncement": "{name} vastgezet",
+    "unpinnedAnnouncement": "{name} losgemaakt",
     "saveFailed": "De pin van {name} kon niet worden opgeslagen. Probeer het opnieuw."
   },
   "tenantsSearch": {

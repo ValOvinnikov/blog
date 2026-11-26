@@ -1,8 +1,7 @@
 'use client';
 
 import { useToast } from '@platform/context/toast-provider';
-import { pinTenantAction } from '@platform/server/tenants/pin-tenant-action';
-import { unpinTenantAction } from '@platform/server/tenants/unpin-tenant-action';
+import { setTenantPinAction } from '@platform/server/tenants/set-tenant-pin-action';
 import {
   applyPinChange,
   type TPinnedTenant,
@@ -11,7 +10,15 @@ import { settleAction } from '@platform/utils/settle-action/settle-action';
 import { isOutcomeSuccess, type TMaybeUndefined } from '@shinefold/config';
 import type { IWithChildren } from '@shinefold/config/react';
 import { useTranslations } from 'next-intl';
-import { createContext, useContext, useOptimistic, useTransition } from 'react';
+import {
+  createContext,
+  useContext,
+  useOptimistic,
+  useState,
+  useTransition,
+} from 'react';
+
+import { pinnedTenantsProviderVariants } from './pinned-tenants-provider-variants';
 
 type TPinnedTenantsContext = {
   pinnedTenants: TPinnedTenant[];
@@ -36,17 +43,22 @@ export const PinnedTenantsProvider = ({
     applyPinChange,
   );
   const [, startTransition] = useTransition();
+  const [announcement, setAnnouncement] = useState('');
+  const { liveRegion } = pinnedTenantsProviderVariants();
 
   const setPinned = (tenant: TPinnedTenant, isPinned: boolean) => {
+    const { id, name } = tenant;
     startTransition(async () => {
       applyOptimisticChange({ tenant, isPinned });
-      const result = await settleAction(
-        isPinned ? pinTenantAction(tenant.id) : unpinTenantAction(tenant.id),
-      );
+      const result = await settleAction(setTenantPinAction(id, isPinned));
 
-      if (!isOutcomeSuccess(result)) {
-        toast.error({ message: t('saveFailed', { name: tenant.name }) });
+      if (isOutcomeSuccess(result)) {
+        setAnnouncement(
+          t(isPinned ? 'pinnedAnnouncement' : 'unpinnedAnnouncement', { name }),
+        );
+        return;
       }
+      toast.error({ message: t('saveFailed', { name }) });
     });
   };
 
@@ -55,6 +67,9 @@ export const PinnedTenantsProvider = ({
       value={{ pinnedTenants: optimisticPinned, setPinned }}
     >
       {children}
+      <span role="status" className={liveRegion()}>
+        {announcement}
+      </span>
     </PinnedTenantsContext.Provider>
   );
 };

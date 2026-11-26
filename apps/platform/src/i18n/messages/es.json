@@ -318,10 +318,13 @@
   },
   "pinnedTenants": {
     "title": "Fijados",
+    "titleAccessible": "{count, plural, one {# cliente fijado} other {# clientes fijados}}",
     "showAll": "Mostrar los {count}",
     "showLess": "Mostrar menos",
     "pinAriaLabel": "Fijar {name}",
     "unpinAriaLabel": "Dejar de fijar {name}",
+    "pinnedAnnouncement": "{name} fijado",
+    "unpinnedAnnouncement": "{name} ya no está fijado",
     "saveFailed": "No se pudo guardar el fijado de {name}. Vuelve a intentarlo."
   },
   "tenantsSearch": {

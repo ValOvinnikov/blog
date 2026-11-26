@@ -3,6 +3,7 @@ import { tv } from '@platform/utils/tv/tv';
 export const pinnedTenantsVariants = tv({
   slots: {
     title: ['inline-flex items-center gap-2'],
+    accessibleTitle: ['sr-only'],
     count: ['text-platform-12 font-normal text-platform-muted'],
     list: [
       'm-0 flex list-none gap-3 overflow-x-auto p-0',
