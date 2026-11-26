@@ -28,20 +28,25 @@ const MOCK_LOGO_FILE = new File([faker.lorem.word()], faker.system.fileName(), {
 });
 const MOCK_STAGED_FAVICON_URL = faker.internet.url();
 
-const DEFAULT_VALUES = defaultLookFormValues();
-const MOCK_WITH_LOGO = { ...DEFAULT_VALUES, logo: { url: MOCK_LOGO_URL } };
+const MOCK_DEFAULT_VALUES = defaultLookFormValues();
+const MOCK_WITH_LOGO = { ...MOCK_DEFAULT_VALUES, logo: { url: MOCK_LOGO_URL } };
 
 describe(isFieldChanged, () => {
   it('treats an equal plain field as unchanged', () => {
     expect(
-      isFieldChanged('accentHue', DEFAULT_VALUES, { ...DEFAULT_VALUES }),
+      isFieldChanged('accentHue', MOCK_DEFAULT_VALUES, {
+        ...MOCK_DEFAULT_VALUES,
+      }),
     ).toBe(false);
   });
 
   it('treats a different plain field as changed', () => {
-    const b = { ...DEFAULT_VALUES, accentHue: DEFAULT_VALUES.accentHue + 1 };
+    const b = {
+      ...MOCK_DEFAULT_VALUES,
+      accentHue: MOCK_DEFAULT_VALUES.accentHue + 1,
+    };
 
-    expect(isFieldChanged('accentHue', DEFAULT_VALUES, b)).toBe(true);
+    expect(isFieldChanged('accentHue', MOCK_DEFAULT_VALUES, b)).toBe(true);
   });
 
   it('treats a brand image with the same url and file as unchanged', () => {
@@ -62,18 +67,18 @@ describe(isFieldChanged, () => {
 
 describe(countChanges, () => {
   it('counts nothing between equal values', () => {
-    expect(countChanges(DEFAULT_VALUES, defaultLookFormValues())).toBe(0);
+    expect(countChanges(MOCK_DEFAULT_VALUES, defaultLookFormValues())).toBe(0);
   });
 
   it('counts each changed field once, brand images included', () => {
     const b = {
-      ...DEFAULT_VALUES,
-      accentHue: DEFAULT_VALUES.accentHue + 1,
+      ...MOCK_DEFAULT_VALUES,
+      accentHue: MOCK_DEFAULT_VALUES.accentHue + 1,
       radiusScale: RADIUS_SCALE.XL,
       favicon: { url: MOCK_STAGED_FAVICON_URL, file: MOCK_LOGO_FILE },
     };
 
-    expect(countChanges(DEFAULT_VALUES, b)).toBe(3);
+    expect(countChanges(MOCK_DEFAULT_VALUES, b)).toBe(3);
   });
 });
 
@@ -100,7 +105,7 @@ describe(restoreLookDraft, () => {
     favicon: { url: MOCK_FAVICON_URL },
   };
   const draft = {
-    ...DEFAULT_VALUES,
+    ...MOCK_DEFAULT_VALUES,
     logo: { url: MOCK_STAGED_LOGO_BLOB_URL },
     logoDark: { url: MOCK_STAGED_LOGO_BLOB_URL },
     favicon: { url: MOCK_STAGED_FAVICON_URL },
@@ -121,30 +126,43 @@ describe(restoreLookDraft, () => {
 });
 
 describe(toLookFormValuesWithin, () => {
-  const SHINEFOLD_VALUES = { ...DEFAULT_VALUES, preset: PRESET_ID.SHINEFOLD };
-  const GROWTH = mockTenantEntitlements(TENANT_PLAN.GROWTH, [
+  const MOCK_SHINEFOLD_VALUES = {
+    ...MOCK_DEFAULT_VALUES,
+    preset: PRESET_ID.SHINEFOLD,
+  };
+  const MOCK_SAVED_VALUES = {
+    ...MOCK_SHINEFOLD_VALUES,
+    buttonColor: MOCK_PINK_HEX,
+  };
+  const MOCK_SHINEFOLD_GROWTH = mockTenantEntitlements(TENANT_PLAN.GROWTH, [
     MOCK_SHINEFOLD_PRESET_GRANT,
   ]);
-  const FREE = mockTenantEntitlements(TENANT_PLAN.FREE, [
+  const MOCK_SHINEFOLD_FREE = mockTenantEntitlements(TENANT_PLAN.FREE, [
     MOCK_SHINEFOLD_PRESET_GRANT,
   ]);
-  const SAVED_VALUES = { ...SHINEFOLD_VALUES, buttonColor: MOCK_PINK_HEX };
 
-  it('leaves an unsaved Shinefold button colour following the preset', () => {
-    expect(toLookFormValuesWithin(SHINEFOLD_VALUES, GROWTH).buttonColor).toBe(
+  it.each([
+    [
+      'an unsaved colour on Growth',
+      MOCK_SHINEFOLD_VALUES,
+      MOCK_SHINEFOLD_GROWTH,
       undefined,
-    );
-  });
-
-  it('keeps a saved button colour', () => {
-    expect(toLookFormValuesWithin(SAVED_VALUES, GROWTH).buttonColor).toBe(
+    ],
+    [
+      'a saved colour on Growth',
+      MOCK_SAVED_VALUES,
+      MOCK_SHINEFOLD_GROWTH,
       MOCK_PINK_HEX,
-    );
-  });
-
-  it('follows the preset while the button colour is locked', () => {
-    expect(toLookFormValuesWithin(SAVED_VALUES, FREE).buttonColor).toBe(
+    ],
+    [
+      'a saved colour locked on Free',
+      MOCK_SAVED_VALUES,
+      MOCK_SHINEFOLD_FREE,
       undefined,
+    ],
+  ])('gives %s the button colour %s', (_, values, entitlements, expected) => {
+    expect(toLookFormValuesWithin(values, entitlements).buttonColor).toBe(
+      expected,
     );
   });
 });

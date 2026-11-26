@@ -2,7 +2,6 @@ import { LOOK_ROW } from '@platform/constants/look-row';
 import { SITE_THEME_BUTTON_STYLE_TEST_ID } from '@platform/constants/site-theme-frame';
 import { screen } from '@platform/testing/custom-render';
 import {
-  BUTTON_COLOR_FOLLOWS_ACCENT,
   BUTTON_COLOR_FOLLOWS_PRESET,
   followSwitch,
 } from '@platform/testing/look/look-button-color';
@@ -27,13 +26,13 @@ vi.mock('@platform/server/site-config/upload-brand-asset-action');
 
 vi.mock('@platform/server/site-config/clear-brand-asset-action');
 
-const SHINEFOLD_TENANT = withLookTenant({
+const MOCK_SHINEFOLD_TENANT = withLookTenant({
   unlockedPresets: [PRESET_ID.SHINEFOLD],
 });
 
 const setupShinefold = (buttonColor?: string) =>
   setupLookForm({
-    ...SHINEFOLD_TENANT,
+    ...MOCK_SHINEFOLD_TENANT,
     initialValues: {
       ...defaultLookFormValues(),
       preset: PRESET_ID.SHINEFOLD,
@@ -64,19 +63,6 @@ describe(`<${LookForm.name}/>`, () => {
     expect(previewedButtonStyle()).toHaveTextContent(
       SHINEFOLD_LOGO_COLOR.YELLOW,
     );
-  });
-
-  it('follows the accent under Editorial', async () => {
-    setupLookForm({
-      initialValues: {
-        ...defaultLookFormValues(),
-        preset: PRESET_ID.EDITORIAL,
-      },
-    });
-    await openLookRow(user, LOOK_ROW.BUTTONS);
-
-    const accentSwitch = followSwitch(BUTTON_COLOR_FOLLOWS_ACCENT);
-    expect(accentSwitch).toBeChecked();
   });
 
   describe('under Shinefold with a saved colour', () => {

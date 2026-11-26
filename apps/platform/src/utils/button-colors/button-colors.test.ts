@@ -48,24 +48,28 @@ describe(isButtonColorInvalid, () => {
 });
 
 describe(withPresetButtonColor, () => {
-  it("takes the preset's colour while none is saved", () => {
-    expect(
-      withPresetButtonColor({ preset: PRESET_ID.SHINEFOLD }).buttonColor,
-    ).toBe(SHINEFOLD_LOGO_COLOR.YELLOW);
-  });
-
-  it('keeps a saved colour over the preset’s', () => {
-    expect(
-      withPresetButtonColor({
-        preset: PRESET_ID.SHINEFOLD,
-        buttonColor: MOCK_PINK_HEX,
-      }).buttonColor,
-    ).toBe(MOCK_PINK_HEX);
-  });
-
-  it('leaves the colour unset under a preset without one', () => {
-    expect(
-      withPresetButtonColor({ preset: PRESET_ID.CONSOLE }).buttonColor,
-    ).toBeUndefined();
+  it.each([
+    [
+      'the preset colour while none is saved',
+      PRESET_ID.SHINEFOLD,
+      undefined,
+      SHINEFOLD_LOGO_COLOR.YELLOW,
+    ],
+    [
+      'a saved colour over the preset one',
+      PRESET_ID.SHINEFOLD,
+      MOCK_PINK_HEX,
+      MOCK_PINK_HEX,
+    ],
+    [
+      'no colour under a preset without one',
+      PRESET_ID.CONSOLE,
+      undefined,
+      undefined,
+    ],
+  ])('takes %s', (_, preset, buttonColor, expected) => {
+    expect(withPresetButtonColor({ preset, buttonColor }).buttonColor).toBe(
+      expected,
+    );
   });
 });
