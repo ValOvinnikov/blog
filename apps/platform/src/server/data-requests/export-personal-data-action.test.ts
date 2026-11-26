@@ -2,9 +2,13 @@ import { recordAuditEvent } from '@platform/server/audit/record-audit-event';
 import { requireSuperAdmin } from '@platform/server/auth/require-super-admin';
 import { firstRecordedAuditEvent } from '@platform/testing/audit-events/recorded-audit-event';
 import {
+  mockEmptyPersonalDataExport,
+  mockEmptyPersonalDataMatches,
+  mockPersonalDataExport,
+} from '@platform/testing/data-requests/export-fixtures';
+import {
   MOCK_DATA_REQUEST_EMAIL,
   MOCK_EXPORT_GENERATED_AT,
-  mockPersonalDataExport,
   mockPersonalDataMatches,
 } from '@platform/testing/data-requests/fixtures';
 import { mockDbConstants } from '@platform/testing/mock-db-constants';
@@ -60,6 +64,21 @@ describe(exportPersonalDataAction, () => {
     expect(result).toEqual({
       outcome: ACTION_OUTCOME.SUCCESS,
       data: mockPersonalDataExport(),
+    });
+  });
+
+  it('states that no data is held when nothing matches', async () => {
+    findPersonalDataMock.mockResolvedValueOnce(
+      okResult(mockEmptyPersonalDataMatches()),
+    );
+
+    const result = await exportPersonalDataAction({
+      email: MOCK_DATA_REQUEST_EMAIL,
+    });
+
+    expect(result).toEqual({
+      outcome: ACTION_OUTCOME.SUCCESS,
+      data: mockEmptyPersonalDataExport(),
     });
   });
 

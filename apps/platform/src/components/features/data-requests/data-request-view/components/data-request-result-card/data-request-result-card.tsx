@@ -58,30 +58,30 @@ export const DataRequestResultCard = ({
       <Card.Header
         title={t('title', { email })}
         actions={
-          matchCount > 0 && (
-            <div className={actions()}>
-              <Button
-                type="button"
-                variant={BUTTON_VARIANT.SECONDARY}
-                size={SIZE.SM}
-                focusGround={FOCUS_RING_GROUND.SURFACE_HEAD}
-                onClick={() => handleExport(DATA_REQUEST_EXPORT_FORMAT.JSON)}
-                isPending={exportingFormat === DATA_REQUEST_EXPORT_FORMAT.JSON}
-                pendingLabel={t('exporting')}
-              >
-                {t('exportJson')}
-              </Button>
-              <Button
-                type="button"
-                variant={BUTTON_VARIANT.SECONDARY}
-                size={SIZE.SM}
-                focusGround={FOCUS_RING_GROUND.SURFACE_HEAD}
-                onClick={() => handleExport(DATA_REQUEST_EXPORT_FORMAT.CSV)}
-                isPending={exportingFormat === DATA_REQUEST_EXPORT_FORMAT.CSV}
-                pendingLabel={t('exporting')}
-              >
-                {t('exportCsv')}
-              </Button>
+          <div className={actions()}>
+            <Button
+              type="button"
+              variant={BUTTON_VARIANT.SECONDARY}
+              size={SIZE.SM}
+              focusGround={FOCUS_RING_GROUND.SURFACE_HEAD}
+              onClick={() => handleExport(DATA_REQUEST_EXPORT_FORMAT.JSON)}
+              isPending={exportingFormat === DATA_REQUEST_EXPORT_FORMAT.JSON}
+              pendingLabel={t('exporting')}
+            >
+              {t('exportJson')}
+            </Button>
+            <Button
+              type="button"
+              variant={BUTTON_VARIANT.SECONDARY}
+              size={SIZE.SM}
+              focusGround={FOCUS_RING_GROUND.SURFACE_HEAD}
+              onClick={() => handleExport(DATA_REQUEST_EXPORT_FORMAT.CSV)}
+              isPending={exportingFormat === DATA_REQUEST_EXPORT_FORMAT.CSV}
+              pendingLabel={t('exporting')}
+            >
+              {t('exportCsv')}
+            </Button>
+            {matchCount > 0 && (
               <DataRequestEraseDialog
                 email={email}
                 hasReaderAccount={hasReaderAccount}
@@ -89,8 +89,8 @@ export const DataRequestResultCard = ({
                 onErase={onErase}
                 onErased={onErased}
               />
-            </div>
-          )
+            )}
+          </div>
         }
       />
       <Card.Body>

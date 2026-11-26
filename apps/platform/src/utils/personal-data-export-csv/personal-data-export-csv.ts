@@ -9,7 +9,7 @@ import type {
 import type { TMaybeUndefined } from '@shinefold/config';
 import type { TPersonalDataReaderAccount } from '@shinefold/db/queries/personal-data/reader-account-personal-data';
 import { toCsv, type TCsvCell } from '@shinefold/utils/csv';
-import { isNull, isString } from '@shinefold/utils/primitives';
+import { hasLength, isNull, isString } from '@shinefold/utils/primitives';
 
 type TExportRecord = {
   kind: TDataRequestMatchKind;
@@ -20,6 +20,7 @@ const HEADER_COLUMNS = [
   'generatedAt',
   'searchedEmail',
   'operatorId',
+  'isDataHeld',
 ] as const satisfies readonly (keyof TPersonalDataExportHeader)[];
 
 const KIND_COLUMN = 'kind';
@@ -84,12 +85,14 @@ export const toPersonalDataExportCsv = (data: TPersonalDataExport): string => {
   ];
   const header = HEADER_COLUMNS.map((column) => data[column]);
 
+  const rows = records.map(({ kind, fields }) => [
+    ...header,
+    kind,
+    ...fieldColumns.map((column) => toCell(fields[column])),
+  ]);
+
   return toCsv([
     [...HEADER_COLUMNS, KIND_COLUMN, ...fieldColumns],
-    ...records.map(({ kind, fields }) => [
-      ...header,
-      kind,
-      ...fieldColumns.map((column) => toCell(fields[column])),
-    ]),
+    ...(hasLength(rows) ? rows : [header]),
   ]);
 };

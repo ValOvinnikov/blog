@@ -41,15 +41,18 @@ page (#5090). The page serves either answer.
   and a kind filter offers each kind the lookup found. All of it runs in the
   browser over the lookup's results.
 - With no matches the result card says "No data held for this address." and
-  nothing else: no table, downloads or "Erase".
+  keeps both downloads, so the operator can save the empty result as the
+  answer to an access request; it shows no table and no "Erase".
 - "Download JSON" and "Download CSV" save
   `personal-data-export-<generatedAt>.json` / `.csv` (colons as dashes, no
   milliseconds, e.g. `personal-data-export-2026-10-27T10-29-42Z.csv`), both with
   the same records, the reader account
   included. Each starts with `generatedAt` (ISO time, set on the server),
-  `searchedEmail` and `operatorId` (the operator's user id, never their
-  email): the JSON as its first keys, the CSV as its first three columns on
-  every row. The CSV is one table with a `kind` column (`SUBSCRIBER`, `LEAD`,
+  `searchedEmail`, `operatorId` (the operator's user id, never their
+  email) and `isDataHeld` (`false` when the lookup found nothing): the JSON as
+  its first keys, the CSV as its first four columns on every row. With nothing
+  held the CSV has one row under its header, those four cells and an empty
+  `kind`. The CSV is one table with a `kind` column (`SUBSCRIBER`, `LEAD`,
   `INVITE`, `STUDIO_REINVITE`, `SELF_SERVE_OWNER`, `READER_ACCOUNT`, `BOOKMARK`,
   `SIGNUP_BLOCK`, `AUDIT_EVENT`) and
   one column per field, empty where a kind has none; dates are ISO times and
