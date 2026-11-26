@@ -27,7 +27,7 @@ export const MOCK_POST_CARD_ITEMS = [
   MOCK_TYPESCRIPT_POST_ITEM,
 ];
 
-export const mockPlaceholderImage = (alt: string) => (
+const mockPlaceholderImage = (alt: string) => (
   // eslint-disable-next-line @next/next/no-img-element -- Storybook placeholder image, not a production asset; next/image would be wrong here
   <img src="https://placehold.co/640x360" alt={alt} />
 );
