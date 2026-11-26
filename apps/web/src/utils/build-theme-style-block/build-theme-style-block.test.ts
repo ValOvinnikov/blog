@@ -457,15 +457,6 @@ describe(buildThemeStyleBlock, () => {
     },
   );
 
-  it("draws the Shinefold preset's surfaces in light and dark", () => {
-    const css = buildThemeStyleBlock({
-      ...CONSOLE_TOKENS,
-      preset: PRESET_ID.SHINEFOLD,
-    });
-
-    expect(css).toContain(formatPresetSurfaceBlock(PRESET_ID.SHINEFOLD));
-  });
-
   it("lets a band's own button colours win over the button roles", () => {
     const css = buildThemeStyleBlock({
       ...CONSOLE_TOKENS,

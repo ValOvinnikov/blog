@@ -14,7 +14,7 @@ import { openMobileSelector } from '@web/testing/shared/sidebar-nav/open-mobile-
 import {
   SHINEFOLD_DARK_GLOBALS,
   SHINEFOLD_LIGHT_GLOBALS,
-} from '@web/testing/shared/site-theme/shinefold-preset-globals';
+} from '@web/testing/shared/site-theme/site-theme-globals';
 import { userEvent, within } from 'storybook/test';
 
 import { SidebarNav } from './sidebar-nav';

@@ -1,14 +1,20 @@
-import { PRESET_ID, type TPresetId } from '@shinefold/config/constants';
+import {
+  COLOR_SCHEME,
+  PRESET_ID,
+  type TColorScheme,
+  type TPresetId,
+} from '@shinefold/config/constants';
+import { SITE_THEME_HUE } from '@web/constants/site-theme';
 
 export type TSiteThemeGlobals = {
   preset: TPresetId;
   accentHue: string;
-  colorMode: 'light' | 'dark';
+  colorMode: TColorScheme;
 };
 
-export const COLOR_MODES: TSiteThemeGlobals['colorMode'][] = ['light', 'dark'];
+export const COLOR_MODES = Object.values(COLOR_SCHEME);
 
-const PRESET_HUE = 'PRESET';
+const PRESET_HUE = SITE_THEME_HUE.FROM_PRESET;
 
 // Hues 130 and 190 sit where the inspection found the accent ramp's worst light-mode failures.
 export const THEME_CASES = [
@@ -21,7 +27,7 @@ export const THEME_CASES = [
 export const INITIAL_GLOBALS: TSiteThemeGlobals = {
   preset: PRESET_ID.CONSOLE,
   accentHue: PRESET_HUE,
-  colorMode: 'light',
+  colorMode: COLOR_SCHEME.LIGHT,
 };
 
 export const VIEWPORT_WIDTHS = [1280, 390];

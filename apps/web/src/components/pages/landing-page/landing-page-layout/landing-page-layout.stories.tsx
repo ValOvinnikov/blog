@@ -12,7 +12,7 @@ import { mockHeroPresentation } from '@web/testing/shared/hero-presentation/fixt
 import {
   SHINEFOLD_DARK_GLOBALS,
   SHINEFOLD_LIGHT_GLOBALS,
-} from '@web/testing/shared/site-theme/shinefold-preset-globals';
+} from '@web/testing/shared/site-theme/site-theme-globals';
 
 import { LandingPageLayout } from './landing-page-layout';
 

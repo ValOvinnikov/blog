@@ -1,4 +1,5 @@
 import {
+  COLOR_SCHEME,
   HUE_MAX,
   HUE_MIN,
   PRESET_ID,
@@ -8,10 +9,10 @@ import {
 import { isOneOf } from '@shinefold/utils/primitives';
 import type { Decorator, Preview } from '@storybook/nextjs-vite';
 import { resolveFontVariableClassName } from '@web/config/fonts';
+import { SITE_THEME_HUE } from '@web/constants/site-theme';
 import { buildThemeStyleBlock } from '@web/utils/build-theme-style-block';
 
 const THEME_STYLE_ID = 'storybook-site-theme';
-const PRESET_HUE = 'FROM_PRESET';
 const HUE_STEP = 10;
 const PRESET_IDS = Object.values(PRESET_ID);
 
@@ -49,7 +50,7 @@ export const SITE_THEME_GLOBAL_TYPES: Preview['globalTypes'] = {
       title: 'Hue',
       icon: 'circle',
       items: [
-        { value: PRESET_HUE, title: 'Preset hue' },
+        { value: SITE_THEME_HUE.FROM_PRESET, title: 'Preset hue' },
         ...Array.from({ length: HUE_MAX / HUE_STEP }, (_, index) => ({
           value: String(index * HUE_STEP),
           title: `Hue ${index * HUE_STEP}`,
@@ -63,7 +64,7 @@ export const SITE_THEME_GLOBAL_TYPES: Preview['globalTypes'] = {
     toolbar: {
       title: 'Mode',
       icon: 'mirror',
-      items: ['light', 'dark'],
+      items: Object.values(COLOR_SCHEME),
       dynamicTitle: true,
     },
   },
@@ -71,8 +72,8 @@ export const SITE_THEME_GLOBAL_TYPES: Preview['globalTypes'] = {
 
 export const SITE_THEME_INITIAL_GLOBALS = {
   preset: PRESET_ID.CONSOLE,
-  accentHue: PRESET_HUE,
-  colorMode: 'light',
+  accentHue: SITE_THEME_HUE.FROM_PRESET,
+  colorMode: COLOR_SCHEME.LIGHT,
 };
 
 // The class names go on the root element, not a wrapper div: the
@@ -103,6 +104,6 @@ export const withSiteTheme: Decorator = (storyFn, { globals }) => {
     classList.remove(...resolvePresetFontClassNames(id));
   });
   classList.add(...resolvePresetFontClassNames(presetId));
-  classList.toggle('dark', globals.colorMode === 'dark');
+  classList.toggle('dark', globals.colorMode === COLOR_SCHEME.DARK);
   return storyFn();
 };
