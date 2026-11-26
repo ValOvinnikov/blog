@@ -88,24 +88,24 @@ degrades to a free-text box. Pick `options` by what backs the prop:
 
 | Prop backed by                | `options`                                                   |
 | ----------------------------- | ----------------------------------------------------------- |
-| a `tv()` variant group        | `objectKeys(xVariants.variants.<group>)`                    |
+| a `tv()` variant group        | `keys(xVariants.variants.<group>)`                          |
 | an UPPERCASE dictionary const | `Object.values(THE_CONST)`, narrowed to the accepted subset |
 | a union behind a named alias  | the plural array const the type derives from                |
 | an inline literal union       | nothing — inference works                                   |
 
 ### `tv()` variant props
 
-`tv()` exposes its config on `.variants` at runtime, so `objectKeys` (from
-`@shinefold/utils/primitives`) yields the real, current option list:
+`tv()` exposes its config on `.variants` at runtime, so `keys` (from
+`remeda`) yields the real, current option list:
 
 ```tsx
-import { objectKeys } from '@shinefold/utils/primitives';
+import { keys } from 'remeda';
 
 import { buttonVariants } from './button-variants';
 
 argTypes: {
-  variant: { control: 'select', options: objectKeys(buttonVariants.variants.variant) },
-  size: { control: 'select', options: objectKeys(buttonVariants.variants.size) },
+  variant: { control: 'select', options: keys(buttonVariants.variants.variant) },
+  size: { control: 'select', options: keys(buttonVariants.variants.size) },
 },
 ```
 
@@ -133,7 +133,7 @@ argTypes: {
   ```tsx
   argTypes: {
     name: { control: 'select', options: Object.values(ICONS) },
-    size: { control: 'select', options: objectKeys(iconVariants.variants.size) },
+    size: { control: 'select', options: keys(iconVariants.variants.size) },
   },
   ```
 
@@ -168,10 +168,9 @@ Name these consts in the plural (`HEADING_LEVELS`): they are lists passed
 straight to `options`, unlike the singular dictionary consts reached through
 `Object.values` (`options: Object.values(FORM_STATUS)`). Where no such const exists, a literal array
 is the fallback — matching the declared type exactly (`THeadingLevel` takes
-numbers, not `['1', '2', …]`). Never derive it with `objectKeys(headingTags)`:
-that record is keyed by numbers, `objectKeys` types the result as
-`Array<1 | 2 | 3 | 4>`, and the control receives strings at runtime —
-type-check passes and the select sets the wrong value.
+numbers, not `['1', '2', …]`). Never derive it with `keys(headingTags)`:
+that record is keyed by numbers, so the control receives the strings
+`'1'`…`'4'`, which `THeadingLevel` rejects.
 
 ## `render` — only when args can't express the story
 
