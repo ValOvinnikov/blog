@@ -1,4 +1,4 @@
-import { objectKeys } from '@shinefold/utils/primitives';
+import { keys } from 'remeda';
 
 import {
   COLOR_SCHEME,
@@ -51,7 +51,7 @@ export const formatPresetSurfaceBlock = (preset: TPresetId): string => {
         ...declarationsOf(lengths[scheme]),
       ]),
     ),
-    ...objectKeys(bands).flatMap((variant) =>
+    ...keys(bands).flatMap((variant) =>
       COLOR_SCHEMES.flatMap((scheme) => {
         const band = bands[variant][scheme];
         return formatBlock(skinSchemeSelector(variant, scheme), [

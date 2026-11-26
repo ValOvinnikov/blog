@@ -1,4 +1,4 @@
-import { mapKeysToRecord } from '@shinefold/utils/primitives';
+import { mapValues } from 'remeda';
 
 import {
   BRAND_VARIANT,
@@ -33,8 +33,6 @@ type TSkinDefinition = {
   pin?: Partial<Record<TColorScheme, Partial<TSkinRoles>>>;
 };
 
-const COLOR_SCHEMES = Object.values(COLOR_SCHEME);
-
 export const defineSkin = (
   title: string,
   { ground, mode, pin = {} }: TSkinDefinition,
@@ -47,7 +45,7 @@ export const defineSkin = (
     ground,
     // Derived on first read: the search measures every accent hue, too slow for module load.
     get roles() {
-      roles ??= mapKeysToRecord(COLOR_SCHEMES, (scheme) =>
+      roles ??= mapValues(COLOR_SCHEME, (scheme) =>
         deriveSkinRoles({
           title,
           ground: ground[scheme],
@@ -79,7 +77,7 @@ export const SKIN_REGISTRY = {
       [COLOR_SCHEME.DARK]: '--palette-neutral-2600',
     },
     mode: SKIN_MODE.MATCH,
-    pin: mapKeysToRecord(COLOR_SCHEMES, (scheme) => ({
+    pin: mapValues(COLOR_SCHEME, (scheme) => ({
       [AMBIENT_RAISED]: PAGE_ROLES[scheme][AMBIENT_RAISED],
     })),
   }),

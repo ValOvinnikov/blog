@@ -1,5 +1,5 @@
 import { hexToOklch, renderedContrastRatio } from '@shinefold/utils/color';
-import { objectKeys } from '@shinefold/utils/primitives';
+import { keys } from 'remeda';
 
 import {
   COLOR_SCHEME,
@@ -38,12 +38,12 @@ const BUTTON_ROLE_FIELDS = {
   [BUTTON_LABEL]: 'label',
 } as const satisfies Record<`--${string}`, keyof TButtonColors>;
 
-const BUTTON_ROLES = objectKeys(BUTTON_ROLE_FIELDS);
+const BUTTON_ROLES = keys(BUTTON_ROLE_FIELDS);
 
 const groundTokenOf = (role: string, ground: TColorScheme): string =>
   `${role}-on-${ground.toLowerCase()}`;
 
-const SKIN_GROUNDS = objectKeys(SKIN_REGISTRY).flatMap((variant) =>
+const SKIN_GROUNDS = keys(SKIN_REGISTRY).flatMap((variant) =>
   COLOR_SCHEMES.map((scheme) => ({
     variant,
     scheme,

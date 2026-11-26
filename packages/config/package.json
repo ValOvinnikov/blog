@@ -28,7 +28,8 @@
   },
   "dependencies": {
     "@portabletext/types": "^4.0.2",
-    "@shinefold/utils": "workspace:*"
+    "@shinefold/utils": "workspace:*",
+    "remeda": "catalog:"
   },
   "devDependencies": {
     "@faker-js/faker": "catalog:",

@@ -1,4 +1,4 @@
-import { mapKeysToRecord, objectKeys } from '@shinefold/utils/primitives';
+import { keys, mapValues } from 'remeda';
 
 import {
   CARD_STYLE,
@@ -39,14 +39,12 @@ const STYLE_AXES: {
   },
 };
 
-const STYLE_AXIS_KEYS = objectKeys(STYLE_AXES);
+const STYLE_AXIS_KEYS = keys(STYLE_AXES);
 
 const axisTokens = (axis: TStyleAxis<string>): Set<string> =>
   new Set(Object.values(axis.declarations).flatMap(Object.keys));
 
-const STYLE_AXIS_TOKENS = mapKeysToRecord(STYLE_AXIS_KEYS, (key) =>
-  axisTokens(STYLE_AXES[key]),
-);
+const STYLE_AXIS_TOKENS = mapValues(STYLE_AXES, axisTokens);
 
 export const findVaryingAxes = (
   tokens: readonly TThemeToken[],
