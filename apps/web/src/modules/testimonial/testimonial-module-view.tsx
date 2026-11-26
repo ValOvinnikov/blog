@@ -1,4 +1,4 @@
-import { CONTENT_ALIGNMENT, DISPLAY_MODE } from '@shinefold/config';
+import { DISPLAY_MODE } from '@shinefold/config';
 import type { TTestimonialModule } from '@shinefold/service';
 import { CardGrid } from '@shinefold/ui/components/organisms/card-grid';
 import { hasLength } from '@shinefold/utils/primitives';
@@ -9,6 +9,7 @@ import { TestimonialCard } from '@web/modules/testimonial/components/testimonial
 import { TestimonialCarousel } from '@web/modules/testimonial/components/testimonial-carousel/testimonial-carousel';
 import { isLoneLastInRow } from '@web/utils/is-lone-last-in-row';
 import { moduleGridActionsVariants } from '@web/utils/module-grid-actions-variants';
+import { toCardAlign, toCenterOrLeftAlignment } from '@web/utils/to-card-align';
 import { toCardGridColumns } from '@web/utils/to-card-grid-columns';
 import { toTestimonialGridColumns } from '@web/utils/to-testimonial-grid-columns';
 
@@ -44,12 +45,8 @@ export const TestimonialModuleView = ({
   const { brandVariant, layout, appearance } = section;
   const [spotlightItem] = testimonials;
   const isSpotlight = testimonials.length === 1;
-  const carouselAlign =
-    contentAlignment === CONTENT_ALIGNMENT.CENTER
-      ? CONTENT_ALIGNMENT.CENTER
-      : CONTENT_ALIGNMENT.LEFT;
-  const cardAlign =
-    cardAlignment === CONTENT_ALIGNMENT.CENTER ? 'center' : 'left';
+  const carouselAlign = toCenterOrLeftAlignment(contentAlignment);
+  const cardAlign = toCardAlign(cardAlignment);
   const columns =
     toCardGridColumns(storedColumns) ??
     toTestimonialGridColumns(testimonials.length);

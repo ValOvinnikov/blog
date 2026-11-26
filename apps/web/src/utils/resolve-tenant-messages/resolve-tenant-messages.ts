@@ -4,6 +4,12 @@ import {
   VOICE_FIELDS,
   type TVoicePortableText,
 } from '@shinefold/config';
+import {
+  hasLength,
+  isPlainObject,
+  isString,
+  isUndefined,
+} from '@shinefold/utils/primitives';
 import { SITE_CONFIG_LOG } from '@web/constants/site-config';
 import { getSiteConfig } from '@web/server/site-config/get-site-config/get-site-config';
 import { logger } from '@web/utils/logger/logger';
@@ -17,7 +23,7 @@ const VOICE_FIELDS_BY_ID = new Map<string, (typeof VOICE_FIELDS)[number]>(
 );
 
 const resolveOverrideText = (value: string | TVoicePortableText): string =>
-  typeof value === 'string' ? value : portableTextToPlainText(value);
+  isString(value) ? value : portableTextToPlainText(value);
 
 const setAtPath = (
   target: Record<string, unknown>,
@@ -25,17 +31,16 @@ const setAtPath = (
   value: string,
 ): Record<string, unknown> => {
   const [key, ...rest] = segments;
-  if (key === undefined) return target;
+  if (isUndefined(key)) return target;
 
-  if (rest.length === 0) {
+  if (!hasLength(rest)) {
     return { ...target, [key]: value };
   }
 
   const child = target[key];
-  const childObject =
-    typeof child === 'object' && child !== null && !Array.isArray(child)
-      ? (child as Record<string, unknown>)
-      : {};
+  const childObject = isPlainObject(child)
+    ? (child as Record<string, unknown>)
+    : {};
 
   return { ...target, [key]: setAtPath(childObject, rest, value) };
 };

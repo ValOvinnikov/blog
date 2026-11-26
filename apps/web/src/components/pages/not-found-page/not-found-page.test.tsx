@@ -20,8 +20,11 @@ const setup = customRender(NotFoundPage, {
 
 describe(`<${NotFoundPage.name}/>`, () => {
   describe('with the catalog copy', () => {
+    let homeLink: HTMLElement;
+
     beforeEach(() => {
       setup();
+      homeLink = screen.getByRole('link', { name: returnHome });
     });
 
     it('renders the eyebrow', () => {
@@ -43,14 +46,11 @@ describe(`<${NotFoundPage.name}/>`, () => {
     });
 
     it('renders a link back home', () => {
-      const link = screen.getByRole('link', { name: returnHome });
-
-      expect(link).toHaveAttribute('href', routes.home());
+      expect(homeLink).toHaveAttribute('href', routes.home());
     });
 
     it('renders the decorative arrow icon inside the link', () => {
-      const link = screen.getByRole('link', { name: returnHome });
-      const icon = within(link).getByTestId('not-found-arrow-icon');
+      const icon = within(homeLink).getByTestId('not-found-arrow-icon');
 
       expect(icon).toBeVisible();
     });

@@ -1,4 +1,5 @@
 import type { TMaybeNull, TMaybeUndefined } from '@shinefold/config';
+import { hasLength } from '@shinefold/utils/primitives';
 import { getRssSelfLink } from '@web/testing/shared/rss/get-rss-self-link';
 
 const XML_CONTENT_TYPE = 'application/xml';
@@ -14,7 +15,7 @@ interface IRssFeed {
   selfLink: TRssFields;
 }
 
-const isLeaf = (element: Element): boolean => element.children.length === 0;
+const isLeaf = (element: Element): boolean => !hasLength(element.children);
 
 const toFields = (elements: Element[]): TRssFields =>
   Object.fromEntries(
@@ -36,7 +37,7 @@ export const parseRssFeed = (xml: string): IRssFeed => {
   );
 
   return {
-    isWellFormed: doc.getElementsByTagName(PARSER_ERROR_TAG).length === 0,
+    isWellFormed: !hasLength(doc.getElementsByTagName(PARSER_ERROR_TAG)),
     root: doc.documentElement.tagName,
     channel: toFields(channelChildren.filter(isLeaf)),
     items: channelChildren

@@ -1,5 +1,5 @@
 import { faker } from '@faker-js/faker';
-import { CONSENT_CATEGORY } from '@shinefold/config';
+import { CONSENT_CATEGORY, type TMaybeUndefined } from '@shinefold/config';
 
 import {
   CONSENT_COOKIE_NAME,
@@ -55,12 +55,34 @@ describe(decodeConsent, () => {
 });
 
 describe(encodeConsent, () => {
-  it('records the granted categories as the cookie value', () => {
-    const [assignment] = encodeConsent([EXTERNAL_MEDIA]).split('; ');
+  describe('for a granted category', () => {
+    let assignment: TMaybeUndefined<string>;
+    let attributes: string[];
 
-    expect(assignment).toBe(
-      `${CONSENT_COOKIE_NAME}=${cookieValue(EXTERNAL_MEDIA)}`,
-    );
+    beforeEach(() => {
+      [assignment, ...attributes] = encodeConsent([EXTERNAL_MEDIA]).split('; ');
+    });
+
+    it('records the granted categories as the cookie value', () => {
+      expect(assignment).toBe(
+        `${CONSENT_COOKIE_NAME}=${cookieValue(EXTERNAL_MEDIA)}`,
+      );
+    });
+
+    it('keeps the cookie for six months, site-wide, Lax and Secure', () => {
+      expect(attributes).toEqual([
+        `Max-Age=${SIX_MONTHS_IN_SECONDS}`,
+        'Path=/',
+        'SameSite=Lax',
+        'Secure',
+      ]);
+    });
+
+    it('reads back what it writes', () => {
+      const value = assignment?.slice(`${CONSENT_COOKIE_NAME}=`.length);
+
+      expect(decodeConsent(value)).toEqual([EXTERNAL_MEDIA]);
+    });
   });
 
   it('records a decline as an empty category list', () => {
@@ -73,24 +95,5 @@ describe(encodeConsent, () => {
     const [assignment] = encodeConsent([NECESSARY]).split('; ');
 
     expect(assignment).toBe(`${CONSENT_COOKIE_NAME}=${cookieValue('')}`);
-  });
-
-  it('keeps the cookie for six months, site-wide, Lax and Secure', () => {
-    const [, ...attributes] = encodeConsent([EXTERNAL_MEDIA]).split('; ');
-
-    expect(attributes).toEqual([
-      `Max-Age=${SIX_MONTHS_IN_SECONDS}`,
-      'Path=/',
-      'SameSite=Lax',
-      'Secure',
-    ]);
-  });
-
-  it('reads back what it writes', () => {
-    const [assignment] = encodeConsent([EXTERNAL_MEDIA]).split('; ');
-
-    expect(
-      decodeConsent(assignment?.slice(`${CONSENT_COOKIE_NAME}=`.length)),
-    ).toEqual([EXTERNAL_MEDIA]);
   });
 });

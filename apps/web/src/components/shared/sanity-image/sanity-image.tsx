@@ -1,7 +1,6 @@
 'use client';
 
-// `sanity-image` uses `useState` internally (LQIP blur-up), so this bridge
-// must be a Client Component boundary when rendered from Server Components.
+// `sanity-image` holds state for its LQIP blur-up, so it needs a client boundary.
 import type {
   ISanityImage,
   ISanityImageCrop,
@@ -23,9 +22,7 @@ export interface ISanityImageProps {
   alt?: string;
 }
 
-// Without a hotspot, `sanity-image` falls back to an entropy crop, which is
-// a heuristic and can land off-centre; a synthetic centre hotspot keeps
-// framing deterministic instead.
+// Without a hotspot `sanity-image` uses an entropy crop, which can land off-centre.
 const toCenterFocalPoint = (
   crop: TMaybeUndefined<ISanityImageCrop>,
 ): ISanityImageHotspot => {
@@ -39,24 +36,6 @@ const toCenterFocalPoint = (
   };
 };
 
-/**
- * Framework-coupled bridge between the service layer's `ISanityImage`
- * view-model and the `sanity-image` package. The CDN origin comes from
- * `useSanityImageBaseUrl` (resolved once per request by the surrounding
- * `SanityImageBaseUrlProvider`), not from the image itself.
- *
- * `preview` (the LQIP blur-up placeholder) is withheld when `priority` is
- * set. When a `preview` is passed, the underlying package renders the real
- * image at `10x10px`/`opacity:0` and only swaps it to full size from a
- * `useEffect`/`onLoad` handler once React has hydrated — gating the LCP
- * element's paint on client hydration rather than on the image request
- * itself. A `priority` image is the page's LCP candidate and already
- * requests eagerly with `fetchPriority="high"`, so it renders straight to
- * its final `<img>` with no hydration-gated placeholder swap.
- *
- * @example
- * <SanityImage image={hero.sanityImage} width={960} height={720} mode="cover" />
- */
 export const SanityImage = ({
   image,
   width,
@@ -76,6 +55,7 @@ export const SanityImage = ({
       baseUrl={baseUrl}
       hotspot={image.hotspot ?? toCenterFocalPoint(image.crop)}
       crop={image.crop}
+      // A preview gates the full-size swap on hydration, which would delay the LCP image.
       preview={priority ? undefined : image.lqip}
       width={width}
       height={height}

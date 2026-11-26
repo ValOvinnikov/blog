@@ -9,8 +9,7 @@ export const ThemeToggleButton = () => {
   const [isDark, setIsDark] = useState(false);
 
   useEffect(() => {
-    // Reads DOM state set by a pre-hydration inline script to avoid an SSR/client
-    // mismatch; there is no external-store subscription to move this into.
+    // The pre-hydration theme script owns this class; there is no store to subscribe to.
     // eslint-disable-next-line react-hooks/set-state-in-effect
     setIsDark(document.documentElement.classList.contains('dark'));
   }, []);

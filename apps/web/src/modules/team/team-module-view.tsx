@@ -1,4 +1,4 @@
-import { CONTENT_ALIGNMENT, DISPLAY_MODE } from '@shinefold/config';
+import { DISPLAY_MODE } from '@shinefold/config';
 import type { TTeamModule } from '@shinefold/service';
 import { CardGrid } from '@shinefold/ui/components/organisms/card-grid';
 import { ModuleActions } from '@web/components/shared/module-actions';
@@ -8,6 +8,7 @@ import { TeamCarousel } from '@web/modules/team/components/team-carousel/team-ca
 import { TeamMemberCard } from '@web/modules/team/components/team-member-card/team-member-card';
 import { TeamSpotlight } from '@web/modules/team/components/team-spotlight/team-spotlight';
 import { isLoneLastInRow } from '@web/utils/is-lone-last-in-row';
+import { toCardAlign } from '@web/utils/to-card-align';
 import { toCardGridColumns } from '@web/utils/to-card-grid-columns';
 import { toTeamGridColumns } from '@web/utils/to-team-grid-columns';
 
@@ -39,8 +40,7 @@ export const TeamModuleView = ({
   const dataTestId = `team-module-${id}`;
   const [spotlightMember] = members;
   const isSpotlight = members.length === 1;
-  const cardAlign =
-    cardAlignment === CONTENT_ALIGNMENT.CENTER ? 'center' : 'left';
+  const cardAlign = toCardAlign(cardAlignment);
   const columns =
     toCardGridColumns(grid.columns) ??
     toTeamGridColumns(members.length, grid.showBios);

@@ -9,6 +9,7 @@ import {
   within,
 } from '@web/testing/custom-render';
 import { ARIA_EXPANDED } from '@web/testing/shared/aria/constants';
+import { KEY_ESCAPE } from '@web/testing/shared/keyboard/constants';
 import {
   MOCK_ABOUT_LINK,
   MOCK_BLOG_LINK,
@@ -46,10 +47,11 @@ const setup = customRender(SiteNavigation, {
 });
 
 describe(`<${SiteNavigation.name}/>`, () => {
+  let user: UserEvent;
   let hidePopover: Mock;
 
   beforeEach(() => {
-    vi.mocked(usePathname).mockReset();
+    user = userEvent.setup();
     vi.mocked(useSession).mockReturnValue(SIGNED_OUT_SESSION);
     hidePopover = stubHidePopover();
   });
@@ -140,36 +142,43 @@ describe(`<${SiteNavigation.name}/>`, () => {
     }
   });
 
-  it('closes an open sub-menu when the route changes', () => {
-    const view = setup({ links: [MOCK_TOPICS_GROUP] });
-    hidePopover.mockClear();
+  describe('with a sub-menu group', () => {
+    let view: ReturnType<typeof setup>;
 
-    vi.mocked(usePathname).mockReturnValue(MOCK_BLOG_LINK.href);
-    view.rerender(
-      <SiteNavigation links={[MOCK_TOPICS_GROUP]} hasReaderAccounts={true} />,
-    );
+    const changeRoute = () => {
+      vi.mocked(usePathname).mockReturnValue(MOCK_BLOG_LINK.href);
+      view.rerender(
+        <SiteNavigation links={[MOCK_TOPICS_GROUP]} hasReaderAccounts={true} />,
+      );
+    };
 
-    expect(hidePopover).toHaveBeenCalledOnce();
-  });
-
-  it('folds an open disclosure sub-menu when the route changes', async () => {
-    const user = userEvent.setup();
-    const view = setup({ links: [MOCK_TOPICS_GROUP] });
-    const toggle = screen.getByRole('button', { name: TOGGLE_NAME });
-    await user.click(toggle);
-    const disclosure = screen.getByRole('group');
-    const summary = within(disclosure).getByText(MOCK_TOPICS_GROUP.label, {
-      selector: 'summary',
+    beforeEach(() => {
+      view = setup({ links: [MOCK_TOPICS_GROUP] });
     });
-    await user.click(summary);
-    expect(disclosure).toHaveAttribute('open');
 
-    vi.mocked(usePathname).mockReturnValue(MOCK_BLOG_LINK.href);
-    view.rerender(
-      <SiteNavigation links={[MOCK_TOPICS_GROUP]} hasReaderAccounts={true} />,
-    );
+    it('closes an open sub-menu when the route changes', () => {
+      hidePopover.mockClear();
 
-    expect(disclosure).not.toHaveAttribute('open');
+      changeRoute();
+
+      expect(hidePopover).toHaveBeenCalledOnce();
+    });
+
+    it('folds an open disclosure sub-menu when the route changes', async () => {
+      const toggle = screen.getByRole('button', { name: TOGGLE_NAME });
+      await user.click(toggle);
+      const disclosure = screen.getByRole('group');
+      const summary = within(disclosure).getByText(MOCK_TOPICS_GROUP.label, {
+        // eslint-disable-next-line shinefold-touched/prefer-shared-constant -- the <summary> element, not TWITTER_CARD.SUMMARY
+        selector: 'summary',
+      });
+      await user.click(summary);
+      expect(disclosure).toHaveAttribute('open');
+
+      changeRoute();
+
+      expect(disclosure).not.toHaveAttribute('open');
+    });
   });
 
   it('renders the actions slot', () => {
@@ -193,16 +202,14 @@ describe(`<${SiteNavigation.name}/>`, () => {
 
     const toggle = screen.getByRole('button', { name: TOGGLE_NAME });
 
-    expect(toggle).toBeInTheDocument();
+    expect(toggle).toBeVisible();
   });
 
   describe('mobile toggle', () => {
-    let user: UserEvent;
     let toggle: HTMLElement;
     let view: ReturnType<typeof setup>;
 
     beforeEach(() => {
-      user = userEvent.setup();
       view = setup();
       toggle = screen.getByRole('button', { name: TOGGLE_NAME });
     });
@@ -215,35 +222,36 @@ describe(`<${SiteNavigation.name}/>`, () => {
       expect(toggle).toHaveAttribute(ARIA_EXPANDED, 'true');
     });
 
-    it('closes on Escape and returns focus to the toggle', async () => {
-      await user.click(toggle);
-
-      await user.keyboard('{Escape}');
-
-      expect(toggle).toHaveAttribute(ARIA_EXPANDED, 'false');
-      expect(toggle).toHaveFocus();
-    });
-
-    it('closes on an outside click', async () => {
-      await user.click(toggle);
-
-      fireEvent.mouseDown(document.body);
-
-      expect(toggle).toHaveAttribute(ARIA_EXPANDED, 'false');
-    });
-
-    it('closes automatically when the route changes', async () => {
-      await user.click(toggle);
-      expect(toggle).toHaveAttribute(ARIA_EXPANDED, 'true');
-
-      vi.mocked(usePathname).mockReturnValue(MOCK_BLOG_LINK.href);
-      view.rerender(<SiteNavigation links={links} hasReaderAccounts={true} />);
-
-      const rerenderedToggle = screen.getByRole('button', {
-        name: TOGGLE_NAME,
+    describe('once opened', () => {
+      beforeEach(async () => {
+        await user.click(toggle);
       });
 
-      expect(rerenderedToggle).toHaveAttribute(ARIA_EXPANDED, 'false');
+      it('closes on Escape and returns focus to the toggle', async () => {
+        await user.keyboard(KEY_ESCAPE);
+
+        expect(toggle).toHaveAttribute(ARIA_EXPANDED, 'false');
+        expect(toggle).toHaveFocus();
+      });
+
+      it('closes on an outside click', () => {
+        fireEvent.mouseDown(document.body);
+
+        expect(toggle).toHaveAttribute(ARIA_EXPANDED, 'false');
+      });
+
+      it('closes automatically when the route changes', () => {
+        vi.mocked(usePathname).mockReturnValue(MOCK_BLOG_LINK.href);
+        view.rerender(
+          <SiteNavigation links={links} hasReaderAccounts={true} />,
+        );
+
+        const rerenderedToggle = screen.getByRole('button', {
+          name: TOGGLE_NAME,
+        });
+
+        expect(rerenderedToggle).toHaveAttribute(ARIA_EXPANDED, 'false');
+      });
     });
   });
 });

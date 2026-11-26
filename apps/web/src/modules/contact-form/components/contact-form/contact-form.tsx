@@ -5,6 +5,7 @@ import { Alert } from '@shinefold/ui/components/atoms/alert';
 import { Button } from '@shinefold/ui/components/atoms/button';
 import { TextInput } from '@shinefold/ui/components/atoms/text-input';
 import { Textarea } from '@shinefold/ui/components/atoms/textarea';
+import { isUndefined } from '@shinefold/utils/primitives';
 import { useBusyStyle } from '@web/context/busy-style-provider';
 import { ContactFormField } from '@web/modules/contact-form/components/contact-form-field/contact-form-field';
 import { ContactFormSuccess } from '@web/modules/contact-form/components/contact-form-success/contact-form-success';
@@ -63,7 +64,7 @@ export const ContactForm = ({
 
   const fieldInput = (field: TContactField) => {
     const label = t(FIELD_MESSAGE_KEYS[field].label);
-    const isInvalid = fieldErrors[field] !== undefined;
+    const isInvalid = !isUndefined(fieldErrors[field]);
     const inputProps = {
       id: `${id}-${field}`,
       value: fields[field],
@@ -118,6 +119,7 @@ export const ContactForm = ({
             <label htmlFor={`${id}-website`}>{t('honeypotLabel')}</label>
             <input
               id={`${id}-website`}
+              // eslint-disable-next-line shinefold-touched/prefer-shared-constant -- a honeypot field name, not OG_TYPE.WEBSITE
               name="website"
               tabIndex={-1}
               autoComplete="off"

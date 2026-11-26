@@ -90,24 +90,29 @@ describe(`<${BackToTopButton.name}/>`, () => {
         expect(scrollTo).toHaveBeenCalledWith({ top: 0, behavior: 'smooth' });
       });
 
-      it('hides once the footer scrolls into view', () => {
-        getFakeIntersectionObserver().trigger([{ isIntersecting: true }]);
-
-        const button = screen.getByRole('button', {
-          hidden: true,
-          name: BACK_TO_TOP_LABEL,
+      describe('with the footer scrolled into view', () => {
+        beforeEach(() => {
+          getFakeIntersectionObserver().trigger([{ isIntersecting: true }]);
         });
 
-        expect(button).toHaveAttribute('inert');
-      });
+        it('hides', () => {
+          const button = screen.getByRole('button', {
+            hidden: true,
+            name: BACK_TO_TOP_LABEL,
+          });
 
-      it('reappears once the footer scrolls back out of view', () => {
-        getFakeIntersectionObserver().trigger([{ isIntersecting: true }]);
-        getFakeIntersectionObserver().trigger([{ isIntersecting: false }]);
+          expect(button).toHaveAttribute('inert');
+        });
 
-        const button = screen.getByRole('button', { name: BACK_TO_TOP_LABEL });
+        it('reappears once the footer scrolls back out of view', () => {
+          getFakeIntersectionObserver().trigger([{ isIntersecting: false }]);
 
-        expect(button).toBeVisible();
+          const button = screen.getByRole('button', {
+            name: BACK_TO_TOP_LABEL,
+          });
+
+          expect(button).toBeVisible();
+        });
       });
     });
   });

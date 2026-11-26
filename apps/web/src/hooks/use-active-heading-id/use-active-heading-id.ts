@@ -1,5 +1,6 @@
 'use client';
 
+import { hasLength, isNull } from '@shinefold/utils/primitives';
 import { useEffect, useState } from 'react';
 
 /**
@@ -16,9 +17,9 @@ export const useActiveHeadingId = (ids: string[]): string | null => {
     const elements = idsKey
       .split('|')
       .map((id) => document.getElementById(id))
-      .filter((element): element is HTMLElement => element !== null);
+      .filter((element): element is HTMLElement => !isNull(element));
 
-    if (elements.length === 0) return;
+    if (!hasLength(elements)) return;
 
     const observer = new IntersectionObserver(
       (entries) => {

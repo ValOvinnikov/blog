@@ -3,6 +3,9 @@ import type { Meta, StoryObj } from '@storybook/nextjs-vite';
 
 import { PageHeading } from './page-heading';
 
+const HEADING = 'Notes on building things';
+const SUPPORTING_TEXT = 'Essays and notes from the team, published as we ship.';
+
 const meta = {
   title: 'Components/PageHeading',
   component: PageHeading,
@@ -16,7 +19,7 @@ const meta = {
   },
   args: {
     headingBlock: {
-      heading: 'Notes on building things',
+      heading: HEADING,
       supportingText: undefined,
     },
     align: undefined,
@@ -31,8 +34,8 @@ export const Default: TStory = {};
 export const WithSupportingText: TStory = {
   args: {
     headingBlock: {
-      heading: 'Notes on building things',
-      supportingText: 'Essays and notes from the team, published as we ship.',
+      heading: HEADING,
+      supportingText: SUPPORTING_TEXT,
     },
   },
 };
@@ -43,7 +46,7 @@ const LONG_SUPPORTING_TEXT =
 export const WithLongSupportingText: TStory = {
   args: {
     headingBlock: {
-      heading: 'Notes on building things',
+      heading: HEADING,
       supportingText: LONG_SUPPORTING_TEXT,
     },
   },
@@ -53,7 +56,7 @@ export const CenterAlignedWithLongSupportingText: TStory = {
   args: {
     align: CONTENT_ALIGNMENT.CENTER,
     headingBlock: {
-      heading: 'Notes on building things',
+      heading: HEADING,
       supportingText: LONG_SUPPORTING_TEXT,
     },
   },
@@ -63,8 +66,8 @@ export const CenterAligned: TStory = {
   args: {
     align: CONTENT_ALIGNMENT.CENTER,
     headingBlock: {
-      heading: 'Notes on building things',
-      supportingText: 'Essays and notes from the team, published as we ship.',
+      heading: HEADING,
+      supportingText: SUPPORTING_TEXT,
     },
   },
 };
@@ -73,8 +76,8 @@ export const RightAligned: TStory = {
   args: {
     align: CONTENT_ALIGNMENT.RIGHT,
     headingBlock: {
-      heading: 'Notes on building things',
-      supportingText: 'Essays and notes from the team, published as we ship.',
+      heading: HEADING,
+      supportingText: SUPPORTING_TEXT,
     },
   },
 };

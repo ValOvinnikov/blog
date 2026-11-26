@@ -9,6 +9,7 @@ import {
   type TSanityProjectRef,
   urlForSanityImage,
 } from '@shinefold/service';
+import { hasLength } from '@shinefold/utils/primitives';
 import { toLocalizedPathname } from '@web/utils/to-localized-pathname';
 
 export type TBlogPostingSchema = {
@@ -57,10 +58,9 @@ export const buildBlogPostingSchema = (
       }),
       base,
     ).href,
-    keywords:
-      post.tags.length > 0
-        ? post.tags.map((tag) => tag.title).join(', ')
-        : undefined,
+    keywords: hasLength(post.tags)
+      ? post.tags.map((tag) => tag.title).join(', ')
+      : undefined,
     inLanguage: LOCALE_BCP47_TAGS[locale],
   };
 };

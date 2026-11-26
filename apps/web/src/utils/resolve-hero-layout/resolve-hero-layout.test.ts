@@ -3,7 +3,7 @@ import { BANNER_SECTION_LAYOUT } from '@web/utils/banner-section-layout';
 
 import { resolveHeroLayout } from './resolve-hero-layout';
 
-const authoredLayout = {
+const MOCK_AUTHORED_LAYOUT = {
   spacingTop: SPACING_SCALE.XL,
   spacingBottom: SPACING_SCALE.LG,
   dividerTop: true,
@@ -11,26 +11,26 @@ const authoredLayout = {
 };
 
 describe(resolveHeroLayout, () => {
-  it('gives a Banner an unpadded, undivided Primary Section', () => {
-    const result = resolveHeroLayout({
-      variant: HERO_VARIANT.BANNER,
-      brandVariant: BRAND_VARIANT.SECONDARY,
-      layout: authoredLayout,
+  describe('for a Banner', () => {
+    let result: ReturnType<typeof resolveHeroLayout>;
+
+    beforeEach(() => {
+      result = resolveHeroLayout({
+        variant: HERO_VARIANT.BANNER,
+        brandVariant: BRAND_VARIANT.SECONDARY,
+        layout: MOCK_AUTHORED_LAYOUT,
+      });
     });
 
-    expect(result.sectionBrandVariant).toBe(BRAND_VARIANT.PRIMARY);
-    expect(result.sectionLayout).toBe(BANNER_SECTION_LAYOUT);
-  });
-
-  it('hands a Banner Hero the authored spacing', () => {
-    const result = resolveHeroLayout({
-      variant: HERO_VARIANT.BANNER,
-      brandVariant: BRAND_VARIANT.SECONDARY,
-      layout: authoredLayout,
+    it('gives the Section an unpadded, undivided Primary layout', () => {
+      expect(result.sectionBrandVariant).toBe(BRAND_VARIANT.PRIMARY);
+      expect(result.sectionLayout).toBe(BANNER_SECTION_LAYOUT);
     });
 
-    expect(result.heroSpacingTop).toBe(SPACING_SCALE.XL);
-    expect(result.heroSpacingBottom).toBe(SPACING_SCALE.LG);
+    it('hands the Hero the authored spacing', () => {
+      expect(result.heroSpacingTop).toBe(SPACING_SCALE.XL);
+      expect(result.heroSpacingBottom).toBe(SPACING_SCALE.LG);
+    });
   });
 
   it.each([HERO_VARIANT.SPLIT, HERO_VARIANT.STACKED])(
@@ -39,12 +39,12 @@ describe(resolveHeroLayout, () => {
       const result = resolveHeroLayout({
         variant,
         brandVariant: BRAND_VARIANT.SECONDARY,
-        layout: authoredLayout,
+        layout: MOCK_AUTHORED_LAYOUT,
       });
 
       expect(result).toEqual({
         sectionBrandVariant: BRAND_VARIANT.SECONDARY,
-        sectionLayout: authoredLayout,
+        sectionLayout: MOCK_AUTHORED_LAYOUT,
         heroSpacingTop: undefined,
         heroSpacingBottom: undefined,
       });

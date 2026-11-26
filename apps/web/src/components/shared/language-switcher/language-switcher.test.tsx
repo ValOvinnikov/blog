@@ -11,6 +11,7 @@ import userEvent, { type UserEvent } from '@testing-library/user-event';
 import { usePathname } from '@web/i18n/navigation';
 import { customRender, screen, within } from '@web/testing/custom-render';
 import { ARIA_EXPANDED } from '@web/testing/shared/aria/constants';
+import { KEY_ESCAPE } from '@web/testing/shared/keyboard/constants';
 import { LANGUAGE_NAV_NAME } from '@web/testing/shared/language-switcher/constants';
 import { MOCK_TENANT_ID } from '@web/testing/shared/tenant/fixtures';
 
@@ -110,47 +111,49 @@ describe(`<${LanguageSwitcher.name}/>`, () => {
       expect(trigger).toHaveTextContent(languageCode(NL));
     });
 
-    it('opens a menu of native names with the current language marked', async () => {
-      await openMenu();
+    describe('once opened', () => {
+      let trigger: HTMLElement;
 
-      const menu = screen.getByRole('menu', { name: LANGUAGE_NAV_NAME });
-      const items = within(menu).getAllByRole('menuitem');
-      const dutchItem = getMenuItem(NL);
+      beforeEach(async () => {
+        trigger = await openMenu();
+      });
 
-      expect(items.map((item) => item.textContent)).toEqual([
-        nativeLabel(EN),
-        nativeLabel(NL),
-        nativeLabel(FR),
-      ]);
-      expect(dutchItem).toHaveAttribute(ARIA_CURRENT, 'page');
-    });
+      it('lists native names with the current language marked', () => {
+        const menu = screen.getByRole('menu', { name: LANGUAGE_NAV_NAME });
+        const items = within(menu).getAllByRole('menuitem');
+        const dutchItem = getMenuItem(NL);
 
-    it('links each entry to the language switch for the current page', async () => {
-      await openMenu();
+        expect(items.map((item) => item.textContent)).toEqual([
+          nativeLabel(EN),
+          nativeLabel(NL),
+          nativeLabel(FR),
+        ]);
+        expect(dutchItem).toHaveAttribute(ARIA_CURRENT, 'page');
+      });
 
-      const dutchItem = getMenuItem(NL);
-      const frenchItem = getMenuItem(FR);
-      const nlBlogPath = `/${LOCALE_BCP47_TAGS[NL]}${BLOG_PATH}`;
+      it('links each entry to the language switch for the current page', () => {
+        const dutchItem = getMenuItem(NL);
+        const frenchItem = getMenuItem(FR);
+        const nlBlogPath = `/${LOCALE_BCP47_TAGS[NL]}${BLOG_PATH}`;
 
-      expect(dutchItem).toHaveAttribute(
-        'href',
-        routes.switchLanguage(NL, nlBlogPath),
-      );
-      expect(frenchItem).toHaveAttribute(
-        'href',
-        routes.switchLanguage(FR, nlBlogPath),
-      );
-      expect(frenchItem).toHaveAttribute('lang', LOCALE_BCP47_TAGS[FR]);
-      expect(frenchItem).toHaveAttribute('hreflang', LOCALE_BCP47_TAGS[FR]);
-    });
+        expect(dutchItem).toHaveAttribute(
+          'href',
+          routes.switchLanguage(NL, nlBlogPath),
+        );
+        expect(frenchItem).toHaveAttribute(
+          'href',
+          routes.switchLanguage(FR, nlBlogPath),
+        );
+        expect(frenchItem).toHaveAttribute('lang', LOCALE_BCP47_TAGS[FR]);
+        expect(frenchItem).toHaveAttribute('hreflang', LOCALE_BCP47_TAGS[FR]);
+      });
 
-    it('closes on Escape and returns focus to the trigger', async () => {
-      const trigger = await openMenu();
+      it('closes on Escape and returns focus to the trigger', async () => {
+        await user.keyboard(KEY_ESCAPE);
 
-      await user.keyboard('{Escape}');
-
-      expect(trigger).toHaveAttribute(ARIA_EXPANDED, 'false');
-      expect(trigger).toHaveFocus();
+        expect(trigger).toHaveAttribute(ARIA_EXPANDED, 'false');
+        expect(trigger).toHaveFocus();
+      });
     });
   });
 
@@ -173,13 +176,28 @@ describe(`<${LanguageSwitcher.name}/>`, () => {
   });
 
   describe('compact codes', () => {
-    it('links the other codes directly, named for screen readers', () => {
-      setup({ switcherStyle: LANGUAGE_SWITCHER_STYLE.CODES });
+    describe('with three live languages', () => {
+      beforeEach(() => {
+        setup({ switcherStyle: LANGUAGE_SWITCHER_STYLE.CODES });
+      });
 
-      const frenchLink = screen.getByRole('link', { name: nativeLabel(FR) });
+      it('links the other codes directly, named for screen readers', () => {
+        const frenchLink = screen.getByRole('link', { name: nativeLabel(FR) });
 
-      expect(frenchLink).toHaveTextContent(languageCode(FR));
-      expect(frenchLink).toHaveAttribute('lang', LOCALE_BCP47_TAGS[FR]);
+        expect(frenchLink).toHaveTextContent(languageCode(FR));
+        expect(frenchLink).toHaveAttribute('lang', LOCALE_BCP47_TAGS[FR]);
+      });
+
+      it('shows the current code as text marked current, in its own language', () => {
+        const currentCode = screen.getByTestId(CURRENT_CODE_TEST_ID);
+        const dutchLink = screen.queryByRole('link', { name: nativeLabel(NL) });
+
+        expect(dutchLink).not.toBeInTheDocument();
+        expect(currentCode).toHaveTextContent(languageCode(NL));
+        expect(currentCode).toHaveAttribute(ARIA_CURRENT, 'page');
+        expect(currentCode).toHaveAttribute('lang', LOCALE_BCP47_TAGS[NL]);
+        expect(currentCode).not.toHaveAttribute('href');
+      });
     });
 
     it('shows the codes at every width, with no phone menu', () => {
@@ -195,19 +213,6 @@ describe(`<${LanguageSwitcher.name}/>`, () => {
       expect(englishLink).toBeVisible();
       expect(menuButton).not.toBeInTheDocument();
       expect(mobileWrapper).not.toBeInTheDocument();
-    });
-
-    it('shows the current code as text marked current, in its own language', () => {
-      setup({ switcherStyle: LANGUAGE_SWITCHER_STYLE.CODES });
-
-      const currentCode = screen.getByTestId(CURRENT_CODE_TEST_ID);
-      const dutchLink = screen.queryByRole('link', { name: nativeLabel(NL) });
-
-      expect(dutchLink).not.toBeInTheDocument();
-      expect(currentCode).toHaveTextContent(languageCode(NL));
-      expect(currentCode).toHaveAttribute(ARIA_CURRENT, 'page');
-      expect(currentCode).toHaveAttribute('lang', LOCALE_BCP47_TAGS[NL]);
-      expect(currentCode).not.toHaveAttribute('href');
     });
 
     it('renders as the menu with more than four live languages', () => {

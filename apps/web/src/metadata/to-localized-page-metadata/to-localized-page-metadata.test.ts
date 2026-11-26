@@ -3,6 +3,7 @@ import {
   LOCALE_OPEN_GRAPH_TAGS,
   routes,
 } from '@shinefold/config';
+import { OG_TYPE } from '@web/constants/metadata';
 import { getRequestContext } from '@web/server/request-context/request-context';
 import {
   DE_PATH_PREFIX,
@@ -38,7 +39,11 @@ const buildFor = (
   translations: readonly TLanguagePage[],
   href = EN_POST_PATH,
 ) =>
-  toLocalizedPageMetadata(MOCK_SEO, { href, translations, ogType: 'article' });
+  toLocalizedPageMetadata(MOCK_SEO, {
+    href,
+    translations,
+    ogType: OG_TYPE.ARTICLE,
+  });
 
 describe(toLocalizedPageMetadata, () => {
   beforeEach(() => {
@@ -55,7 +60,7 @@ describe(toLocalizedPageMetadata, () => {
         { language: NL, href: TOPICS_PATH },
         { language: DE, href: TOPICS_PATH },
       ],
-      ogType: 'website',
+      ogType: OG_TYPE.WEBSITE,
     });
 
     expect(metadata.openGraph?.locale).toBe(LOCALE_OPEN_GRAPH_TAGS.EN);
@@ -89,7 +94,7 @@ describe(toLocalizedPageMetadata, () => {
     const metadata = await toLocalizedPageMetadata(MOCK_SEO, {
       href: routes.blogIndex(2),
       translations: [],
-      ogType: 'website',
+      ogType: OG_TYPE.WEBSITE,
     });
 
     expect(metadata.openGraph?.locale).toBe(LOCALE_OPEN_GRAPH_TAGS.EN);

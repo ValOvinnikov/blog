@@ -57,25 +57,29 @@ describe(usePopover, () => {
   testCoreDismissibleMenuBehavior(getUser);
   testArrowUpAndHomeBehavior(getUser);
 
-  it('names the panel the trigger controls', async () => {
-    const trigger = screen.getByRole('button', { name: MENU_TRIGGER_NAME });
+  describe('once opened', () => {
+    let trigger: HTMLElement;
 
-    await user.click(trigger);
+    beforeEach(async () => {
+      trigger = screen.getByRole('button', { name: MENU_TRIGGER_NAME });
+      await user.click(trigger);
+    });
 
-    expect(trigger).toHaveAttribute(
-      ARIA_CONTROLS,
-      screen.getByTestId(PANEL_TEST_ID).id,
-    );
-  });
+    it('names the panel the trigger controls', () => {
+      const panel = screen.getByTestId(PANEL_TEST_ID);
 
-  it('closes from inside the panel and returns focus to the trigger', async () => {
-    const trigger = screen.getByRole('button', { name: MENU_TRIGGER_NAME });
-    await user.click(trigger);
-    const closeItem = screen.getByRole('button', { name: MENU_LAST_ITEM_NAME });
+      expect(trigger).toHaveAttribute(ARIA_CONTROLS, panel.id);
+    });
 
-    await user.click(closeItem);
+    it('closes from inside the panel and returns focus to the trigger', async () => {
+      const closeItem = screen.getByRole('button', {
+        name: MENU_LAST_ITEM_NAME,
+      });
 
-    expectMenuClosed(trigger);
-    expect(trigger).toHaveFocus();
+      await user.click(closeItem);
+
+      expectMenuClosed(trigger);
+      expect(trigger).toHaveFocus();
+    });
   });
 });

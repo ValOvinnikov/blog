@@ -32,31 +32,26 @@ const setup = customRenderAsync(CtaModule, {
 });
 
 describe(`<${CtaModule.name}/>`, () => {
-  beforeEach(() => {
-    getCtaMock.mockReset();
-  });
-
-  it('fetches the module with the resolved tenant Sanity context', async () => {
-    getCtaMock.mockResolvedValue(okResult(MOCK_CTA_MODULE));
-
-    await setup();
-
-    expect(getCtaMock).toHaveBeenCalledWith(
-      MOCK_CTA_MODULE_ID,
-      MOCK_TENANT_SANITY_CONTEXT,
-    );
-  });
-
-  it('renders the resolved module', async () => {
-    getCtaMock.mockResolvedValue(okResult(MOCK_CTA_MODULE));
-
-    await setup();
-
-    const region = screen.getByRole('region', {
-      name: MOCK_CTA_MODULE.headingBlock.heading,
+  describe('when the fetch succeeds', () => {
+    beforeEach(async () => {
+      getCtaMock.mockResolvedValue(okResult(MOCK_CTA_MODULE));
+      await setup();
     });
 
-    expect(region).toBeVisible();
+    it('fetches the module with the resolved tenant Sanity context', () => {
+      expect(getCtaMock).toHaveBeenCalledWith(
+        MOCK_CTA_MODULE_ID,
+        MOCK_TENANT_SANITY_CONTEXT,
+      );
+    });
+
+    it('renders the resolved module', () => {
+      const region = screen.getByRole('region', {
+        name: MOCK_CTA_MODULE.headingBlock.heading,
+      });
+
+      expect(region).toBeVisible();
+    });
   });
 
   it('renders nothing when the fetch fails', async () => {

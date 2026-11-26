@@ -47,24 +47,28 @@ describe(`<${CtaModuleView.name}/>`, () => {
     });
   });
 
-  it('gives two instances of the same module distinct heading ids', () => {
-    Array.from({ length: INSTANCE_COUNT }).forEach(() => setup());
-
-    const headings = screen.getAllByRole('heading', {
-      level: 2,
-      name: MOCK_CTA_HEADING,
+  describe('with two instances of the same module', () => {
+    beforeEach(() => {
+      Array.from({ length: INSTANCE_COUNT }).forEach(() => setup());
     });
-    const headingIds = headings.map(({ id }) => id);
 
-    expect(new Set(headingIds).size).toBe(INSTANCE_COUNT);
-  });
+    it('gives each instance a distinct heading id', () => {
+      const headings = screen.getAllByRole('heading', {
+        level: 2,
+        name: MOCK_CTA_HEADING,
+      });
+      const headingIds = headings.map(({ id }) => id);
 
-  it('labels each of two instances by its own heading', () => {
-    Array.from({ length: INSTANCE_COUNT }).forEach(() => setup());
+      expect(new Set(headingIds).size).toBe(INSTANCE_COUNT);
+    });
 
-    const regions = screen.getAllByRole('region', { name: MOCK_CTA_HEADING });
+    it('labels each instance by its own heading', () => {
+      const regions = screen.getAllByRole('region', {
+        name: MOCK_CTA_HEADING,
+      });
 
-    expect(regions).toHaveLength(INSTANCE_COUNT);
+      expect(regions).toHaveLength(INSTANCE_COUNT);
+    });
   });
 
   it('renders the authored actions as links, in order', () => {

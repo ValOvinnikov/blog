@@ -23,8 +23,7 @@ export const NewsletterSection = async () => {
     userId,
   );
 
-  // Subscribing is a separate `NewsletterForm` module's job — this
-  // section only ever manages an existing subscription.
+  // Subscribing happens in the `NewsletterForm` module; this section only manages one.
   if (status.outcome === SUBSCRIBER_OUTCOME.NOT_SUBSCRIBED) return null;
 
   const t = await getTranslations('accountPage.newsletter');

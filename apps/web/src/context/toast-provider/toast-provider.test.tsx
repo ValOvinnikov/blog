@@ -8,6 +8,7 @@ import {
   screen,
   within,
 } from '@web/testing/custom-render';
+import { KEY_ESCAPE } from '@web/testing/shared/keyboard/constants';
 
 import { ToastProvider, useToast } from './toast-provider';
 
@@ -119,19 +120,6 @@ describe(`<${ToastProvider.name}/>`, () => {
       expect(status).not.toBeInTheDocument();
     });
 
-    it('shows a fired success toast with its title and message', async () => {
-      const { fireSuccessButton } = getFireButtons();
-      await user.click(fireSuccessButton);
-
-      const status = screen.getByRole('status');
-      const title = within(status).getByText(MOCK_TITLE);
-      const message = within(status).getByText(MOCK_SUCCESS_MESSAGE);
-
-      expect(status).toBeVisible();
-      expect(title).toBeVisible();
-      expect(message).toBeVisible();
-    });
-
     it('shows a fired error toast as an alert', async () => {
       const { fireErrorButton } = getFireButtons();
       await user.click(fireErrorButton);
@@ -141,124 +129,6 @@ describe(`<${ToastProvider.name}/>`, () => {
 
       expect(alert).toBeVisible();
       expect(message).toBeVisible();
-    });
-
-    it('dismisses a toast via its close button', async () => {
-      const { fireSuccessButton } = getFireButtons();
-      await user.click(fireSuccessButton);
-      const dismissButton = screen.getByRole('button', { name: DISMISS_LABEL });
-      await user.click(dismissButton);
-      await advanceTime(MOCK_SHORT_WAIT_MS);
-
-      const message = screen.queryByText(MOCK_SUCCESS_MESSAGE);
-
-      expect(message).not.toBeInTheDocument();
-    });
-
-    it('runs the action callback and dismisses the toast', async () => {
-      const { fireSuccessButton } = getFireButtons();
-      await user.click(fireSuccessButton);
-      const actionButton = screen.getByRole('button', {
-        name: MOCK_ACTION_LABEL,
-      });
-      await user.click(actionButton);
-      await advanceTime(MOCK_SHORT_WAIT_MS);
-
-      const message = screen.queryByText(MOCK_SUCCESS_MESSAGE);
-
-      expect(onAct).toHaveBeenCalledTimes(1);
-      expect(message).not.toBeInTheDocument();
-    });
-
-    it('holds a hovered toast open and dismisses it after the pointer leaves', async () => {
-      const { fireSuccessButton } = getFireButtons();
-      await user.click(fireSuccessButton);
-      const status = screen.getByRole('status');
-
-      await advanceTime(MOCK_SHORT_WAIT_MS);
-      await user.hover(status);
-      await advanceTime(MOCK_HOLD_MS);
-      const heldMessage = screen.getByText(MOCK_SUCCESS_MESSAGE);
-
-      expect(heldMessage).toBeVisible();
-
-      await user.unhover(status);
-      await advanceTime(MOCK_HOLD_MS);
-      const message = screen.queryByText(MOCK_SUCCESS_MESSAGE);
-
-      expect(message).not.toBeInTheDocument();
-    });
-
-    it('keeps a toast open after the pointer leaves while focus is inside it', async () => {
-      const { fireSuccessButton } = getFireButtons();
-      await user.click(fireSuccessButton);
-      const status = screen.getByRole('status');
-      const dismissButton = screen.getByRole('button', { name: DISMISS_LABEL });
-
-      await user.hover(status);
-      await user.tab();
-      await user.tab();
-      await user.tab();
-      await user.unhover(status);
-      await advanceTime(MOCK_HOLD_MS);
-      const heldMessage = screen.getByText(MOCK_SUCCESS_MESSAGE);
-
-      expect(dismissButton).toHaveFocus();
-      expect(heldMessage).toBeVisible();
-
-      await user.click(document.body);
-      await advanceTime(MOCK_HOLD_MS);
-      const message = screen.queryByText(MOCK_SUCCESS_MESSAGE);
-
-      expect(message).not.toBeInTheDocument();
-    });
-
-    it('merges a rapid identical success toast into one with a count', async () => {
-      const { fireSuccessButton } = getFireButtons();
-      await user.click(fireSuccessButton);
-      await user.click(fireSuccessButton);
-
-      const statuses = screen.getAllByRole('status');
-      const message = screen.getByText(`${MOCK_SUCCESS_MESSAGE} ×2`);
-
-      expect(statuses).toHaveLength(1);
-      expect(message).toBeVisible();
-    });
-
-    it('dismisses the newest toast on Escape when none is focused', async () => {
-      const { fireSuccessButton, fireErrorButton } = getFireButtons();
-      await user.click(fireErrorButton);
-      await user.click(fireSuccessButton);
-
-      await user.keyboard('{Escape}');
-      await advanceTime(MOCK_SHORT_WAIT_MS);
-      const successMessage = screen.queryByText(MOCK_SUCCESS_MESSAGE);
-      const errorMessage = screen.getByText(MOCK_ERROR_MESSAGE);
-
-      expect(successMessage).not.toBeInTheDocument();
-      expect(errorMessage).toBeVisible();
-    });
-
-    it('dismisses the focused toast on Escape', async () => {
-      const { fireSuccessButton, fireErrorButton } = getFireButtons();
-      await user.click(fireErrorButton);
-      await user.click(fireSuccessButton);
-      const [errorDismissButton] = screen.getAllByRole('button', {
-        name: DISMISS_LABEL,
-      });
-
-      await user.tab();
-      await user.tab();
-      await user.tab();
-      expect(errorDismissButton).toHaveFocus();
-
-      await user.keyboard('{Escape}');
-      await advanceTime(MOCK_SHORT_WAIT_MS);
-      const errorMessage = screen.queryByText(MOCK_ERROR_MESSAGE);
-      const successMessage = screen.getByText(MOCK_SUCCESS_MESSAGE);
-
-      expect(errorMessage).not.toBeInTheDocument();
-      expect(successMessage).toBeVisible();
     });
 
     it('shows the resolved toast without a loading toast for a quick promise', async () => {
@@ -271,6 +141,131 @@ describe(`<${ToastProvider.name}/>`, () => {
 
       expect(message).toBeVisible();
       expect(loadingMessage).not.toBeInTheDocument();
+    });
+
+    describe('with a success toast fired', () => {
+      let fireSuccessButton: HTMLElement;
+      let status: HTMLElement;
+      let dismissButton: HTMLElement;
+
+      beforeEach(async () => {
+        ({ fireSuccessButton } = getFireButtons());
+        await user.click(fireSuccessButton);
+        status = screen.getByRole('status');
+        dismissButton = screen.getByRole('button', { name: DISMISS_LABEL });
+      });
+
+      it('shows its title and message', () => {
+        const title = within(status).getByText(MOCK_TITLE);
+        const message = within(status).getByText(MOCK_SUCCESS_MESSAGE);
+
+        expect(status).toBeVisible();
+        expect(title).toBeVisible();
+        expect(message).toBeVisible();
+      });
+
+      it('dismisses the toast via its close button', async () => {
+        await user.click(dismissButton);
+        await advanceTime(MOCK_SHORT_WAIT_MS);
+
+        const message = screen.queryByText(MOCK_SUCCESS_MESSAGE);
+
+        expect(message).not.toBeInTheDocument();
+      });
+
+      it('runs the action callback and dismisses the toast', async () => {
+        const actionButton = screen.getByRole('button', {
+          name: MOCK_ACTION_LABEL,
+        });
+        await user.click(actionButton);
+        await advanceTime(MOCK_SHORT_WAIT_MS);
+
+        const message = screen.queryByText(MOCK_SUCCESS_MESSAGE);
+
+        expect(onAct).toHaveBeenCalledTimes(1);
+        expect(message).not.toBeInTheDocument();
+      });
+
+      it('holds a hovered toast open and dismisses it after the pointer leaves', async () => {
+        await advanceTime(MOCK_SHORT_WAIT_MS);
+        await user.hover(status);
+        await advanceTime(MOCK_HOLD_MS);
+        const heldMessage = screen.getByText(MOCK_SUCCESS_MESSAGE);
+
+        expect(heldMessage).toBeVisible();
+
+        await user.unhover(status);
+        await advanceTime(MOCK_HOLD_MS);
+        const message = screen.queryByText(MOCK_SUCCESS_MESSAGE);
+
+        expect(message).not.toBeInTheDocument();
+      });
+
+      it('keeps the toast open after the pointer leaves while focus is inside', async () => {
+        await user.hover(status);
+        await user.tab();
+        await user.tab();
+        await user.tab();
+        await user.unhover(status);
+        await advanceTime(MOCK_HOLD_MS);
+        const heldMessage = screen.getByText(MOCK_SUCCESS_MESSAGE);
+
+        expect(dismissButton).toHaveFocus();
+        expect(heldMessage).toBeVisible();
+
+        await user.click(document.body);
+        await advanceTime(MOCK_HOLD_MS);
+        const message = screen.queryByText(MOCK_SUCCESS_MESSAGE);
+
+        expect(message).not.toBeInTheDocument();
+      });
+
+      it('merges a rapid identical success toast into one with a count', async () => {
+        await user.click(fireSuccessButton);
+
+        const statuses = screen.getAllByRole('status');
+        const message = screen.getByText(`${MOCK_SUCCESS_MESSAGE} ×2`);
+
+        expect(statuses).toHaveLength(1);
+        expect(message).toBeVisible();
+      });
+    });
+
+    describe('with an error toast then a success toast fired', () => {
+      beforeEach(async () => {
+        const { fireSuccessButton, fireErrorButton } = getFireButtons();
+        await user.click(fireErrorButton);
+        await user.click(fireSuccessButton);
+      });
+
+      it('dismisses the newest toast on Escape when none is focused', async () => {
+        await user.keyboard(KEY_ESCAPE);
+        await advanceTime(MOCK_SHORT_WAIT_MS);
+        const successMessage = screen.queryByText(MOCK_SUCCESS_MESSAGE);
+        const errorMessage = screen.getByText(MOCK_ERROR_MESSAGE);
+
+        expect(successMessage).not.toBeInTheDocument();
+        expect(errorMessage).toBeVisible();
+      });
+
+      it('dismisses the focused toast on Escape', async () => {
+        const [errorDismissButton] = screen.getAllByRole('button', {
+          name: DISMISS_LABEL,
+        });
+
+        await user.tab();
+        await user.tab();
+        await user.tab();
+        expect(errorDismissButton).toHaveFocus();
+
+        await user.keyboard(KEY_ESCAPE);
+        await advanceTime(MOCK_SHORT_WAIT_MS);
+        const errorMessage = screen.queryByText(MOCK_ERROR_MESSAGE);
+        const successMessage = screen.getByText(MOCK_SUCCESS_MESSAGE);
+
+        expect(errorMessage).not.toBeInTheDocument();
+        expect(successMessage).toBeVisible();
+      });
     });
   });
 

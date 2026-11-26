@@ -1,11 +1,9 @@
+import type { TMaybeNull } from '@shinefold/config';
+
 const CANONICAL_POSITIVE_INT = /^[1-9]\d*$/;
 
-/**
- * Parses a pagination path segment. Only the canonical decimal form is
- * accepted — `02`, `1.5`, `1e2` etc. return null so the route can hard-404
- * instead of serving duplicate URLs for the same page.
- */
-export const parsePageParam = (raw: string): number | null => {
+/** Accepts only the canonical form, so `02` or `1e2` 404s instead of duplicating a page. */
+export const parsePageParam = (raw: string): TMaybeNull<number> => {
   if (!CANONICAL_POSITIVE_INT.test(raw)) return null;
   return Number(raw);
 };

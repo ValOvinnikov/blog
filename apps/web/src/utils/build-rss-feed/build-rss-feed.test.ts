@@ -1,7 +1,8 @@
+import { faker } from '@faker-js/faker';
+import { ALTERNATE_TYPE } from '@web/constants/metadata';
 /**
  * @vitest-environment jsdom
  */
-import { faker } from '@faker-js/faker';
 import { parseRssFeed } from '@web/testing/shared/rss/parse-rss-feed';
 
 import {
@@ -61,7 +62,7 @@ describe(buildRssFeed, () => {
     expect(selfLink).toEqual({
       href: MOCK_FEED_URL,
       rel: 'self',
-      type: 'application/rss+xml',
+      type: ALTERNATE_TYPE.RSS,
     });
   });
 

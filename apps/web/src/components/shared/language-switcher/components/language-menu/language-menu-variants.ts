@@ -1,10 +1,12 @@
-import { tv } from '@shinefold/ui/lib/styling';
+import { TEXT_ROLE } from '@shinefold/config';
+import { tv, TYPOGRAPHY } from '@shinefold/ui/lib/styling';
 
 export const languageMenuVariants = tv({
   slots: {
     footerTrigger: [
       'inline-flex size-auto items-center gap-1 px-0 py-0.5',
-      'font-mono text-meta text-muted',
+      TYPOGRAPHY[TEXT_ROLE.META],
+      'text-muted',
       'hover:border-transparent hover:bg-transparent hover:text-text',
     ],
     caret: ['size-3'],

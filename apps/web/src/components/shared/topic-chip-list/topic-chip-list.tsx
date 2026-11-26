@@ -1,6 +1,7 @@
 import { routes } from '@shinefold/config';
 import type { TTopicsList } from '@shinefold/service';
 import { Tag } from '@shinefold/ui/components/atoms/tag';
+import { hasLength, isUndefined } from '@shinefold/utils/primitives';
 import { SmartLink } from '@web/components/shared/smart-link';
 import { useTranslations } from 'next-intl';
 
@@ -18,9 +19,9 @@ export interface ITopicChipListProps {
 export const TopicChipList = ({ topics, activeSlug }: ITopicChipListProps) => {
   const t = useTranslations('topicChipList');
 
-  if (topics.length === 0) return null;
+  if (!hasLength(topics)) return null;
 
-  const isAllActive = activeSlug === undefined;
+  const isAllActive = isUndefined(activeSlug);
 
   return (
     <nav aria-label={t('ariaLabel')} className={topicChipListVariants()}>

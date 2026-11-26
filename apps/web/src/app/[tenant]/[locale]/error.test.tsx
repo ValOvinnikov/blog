@@ -1,5 +1,5 @@
 import { SITE_MESSAGES } from '@shinefold/config';
-import userEvent from '@testing-library/user-event';
+import userEvent, { type UserEvent } from '@testing-library/user-event';
 import { customRender, screen } from '@web/testing/custom-render';
 import { MOCK_ERROR_WITH_DIGEST } from '@web/testing/shared/error/fixtures';
 import { reportClientError } from '@web/utils/report-client-error';
@@ -18,7 +18,10 @@ const setup = customRender(ErrorBoundary, {
 });
 
 describe(`<${ErrorBoundary.name}/>`, () => {
+  let user: UserEvent;
+
   beforeEach(() => {
+    user = userEvent.setup();
     setup();
   });
 
@@ -30,7 +33,6 @@ describe(`<${ErrorBoundary.name}/>`, () => {
   });
 
   it('retries through the reset it was given', async () => {
-    const user = userEvent.setup();
     const retryButton = screen.getByRole('button', { name: RETRY });
 
     await user.click(retryButton);

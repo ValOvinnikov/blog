@@ -47,13 +47,14 @@ const setupWide = customRender(SanityImage, {
 
 describe(`<${SanityImage.name}/>`, () => {
   describe('with default props', () => {
+    let img: HTMLElement;
+
     beforeEach(() => {
       setup();
+      img = screen.getByRole('img', { name: MOCK_IMAGE.alt });
     });
 
     it('renders the src and srcset against the default base URL', () => {
-      const img = screen.getByRole('img', { name: MOCK_IMAGE.alt });
-
       expect(img.getAttribute('src')).toContain(STATIC_SANITY_IMAGE_BASE_URL);
       expect(img.getAttribute('srcset')).toContain(
         STATIC_SANITY_IMAGE_BASE_URL,
@@ -61,8 +62,6 @@ describe(`<${SanityImage.name}/>`, () => {
     });
 
     it('renders no fetchpriority attribute when priority is omitted', () => {
-      const img = screen.getByRole('img', { name: MOCK_IMAGE.alt });
-
       expect(img).not.toHaveAttribute('fetchpriority');
     });
   });

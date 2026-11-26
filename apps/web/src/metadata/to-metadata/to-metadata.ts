@@ -1,6 +1,10 @@
 import type { TValueOf } from '@shinefold/config/utils';
 import { type TSeoResolved, urlForSanityImage } from '@shinefold/service';
-import { ALTERNATE_TYPE, OG_TYPE, TWITTER_CARD } from '@web/constants/metadata';
+import {
+  ALTERNATE_TYPE,
+  type OG_TYPE,
+  TWITTER_CARD,
+} from '@web/constants/metadata';
 import { getRequestContext } from '@web/server/request-context/request-context';
 import type { Metadata } from 'next';
 

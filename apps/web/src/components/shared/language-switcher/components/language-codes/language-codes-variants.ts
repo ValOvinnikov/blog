@@ -3,7 +3,7 @@ import { HEADER_CONTROL_FRAME, tv } from '@shinefold/ui/lib/styling';
 export const languageCodesVariants = tv({
   slots: {
     list: ['flex'],
-    link: ['font-mono'],
+    link: [],
     label: ['sr-only'],
   },
   variants: {
@@ -17,7 +17,6 @@ export const languageCodesVariants = tv({
       },
       true: {
         list: ['items-baseline gap-2'],
-        link: ['text-meta'],
       },
     },
     isCurrent: {

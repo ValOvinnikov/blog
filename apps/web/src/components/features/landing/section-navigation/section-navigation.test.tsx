@@ -133,25 +133,24 @@ describe(`<${SectionNavigation.name}/>`, () => {
   });
 
   describe('in a section nested inside another section', () => {
+    let backLink: HTMLElement;
+
     beforeEach(() => {
       setup({
         sectionNavigation: mockLandingSectionNavigation({
           parentSection: { title: MOCK_PARENT_TITLE, path: MOCK_PARENT_PATH },
         }),
       });
+      backLink = screen.getByRole('link', { name: BACK_LINK_NAME });
     });
 
     it('starts with a back link to the parent section', () => {
-      const backLink = screen.getByRole('link', { name: BACK_LINK_NAME });
-
       const firstLink = screen.getAllByRole('link').at(0);
 
       expect(firstLink).toBe(backLink);
     });
 
     it("points the back link at the parent section's path", () => {
-      const backLink = screen.getByRole('link', { name: BACK_LINK_NAME });
-
       expect(backLink).toHaveAttribute(
         'href',
         routes.landingPage(MOCK_PARENT_PATH),

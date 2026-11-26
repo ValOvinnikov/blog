@@ -1,4 +1,5 @@
-import { tv } from '@shinefold/ui/lib/styling';
+import { TEXT_ROLE } from '@shinefold/config';
+import { tv, TYPOGRAPHY } from '@shinefold/ui/lib/styling';
 
 export const identitySectionVariants = tv({
   slots: {
@@ -11,6 +12,6 @@ export const identitySectionVariants = tv({
     linkedStatus: ['font-mono text-copy text-success'],
     emailIcon: ['text-brand-primary text-lg leading-none'],
     lastMethodNotice: ['font-body text-copy text-text-subtle italic'],
-    linkError: ['font-mono text-meta text-error'],
+    linkError: [TYPOGRAPHY[TEXT_ROLE.META], 'text-error'],
   },
 });

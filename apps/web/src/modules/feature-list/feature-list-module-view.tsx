@@ -1,4 +1,4 @@
-import { CONTENT_ALIGNMENT, DISPLAY_MODE } from '@shinefold/config';
+import { DISPLAY_MODE } from '@shinefold/config';
 import type { TFeatureListModule } from '@shinefold/service';
 import { CardGrid } from '@shinefold/ui/components/organisms/card-grid';
 import { hasLength } from '@shinefold/utils/primitives';
@@ -12,6 +12,7 @@ import {
   CAROUSEL_IMAGE_SIZES,
   GRID_IMAGE_SIZES,
 } from '@web/utils/module-image-sizes';
+import { toCardAlign } from '@web/utils/to-card-align';
 import { toCardGridColumns } from '@web/utils/to-card-grid-columns';
 import { toModuleGridColumns } from '@web/utils/to-module-grid-columns';
 
@@ -45,8 +46,7 @@ export const FeatureListModuleView = ({
   const { brandVariant, layout, appearance } = section;
   const titleId = `feature-list-${id}`;
   const dataTestId = `feature-list-module-${id}`;
-  const cardAlign =
-    cardAlignment === CONTENT_ALIGNMENT.CENTER ? 'center' : 'left';
+  const cardAlign = toCardAlign(cardAlignment);
   const columns =
     toCardGridColumns(storedColumns) ?? toModuleGridColumns(items.length);
   const s = moduleGridActionsVariants({ align: contentAlignment });

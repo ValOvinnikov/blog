@@ -1,4 +1,5 @@
-import { tv } from '@shinefold/ui/lib/styling';
+import { TEXT_ROLE } from '@shinefold/config';
+import { tv, TYPOGRAPHY } from '@shinefold/ui/lib/styling';
 
 // 30rem: below it a 320px popover no longer fits between the bar's account button and the left gutter.
 const SHEET_ON_PHONE = [
@@ -15,7 +16,8 @@ export const authMenuVariants = tv({
     errorNotice: [
       'absolute top-full right-0 z-20 mt-2 min-w-[220px]',
       'rounded-md border border-border bg-surface px-3 py-2 shadow-lg',
-      'font-mono text-meta text-error',
+      TYPOGRAPHY[TEXT_ROLE.META],
+      'text-error',
       SHEET_ON_PHONE,
     ],
     slot: ['inline-flex shrink-0'],

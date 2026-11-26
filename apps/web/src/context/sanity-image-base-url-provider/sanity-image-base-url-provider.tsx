@@ -1,5 +1,6 @@
 'use client';
 
+import { isUndefined } from '@shinefold/utils/primitives';
 import { createContext, useContext, type ReactNode } from 'react';
 
 const SanityImageBaseUrlContext = createContext<string | undefined>(undefined);
@@ -29,7 +30,7 @@ export const SanityImageBaseUrlProvider = ({
 /** Reads the current tenant's Sanity CDN base URL — throws outside a SanityImageBaseUrlProvider. */
 export const useSanityImageBaseUrl = (): string => {
   const context = useContext(SanityImageBaseUrlContext);
-  if (context === undefined) {
+  if (isUndefined(context)) {
     throw new Error(
       'useSanityImageBaseUrl must be used within a SanityImageBaseUrlProvider',
     );

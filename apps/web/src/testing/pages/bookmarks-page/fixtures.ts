@@ -1,4 +1,5 @@
 import { routes } from '@shinefold/config';
+import { hasLength } from '@shinefold/utils/primitives';
 import type {
   IBookmarkedPost,
   IBookmarksPageViewProps,
@@ -40,7 +41,7 @@ export const mockBookmarksPageView = (
     listHeading: MOCK_LIST_HEADING,
     posts,
     emptyMessage: MOCK_EMPTY_MESSAGE,
-    hint: posts.length > 0 ? MOCK_HINT : undefined,
+    hint: hasLength(posts) ? MOCK_HINT : undefined,
     ...overrides,
   };
 };

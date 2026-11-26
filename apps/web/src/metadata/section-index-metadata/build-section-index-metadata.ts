@@ -1,5 +1,6 @@
 import { pageHref, routes } from '@shinefold/config';
 import type { TSectionIndexType } from '@shinefold/service';
+import { OG_TYPE } from '@web/constants/metadata';
 import { SECTION_INDEX_LOG } from '@web/constants/section-index';
 import { toLocalizedPageMetadata } from '@web/metadata/to-localized-page-metadata';
 import { getSectionIndexPage } from '@web/server/section-index/get-section-index-page/get-section-index-page';
@@ -29,6 +30,6 @@ export const buildSectionIndexMetadata = async (
   return toLocalizedPageMetadata(seo, {
     href,
     translations: translations.map((language) => ({ language, href })),
-    ogType: 'website',
+    ogType: OG_TYPE.WEBSITE,
   });
 };
