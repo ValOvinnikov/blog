@@ -67,6 +67,7 @@ describe(toThemeTokens, () => {
     const result = toThemeTokens(undefined);
 
     expect(result).toEqual({
+      preset: PRESET_ID.CONSOLE,
       ...CONSOLE.themeTokens,
       logoHue: CONSOLE.themeTokens.accentHue,
       ...presetStyles(CONSOLE),
@@ -77,6 +78,7 @@ describe(toThemeTokens, () => {
     const result = toThemeTokens(EDITORIAL_ROW);
 
     expect(result).toEqual({
+      preset: PRESET_ID.EDITORIAL,
       ...EDITORIAL.themeTokens,
       logoHue: EDITORIAL.themeTokens.accentHue,
       ...presetStyles(EDITORIAL),
@@ -132,5 +134,14 @@ describe(toThemeTokens, () => {
 
     expect(result.buttonColor).toBe(MOCK_YELLOW_HEX);
     expect(result.buttonColorDark).toBe(MOCK_PINK_HEX);
+  });
+
+  it("keeps the row's preset so the style block can draw its surfaces", () => {
+    const result = toThemeTokens({
+      ...CONSOLE_ROW,
+      preset: PRESET_ID.SHINEFOLD,
+    });
+
+    expect(result.preset).toBe(PRESET_ID.SHINEFOLD);
   });
 });

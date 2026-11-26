@@ -5,13 +5,15 @@ import {
   PRESET_REGISTRY,
   type TPresetId,
 } from '@shinefold/config';
+import { isOneOf } from '@shinefold/utils/primitives';
 import type { Decorator, Preview } from '@storybook/nextjs-vite';
 import { resolveFontVariableClassName } from '@web/config/fonts';
 import { buildThemeStyleBlock } from '@web/utils/build-theme-style-block';
 
 const THEME_STYLE_ID = 'storybook-site-theme';
-const PRESET_HUE = 'PRESET';
+const PRESET_HUE = 'FROM_PRESET';
 const HUE_STEP = 10;
+const PRESET_IDS = Object.values(PRESET_ID);
 
 const resolvePresetFontClassNames = (presetId: TPresetId): string[] => {
   const { headingFont, bodyFont } = PRESET_REGISTRY[presetId].themeTokens;
@@ -37,7 +39,7 @@ export const SITE_THEME_GLOBAL_TYPES: Preview['globalTypes'] = {
     toolbar: {
       title: 'Preset',
       icon: 'paintbrush',
-      items: Object.values(PRESET_ID),
+      items: PRESET_IDS,
       dynamicTitle: true,
     },
   },
@@ -77,11 +79,11 @@ export const SITE_THEME_INITIAL_GLOBALS = {
 // `--font-*-family` custom properties are read on `body`, which doesn't
 // inherit them from a descendant.
 export const withSiteTheme: Decorator = (storyFn, { globals }) => {
-  const presetId =
-    globals.preset === PRESET_ID.EDITORIAL
-      ? PRESET_ID.EDITORIAL
-      : PRESET_ID.CONSOLE;
-  const { themeTokens, cardStyle } = PRESET_REGISTRY[presetId];
+  const presetId = isOneOf(PRESET_IDS, globals.preset)
+    ? globals.preset
+    : PRESET_ID.CONSOLE;
+  const { themeTokens, cardStyle, buttonShape, buttonColor } =
+    PRESET_REGISTRY[presetId];
   const hue = Number(globals.accentHue);
   const accentHue =
     Number.isInteger(hue) && hue >= HUE_MIN && hue < HUE_MAX
@@ -89,12 +91,15 @@ export const withSiteTheme: Decorator = (storyFn, { globals }) => {
       : themeTokens.accentHue;
   ensureThemeStyle().textContent = buildThemeStyleBlock({
     ...themeTokens,
+    preset: presetId,
     cardStyle,
+    buttonShape,
+    buttonColor: buttonColor ?? undefined,
     accentHue,
   });
 
   const { classList } = document.documentElement;
-  Object.values(PRESET_ID).forEach((id) => {
+  PRESET_IDS.forEach((id) => {
     classList.remove(...resolvePresetFontClassNames(id));
   });
   classList.add(...resolvePresetFontClassNames(presetId));
