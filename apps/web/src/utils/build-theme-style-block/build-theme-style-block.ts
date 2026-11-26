@@ -12,6 +12,7 @@ import {
   DIVIDER_WIDTH_DECLARATIONS,
   formatButtonStyleBlock,
   formatOklchRamp,
+  formatPresetSurfaceBlock,
   HEADER_CONTROL_SHAPE,
   HEADER_CONTROL_SHAPE_DECLARATIONS,
   HEADER_CONTROL_STYLE,
@@ -27,6 +28,7 @@ import {
   LOGO_RAMP_LIGHT,
   NAV_LINK_STYLE,
   NAV_LINK_STYLE_DECLARATIONS,
+  PRESET_ID,
   RADIUS_DECLARATIONS,
   type TThemeDeclarations,
 } from '@shinefold/config';
@@ -44,6 +46,7 @@ const formatDeclarations = (declarations: TThemeDeclarations): string => {
  * preset's output so a site with no saved look renders the same.
  */
 export const buildThemeStyleBlock = ({
+  preset = PRESET_ID.CONSOLE,
   accentHue,
   logoHue,
   radiusScale,
@@ -69,6 +72,8 @@ export const buildThemeStyleBlock = ({
         }),
       )}`
     : '';
+  const presetSurfaceBlock = formatPresetSurfaceBlock(preset);
+  const presetStyleBlock = presetSurfaceBlock ? `\n${presetSurfaceBlock}` : '';
 
   return `:root {
     ${formatDeclarations({
@@ -99,5 +104,5 @@ export const buildThemeStyleBlock = ({
       ...formatOklchRamp(ACCENT_RAMP_DARK, accentHue),
       ...formatOklchRamp(LOGO_RAMP_DARK, resolvedLogoHue),
     })}
-}${buttonStyleBlock}`;
+}${buttonStyleBlock}${presetStyleBlock}`;
 };

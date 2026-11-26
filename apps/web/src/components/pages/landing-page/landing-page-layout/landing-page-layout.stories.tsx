@@ -9,6 +9,10 @@ import {
   mockLandingSectionNavigation,
 } from '@web/testing/pages/landing-page/fixtures';
 import { mockHeroPresentation } from '@web/testing/shared/hero-presentation/fixtures';
+import {
+  SHINEFOLD_DARK_GLOBALS,
+  SHINEFOLD_LIGHT_GLOBALS,
+} from '@web/testing/shared/site-theme/site-theme-globals';
 
 import { LandingPageLayout } from './landing-page-layout';
 
@@ -67,6 +71,16 @@ export const SectionedWithStackedHero: TStory = {
 
 export const SectionedWithBannerHero: TStory = {
   args: { topBlock: makeHero(HERO_VARIANT.BANNER) },
+};
+
+export const SectionedWithStackedHeroShinefoldLight: TStory = {
+  args: SectionedWithStackedHero.args,
+  globals: SHINEFOLD_LIGHT_GLOBALS,
+};
+
+export const SectionedWithStackedHeroShinefoldDark: TStory = {
+  args: SectionedWithStackedHero.args,
+  globals: SHINEFOLD_DARK_GLOBALS,
 };
 
 export const WithoutSection: TStory = {

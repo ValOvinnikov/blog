@@ -8,6 +8,7 @@ import {
 } from '@shinefold/config';
 
 export type TSiteThemeTokens = TThemeTokens & {
+  preset?: TPresetId;
   buttonColor?: string;
   buttonColorDark?: string;
 };
@@ -37,6 +38,7 @@ export const toThemeTokens = (
     : base.accentHue;
 
   return {
+    preset,
     accentHue,
     logoHue: row?.logoHue ?? base.logoHue ?? accentHue,
     headingFont: row?.headingFont ?? base.headingFont,

@@ -9,6 +9,7 @@ import {
   MOCK_POST_DETAIL_BODY_TEXT,
   MOCK_POST_TAKEAWAYS,
 } from '@web/testing/pages/blog-post-page/fixtures';
+import { DARK_GLOBALS } from '@web/testing/shared/site-theme/site-theme-globals';
 import { userEvent, within } from 'storybook/test';
 
 import { PostSummaryCardView } from './post-summary-card-view';
@@ -79,10 +80,10 @@ export const Closed: TStory = {};
 
 export const Open: TStory = { play: openSummary };
 
-export const ClosedDark: TStory = { globals: { colorMode: 'dark' } };
+export const ClosedDark: TStory = { globals: DARK_GLOBALS };
 
 export const OpenDark: TStory = {
-  globals: { colorMode: 'dark' },
+  globals: DARK_GLOBALS,
   play: openSummary,
 };
 

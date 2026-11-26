@@ -67,6 +67,7 @@ describe(toThemeTokens, () => {
     const result = toThemeTokens(undefined);
 
     expect(result).toEqual({
+      preset: PRESET_ID.CONSOLE,
       ...CONSOLE.themeTokens,
       logoHue: CONSOLE.themeTokens.accentHue,
       ...presetStyles(CONSOLE),
@@ -77,6 +78,7 @@ describe(toThemeTokens, () => {
     const result = toThemeTokens(EDITORIAL_ROW);
 
     expect(result).toEqual({
+      preset: PRESET_ID.EDITORIAL,
       ...EDITORIAL.themeTokens,
       logoHue: EDITORIAL.themeTokens.accentHue,
       ...presetStyles(EDITORIAL),

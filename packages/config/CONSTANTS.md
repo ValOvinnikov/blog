@@ -1234,6 +1234,10 @@ Every key/value const an agent should reuse before writing a literal. The
 
 - **SITE_CONFIG_LOG**: `FETCH_FAILED`=`"site_config.fetch_failed"`, `BRAND_NAME_FETCH_FAILED`=`"brand_name.site_config_fetch_failed"`, `BRAND_LOGO_FETCH_FAILED`=`"brand_logo.site_config_fetch_failed"`, `PLAN_FETCH_FAILED`=`"site_config.plan_fetch_failed"`, `ANALYTICS_FETCH_FAILED`=`"site_config.analytics_fetch_failed"`, `VOICE_RICH_FETCH_FAILED`=`"voice_rich.fetch_failed"`, `COLOR_MODE_FETCH_FAILED`=`"color_mode.site_config_fetch_failed"`, `LANGUAGE_SWITCHER_STYLE_FETCH_FAILED`=`"language_switcher_style.site_config_fetch_failed"`
 
+### `@web/constants/site-theme` — `apps/web/src/constants/site-theme.ts`
+
+- **SITE_THEME_HUE**: `FROM_PRESET`
+
 ### `@web/constants/sitemap` — `apps/web/src/constants/sitemap.ts`
 
 - **SITEMAP_LOG**: `SITE_URL_MISSING`=`"sitemap.site_url_missing"`, `POST_PARAMS_FETCH_FAILED`=`"sitemap.post_params_fetch_failed"`, `TOPIC_PARAMS_FETCH_FAILED`=`"sitemap.topic_params_fetch_failed"`, `TAG_PARAMS_FETCH_FAILED`=`"sitemap.tag_params_fetch_failed"`, `TOPIC_PAGINATION_PARAMS_FETCH_FAILED`=`"sitemap.topic_pagination_params_fetch_failed"`, `TAG_PAGINATION_PARAMS_FETCH_FAILED`=`"sitemap.tag_pagination_params_fetch_failed"`, `BLOG_PAGE_PARAMS_FETCH_FAILED`=`"sitemap.blog_page_params_fetch_failed"`, `LANDING_PAGE_SLUGS_FETCH_FAILED`=`"sitemap.landing_page_slugs_fetch_failed"`, `PRIVACY_DOCUMENT_PARAMS_FETCH_FAILED`=`"sitemap.privacy_document_params_fetch_failed"`, `LEGAL_DOCUMENT_PARAMS_FETCH_FAILED`=`"sitemap.legal_document_params_fetch_failed"`, `TRANSLATION_MAP_FETCH_FAILED`=`"sitemap.translation_map_fetch_failed"`

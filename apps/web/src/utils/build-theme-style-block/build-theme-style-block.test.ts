@@ -14,6 +14,7 @@ import {
   deriveButtonColors,
   DIVIDER_WIDTH_DECLARATIONS,
   formatButtonStyleBlock,
+  formatPresetSurfaceBlock,
   HEADER_CONTROL_SHAPE_DECLARATIONS,
   HEADER_CONTROL_STYLE_DECLARATIONS,
   HEADING_CASE_DECLARATIONS,
@@ -446,4 +447,29 @@ describe(buildThemeStyleBlock, () => {
       );
     },
   );
+
+  it.each([PRESET_ID.CONSOLE, PRESET_ID.EDITORIAL])(
+    'draws no preset surfaces for %s',
+    (preset) => {
+      expect(buildThemeStyleBlock({ ...CONSOLE_TOKENS, preset })).toBe(
+        buildThemeStyleBlock(CONSOLE_TOKENS),
+      );
+    },
+  );
+
+  it("lets a band's own button colours win over the button roles", () => {
+    const css = buildThemeStyleBlock({
+      ...CONSOLE_TOKENS,
+      preset: PRESET_ID.SHINEFOLD,
+      buttonColor: MOCK_YELLOW_HEX,
+    });
+
+    expect(
+      css.indexOf(formatPresetSurfaceBlock(PRESET_ID.SHINEFOLD)),
+    ).toBeGreaterThan(
+      css.indexOf(
+        formatButtonStyleBlock(deriveButtonColors({ color: MOCK_YELLOW_HEX })),
+      ),
+    );
+  });
 });

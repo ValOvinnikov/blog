@@ -11,6 +11,10 @@ import {
   MOCK_SIDEBAR_NAV_PRICING_ITEM,
 } from '@web/testing/shared/sidebar-nav/fixtures';
 import { openMobileSelector } from '@web/testing/shared/sidebar-nav/open-mobile-selector';
+import {
+  SHINEFOLD_DARK_GLOBALS,
+  SHINEFOLD_LIGHT_GLOBALS,
+} from '@web/testing/shared/site-theme/site-theme-globals';
 import { userEvent, within } from 'storybook/test';
 
 import { SidebarNav } from './sidebar-nav';
@@ -33,6 +37,14 @@ export default meta;
 type TStory = StoryObj<typeof meta>;
 
 export const Desktop: TStory = {};
+
+export const DesktopShinefoldLight: TStory = {
+  globals: SHINEFOLD_LIGHT_GLOBALS,
+};
+
+export const DesktopShinefoldDark: TStory = {
+  globals: SHINEFOLD_DARK_GLOBALS,
+};
 
 export const DesktopRootActive: TStory = {
   args: { activeHref: '/modules' },

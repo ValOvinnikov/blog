@@ -37,8 +37,8 @@ export const sidebarNavListVariants = tv({
     isActive: {
       true: {
         link: [
-          'border-brand-primary text-brand-primary',
-          'hover:border-brand-primary hover:text-brand-primary',
+          'border-sidenav-current-bar text-sidenav-current-text',
+          'hover:border-sidenav-current-bar hover:text-sidenav-current-text',
         ],
       },
     },

@@ -13770,6 +13770,14 @@
         "file": "apps/web/src/constants/site-config.ts"
       }
     ],
+    "FROM_PRESET": [
+      {
+        "ref": "SITE_THEME_HUE.FROM_PRESET",
+        "scope": "app:web",
+        "from": "@web/constants/site-theme",
+        "file": "apps/web/src/constants/site-theme.ts"
+      }
+    ],
     "sitemap.site_url_missing": [
       {
         "ref": "SITEMAP_LOG.SITE_URL_MISSING",
