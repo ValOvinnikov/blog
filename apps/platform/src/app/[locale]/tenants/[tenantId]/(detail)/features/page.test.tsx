@@ -6,6 +6,7 @@ import { mockUnsavedSettingsFeaturesAndPreset } from '@platform/testing/settings
 import { mockTenant, MOCK_TENANT_ID } from '@platform/testing/tenants/fixtures';
 import { noEntitlementGrantQueries } from '@platform/testing/tenants/no-entitlement-grant-queries';
 import { NEXT_NAVIGATION_ERROR } from '@shinefold/config';
+import type { getSettingsFeaturesAndPreset } from '@shinefold/db/queries/settings-features';
 
 import FeaturesPage from './page';
 
@@ -16,7 +17,8 @@ const {
 } = vi.hoisted(() => ({
   getAdminByUserIdMock: vi.fn(),
   getTenantByIdMock: vi.fn(),
-  getSettingsFeaturesAndPresetMock: vi.fn(),
+  getSettingsFeaturesAndPresetMock:
+    vi.fn<typeof getSettingsFeaturesAndPreset>(),
 }));
 
 vi.mock('@platform/server/auth/auth');
