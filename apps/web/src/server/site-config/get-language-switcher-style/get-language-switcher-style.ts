@@ -3,22 +3,15 @@ import {
   type TLanguageSwitcherStyle,
 } from '@shinefold/config';
 import { SITE_CONFIG_LOG } from '@web/constants/site-config';
-import { getSiteConfig } from '@web/server/site-config/get-site-config/get-site-config';
-import { logger } from '@web/utils/logger/logger';
+import { getSiteConfigRow } from '@web/server/site-config/get-site-config-row/get-site-config-row';
 
 export const getLanguageSwitcherStyle = async (
   tenant?: string,
 ): Promise<TLanguageSwitcherStyle> => {
-  const result = await getSiteConfig(tenant);
-
-  if (!result.ok) {
-    logger.error(SITE_CONFIG_LOG.LANGUAGE_SWITCHER_STYLE_FETCH_FAILED, {
-      error: result.error,
-    });
-    return LANGUAGE_SWITCHER_STYLE.MENU_CODE;
-  }
-
-  return (
-    result.data?.languageSwitcherStyle ?? LANGUAGE_SWITCHER_STYLE.MENU_CODE
+  const row = await getSiteConfigRow(
+    SITE_CONFIG_LOG.LANGUAGE_SWITCHER_STYLE_FETCH_FAILED,
+    tenant,
   );
+
+  return row?.languageSwitcherStyle ?? LANGUAGE_SWITCHER_STYLE.MENU_CODE;
 };

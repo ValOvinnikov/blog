@@ -1,9 +1,8 @@
 import type { TVoicePortableText } from '@shinefold/config';
 import { SITE_CONFIG_LOG } from '@web/constants/site-config';
 import { getRequestContext } from '@web/server/request-context/request-context';
-import { getSiteConfig } from '@web/server/site-config/get-site-config/get-site-config';
+import { getSiteConfigRow } from '@web/server/site-config/get-site-config-row/get-site-config-row';
 import { UNRESOLVED_TENANT_PLACEHOLDER } from '@web/server/tenant/constants/constants';
-import { logger } from '@web/utils/logger/logger';
 import {
   resolveVoiceRichFields,
   type TVoiceRichFieldId,
@@ -17,17 +16,12 @@ export const getVoiceRich = async (
     getRequestContext(),
     getMessages(),
   ]);
-  const result = await getSiteConfig(tenantId ?? UNRESOLVED_TENANT_PLACEHOLDER);
-
-  if (!result.ok) {
-    logger.error(SITE_CONFIG_LOG.VOICE_RICH_FETCH_FAILED, {
-      id,
-      error: result.error,
-    });
-    return resolveVoiceRichFields({}, baseMessages)[id];
-  }
-
-  const voiceOverrides = result.data?.voiceOverridesByLocale[locale] ?? {};
+  const row = await getSiteConfigRow(
+    SITE_CONFIG_LOG.VOICE_RICH_FETCH_FAILED,
+    tenantId ?? UNRESOLVED_TENANT_PLACEHOLDER,
+    { id },
+  );
+  const voiceOverrides = row?.voiceOverridesByLocale[locale] ?? {};
 
   return resolveVoiceRichFields(voiceOverrides, baseMessages)[id];
 };

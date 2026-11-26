@@ -1,7 +1,7 @@
 import { faker } from '@faker-js/faker';
-import { queries } from '@shinefold/db';
 import { SITE_CONFIG_LOG } from '@web/constants/site-config';
 import { mockSiteConfig } from '@web/testing/server/site-config/fixtures';
+import { getSiteConfigMock } from '@web/testing/server/site-config/site-config-row-edges';
 import { MOCK_ERROR } from '@web/testing/shared/error/fixtures';
 import {
   MOCK_TENANT_ID,
@@ -13,29 +13,11 @@ import { getBrandName } from './get-brand-name';
 
 faker.seed(6760);
 
-vi.mock('@web/server/tenant/request-tenant/request-tenant');
-
-vi.mock(
-  '@shinefold/db',
-  () => import('@web/testing/server/site-config/site-config-db'),
-);
-
-vi.mock(
-  'next/cache',
-  () => import('@web/testing/server/next-cache/passthrough-next-cache'),
-);
-
-const getSiteConfigMock = vi.mocked(queries.siteConfig.getSiteConfig);
-
 const MOCK_BRAND_NAME = faker.company.name();
 
 const SOURCE = { tenantId: MOCK_TENANT_ID, tenantName: MOCK_TENANT_NAME };
 
 describe(getBrandName, () => {
-  beforeEach(() => {
-    getSiteConfigMock.mockReset();
-  });
-
   it("returns the brand name saved on the tenant's Look", async () => {
     getSiteConfigMock.mockResolvedValue(
       mockSiteConfig({ brandName: MOCK_BRAND_NAME }),
