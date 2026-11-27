@@ -1,10 +1,10 @@
 import { faker } from '@faker-js/faker';
 import { SANITY_CONTENT_REVALIDATE_SECONDS } from '@shinefold/config';
 import { mockRun } from '@shinefold/service/testing/mock-run-query';
+import { mockRawCtaModule } from '@shinefold/service/testing/modules/cta/fixtures';
 import {
   MOCK_CTA_BUTTON_URL,
   mockRawCtaButton,
-  mockRawCtaModule,
 } from '@shinefold/service/testing/modules/fixtures';
 import {
   MOCK_LINK_TARGET_CACHE_TAGS,

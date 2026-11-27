@@ -3,7 +3,6 @@ import {
   CONTENT_ALIGNMENT,
   CTA_ACTION_APPEARANCE,
   CTA_ACTION_VARIANT,
-  CTA_VARIANT,
   DISPLAY_MODE,
   HERO_VARIANT,
   LINK_TYPE,
@@ -75,7 +74,7 @@ export const MOCK_POST_LIST_PAGE_SIZE = 9;
 const FAQ_QUESTION = 'How long does onboarding take?';
 const FAQ_ANSWER = 'Most teams are live within a week.';
 export const MOCK_PERSON_NAME = 'Jamie Rivera';
-const INBOX_SUPPORTING_TEXT = 'Get new posts in your inbox.';
+export const INBOX_SUPPORTING_TEXT = 'Get new posts in your inbox.';
 export const MOCK_SHIP_FASTER_HEADING = 'Ship faster';
 
 export function mockModuleDocument(
@@ -135,30 +134,6 @@ export function mockRawContentModule(
   return {
     brandVariant: BRAND_VARIANT.PRIMARY,
     body: [mockRawContentBlock()],
-    layout: null,
-    ...overrides,
-  };
-}
-
-export function mockRawCtaModule(
-  overrides: Partial<TRawCtaModule> = {},
-): TRawCtaModule {
-  return {
-    variant: CTA_VARIANT.CALLOUT,
-    brandVariant: BRAND_VARIANT.PRIMARY,
-    bandTone: BRAND_VARIANT.PRIMARY,
-    eyebrow: null,
-    headingBlock: mockRawModuleHeadingBlock('Subscribe to the newsletter', {
-      supportingText: INBOX_SUPPORTING_TEXT,
-    }),
-    content: null,
-    image: null,
-    contentPositionSplit: null,
-    contentPositionBanner: null,
-    contentAlignment: null,
-    mobileMediaOrder: null,
-    ctaButtons: null,
-    footnote: null,
     layout: null,
     ...overrides,
   };

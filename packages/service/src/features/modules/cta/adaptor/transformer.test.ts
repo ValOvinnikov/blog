@@ -6,12 +6,12 @@ import {
   LINK_TYPE,
   PORTABLE_TEXT_BLOCK_TYPE,
 } from '@shinefold/config';
+import { mockRawCtaModule } from '@shinefold/service/testing/modules/cta/fixtures';
 import {
   mockCtaButtonView,
   mockRawContentBlock,
   mockRawContentMarkDef,
   mockRawCtaButton,
-  mockRawCtaModule,
 } from '@shinefold/service/testing/modules/fixtures';
 import {
   MOCK_LINK_LABEL,
@@ -25,6 +25,10 @@ import {
   mockRawModuleHeadingBlock,
   mockModuleHeadingBlockView,
 } from '@shinefold/service/testing/shared/localized';
+import {
+  MOCK_AUTHORED_CARD_APPEARANCE,
+  MOCK_UNSET_MODULE_APPEARANCE,
+} from '@shinefold/service/testing/shared/module-appearance';
 
 import { toCtaModule } from './transformer';
 
@@ -203,5 +207,39 @@ describe(toCtaModule, () => {
     const cta = toCtaModule(raw);
 
     expect(cta.layout).toEqual(layout);
+  });
+
+  it.each([CTA_VARIANT.CALLOUT, CTA_VARIANT.SPLIT])(
+    'leaves every card override undefined on %s when unset',
+    (variant) => {
+      const cta = toCtaModule(mockRawCtaModule({ variant }));
+
+      expect(cta).toMatchObject(MOCK_UNSET_MODULE_APPEARANCE);
+    },
+  );
+
+  it.each([CTA_VARIANT.CALLOUT, CTA_VARIANT.SPLIT])(
+    'maps the authored card overrides on %s',
+    (variant) => {
+      const raw = mockRawCtaModule({
+        variant,
+        ...MOCK_AUTHORED_CARD_APPEARANCE,
+      });
+
+      const cta = toCtaModule(raw);
+
+      expect(cta).toMatchObject(MOCK_AUTHORED_CARD_APPEARANCE);
+    },
+  );
+
+  it('drops the stored card overrides on a Banner', () => {
+    const raw = mockRawCtaModule({
+      variant: CTA_VARIANT.BANNER,
+      ...MOCK_AUTHORED_CARD_APPEARANCE,
+    });
+
+    const cta = toCtaModule(raw);
+
+    expect(cta).toMatchObject(MOCK_UNSET_MODULE_APPEARANCE);
   });
 });

@@ -9,6 +9,10 @@ import { toCtaButtons } from '@shinefold/service/shared/transformers/cta/to-cta-
 import { toModuleHeadingBlock } from '@shinefold/service/shared/transformers/heading-block/to-module-heading-block';
 import { toSanityImage } from '@shinefold/service/shared/transformers/image/to-sanity-image';
 import { toLayout } from '@shinefold/service/shared/transformers/layout/to-layout';
+import {
+  toModuleAppearance,
+  type TModuleAppearance,
+} from '@shinefold/service/shared/transformers/module/to-module-appearance';
 import { toPortableText } from '@shinefold/service/shared/transformers/portable-text/to-portable-text-mark-def';
 import { hasLength } from '@shinefold/utils/primitives';
 import type { InferResultType } from 'groqd';
@@ -38,6 +42,18 @@ function toContentPosition(
   }
 }
 
+function toCardOverrides(raw: TRawCtaModule): TModuleAppearance {
+  if (raw.variant === CTA_VARIANT.BANNER) {
+    return {
+      cardStyle: undefined,
+      radiusScale: undefined,
+      density: undefined,
+      columns: undefined,
+    };
+  }
+  return toModuleAppearance(raw);
+}
+
 export function toCtaModule(raw: TRawCtaModule): TCtaModule {
   return {
     variant: raw.variant,
@@ -53,5 +69,6 @@ export function toCtaModule(raw: TRawCtaModule): TCtaModule {
     ctaButtons: toCtaButtons(raw.ctaButtons),
     footnote: raw.footnote ?? undefined,
     layout: toLayout(raw.layout),
+    ...toCardOverrides(raw),
   };
 }

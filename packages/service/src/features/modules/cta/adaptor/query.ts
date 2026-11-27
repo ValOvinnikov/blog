@@ -6,6 +6,7 @@ import { ctaButtonsFragment } from '@shinefold/service/shared/fragments/cta/cta-
 import { moduleHeadingBlockFragment } from '@shinefold/service/shared/fragments/heading-block/module-heading-block';
 import { localizedImageWithAltOptionalFragment } from '@shinefold/service/shared/fragments/image/localized-image-with-alt';
 import { moduleCtaLayoutFragment } from '@shinefold/service/shared/fragments/layout/layout';
+import { moduleAppearanceFragment } from '@shinefold/service/shared/fragments/module/module-appearance';
 import { moduleContentAlignmentFragment } from '@shinefold/service/shared/fragments/module/module-content-alignment';
 import { getLocalizedField } from '@shinefold/service/shared/localization/get-localized-field/get-localized-field';
 import { getLocalizedPortableTextBlock } from '@shinefold/service/shared/localization/get-localized-portable-text-block/get-localized-portable-text-block';
@@ -36,5 +37,6 @@ export const ctaModuleQuery = q
     ...ctaButtonsFragment,
     footnote: getLocalizedField(sub, 'footnote'),
     ...moduleCtaLayoutFragment,
+    ...moduleAppearanceFragment,
   }))
   .notNull();
