@@ -6,12 +6,15 @@ import type { TPlatformViewer } from '@platform/server/auth/platform-viewer';
 import { tenantOwnerStudioAccess } from '@platform/utils/owner-studio-access/owner-studio-access';
 import { isPendingStudioAccess } from '@platform/utils/pending-studio-access/pending-studio-access';
 import type { TPlatformTenant } from '@platform/utils/platform-tenant/platform-tenant';
+import {
+  type TTeamSeats,
+  teamSeats,
+} from '@platform/utils/team-seats/team-seats';
 import type { TMaybeUndefined } from '@shinefold/config';
 import { STUDIO_ACCESS, type TStudioAccess } from '@shinefold/config/constants';
 import { MEMBERSHIP_ROLE, type TMembershipRole } from '@shinefold/db/constants';
 import type { TPendingMembershipInvite } from '@shinefold/db/queries/membership-invites';
 import type { TTenantMember } from '@shinefold/db/queries/memberships';
-import { graceEndDate } from '@shinefold/db/utils/grace-end-date/grace-end-date';
 import { isSameLocalDay } from '@shinefold/utils/date';
 
 export type TTeamMemberRow = {
@@ -34,13 +37,7 @@ export type TTeamInviteRow = {
   isInvitedToday: boolean;
 };
 
-export type TTeamViewModel = {
-  seats: number;
-  shownUsed: number;
-  isFull: boolean;
-  freeSeats: number;
-  seatsOver: number;
-  graceEndsAt: TMaybeUndefined<Date>;
+export type TTeamViewModel = TTeamSeats & {
   hasEditor: boolean;
   members: TTeamMemberRow[];
   invites: TTeamInviteRow[];
@@ -68,12 +65,6 @@ export const teamViewModel = (
   { tenant, viewer, currentUserId, members, invites }: TTeamViewModelInput,
   now: Date = new Date(),
 ): TTeamViewModel => {
-  const { entitlements, downgradeGraceStartedAt } = tenant;
-  const { seats } = entitlements;
-  const used = members.length + invites.length;
-  const holding =
-    members.filter(({ lockedAt }) => !lockedAt).length + invites.length;
-  const seatsOver = Math.max(holding - seats, 0);
   const ownerCount = members.filter(
     ({ role }) => role === MEMBERSHIP_ROLE.OWNER,
   ).length;
@@ -82,17 +73,10 @@ export const teamViewModel = (
   const mayRequestAccess = viewer.isOwner || viewer.isSuperAdmin;
 
   return {
-    seats,
-    shownUsed: seatsOver > 0 ? holding : Math.min(used, seats),
-    isFull: used >= seats,
-    freeSeats: Math.max(seats - used, 0),
-    seatsOver,
-    graceEndsAt: downgradeGraceStartedAt
-      ? graceEndDate(downgradeGraceStartedAt)
-      : undefined,
+    ...teamSeats({ tenant, members, invites }),
     hasEditor: members.some(({ role }) => role === MEMBERSHIP_ROLE.EDITOR),
     members: members.map((member) => {
-      const { membershipId, email, role, joinedAt, userId } = member;
+      const { membershipId, email, role, joinedAt, userId, lockedAt } = member;
       const isYou = !viewer.isOperator && userId === currentUserId;
       const access = rowAccess(member, ownerAccess);
 
@@ -104,7 +88,9 @@ export const teamViewModel = (
         isJoinedToday: isSameLocalDay(joinedAt, now),
         isYou,
         canRemove:
-          !isYou && !(role === MEMBERSHIP_ROLE.OWNER && ownerCount <= 1),
+          !isYou &&
+          !lockedAt &&
+          !(role === MEMBERSHIP_ROLE.OWNER && ownerCount <= 1),
         access,
         canRequestAccess:
           mayRequestAccess && !!email && isPendingStudioAccess(access),

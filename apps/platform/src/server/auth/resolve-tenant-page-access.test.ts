@@ -27,12 +27,16 @@ vi.mock('@platform/server/subscribers/can-manage-subscribers', () => ({
 vi.mock('@shinefold/db', () => ({
   queries: {
     leads: { countLeadsForTenant: vi.fn() },
-    membershipInvites: { countUnlockedSeatsInUse: vi.fn() },
+    membershipInvites: {
+      countSeatsInUse: vi.fn(),
+      countUnlockedSeatsInUse: vi.fn(),
+    },
   },
 }));
 
 const MOCK_STORED_LEAD_COUNT = 2;
 const countLeadsForTenant = vi.mocked(queries.leads.countLeadsForTenant);
+const countSeatsInUse = vi.mocked(queries.membershipInvites.countSeatsInUse);
 const countUnlockedSeatsInUse = vi.mocked(
   queries.membershipInvites.countUnlockedSeatsInUse,
 );
@@ -60,6 +64,8 @@ describe(resolveTenantPageAccess, () => {
   beforeEach(() => {
     countLeadsForTenant.mockReset();
     countLeadsForTenant.mockResolvedValue(0);
+    countSeatsInUse.mockReset();
+    countSeatsInUse.mockResolvedValue(1);
     countUnlockedSeatsInUse.mockReset();
     countUnlockedSeatsInUse.mockResolvedValue(1);
   });
@@ -169,6 +175,7 @@ describe(resolveTenantPageAccess, () => {
   ])(
     'opens Team to %s while the site is over its seats: %s',
     async (_label, plan, role, isOpen) => {
+      countSeatsInUse.mockResolvedValue(MOCK_SEATS_OVER_ONE_SEAT);
       countUnlockedSeatsInUse.mockResolvedValue(MOCK_SEATS_OVER_ONE_SEAT);
 
       const { team } = await resolveFor(plan, role);
@@ -177,9 +184,24 @@ describe(resolveTenantPageAccess, () => {
     },
   );
 
+  it.each([
+    ['an owner', MEMBERSHIP_ROLE.OWNER, true],
+    ['an editor', MEMBERSHIP_ROLE.EDITOR, false],
+  ])(
+    'opens Team on Free to %s while a member is locked: %s',
+    async (_label, role, isOpen) => {
+      countSeatsInUse.mockResolvedValue(MOCK_SEATS_OVER_ONE_SEAT);
+
+      const { team } = await resolveFor(TENANT_PLAN.FREE, role);
+
+      expect(team).toBe(isOpen);
+    },
+  );
+
   it('counts no seats when the plan already opens Team', async () => {
     await resolveFor(TENANT_PLAN.GROWTH, MEMBERSHIP_ROLE.OWNER);
 
+    expect(countSeatsInUse).not.toHaveBeenCalled();
     expect(countUnlockedSeatsInUse).not.toHaveBeenCalled();
   });
 });

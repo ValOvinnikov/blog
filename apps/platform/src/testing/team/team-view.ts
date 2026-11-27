@@ -94,6 +94,8 @@ export const mockTeamViewModel = (
   freeSeats: 2,
   seatsOver: 0,
   graceEndsAt: undefined,
+  lockedCount: 0,
+  emailsLosingAccess: [],
   hasEditor: false,
   members: [mockTeamOwnerRow()],
   invites: [],
