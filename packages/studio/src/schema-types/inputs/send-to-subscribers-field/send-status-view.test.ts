@@ -103,12 +103,20 @@ describe(toSendStatusView, () => {
     NEWSLETTER_SKIP_REASON.SITE_PAUSED,
     NEWSLETTER_SKIP_REASON.REPUTATION_STOP,
     NEWSLETTER_SKIP_REASON.SITE_INACTIVE,
-  ] as const)('shows a %s skip as paused, with no link', (skipReason) => {
-    const pausedView = viewOf(skipped(NEWSLETTER_SKIP_REASON.SITE_PAUSED));
+  ] as const)('shows a %s skip with no link', (skipReason) => {
     const view = viewOf(skipped(skipReason));
 
-    expect(view).toStrictEqual(pausedView);
     expect(view?.link).toBeUndefined();
+  });
+
+  it('names a different reason for each kind of pause', () => {
+    const details = [
+      NEWSLETTER_SKIP_REASON.SITE_PAUSED,
+      NEWSLETTER_SKIP_REASON.REPUTATION_STOP,
+      NEWSLETTER_SKIP_REASON.SITE_INACTIVE,
+    ].map((skipReason) => viewOf(skipped(skipReason))?.detail);
+
+    expect(new Set(details).size).toBe(details.length);
   });
 
   it.each([

@@ -10,7 +10,7 @@ import type {
   TSendStatusLink,
   TSendStatusView,
 } from '@shinefold/studio/schema-types/inputs/send-to-subscribers-field/send-status-types';
-import { SENDING_PAUSED } from '@shinefold/studio/schema-types/inputs/send-to-subscribers-field/send-switch-view';
+import { SITE_SUSPENDED } from '@shinefold/studio/schema-types/inputs/send-to-subscribers-field/send-switch-view';
 
 const NOT_EMAILED = 'Not emailed';
 const OPEN_SUBSCRIBERS: TSendStatusLink = {
@@ -58,9 +58,13 @@ export const toSkippedView = (
         link: OPEN_SUBSCRIBERS,
       };
     case NEWSLETTER_SKIP_REASON.SITE_PAUSED:
+      return pausedView('Sending is paused for this site.');
     case NEWSLETTER_SKIP_REASON.REPUTATION_STOP:
+      return pausedView(
+        'Sending was paused because too many emails bounced or were marked as spam.',
+      );
     case NEWSLETTER_SKIP_REASON.SITE_INACTIVE:
-      return pausedView(SENDING_PAUSED);
+      return pausedView(SITE_SUSPENDED);
     case NEWSLETTER_SKIP_REASON.NEWSLETTER_OFF:
       return offView(
         'the newsletter is off in Features.',
