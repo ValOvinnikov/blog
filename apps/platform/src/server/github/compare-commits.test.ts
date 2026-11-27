@@ -25,6 +25,7 @@ const COMMITS_PER_PAGE = 100;
 const MANY_COMMITS = 250;
 const TWO_PAGES_OF_COMMITS = 150;
 const MOCK_THOUSANDS_OF_COMMITS = 5000;
+const MOCK_PAST_TOTAL_LIMIT_COMMITS = 10_656;
 
 describe(compareCommits, () => {
   const github = useGitHubFetch();
@@ -91,6 +92,26 @@ describe(compareCommits, () => {
     );
   });
 
+  it('counts and lists the newest commits past GitHub total_commits limit', async () => {
+    const commits = Array.from(
+      { length: MOCK_PAST_TOTAL_LIMIT_COMMITS },
+      mockGitHubCommit,
+    );
+    respondCompare(commits, []);
+
+    const result = await compareCommits(MOCK_BASE, MOCK_HEAD);
+
+    expect(result.ok && result.data.totalCommits).toBe(
+      MOCK_PAST_TOTAL_LIMIT_COMMITS,
+    );
+    expect(result.ok && result.data.commits.map(({ sha }) => sha)).toEqual(
+      commits
+        .slice(-COMMITS_PER_PAGE)
+        .reverse()
+        .map(({ sha }) => sha),
+    );
+  });
+
   it('keeps the cache identifier out of every request', async () => {
     const baseId = faker.git.commitSha();
     respondCompare([mockGitHubCommit()], []);
@@ -108,6 +129,7 @@ describe(compareCommits, () => {
     { total: 10, pages: [1] },
     { total: TWO_PAGES_OF_COMMITS, pages: [1, 2] },
     { total: MOCK_THOUSANDS_OF_COMMITS, pages: [1, 49, 50] },
+    { total: MOCK_PAST_TOTAL_LIMIT_COMMITS, pages: [1, 106, 107] },
   ])(
     'requests commit pages $pages for $total commits and no file pages',
     async ({ total, pages }) => {

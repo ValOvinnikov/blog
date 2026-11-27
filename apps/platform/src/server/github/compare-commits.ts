@@ -9,7 +9,7 @@ import { fetchGitHubJson, type TGitHubResult } from './fetch-github';
 const PER_PAGE = 100;
 
 const compareSchema = z.object({
-  total_commits: z.number(),
+  ahead_by: z.number(),
   commits: z.array(
     z.object({
       sha: z.string(),
@@ -73,8 +73,8 @@ const readComparison = async (
   const first = await fetchComparePage(base, head, 1);
   if (!first.ok) return first;
 
-  const { total_commits, files } = first.data;
-  const lastCommitPage = Math.max(1, Math.ceil(total_commits / PER_PAGE));
+  const { ahead_by, files } = first.data;
+  const lastCommitPage = Math.max(1, Math.ceil(ahead_by / PER_PAGE));
   const newestPages = [lastCommitPage - 1, lastCommitPage];
 
   const fetched = await Promise.all(
@@ -98,14 +98,14 @@ const readComparison = async (
 
   return okResult({
     commits: newestCommits.map(toComparedCommit),
-    totalCommits: total_commits,
+    totalCommits: ahead_by,
     files,
     isFileListTruncated: files.length >= GITHUB_COMPARE_FILE_LIMIT,
   });
 };
 
 // Bump when TCommitComparison or the page maths changes: stored entries outlive deployments.
-const COMPARISON_CACHE_VERSION = 1;
+const COMPARISON_CACHE_VERSION = 2;
 
 const compareCommitsCached = cacheGitHubResult(readComparison, {
   key: GITHUB_CACHE_KEY.COMPARISON,
