@@ -21,9 +21,8 @@ type TTeamSeatsInput = {
   invites: TPendingMembershipInvite[];
 };
 
-// Members arrive in seat rank (owners first, then by join), the order the day-14 lock reads.
-const membersPastSeats = (members: TTenantMember[], seats: number) =>
-  members.filter(({ lockedAt }, rank) => !lockedAt && rank >= seats);
+const membersPastSeats = (membersBySeatRank: TTenantMember[], seats: number) =>
+  membersBySeatRank.filter(({ lockedAt }, rank) => !lockedAt && rank >= seats);
 
 export const teamSeats = ({
   tenant: { entitlements, downgradeGraceStartedAt },

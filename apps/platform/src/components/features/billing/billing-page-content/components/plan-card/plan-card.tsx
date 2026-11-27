@@ -1,21 +1,16 @@
 import { Card } from '@platform/components/shared/card';
 import { DetailList } from '@platform/components/shared/detail-list';
-import { LinkButton } from '@platform/components/shared/link-button';
 import { StatusBadge } from '@platform/components/shared/status-badge';
 import { Text } from '@platform/components/shared/text';
+import { UpgradeLinkButton } from '@platform/components/shared/upgrade-link-button';
 import type {
   TBillingNextPayment,
   TBillingRenewal,
 } from '@platform/server/billing/fetch-stripe-billing';
 import type { TBillingAmountOwed } from '@platform/server/billing/read-amount-owed';
 import { richDate } from '@platform/utils/rich-date/rich-date';
-import { adminRoutes } from '@platform/utils/routes/routes';
 import { tenantStatusTone } from '@platform/utils/status-tone/status-tone';
-import {
-  formatStripeAmount,
-  SIZE,
-  type TMaybeUndefined,
-} from '@shinefold/config';
+import { formatStripeAmount, type TMaybeUndefined } from '@shinefold/config';
 import type { TTenantPlan } from '@shinefold/config/constants';
 import type { TTenantStatus } from '@shinefold/db/constants';
 import { useLocale, useTranslations } from 'next-intl';
@@ -91,9 +86,9 @@ export const PlanCard = ({
       </Card.Body>
       {canChangePlan && !endsAt && (
         <Card.Footer>
-          <LinkButton href={adminRoutes.dashboardUpgrade()} size={SIZE.SM}>
+          <UpgradeLinkButton>
             {isSubscribed ? t('changePlan') : t('upgrade')}
-          </LinkButton>
+          </UpgradeLinkButton>
         </Card.Footer>
       )}
     </Card>

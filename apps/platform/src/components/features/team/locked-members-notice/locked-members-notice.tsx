@@ -1,20 +1,18 @@
 import { Alert } from '@platform/components/shared/alert';
-import { LinkButton } from '@platform/components/shared/link-button';
-import { adminRoutes } from '@platform/utils/routes/routes';
+import { UpgradeLinkButton } from '@platform/components/shared/upgrade-link-button';
+import { TEAM_SEAT_NOTICE_ID } from '@platform/constants/team-access';
 import type { TTeamViewModel } from '@platform/utils/team-view-model/team-view-model';
-import { ALERT_TYPE, SIZE } from '@shinefold/config';
+import { ALERT_TYPE } from '@shinefold/config';
 import type { TTenantPlan } from '@shinefold/config/constants';
 import { useTranslations } from 'next-intl';
 
 export type TLockedMembersNoticeProps = {
-  id: string;
   plan: TTenantPlan;
   team: Pick<TTeamViewModel, 'seats' | 'lockedCount'>;
   canUpgrade: boolean;
 };
 
 export const LockedMembersNotice = ({
-  id,
   plan,
   team: { seats, lockedCount },
   canUpgrade,
@@ -24,7 +22,7 @@ export const LockedMembersNotice = ({
 
   return (
     <Alert
-      id={id}
+      id={TEAM_SEAT_NOTICE_ID}
       type={ALERT_TYPE.WARNING}
       title={t('lockedTitle', { count: lockedCount })}
       description={
@@ -34,11 +32,7 @@ export const LockedMembersNotice = ({
         </>
       }
       action={
-        canUpgrade && (
-          <LinkButton href={adminRoutes.dashboardUpgrade()} size={SIZE.SM}>
-            {t('upgrade')}
-          </LinkButton>
-        )
+        canUpgrade && <UpgradeLinkButton>{t('upgrade')}</UpgradeLinkButton>
       }
     />
   );

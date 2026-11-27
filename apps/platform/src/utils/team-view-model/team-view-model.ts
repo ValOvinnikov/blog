@@ -76,7 +76,7 @@ export const teamViewModel = (
     ...teamSeats({ tenant, members, invites }),
     hasEditor: members.some(({ role }) => role === MEMBERSHIP_ROLE.EDITOR),
     members: members.map((member) => {
-      const { membershipId, email, role, joinedAt, userId, lockedAt } = member;
+      const { membershipId, email, role, joinedAt, userId } = member;
       const isYou = !viewer.isOperator && userId === currentUserId;
       const access = rowAccess(member, ownerAccess);
 
@@ -88,9 +88,7 @@ export const teamViewModel = (
         isJoinedToday: isSameLocalDay(joinedAt, now),
         isYou,
         canRemove:
-          !isYou &&
-          !lockedAt &&
-          !(role === MEMBERSHIP_ROLE.OWNER && ownerCount <= 1),
+          !isYou && !(role === MEMBERSHIP_ROLE.OWNER && ownerCount <= 1),
         access,
         canRequestAccess:
           mayRequestAccess && !!email && isPendingStudioAccess(access),

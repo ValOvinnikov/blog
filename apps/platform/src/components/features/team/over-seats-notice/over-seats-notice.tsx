@@ -1,9 +1,8 @@
 import { Alert } from '@platform/components/shared/alert';
-import { LinkButton } from '@platform/components/shared/link-button';
+import { UpgradeLinkButton } from '@platform/components/shared/upgrade-link-button';
 import { richDate } from '@platform/utils/rich-date/rich-date';
-import { adminRoutes } from '@platform/utils/routes/routes';
 import type { TTeamViewModel } from '@platform/utils/team-view-model/team-view-model';
-import { ALERT_TYPE, SIZE } from '@shinefold/config';
+import { ALERT_TYPE } from '@shinefold/config';
 import type { TTenantPlan } from '@shinefold/config/constants';
 import { hasLength } from '@shinefold/utils/primitives';
 import { useFormatter, useLocale, useTranslations } from 'next-intl';
@@ -53,11 +52,7 @@ export const OverSeatsNotice = ({
         </>
       }
       action={
-        canUpgrade && (
-          <LinkButton href={adminRoutes.dashboardUpgrade()} size={SIZE.SM}>
-            {t('upgrade')}
-          </LinkButton>
-        )
+        canUpgrade && <UpgradeLinkButton>{t('upgrade')}</UpgradeLinkButton>
       }
     />
   );

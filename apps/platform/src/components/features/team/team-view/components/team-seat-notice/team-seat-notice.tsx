@@ -27,12 +27,7 @@ export const TeamSeatNotice = ({
   }
   if (lockedCount > 0) {
     return (
-      <LockedMembersNotice
-        id={TEAM_SEAT_NOTICE_ID}
-        plan={plan}
-        team={team}
-        canUpgrade={canUpgrade}
-      />
+      <LockedMembersNotice plan={plan} team={team} canUpgrade={canUpgrade} />
     );
   }
   if (!isFull) return null;

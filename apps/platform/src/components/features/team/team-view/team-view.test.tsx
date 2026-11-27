@@ -18,6 +18,7 @@ import {
 } from '@platform/testing/team/team-view';
 import { MOCK_TENANT_ID } from '@platform/testing/tenants/fixtures';
 import { adminRoutes } from '@platform/utils/routes/routes';
+import type { TTeamViewModel } from '@platform/utils/team-view-model/team-view-model';
 import { ACTION_OUTCOME } from '@shinefold/config';
 import { STUDIO_ACCESS, TENANT_PLAN } from '@shinefold/config/constants';
 import { MEMBERSHIP_ROLE } from '@shinefold/db/constants';
@@ -103,18 +104,22 @@ describe(`<${TeamView.name}/>`, () => {
   });
 
   describe('over the seats on Starter', () => {
-    const overSeats = (graceEndsAt?: Date) =>
+    const overSeats = ({
+      canUpgrade = false,
+      ...team
+    }: Partial<TTeamViewModel> & { canUpgrade?: boolean } = {}) =>
       setup({
         plan: TENANT_PLAN.STARTER,
+        canUpgrade,
         team: mockTeamViewModel({
           seats: 1,
           shownUsed: 3,
           isFull: true,
           freeSeats: 0,
           seatsOver: 2,
-          graceEndsAt,
           members: [mockTeamOwnerRow(), mockTeamMemberRow()],
           invites: [mockTeamInviteRow()],
+          ...team,
         }),
       });
 
@@ -151,7 +156,7 @@ describe(`<${TeamView.name}/>`, () => {
     });
 
     it('names the grace deadline while a grace runs', () => {
-      overSeats(MOCK_GRACE_ENDS_AT);
+      overSeats({ graceEndsAt: MOCK_GRACE_ENDS_AT });
 
       const deadline = screen.getByText(/loses Studio access/);
       const date = within(deadline).getByText(/2026/);
@@ -161,15 +166,9 @@ describe(`<${TeamView.name}/>`, () => {
     });
 
     it('names the members who lose access when the grace ends', () => {
-      setup({
-        plan: TENANT_PLAN.STARTER,
-        team: mockTeamViewModel({
-          seats: 1,
-          seatsOver: 2,
-          graceEndsAt: MOCK_GRACE_ENDS_AT,
-          emailsLosingAccess: [MOCK_MEMBER_EMAIL, undefined],
-          members: [mockTeamOwnerRow(), mockTeamMemberRow()],
-        }),
+      overSeats({
+        graceEndsAt: MOCK_GRACE_ENDS_AT,
+        emailsLosingAccess: [MOCK_MEMBER_EMAIL, undefined],
       });
 
       const losing = screen.getByText(
@@ -187,11 +186,7 @@ describe(`<${TeamView.name}/>`, () => {
     ])(
       'offers an upgrade only to an owner who can upgrade: %s',
       (canUpgrade, links) => {
-        setup({
-          plan: TENANT_PLAN.STARTER,
-          canUpgrade,
-          team: mockTeamViewModel({ seats: 1, seatsOver: 1 }),
-        });
+        overSeats({ canUpgrade });
 
         const upgrade = screen.queryAllByRole('link', { name: UPGRADE });
 
@@ -216,7 +211,6 @@ describe(`<${TeamView.name}/>`, () => {
             mockTeamMemberRow({
               email: MOCK_LOCKED_EMAIL,
               access: TEAM_ROW_ACCESS.LOCKED,
-              canRemove: false,
             }),
           ],
         }),
@@ -239,11 +233,13 @@ describe(`<${TeamView.name}/>`, () => {
         expect(full).not.toBeInTheDocument();
       });
 
-      it('offers no Remove on a locked member and holds Invite editor', () => {
-        const remove = screen.queryByRole('button', { name: /^Remove/ });
+      it('keeps Remove on a locked member and holds Invite editor', () => {
+        const remove = screen.getByRole('button', {
+          name: `Remove ${MOCK_LOCKED_EMAIL}`,
+        });
         const invite = screen.getByRole('button', { name: INVITE_EDITOR });
 
-        expect(remove).not.toBeInTheDocument();
+        expect(remove).toBeVisible();
         expect(invite).toHaveAttribute(
           ARIA_ATTRIBUTE.DESCRIBEDBY,
           TEAM_SEAT_NOTICE_ID,
@@ -297,13 +293,7 @@ describe(`<${TeamView.name}/>`, () => {
           hasEditor: true,
           members: [
             mockTeamOwnerRow(),
-            mockTeamMemberRow(),
-            mockTeamMemberRow({
-              membershipId: 'locked',
-              email: MOCK_LOCKED_EMAIL,
-              access: TEAM_ROW_ACCESS.LOCKED,
-              canRemove: false,
-            }),
+            mockTeamMemberRow({ access: TEAM_ROW_ACCESS.LOCKED }),
             mockTeamMemberRow({
               membershipId: 'reader',
               email: MOCK_READER_EMAIL,

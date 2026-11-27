@@ -126,7 +126,7 @@ describe(`<${DashboardTeamPage.name}/>`, () => {
     expect(invite).not.toBeInTheDocument();
   });
 
-  it('shows a Free owner who is locked, with Upgrade and no Remove', async () => {
+  it('shows a Free owner who is locked, with Upgrade', async () => {
     signInAs(MEMBERSHIP_ROLE.OWNER, TENANT_PLAN.FREE);
     countSeatsInUseMock.mockResolvedValue(MOCK_SEATS_OVER_ONE_SEAT);
     listTenantMembersMock.mockResolvedValue([
@@ -139,10 +139,8 @@ describe(`<${DashboardTeamPage.name}/>`, () => {
     const upgrade = screen.getByRole('link', {
       name: messages.teamPage.upgrade,
     });
-    const remove = screen.queryByRole('button', { name: /^Remove/ });
 
     expect(locked).toBeVisible();
     expect(upgrade).toBeVisible();
-    expect(remove).not.toBeInTheDocument();
   });
 });

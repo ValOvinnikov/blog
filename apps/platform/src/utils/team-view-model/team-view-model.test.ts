@@ -188,14 +188,6 @@ describe(teamViewModel, () => {
     ]);
   });
 
-  it('offers no Remove on a locked member', () => {
-    const { members } = modelFor({
-      members: [MOCK_OWNER, mockTenantMember({ lockedAt: MOCK_JOINED_AT })],
-    });
-
-    expect(members[1]?.canRemove).toBe(false);
-  });
-
   it('never marks a row as your own for an operator', () => {
     const { members } = modelFor({
       viewer: mockViewer({ admin: mockAdmin({ role: ADMIN_ROLE.SUPERADMIN }) }),

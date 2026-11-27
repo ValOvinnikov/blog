@@ -1,7 +1,6 @@
 import { OwnerHomeView } from '@platform/components/features/tenants/owner-home-view';
-import { UPGRADE_STATE } from '@platform/constants/billing';
 import { resolveDashboardTenant } from '@platform/server/auth/resolve-dashboard-tenant';
-import { upgradeStateFor } from '@platform/server/billing/upgrade-state-for';
+import { canOfferUpgrade } from '@platform/server/billing/can-offer-upgrade';
 import { getStartedFor } from '@platform/server/onboarding/get-started-for';
 import { pageMetadata } from '@platform/server/page-metadata/page-metadata';
 import { getDomainVerificationStatus } from '@platform/server/provisioning/get-domain-verification-status';
@@ -39,7 +38,7 @@ export default async function DashboardOverviewPage() {
         getStarted,
         sampleContent: sampleContentFor(tenant, viewer),
       }}
-      canUpgrade={upgradeStateFor(tenant, viewer) === UPGRADE_STATE.AVAILABLE}
+      canUpgrade={canOfferUpgrade(tenant, viewer)}
       usage={{
         links: {
           languages: adminRoutes.dashboardLanguages(),
