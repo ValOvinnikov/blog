@@ -1,7 +1,7 @@
 import { HTTP_STATUS } from '@shinefold/config/constants';
 import { getTenantById } from '@shinefold/db/queries/tenants';
 import { sanitizeLogMessage } from '@shinefold/insight';
-import { DEPROVISIONING_START_FAILED_EVENT } from '@worker/constants/deprovisioning';
+import { DEPROVISIONING_LOG } from '@worker/constants/deprovisioning';
 import { ENQUEUE_ERROR } from '@worker/constants/enqueue-error';
 import { logger } from '@worker/utils/logger/logger';
 import {
@@ -26,7 +26,7 @@ export async function POST(request: Request): Promise<Response> {
     const run = await start(deprovisionTenant, [tenantId]);
     return respond(HTTP_STATUS.ACCEPTED, { runId: run.runId });
   } catch (error) {
-    logger.error(DEPROVISIONING_START_FAILED_EVENT, {
+    logger.error(DEPROVISIONING_LOG.START_FAILED, {
       tenantId,
       error: sanitizeLogMessage(error),
     });

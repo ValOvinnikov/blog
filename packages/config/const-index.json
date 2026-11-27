@@ -14404,6 +14404,54 @@
         "file": "apps/worker/src/constants/custom-domain.ts"
       }
     ],
+    "deprovisioning.start_failed": [
+      {
+        "ref": "DEPROVISIONING_LOG.START_FAILED",
+        "scope": "app:worker",
+        "from": "@worker/constants/deprovisioning",
+        "file": "apps/worker/src/constants/deprovisioning.ts"
+      }
+    ],
+    "deprovisioning.step_failed": [
+      {
+        "ref": "DEPROVISIONING_LOG.STEP_FAILED",
+        "scope": "app:worker",
+        "from": "@worker/constants/deprovisioning",
+        "file": "apps/worker/src/constants/deprovisioning.ts"
+      }
+    ],
+    "deprovisioning.run_failed": [
+      {
+        "ref": "DEPROVISIONING_LOG.RUN_FAILED",
+        "scope": "app:worker",
+        "from": "@worker/constants/deprovisioning",
+        "file": "apps/worker/src/constants/deprovisioning.ts"
+      }
+    ],
+    "deprovisioning.token_revoke_failed": [
+      {
+        "ref": "DEPROVISIONING_LOG.TOKEN_REVOKE_FAILED",
+        "scope": "app:worker",
+        "from": "@worker/constants/deprovisioning",
+        "file": "apps/worker/src/constants/deprovisioning.ts"
+      }
+    ],
+    "deprovisioning.alert_no_recipients": [
+      {
+        "ref": "DEPROVISIONING_LOG.ALERT_NO_RECIPIENTS",
+        "scope": "app:worker",
+        "from": "@worker/constants/deprovisioning",
+        "file": "apps/worker/src/constants/deprovisioning.ts"
+      }
+    ],
+    "deprovisioning.alert_send_failed": [
+      {
+        "ref": "DEPROVISIONING_LOG.ALERT_SEND_FAILED",
+        "scope": "app:worker",
+        "from": "@worker/constants/deprovisioning",
+        "file": "apps/worker/src/constants/deprovisioning.ts"
+      }
+    ],
     "downgrade_grace.failed": [
       {
         "ref": "DOWNGRADE_GRACE_LOG.FAILED",

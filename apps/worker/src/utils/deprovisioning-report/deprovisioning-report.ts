@@ -10,7 +10,7 @@ import {
 } from '@shinefold/db/queries/tenants';
 import {
   DEPROVISIONING_AUDIT_VIA,
-  DEPROVISIONING_STEP_FAILED_EVENT,
+  DEPROVISIONING_LOG,
 } from '@worker/constants/deprovisioning';
 import type { TStepReporter } from '@worker/units/run-reported-step';
 import { logger } from '@worker/utils/logger/logger';
@@ -35,7 +35,7 @@ async function reportDeprovisioningStep(input: {
 
 export const DEPROVISIONING_STEP_REPORTER: TStepReporter<TDeprovisioningStep> =
   {
-    failedEvent: DEPROVISIONING_STEP_FAILED_EVENT,
+    failedEvent: DEPROVISIONING_LOG.STEP_FAILED,
     report: reportDeprovisioningStep,
   };
 

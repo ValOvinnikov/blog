@@ -1,6 +1,6 @@
 import { HTTP_STATUS } from '@shinefold/config/constants';
 import { getTenantById } from '@shinefold/db/queries/tenants';
-import { DEPROVISIONING_START_FAILED_EVENT } from '@worker/constants/deprovisioning';
+import { DEPROVISIONING_LOG } from '@worker/constants/deprovisioning';
 import { ENQUEUE_ERROR } from '@worker/constants/enqueue-error';
 import {
   MOCK_FORGED_SECRET,
@@ -73,12 +73,9 @@ describe('POST /api/deprovision', () => {
     const response = await POST(deprovisionRequest());
 
     expect(response.status).toBe(HTTP_STATUS.INTERNAL_SERVER_ERROR);
-    expect(logger.error).toHaveBeenCalledWith(
-      DEPROVISIONING_START_FAILED_EVENT,
-      {
-        tenantId: MOCK_TENANT_ID,
-        error: MOCK_QUEUE_DOWN,
-      },
-    );
+    expect(logger.error).toHaveBeenCalledWith(DEPROVISIONING_LOG.START_FAILED, {
+      tenantId: MOCK_TENANT_ID,
+      error: MOCK_QUEUE_DOWN,
+    });
   });
 });

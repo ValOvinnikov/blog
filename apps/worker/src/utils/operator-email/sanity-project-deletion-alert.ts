@@ -1,8 +1,7 @@
 import type { TTenant } from '@shinefold/db/schema/tenants';
 import { buildArchivedSanityProjectAlertEmail } from '@shinefold/email';
 import {
-  DEPROVISIONING_ALERT_NO_RECIPIENTS_EVENT,
-  DEPROVISIONING_ALERT_SEND_FAILED_EVENT,
+  DEPROVISIONING_LOG,
   SANITY_MANAGE_PROJECT_URL,
 } from '@worker/constants/deprovisioning';
 
@@ -21,7 +20,7 @@ export async function alertOperatorsToDeleteSanityProject(
     manageUrl: `${SANITY_MANAGE_PROJECT_URL}${sanityProjectId}`,
   });
   await sendOperatorEmail(tenantId, message, {
-    noRecipientsEvent: DEPROVISIONING_ALERT_NO_RECIPIENTS_EVENT,
-    sendFailedEvent: DEPROVISIONING_ALERT_SEND_FAILED_EVENT,
+    noRecipientsEvent: DEPROVISIONING_LOG.ALERT_NO_RECIPIENTS,
+    sendFailedEvent: DEPROVISIONING_LOG.ALERT_SEND_FAILED,
   });
 }

@@ -1,4 +1,5 @@
 export const SANITY_API_PATH = {
+  currentUser: () => '/users/me',
   projects: () => '/projects',
   project: (projectId: string) => `/projects/${projectId}`,
   projectDatasets: (projectId: string) => `/projects/${projectId}/datasets`,

@@ -21,8 +21,9 @@ import {
   updateDeprovisioningStep,
 } from '@shinefold/db/queries/tenants';
 import { archiveSanityProject } from '@shinefold/db/utils/sanity-management-client/sanity-project-lifecycle';
+import { revokeSanityRobotToken } from '@shinefold/db/utils/sanity-management-client/sanity-robot-revocation';
 import {
-  deleteSanityRobotToken,
+  getSanityTokenUserId,
   listSanityRobotTokens,
 } from '@shinefold/db/utils/sanity-management-client/sanity-robot-tokens';
 import { requestTenantCacheInvalidation } from '@shinefold/db/utils/tenant-cache/request-tenant-cache-invalidation';
@@ -30,8 +31,7 @@ import { deleteVercelProjectDomains } from '@shinefold/db/utils/vercel-client/ve
 import { errorResult, okResult } from '@shinefold/utils/result';
 import {
   DEPROVISIONING_AUDIT_VIA,
-  DEPROVISIONING_STEP_FAILED_EVENT,
-  DEPROVISIONING_TOKEN_REVOKE_FAILED_EVENT,
+  DEPROVISIONING_LOG,
 } from '@worker/constants/deprovisioning';
 import { PROVISIONING_UNIT_MAX_RETRIES } from '@worker/constants/provisioning';
 import { MOCK_NOW } from '@worker/testing/clock/frozen-clock';
@@ -58,6 +58,7 @@ const MOCK_PROVISIONED_TENANT = mockProvisionedTenant();
 const MOCK_READ_ROBOT_ID = faker.string.uuid();
 const MOCK_WRITE_ROBOT_ID = faker.string.uuid();
 const MOCK_HAND_MADE_ROBOT_ID = faker.string.uuid();
+const MOCK_ORGANIZATION_ROBOT_ID = faker.string.uuid();
 const MOCK_MANAGEMENT_CREDENTIALS = {
   projectId: MOCK_SANITY_PROJECT_ID,
   token: MOCK_TENANT_MANAGEMENT_TOKEN,
@@ -80,6 +81,13 @@ vi.mock(
   '@shinefold/db/utils/sanity-management-client/sanity-project-lifecycle',
 );
 vi.mock('@shinefold/db/utils/sanity-management-client/sanity-robot-tokens');
+vi.mock(
+  '@shinefold/db/utils/sanity-management-client/sanity-robot-revocation',
+  async (importOriginal) => ({
+    ...(await importOriginal()),
+    revokeSanityRobotToken: vi.fn(),
+  }),
+);
 vi.mock('@shinefold/db/utils/tenant-cache/request-tenant-cache-invalidation');
 vi.mock('@shinefold/db/utils/vercel-client/vercel-project-domains');
 vi.mock('@shinefold/db/queries/tenants');
@@ -111,6 +119,9 @@ describe(runDeprovisioningStep, () => {
       okResult(MOCK_PROVISIONED_TENANT),
     );
     vi.mocked(listSanityRobotTokens).mockResolvedValue([]);
+    vi.mocked(getSanityTokenUserId).mockResolvedValue(
+      MOCK_ORGANIZATION_ROBOT_ID,
+    );
     vi.mocked(getTenantSanityManagementCredentials).mockResolvedValue(
       MOCK_MANAGEMENT_CREDENTIALS,
     );
@@ -167,7 +178,7 @@ describe(runDeprovisioningStep, () => {
 
     expect(
       vi
-        .mocked(deleteSanityRobotToken)
+        .mocked(revokeSanityRobotToken)
         .mock.calls.map(([input]) => input.robotId),
     ).toEqual([
       MOCK_READ_ROBOT_ID,
@@ -177,18 +188,61 @@ describe(runDeprovisioningStep, () => {
     ]);
   });
 
-  it("revokes with the tenant's own management token", async () => {
+  it('revokes with the tenant token, the organisation token as its fallback', async () => {
     vi.mocked(listSanityRobotTokens).mockResolvedValue([
       { id: MOCK_READ_ROBOT_ID, label: faker.lorem.words(2) },
     ]);
 
     await run(DEPROVISIONING_STEP.REVOKE_SANITY_TOKENS);
 
-    expect(deleteSanityRobotToken).toHaveBeenCalledWith({
+    expect(revokeSanityRobotToken).toHaveBeenCalledWith({
       token: MOCK_TENANT_MANAGEMENT_TOKEN,
+      organizationToken: MOCK_DEPROVISION_ENV.sanityManagementToken,
       projectId: MOCK_SANITY_PROJECT_ID,
       robotId: MOCK_READ_ROBOT_ID,
     });
+  });
+
+  it("never revokes the organisation token's own robot", async () => {
+    vi.mocked(listSanityRobotTokens).mockResolvedValue([
+      { id: MOCK_ORGANIZATION_ROBOT_ID, label: faker.company.name() },
+      { id: MOCK_READ_ROBOT_ID, label: faker.lorem.words(2) },
+    ]);
+
+    await run(DEPROVISIONING_STEP.REVOKE_SANITY_TOKENS);
+
+    expect(getSanityTokenUserId).toHaveBeenCalledWith(
+      MOCK_DEPROVISION_ENV.sanityManagementToken,
+    );
+    expect(
+      vi
+        .mocked(revokeSanityRobotToken)
+        .mock.calls.map(([input]) => input.robotId),
+    ).toEqual([MOCK_READ_ROBOT_ID]);
+  });
+
+  it('logs a robot that cannot be revoked and still revokes the rest', async () => {
+    vi.mocked(listSanityRobotTokens).mockResolvedValue([
+      { id: MOCK_READ_ROBOT_ID, label: faker.lorem.words(2) },
+      { id: MOCK_WRITE_ROBOT_ID, label: faker.lorem.words(2) },
+    ]);
+    vi.mocked(revokeSanityRobotToken).mockRejectedValueOnce(
+      new Error(MOCK_SANITY_OUTAGE),
+    );
+
+    await expect(
+      run(DEPROVISIONING_STEP.REVOKE_SANITY_TOKENS),
+    ).resolves.toEqual({ ok: true, data: undefined });
+
+    expect(revokeSanityRobotToken).toHaveBeenCalledTimes(2);
+    expect(logger.error).toHaveBeenCalledWith(
+      DEPROVISIONING_LOG.TOKEN_REVOKE_FAILED,
+      {
+        tenantId: MOCK_TENANT_ID,
+        robotId: MOCK_READ_ROBOT_ID,
+        error: MOCK_SANITY_OUTAGE,
+      },
+    );
   });
 
   it('logs and still succeeds when the tenant has no management token', async () => {
@@ -202,7 +256,7 @@ describe(runDeprovisioningStep, () => {
 
     expect(listSanityRobotTokens).not.toHaveBeenCalled();
     expect(logger.error).toHaveBeenCalledWith(
-      DEPROVISIONING_TOKEN_REVOKE_FAILED_EVENT,
+      DEPROVISIONING_LOG.TOKEN_REVOKE_FAILED,
       expect.objectContaining({ tenantId: MOCK_TENANT_ID }),
     );
   });
@@ -221,7 +275,7 @@ describe(runDeprovisioningStep, () => {
     });
 
     expect(listSanityRobotTokens).not.toHaveBeenCalled();
-    expect(deleteSanityRobotToken).not.toHaveBeenCalled();
+    expect(revokeSanityRobotToken).not.toHaveBeenCalled();
     expect(reportedStatuses()).toEqual([
       TENANT_PROVISIONING_STEP_STATUS.RUNNING,
       TENANT_PROVISIONING_STEP_STATUS.FAILED,
@@ -238,7 +292,7 @@ describe(runDeprovisioningStep, () => {
     ).resolves.toEqual({ ok: true, data: undefined });
 
     expect(logger.error).toHaveBeenCalledWith(
-      DEPROVISIONING_TOKEN_REVOKE_FAILED_EVENT,
+      DEPROVISIONING_LOG.TOKEN_REVOKE_FAILED,
       { tenantId: MOCK_TENANT_ID, error: MOCK_SANITY_OUTAGE },
     );
   });
@@ -329,14 +383,11 @@ describe(runDeprovisioningStep, () => {
       TENANT_PROVISIONING_STEP_STATUS.RUNNING,
       TENANT_PROVISIONING_STEP_STATUS.FAILED,
     ]);
-    expect(logger.error).toHaveBeenCalledWith(
-      DEPROVISIONING_STEP_FAILED_EVENT,
-      {
-        tenantId: MOCK_TENANT_ID,
-        runId: MOCK_RUN_CONTEXT.runId,
-        step: DEPROVISIONING_STEP.INVALIDATE_TENANT_CACHE,
-        error: MOCK_REVALIDATION_REFUSED,
-      },
-    );
+    expect(logger.error).toHaveBeenCalledWith(DEPROVISIONING_LOG.STEP_FAILED, {
+      tenantId: MOCK_TENANT_ID,
+      runId: MOCK_RUN_CONTEXT.runId,
+      step: DEPROVISIONING_STEP.INVALIDATE_TENANT_CACHE,
+      error: MOCK_REVALIDATION_REFUSED,
+    });
   });
 });

@@ -16,12 +16,14 @@ import {
   MOCK_SANITY_MINTED_TOKEN,
   MOCK_SANITY_PROJECT_ID,
   MOCK_SANITY_ROBOT_ID,
+  MOCK_SANITY_TOKEN,
   mockSanityProjectInput,
 } from '@shinefold/db/testing/sanity-management-client/fixtures';
 
 import {
   createSanityRobotToken,
   deleteSanityRobotToken,
+  getSanityTokenUserId,
   listSanityRobotTokens,
 } from './sanity-robot-tokens';
 
@@ -164,5 +166,25 @@ describe(listSanityRobotTokens, () => {
     const result = await listSanityRobotTokens(mockSanityProjectInput({}));
 
     expect(result).toEqual(expected);
+  });
+});
+
+describe(getSanityTokenUserId, () => {
+  it("GETs /users/me with the token and returns the token's own id", async () => {
+    fetchMock.mockResolvedValue(jsonResponse({ id: MOCK_SANITY_ROBOT_ID }));
+
+    await expect(getSanityTokenUserId(MOCK_SANITY_TOKEN)).resolves.toBe(
+      MOCK_SANITY_ROBOT_ID,
+    );
+
+    const { url, headers } = firstFetchCall(fetchMock);
+    expect(url).toBe(MOCK_SANITY_EXPECTED_URL.currentUser);
+    expect(headers['Authorization']).toContain(MOCK_SANITY_TOKEN);
+  });
+
+  it('throws when Sanity returns no id', async () => {
+    fetchMock.mockResolvedValue(jsonResponse({}));
+
+    await expect(getSanityTokenUserId(MOCK_SANITY_TOKEN)).rejects.toThrow();
   });
 });
