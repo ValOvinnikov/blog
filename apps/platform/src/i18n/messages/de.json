@@ -1964,7 +1964,7 @@
     "languagesNotInPlan": "Ihre Website nutzt den Tarif {plan, select, FREE {Free} STARTER {Starter} GROWTH {Growth} other {aktuellen}}, der {limit, plural, one {# Sprache} other {# Sprachen}} erlaubt. {count, plural, one {{items} wurde nicht hinzugefügt} other {{items} wurden nicht hinzugefügt}}.",
     "shortcut": "⌘S / Strg+S",
     "discard": "Verwerfen",
-    "save": "Änderungen speichern",
+    "save": "Speichern",
     "saving": "Wird gespeichert…"
   },
   "leavePageDialog": {

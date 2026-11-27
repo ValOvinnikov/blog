@@ -12,7 +12,7 @@ import { USER_EVENT_KEY } from '@platform/testing/keyboard';
 import { stubMatchingMediaQuery } from '@platform/testing/match-media';
 import { mockRouterRefresh } from '@platform/testing/mock-router';
 import {
-  SAVE_CHANGES,
+  SAVE,
   UNSAVED_CHANGES,
 } from '@platform/testing/render-in-settings-form';
 import { MOCK_ARCHIVED_AT } from '@platform/testing/tenants/fixtures';
@@ -218,7 +218,7 @@ describe(`<${VoiceSettings.name}/> sections`, () => {
           name: UNSAVED_CHANGES,
         });
         const saveButton = within(saveBar).getByRole('button', {
-          name: SAVE_CHANGES,
+          name: SAVE,
         });
         await user.click(saveButton);
 

@@ -13,7 +13,7 @@ import { mockRouterRefresh } from '@platform/testing/mock-router';
 import {
   ALL_CHANGES_SAVED,
   ARCHIVED_NOTICE_DESCRIPTION,
-  SAVE_CHANGES,
+  SAVE,
   UNSAVED_CHANGES,
 } from '@platform/testing/render-in-settings-form';
 import {
@@ -119,7 +119,7 @@ describe(`<${LanguagesSettings.name}/>`, () => {
       await user.click(frenchSwitch);
       await user.click(dutchSwitch);
 
-      const saveButton = screen.getByRole('button', { name: SAVE_CHANGES });
+      const saveButton = screen.getByRole('button', { name: SAVE });
       await user.click(saveButton);
 
       await waitFor(() => {
@@ -138,7 +138,7 @@ describe(`<${LanguagesSettings.name}/>`, () => {
         name: languageNames[DE],
       });
       await user.click(germanSwitch);
-      const saveButton = screen.getByRole('button', { name: SAVE_CHANGES });
+      const saveButton = screen.getByRole('button', { name: SAVE });
       await user.click(saveButton);
 
       const refusal = await screen.findByText(
@@ -158,7 +158,7 @@ describe(`<${LanguagesSettings.name}/>`, () => {
       });
       await user.click(dutchSwitch);
       await user.click(frenchSwitch);
-      const saveButton = screen.getByRole('button', { name: SAVE_CHANGES });
+      const saveButton = screen.getByRole('button', { name: SAVE });
       await user.click(saveButton);
 
       const refusal = await screen.findByText(
@@ -518,7 +518,7 @@ describe(`<${LanguagesSettings.name}/>`, () => {
     });
 
     it('offers no Save until something changes', () => {
-      const saveButton = screen.queryByRole('button', { name: SAVE_CHANGES });
+      const saveButton = screen.queryByRole('button', { name: SAVE });
       const savedText = screen.queryByText(ALL_CHANGES_SAVED);
 
       expect(saveButton).not.toBeInTheDocument();

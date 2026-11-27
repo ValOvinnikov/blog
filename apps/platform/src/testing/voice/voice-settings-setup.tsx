@@ -7,7 +7,7 @@ import de from '@platform/i18n/messages/de.json';
 import en from '@platform/i18n/messages/en.json';
 import { customRender, screen, within } from '@platform/testing/custom-render';
 import {
-  SAVE_CHANGES,
+  SAVE,
   UNSAVED_CHANGES,
 } from '@platform/testing/render-in-settings-form';
 import { MOCK_TENANT_ID } from '@platform/testing/tenants/fixtures';
@@ -127,7 +127,7 @@ export const editVoiceHeadingAndSave = async (
 
   const saveBar = screen.getByRole('region', { name: UNSAVED_CHANGES });
   const saveButton = within(saveBar).getByRole('button', {
-    name: SAVE_CHANGES,
+    name: SAVE,
   });
   await user.click(saveButton);
 };

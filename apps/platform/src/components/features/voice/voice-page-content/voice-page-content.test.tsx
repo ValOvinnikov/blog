@@ -6,7 +6,10 @@ import {
   within,
 } from '@platform/testing/custom-render';
 import { mockDbConstants } from '@platform/testing/mock-db-constants';
-import { ARCHIVED_NOTICE_TEXT } from '@platform/testing/render-in-settings-form';
+import {
+  ARCHIVED_NOTICE_TEXT,
+  SAVE,
+} from '@platform/testing/render-in-settings-form';
 import {
   mockReadyTenant,
   MOCK_ARCHIVED_AT,
@@ -165,7 +168,7 @@ describe(`<${VoicePageContent.name}/>`, () => {
     });
 
     const archivedNotice = screen.getByText(ARCHIVED_NOTICE_TEXT);
-    const saveButton = screen.queryByRole('button', { name: 'Save changes' });
+    const saveButton = screen.queryByRole('button', { name: SAVE });
 
     expect(archivedNotice).toBeVisible();
     expect(saveButton).not.toBeInTheDocument();

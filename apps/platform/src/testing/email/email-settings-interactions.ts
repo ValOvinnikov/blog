@@ -8,7 +8,7 @@ import {
   tTemplate,
 } from '@platform/testing/email/email-settings';
 import {
-  SAVE_CHANGES,
+  SAVE,
   UNSAVED_CHANGES,
 } from '@platform/testing/render-in-settings-form';
 import { selectFile } from '@platform/testing/select-file';
@@ -83,6 +83,6 @@ export const selectSenderLogo = () =>
   );
 
 export const save = async (user: UserEvent) => {
-  const saveButton = screen.getByRole('button', { name: SAVE_CHANGES });
+  const saveButton = screen.getByRole('button', { name: SAVE });
   await user.click(saveButton);
 };
