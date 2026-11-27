@@ -1,5 +1,8 @@
 import { faker } from '@faker-js/faker';
-import { GITHUB_COMPARE_FILE_LIMIT } from '@platform/constants/release';
+import {
+  GITHUB_COMPARE_FILE_LIMIT,
+  GITHUB_COMPARE_TOTAL_COMMITS_LIMIT,
+} from '@platform/constants/release';
 import { env } from '@platform/utils/env/env';
 import { MEDIA_TYPE } from '@shinefold/config';
 
@@ -32,7 +35,8 @@ export const mockGitHubCompareResponse = (
   files: unknown[],
 ): Response =>
   mockGitHubResponse({
-    total_commits: commits.length,
+    total_commits: Math.min(commits.length, GITHUB_COMPARE_TOTAL_COMMITS_LIMIT),
+    ahead_by: commits.length,
     commits: mockGitHubPage(commits, path),
     files: isFirstPage(path) ? files.slice(0, GITHUB_COMPARE_FILE_LIMIT) : [],
   });

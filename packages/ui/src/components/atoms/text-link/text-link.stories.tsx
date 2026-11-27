@@ -1,7 +1,11 @@
 import { faker } from '@faker-js/faker';
-import { ICONS, SIZE } from '@shinefold/config';
+import { BRAND_VARIANT, ICONS, SIZE } from '@shinefold/config';
 import { Icon } from '@shinefold/ui/components/atoms/icon';
-import { focusLastLink } from '@shinefold/ui/testing/brand-bands';
+import {
+  BRAND_BAND_LABELS,
+  BrandBand,
+  focusLastLink,
+} from '@shinefold/ui/testing/brand-bands';
 import { SHINEFOLD_PRESET_STORY } from '@shinefold/ui/testing/shinefold-preset';
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import type { AnchorHTMLAttributes } from 'react';
@@ -70,6 +74,35 @@ export const ProseDescendersAndWrapping: TStory = {
       </p>
     </div>
   ),
+};
+
+const PROSE_LINK_BANDS = [
+  BRAND_VARIANT.PRIMARY,
+  BRAND_VARIANT.SECONDARY,
+  BRAND_VARIANT.BRAND_PRIMARY,
+];
+
+export const ProseOnBrandBands: TStory = {
+  name: 'Prose, on brand bands',
+  render: (args) => (
+    <div className="flex flex-col gap-6">
+      {PROSE_LINK_BANDS.map((tone) => (
+        <BrandBand key={tone} tone={tone}>
+          <p className="text-copy">
+            {BRAND_BAND_LABELS[tone]}: read{' '}
+            <TextLink {...args}>the typography guidelines</TextLink> before you
+            publish.
+          </p>
+        </BrandBand>
+      ))}
+    </div>
+  ),
+};
+
+export const ProseOnBrandBandsDark: TStory = {
+  ...ProseOnBrandBands,
+  name: 'Prose, on brand bands, dark',
+  globals: { theme: 'dark' },
 };
 
 export const Nav: TStory = { args: { appearance: 'nav' } };
