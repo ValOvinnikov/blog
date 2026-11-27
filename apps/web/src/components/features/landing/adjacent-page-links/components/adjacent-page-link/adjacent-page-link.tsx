@@ -1,5 +1,6 @@
-import { routes } from '@shinefold/config';
+import { ICONS, routes } from '@shinefold/config';
 import type { TLandingBreadcrumb } from '@shinefold/service';
+import { Icon } from '@shinefold/ui/components/atoms/icon';
 import { SmartLink } from '@web/components/shared/smart-link';
 
 import { adjacentPageLinkVariants } from './adjacent-page-link-variants';
@@ -16,12 +17,19 @@ export const AdjacentPageLink = ({
   page,
   direction,
   isNext,
-}: IAdjacentPageLinkProps) => (
-  <SmartLink
-    href={routes.landingPage(page.path)}
-    className={s.root({ isNext })}
-  >
-    <span className={s.direction()}>{direction}</span>{' '}
-    <span className={s.title()}>{page.title}</span>
-  </SmartLink>
-);
+}: IAdjacentPageLinkProps) => {
+  const arrow = <Icon name={ICONS.ARROW} className={s.arrow({ isNext })} />;
+
+  return (
+    <SmartLink
+      href={routes.landingPage(page.path)}
+      className={s.root({ isNext })}
+    >
+      {!isNext && arrow}
+      <span className={s.title()}>
+        <span className={s.direction()}>{direction}</span> {page.title}
+      </span>
+      {isNext && arrow}
+    </SmartLink>
+  );
+};

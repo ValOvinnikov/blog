@@ -3,8 +3,8 @@ import { Article } from '@shinefold/ui/components/organisms/article';
 import type { Meta, StoryObj } from '@storybook/nextjs-vite';
 import { ContentsRailLayout } from '@web/components/shared/contents-rail-layout';
 import {
-  createPostBodyOverride,
   PortableText,
+  postBodyOverride,
 } from '@web/components/shared/portable-text';
 import { MOCK_CONTENTS_RAIL_BODY } from '@web/testing/shared/contents-rail/fixtures';
 import { MOCK_FULL_BLEED_IMAGE_DEMO } from '@web/testing/shared/portable-text/fixtures';
@@ -13,7 +13,6 @@ import { MOCK_WIDE_TABLE_DEMO } from '@web/testing/shared/portable-text/wide-tab
 import { postArticleVariants } from './post-article-variants';
 
 const s = postArticleVariants();
-const postBodyComponents = createPostBodyOverride();
 
 const meta = {
   title: 'Features/Post/PostArticleBody',
@@ -23,7 +22,7 @@ const meta = {
       <Article.Body className={s.body()}>
         <ContentsRailLayout body={body}>
           <Prose className={s.prose()}>
-            <PortableText value={body} components={postBodyComponents} />
+            <PortableText value={body} components={postBodyOverride} />
           </Prose>
         </ContentsRailLayout>
       </Article.Body>

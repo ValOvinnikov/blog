@@ -16,7 +16,6 @@ import {
   cookieListTypeComponent,
   makeAsideTypeComponent,
   makeTableTypeComponent,
-  type TAsideKindLabels,
 } from './types';
 
 const componentsWithoutAside: PortableTextComponents = {
@@ -62,25 +61,18 @@ const makeTypeOverrides = (
     ),
 });
 
-const defaultAside = makeAsideTypeComponent(baseForAsideRecursion);
-const articleTextComponents = makeArticleTextComponents(defaultAside);
+const aside = makeAsideTypeComponent(baseForAsideRecursion);
+const articleTextComponents = makeArticleTextComponents(aside);
 
 export const baseComponents = mergeComponents(defaultComponents, {
   ...articleTextComponents,
   types: {
     ...articleTextComponents.types,
-    ...makeTypeOverrides(defaultAside, true),
+    ...makeTypeOverrides(aside, true),
   },
 });
 
 // A post's expandable section keeps the text measure; elsewhere it widens like a table.
-export const createPostBodyOverride = (
-  asideKindLabels?: TAsideKindLabels,
-): PortableTextComponents => ({
-  types: makeTypeOverrides(
-    makeAsideTypeComponent(baseForAsideRecursion, asideKindLabels),
-    false,
-  ),
-});
-
-export type { TAsideKindLabels } from './types';
+export const postBodyOverride: PortableTextComponents = {
+  types: makeTypeOverrides(aside, false),
+};

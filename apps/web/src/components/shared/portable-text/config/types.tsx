@@ -8,7 +8,6 @@ import {
   PORTABLE_TEXT_BLOCK_TYPE,
   type Code,
   type IBodyImageBlock,
-  type TAsideKind,
 } from '@shinefold/config';
 import type { TPortableTextBody } from '@shinefold/service';
 import { Aside } from '@shinefold/ui/components/molecules/aside';
@@ -24,8 +23,6 @@ import { CookieList } from './cookie-list';
 import { FULL_BLEED_DATA_ATTR } from './full-bleed';
 
 const s = portableTextVariants();
-
-export type TAsideKindLabels = Partial<Record<TAsideKind, string>>;
 
 type TResolvedAsideBlock = Extract<
   TPortableTextBody[number],
@@ -77,14 +74,13 @@ export const cookieListTypeComponent = () => <CookieList />;
 
 export const makeAsideTypeComponent = (
   baseComponents: PortableTextReactComponents,
-  asideKindLabels?: TAsideKindLabels,
 ) => {
   const AsideType = ({ value }: { value: TResolvedAsideBlock }) => {
+    const t = useTranslations('blogPostPage.asideKind');
     const kind = value.kind ?? ASIDE_KIND.CONTEXT;
-    const label = asideKindLabels?.[kind] ?? kind;
 
     return (
-      <Aside kind={kind} label={label}>
+      <Aside kind={kind} label={t(kind)}>
         <PortableTextRoot
           value={value.body ?? []}
           components={baseComponents}
