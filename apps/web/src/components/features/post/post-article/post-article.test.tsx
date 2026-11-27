@@ -13,6 +13,7 @@ import { SESSION_STATUS } from '@web/constants/session';
 import { ToastProvider } from '@web/context/toast-provider';
 import { getBookmarkStatus } from '@web/server/bookmarks/bookmark-actions/bookmark-actions';
 import { isCapabilityEnabled } from '@web/server/settings-features/is-capability-enabled/is-capability-enabled';
+import { isReaderAccountFeatureEnabled } from '@web/server/settings-features/is-reader-account-enabled/is-reader-account-enabled';
 import {
   customRenderServerAsync,
   screen,
@@ -60,6 +61,10 @@ vi.mock(
   () => ({
     isCapabilityEnabled: vi.fn(),
   }),
+);
+
+vi.mock(
+  '@web/server/settings-features/is-reader-account-enabled/is-reader-account-enabled',
 );
 
 vi.mock('@web/server/bookmarks/bookmark-actions/bookmark-actions', () => ({
@@ -123,6 +128,7 @@ describe(`<${PostArticle.name}/>`, () => {
   beforeEach(() => {
     getPostMock.mockResolvedValue(okResult(MOCK_POST));
     vi.mocked(isCapabilityEnabled).mockResolvedValue(false);
+    vi.mocked(isReaderAccountFeatureEnabled).mockResolvedValue(false);
     vi.mocked(useSession).mockReturnValue({
       data: { user: { id: faker.string.uuid() }, expires: '' },
       status: SESSION_STATUS.AUTHENTICATED,
@@ -362,6 +368,7 @@ describe(`<${PostArticle.name}/>`, () => {
 
     beforeEach(async () => {
       vi.mocked(isCapabilityEnabled).mockResolvedValue(true);
+      vi.mocked(isReaderAccountFeatureEnabled).mockResolvedValue(true);
       getPostMock.mockResolvedValue(
         okResult({ ...MOCK_POST, postTakeaways: MOCK_POST_TAKEAWAYS }),
       );

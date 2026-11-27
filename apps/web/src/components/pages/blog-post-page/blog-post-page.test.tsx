@@ -5,6 +5,7 @@ import { service } from '@shinefold/service';
 import { errorResult, okResult } from '@shinefold/utils';
 import { POST_LOG } from '@web/constants/post';
 import { isCapabilityEnabled } from '@web/server/settings-features/is-capability-enabled/is-capability-enabled';
+import { isReaderAccountFeatureEnabled } from '@web/server/settings-features/is-reader-account-enabled/is-reader-account-enabled';
 import {
   customRenderServerAsync,
   screen,
@@ -49,6 +50,10 @@ vi.mock(
   }),
 );
 
+vi.mock(
+  '@web/server/settings-features/is-reader-account-enabled/is-reader-account-enabled',
+);
+
 vi.mock('@web/server/bookmarks/bookmark-actions/bookmark-actions', () => ({
   getBookmarkStatus: vi.fn(),
   setBookmarkStatus: vi.fn(),
@@ -67,6 +72,7 @@ describe(`<${BlogPostPage.name}/>`, () => {
       okResult({ ...MOCK_POST_DETAIL, modules: [] }),
     );
     vi.mocked(isCapabilityEnabled).mockResolvedValue(false);
+    vi.mocked(isReaderAccountFeatureEnabled).mockResolvedValue(false);
   });
 
   describe('with the default post', () => {
