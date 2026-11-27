@@ -12,8 +12,11 @@ export const EnabledStateBooleanInput = (props: BooleanInputProps) => {
     validation,
     readOnly,
   } = props;
-  const checked = value ?? false;
-  const indeterminate = typeof value !== 'boolean';
+  const { initialValue } = schemaType;
+  const shownValue =
+    value ?? (typeof initialValue === 'boolean' ? initialValue : undefined);
+  const checked = shownValue ?? false;
+  const indeterminate = typeof shownValue !== 'boolean';
 
   return (
     <FormField

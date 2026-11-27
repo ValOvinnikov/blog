@@ -83,6 +83,7 @@ export type Module_pricing = {
     } & PricingTier
   >;
   footnote?: InternationalizedArrayString;
+  showPlanComparison?: boolean;
   ctaButtons?: Array<
     {
       _key: string;

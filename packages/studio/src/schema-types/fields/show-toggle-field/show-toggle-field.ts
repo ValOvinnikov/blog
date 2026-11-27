@@ -1,11 +1,12 @@
-import { EnabledStateBooleanInput } from '@shinefold/studio/schema-types/inputs/enabled-state-boolean-input';
-import { defineField } from 'sanity';
+import { EnabledStateBooleanInput } from '@shinefold/studio/schema-types/inputs/enabled-state-boolean-input/enabled-state-boolean-input';
+import { type ConditionalProperty, defineField } from 'sanity';
 
 type TShowToggleFieldOptions = {
   name: string;
   title: string;
   description: string;
   initialValue: boolean;
+  hidden?: ConditionalProperty;
 };
 
 export const showToggleField = ({
@@ -13,6 +14,7 @@ export const showToggleField = ({
   title,
   description,
   initialValue,
+  hidden,
 }: TShowToggleFieldOptions) =>
   defineField({
     name,
@@ -21,4 +23,5 @@ export const showToggleField = ({
     description,
     components: { input: EnabledStateBooleanInput },
     initialValue,
+    hidden,
   });
