@@ -10,7 +10,7 @@ import { queries } from '@shinefold/db';
 import { toOutcome } from '@shinefold/utils/to-outcome';
 import { BOOKMARK_LOG } from '@web/constants/bookmark';
 import { auth } from '@web/server/auth/auth';
-import { isReaderAccountFeatureEnabled } from '@web/server/settings-features/is-reader-account-enabled/is-reader-account-enabled';
+import { isReaderAccountFeatureEnabledForTenant } from '@web/server/settings-features/is-reader-account-enabled/is-reader-account-enabled';
 import { getRequestTenantId } from '@web/server/tenant/request-tenant/request-tenant';
 import { resolveWritableTenant } from '@web/server/tenant/write-gate/write-gate';
 import { logger } from '@web/utils/logger/logger';
@@ -52,7 +52,12 @@ export const setBookmarkStatus = async (
   }
   const { data: tenantId } = tenant;
 
-  if (!(await isReaderAccountFeatureEnabled(CAPABILITY.BOOKMARKS))) {
+  if (
+    !(await isReaderAccountFeatureEnabledForTenant(
+      tenantId,
+      CAPABILITY.BOOKMARKS,
+    ))
+  ) {
     return UNAVAILABLE;
   }
 

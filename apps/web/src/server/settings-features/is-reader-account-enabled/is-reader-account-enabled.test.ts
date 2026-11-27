@@ -2,6 +2,7 @@ import { faker } from '@faker-js/faker';
 import { CAPABILITY, type TCapability } from '@shinefold/config';
 import { TENANT_PLAN } from '@shinefold/config/constants';
 import { queries } from '@shinefold/db';
+import { getRequestContext } from '@web/server/request-context/request-context';
 import { mockSettingsFeaturesRowEnabling } from '@web/testing/server/settings-features/fixtures';
 import {
   MOCK_TENANT_ID,
@@ -12,6 +13,7 @@ import {
   isReaderAccountEnabled,
   isReaderAccountEnabledForTenant,
   isReaderAccountFeatureEnabled,
+  isReaderAccountFeatureEnabledForTenant,
 } from './is-reader-account-enabled';
 
 faker.seed(6010);
@@ -41,6 +43,11 @@ const enableOnly = (...capabilities: TCapability[]) => {
     mockSettingsFeaturesRowEnabling(capabilities),
   );
 };
+
+const FEATURE_OFF_CASES: [string, TCapability[]][] = [
+  ['Reader accounts is off', [CAPABILITY.BOOKMARKS]],
+  ['the feature is off', [CAPABILITY.READER_ACCOUNTS]],
+];
 
 beforeEach(() => {
   vi.mocked(queries.tenants.getTenantById).mockReset();
@@ -118,14 +125,55 @@ describe(isReaderAccountFeatureEnabled, () => {
     ).resolves.toBe(true);
   });
 
-  it.each<[string, TCapability[]]>([
-    ['Reader accounts is off', [CAPABILITY.BOOKMARKS]],
-    ['the feature is off', [CAPABILITY.READER_ACCOUNTS]],
-  ])('is disabled when %s', async (_, enabled) => {
+  it.each(FEATURE_OFF_CASES)('is disabled when %s', async (_, enabled) => {
     enableOnly(...enabled);
 
     await expect(
       isReaderAccountFeatureEnabled(CAPABILITY.BOOKMARKS),
     ).resolves.toBe(false);
   });
+});
+
+describe(isReaderAccountFeatureEnabledForTenant, () => {
+  describe('with Reader accounts and the feature on', () => {
+    beforeEach(() => {
+      enableOnly(CAPABILITY.READER_ACCOUNTS, CAPABILITY.BOOKMARKS);
+    });
+
+    it('is enabled for that tenant', async () => {
+      await expect(
+        isReaderAccountFeatureEnabledForTenant(
+          MOCK_TENANT_ID,
+          CAPABILITY.BOOKMARKS,
+        ),
+      ).resolves.toBe(true);
+    });
+
+    it('reads the named tenant without the request context', async () => {
+      await isReaderAccountFeatureEnabledForTenant(
+        MOCK_TENANT_ID,
+        CAPABILITY.BOOKMARKS,
+      );
+
+      expect(queries.tenants.getTenantById).toHaveBeenCalledWith(
+        MOCK_TENANT_ID,
+        expect.anything(),
+      );
+      expect(getRequestContext).not.toHaveBeenCalled();
+    });
+  });
+
+  it.each(FEATURE_OFF_CASES)(
+    'is disabled for that tenant when %s',
+    async (_, enabled) => {
+      enableOnly(...enabled);
+
+      await expect(
+        isReaderAccountFeatureEnabledForTenant(
+          MOCK_TENANT_ID,
+          CAPABILITY.BOOKMARKS,
+        ),
+      ).resolves.toBe(false);
+    },
+  );
 });

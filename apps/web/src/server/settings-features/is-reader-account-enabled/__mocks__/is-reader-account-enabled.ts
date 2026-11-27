@@ -11,3 +11,7 @@ export const isReaderAccountEnabledForTenant = vi.fn<
 export const isReaderAccountFeatureEnabled = vi.fn<
   typeof TModule.isReaderAccountFeatureEnabled
 >(async () => true);
+
+export const isReaderAccountFeatureEnabledForTenant = vi.fn<
+  typeof TModule.isReaderAccountFeatureEnabledForTenant
+>(async () => true);

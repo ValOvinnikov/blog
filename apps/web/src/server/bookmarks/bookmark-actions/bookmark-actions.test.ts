@@ -7,7 +7,7 @@ import {
 } from '@shinefold/config';
 import { queries } from '@shinefold/db';
 import { errorResult, okResult } from '@shinefold/utils';
-import { isReaderAccountFeatureEnabled } from '@web/server/settings-features/is-reader-account-enabled/is-reader-account-enabled';
+import { isReaderAccountFeatureEnabledForTenant } from '@web/server/settings-features/is-reader-account-enabled/is-reader-account-enabled';
 import { getRequestTenantId } from '@web/server/tenant/request-tenant/request-tenant';
 import { resolveWritableTenant } from '@web/server/tenant/write-gate/write-gate';
 import { MOCK_ERROR } from '@web/testing/shared/error/fixtures';
@@ -102,7 +102,9 @@ describe(setBookmarkStatus, () => {
       ACTION_OUTCOME.UNAVAILABLE,
       'bookmarks are switched off',
       () =>
-        vi.mocked(isReaderAccountFeatureEnabled).mockResolvedValueOnce(false),
+        vi
+          .mocked(isReaderAccountFeatureEnabledForTenant)
+          .mockResolvedValueOnce(false),
     ],
   ])('answers %s without writing when %s', async (outcome, _, arrange) => {
     arrange();
@@ -117,10 +119,11 @@ describe(setBookmarkStatus, () => {
     expect(queries.bookmarks.removeBookmark).not.toHaveBeenCalled();
   });
 
-  it('checks bookmarks as a reader-account feature', async () => {
+  it('checks bookmarks as a reader-account feature of the tenant it writes to', async () => {
     await setBookmarkStatus(MOCK_POST_ID, true);
 
-    expect(isReaderAccountFeatureEnabled).toHaveBeenCalledWith(
+    expect(isReaderAccountFeatureEnabledForTenant).toHaveBeenCalledWith(
+      MOCK_TENANT_ID,
       CAPABILITY.BOOKMARKS,
     );
   });
