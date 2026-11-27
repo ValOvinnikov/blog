@@ -1,4 +1,5 @@
-import { tv } from '@shinefold/ui/lib/styling';
+import { TEXT_ROLE } from '@shinefold/config';
+import { tv, TYPOGRAPHY } from '@shinefold/ui/lib/styling';
 
 export const contactFormVariants = tv({
   slots: {
@@ -6,6 +7,6 @@ export const contactFormVariants = tv({
     fullWidth: ['sm:col-span-2'],
     honeypot: ['absolute -left-[9999px] h-px w-px overflow-hidden'],
     actions: ['flex flex-col items-start gap-3', 'sm:col-span-2'],
-    privacyNote: ['text-meta text-muted'],
+    privacyNote: [TYPOGRAPHY[TEXT_ROLE.FOOTNOTE]],
   },
 });
