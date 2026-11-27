@@ -3,6 +3,7 @@ import {
   MOCK_GRACE_ENDS_AT,
   MOCK_GRACE_STARTED_AT,
 } from '@platform/testing/billing/grace';
+import { PAY_INVOICE_BUTTON_NAME } from '@platform/testing/billing/pay-invoice-button';
 import {
   customRenderAsync,
   screen,
@@ -187,7 +188,7 @@ describe(`<${BillingStatusNotice.name}/>`, () => {
       t('pastDueDescription', { plan: 'Growth' }),
     );
     const payButton = screen.getByRole('button', {
-      name: billingStatusNotice.pastDueAction,
+      name: PAY_INVOICE_BUTTON_NAME,
     });
     const billingLink = screen.queryByRole('link');
     const date = screen.queryByRole('time');
@@ -205,7 +206,7 @@ describe(`<${BillingStatusNotice.name}/>`, () => {
 
     const title = screen.getByText(billingStatusNotice.pastDueTitle);
     const payButton = screen.queryByRole('button', {
-      name: billingStatusNotice.pastDueAction,
+      name: PAY_INVOICE_BUTTON_NAME,
     });
 
     expect(title).toBeVisible();

@@ -19,7 +19,6 @@ import { ACTION_OUTCOME, NEXT_NAVIGATION_ERROR } from '@shinefold/config';
 import { queries } from '@shinefold/db';
 import { ADMIN_ROLE } from '@shinefold/db/constants';
 import { MOCK_EMPTY_TENANT_BILLING } from '@shinefold/db/testing/tenants/billing';
-import { redirect } from 'next/navigation';
 import type Stripe from 'stripe';
 
 import { payOpenInvoiceAction } from './pay-open-invoice-action';
@@ -64,15 +63,18 @@ describe(payOpenInvoiceAction, () => {
     ]);
   });
 
-  it("sends the owner to the open invoice's payment page", async () => {
-    await expect(pay()).rejects.toThrow(NEXT_NAVIGATION_ERROR.NEXT_REDIRECT);
+  it("returns the open invoice's payment page", async () => {
+    const result = await pay();
 
     expect(listInvoicesMock).toHaveBeenCalledWith({
       subscription: MOCK_STRIPE_SUBSCRIPTION_ID,
       status: STRIPE_INVOICE_STATUS.OPEN,
       limit: 1,
     });
-    expect(redirect).toHaveBeenCalledWith(MOCK_HOSTED_INVOICE_URL);
+    expect(result).toEqual({
+      outcome: ACTION_OUTCOME.SUCCESS,
+      url: MOCK_HOSTED_INVOICE_URL,
+    });
   });
 
   it.each([ADMIN_ROLE.SUPERADMIN, ADMIN_ROLE.MODERATOR])(
@@ -118,12 +120,15 @@ describe(payOpenInvoiceAction, () => {
           mockStripeInvoice({ status: STRIPE_INVOICE_STATUS.OPEN }),
         ]),
     ],
-  ])('sends the owner to the Billing page for %s', async (_label, arrange) => {
+  ])('returns the Billing page for %s', async (_label, arrange) => {
     arrange();
 
-    await expect(pay()).rejects.toThrow(NEXT_NAVIGATION_ERROR.NEXT_REDIRECT);
+    const result = await pay();
 
-    expect(redirect).toHaveBeenCalledWith(adminRoutes.dashboardBilling());
+    expect(result).toEqual({
+      outcome: ACTION_OUTCOME.SUCCESS,
+      url: adminRoutes.dashboardBilling(),
+    });
   });
 
   it('fails and logs when the billing key is unset', async () => {
@@ -143,7 +148,6 @@ describe(payOpenInvoiceAction, () => {
     const result = await pay();
 
     expect(result).toEqual(SERVER_ERROR);
-    expect(redirect).not.toHaveBeenCalled();
     expect(logger.error).toHaveBeenCalledWith(
       BILLING_LOG.OPEN_INVOICE_FAILED,
       expect.objectContaining({ tenantId: MOCK_TENANT_ID }),

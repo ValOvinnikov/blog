@@ -1,8 +1,6 @@
+import { NewTabHint } from '@platform/components/shared/new-tab-hint';
 import type { IWithClassName } from '@shinefold/config/types';
-import { useTranslations } from 'next-intl';
 import type { ReactNode } from 'react';
-
-import { newTabHintVariants } from './external-link-variants';
 
 export type TExternalLinkProps = IWithClassName & {
   href: string;
@@ -17,19 +15,15 @@ export const ExternalLink = ({
   className,
   ariaLabel,
   title,
-}: TExternalLinkProps) => {
-  const t = useTranslations('externalLink');
-
-  return (
-    <a
-      href={href}
-      target="_blank"
-      rel="noopener noreferrer"
-      className={className}
-      aria-label={ariaLabel}
-      title={title}
-    >
-      {children} <span className={newTabHintVariants()}>{t('newTabHint')}</span>
-    </a>
-  );
-};
+}: TExternalLinkProps) => (
+  <a
+    href={href}
+    target="_blank"
+    rel="noopener noreferrer"
+    className={className}
+    aria-label={ariaLabel}
+    title={title}
+  >
+    {children} <NewTabHint />
+  </a>
+);

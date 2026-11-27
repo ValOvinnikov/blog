@@ -10,16 +10,15 @@ import { adminRoutes } from '@platform/utils/routes/routes';
 import { tenantIdSchema } from '@platform/utils/tenant-id-schema/tenant-id-schema';
 import {
   ACTION_OUTCOME,
-  type TActionResult,
   type TMaybeUndefined,
+  type TOutcome,
 } from '@shinefold/config';
 import { queries } from '@shinefold/db';
 import { toOutcome } from '@shinefold/utils/to-outcome';
-import { redirect } from 'next/navigation';
 
-export type TPayOpenInvoiceResult = TActionResult<
-  typeof ACTION_OUTCOME.SERVER_ERROR
->;
+export type TPayOpenInvoiceResult =
+  | { outcome: typeof ACTION_OUTCOME.SUCCESS; url: string }
+  | TOutcome<typeof ACTION_OUTCOME.SERVER_ERROR>;
 
 const resolvePayDestination = async (
   tenantId: string,
@@ -52,10 +51,10 @@ export const payOpenInvoiceAction = async (
   await requireTenantOwner(parsed.data);
   const billing = await queries.tenants.getTenantBilling(parsed.data);
   const subscription = billing?.stripeSubscriptionId;
-  if (!subscription) redirect(adminRoutes.dashboardBilling());
+  const url = subscription
+    ? await resolvePayDestination(parsed.data, subscription)
+    : adminRoutes.dashboardBilling();
+  if (!url) return toOutcome(ACTION_OUTCOME.SERVER_ERROR);
 
-  const destination = await resolvePayDestination(parsed.data, subscription);
-  if (!destination) return toOutcome(ACTION_OUTCOME.SERVER_ERROR);
-
-  redirect(destination);
+  return { outcome: ACTION_OUTCOME.SUCCESS, url };
 };
