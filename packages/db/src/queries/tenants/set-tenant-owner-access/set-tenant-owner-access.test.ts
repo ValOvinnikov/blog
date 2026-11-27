@@ -10,6 +10,7 @@ import {
   mockTenantOwnerAccess,
   toTenantOwnerAccessColumns,
 } from '@shinefold/db/testing/tenants/owner-access';
+import { eq } from 'drizzle-orm';
 
 import { setTenantOwnerAccess } from './set-tenant-owner-access';
 
@@ -99,6 +100,18 @@ describe(setTenantOwnerAccess, () => {
 
       expect(result).toEqual({ ok: true, data: ownerAccess });
     });
+  });
+
+  it('keeps a platform-created site marked as such', async () => {
+    const { id } = await insertTestTenant(db(), { createdFromPlatform: true });
+
+    await setTenantOwnerAccess(id, mockTenantOwnerAccess());
+
+    const [row] = await db()
+      .select({ createdFromPlatform: schema.tenants.createdFromPlatform })
+      .from(schema.tenants)
+      .where(eq(schema.tenants.id, id));
+    expect(row).toEqual({ createdFromPlatform: true });
   });
 
   it('returns DB_NOT_FOUND for a tenant id that does not exist', async () => {

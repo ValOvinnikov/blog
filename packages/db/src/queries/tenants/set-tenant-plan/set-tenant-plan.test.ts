@@ -289,6 +289,20 @@ describe(setTenantPlan, () => {
       expect(await readSelfServeIndex(db(), tenantId)).toBeNull();
     });
 
+    it('keeps a platform-created site marked as such on a move to a paid plan', async () => {
+      const { id } = await insertTestTenant(db(), {
+        createdFromPlatform: true,
+      });
+
+      await setTenantPlan(id, MOCK_MOVE_TO_GROWTH);
+
+      const [row] = await db()
+        .select({ createdFromPlatform: tenants.createdFromPlatform })
+        .from(tenants)
+        .where(eq(tenants.id, id));
+      expect(row).toEqual({ createdFromPlatform: true });
+    });
+
     it('reports the stored plan as the previous one when a write repeats it', async () => {
       await setTenantPlan(tenantId, MOCK_MOVE_TO_GROWTH);
 

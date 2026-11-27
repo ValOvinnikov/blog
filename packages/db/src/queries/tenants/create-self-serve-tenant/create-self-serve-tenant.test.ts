@@ -208,6 +208,7 @@ describe(createSelfServeTenant, () => {
         siteType,
         siteTemplateVersion,
         sanityProjectId,
+        createdFromPlatform,
       } = row ?? {};
 
       expect({
@@ -220,6 +221,7 @@ describe(createSelfServeTenant, () => {
         siteType,
         siteTemplateVersion,
         sanityProjectId,
+        createdFromPlatform,
       }).toEqual({
         name: MOCK_SELF_SERVE_NAME,
         primaryDomain: MOCK_SELF_SERVE_DOMAIN,
@@ -230,6 +232,7 @@ describe(createSelfServeTenant, () => {
         siteType: SITE_TYPE.PORTFOLIO,
         siteTemplateVersion: null,
         sanityProjectId: null,
+        createdFromPlatform: false,
       });
     });
 

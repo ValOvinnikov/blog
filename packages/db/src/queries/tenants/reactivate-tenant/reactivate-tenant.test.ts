@@ -47,6 +47,7 @@ describe(reactivateTenant, () => {
       status: TENANT_STATUS.ARCHIVED,
       deprovisionedAt: MOCK_DEPROVISIONED_AT,
       provisioningStatus: TENANT_PROVISIONING_STATUS.READY,
+      createdFromPlatform: true,
     });
     const reactivated = {
       ...tenant,
