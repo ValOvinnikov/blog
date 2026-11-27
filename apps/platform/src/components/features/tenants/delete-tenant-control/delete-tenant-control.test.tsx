@@ -1,4 +1,5 @@
 import { TENANT_FIELD_ERROR } from '@platform/constants/tenant';
+import { deleteTenantAction } from '@platform/server/provisioning/delete-tenant-action';
 import { customRender, screen, within } from '@platform/testing/custom-render';
 import { mockRouter } from '@platform/testing/mock-router';
 import {
@@ -13,13 +14,9 @@ import userEvent, { type UserEvent } from '@testing-library/user-event';
 
 import { DeleteTenantControl } from './delete-tenant-control';
 
-const { deleteTenantActionMock } = vi.hoisted(() => ({
-  deleteTenantActionMock: vi.fn(),
-}));
+vi.mock('@platform/server/provisioning/delete-tenant-action');
 
-vi.mock('@platform/server/provisioning/delete-tenant-action', () => ({
-  deleteTenantAction: deleteTenantActionMock,
-}));
+const deleteTenantActionMock = vi.mocked(deleteTenantAction);
 
 const DELETE_TENANT_DIALOG_TITLE = `Delete ${MOCK_TENANT_NAME}`;
 

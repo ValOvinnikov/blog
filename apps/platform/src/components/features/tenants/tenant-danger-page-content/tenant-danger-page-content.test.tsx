@@ -1,5 +1,6 @@
 import { faker } from '@faker-js/faker';
 import { ARIA_ATTRIBUTE } from '@platform/constants/aria-attribute';
+import { getTenantDeprovisioningStatusAction } from '@platform/server/provisioning/get-tenant-deprovisioning-status-action';
 import { act, customRender, screen } from '@platform/testing/custom-render';
 import {
   mockIdleDeprovisioningSteps,
@@ -21,29 +22,19 @@ faker.seed(6120);
 
 const MOCK_STEP_ERROR = faker.lorem.sentence();
 
-const { getTenantDeprovisioningStatusActionMock } = vi.hoisted(() => ({
-  getTenantDeprovisioningStatusActionMock: vi.fn(),
-}));
-
 vi.mock(
   '@platform/server/provisioning/get-tenant-deprovisioning-status-action',
-  () => ({
-    getTenantDeprovisioningStatusAction:
-      getTenantDeprovisioningStatusActionMock,
-  }),
 );
 
-vi.mock('@platform/server/provisioning/deprovision-tenant-action', () => ({
-  deprovisionTenantAction: vi.fn(),
-}));
+const getTenantDeprovisioningStatusActionMock = vi.mocked(
+  getTenantDeprovisioningStatusAction,
+);
 
-vi.mock('@platform/server/provisioning/delete-tenant-action', () => ({
-  deleteTenantAction: vi.fn(),
-}));
+vi.mock('@platform/server/provisioning/deprovision-tenant-action');
 
-vi.mock('@platform/server/provisioning/reactivate-tenant-action', () => ({
-  reactivateTenantAction: vi.fn(),
-}));
+vi.mock('@platform/server/provisioning/delete-tenant-action');
+
+vi.mock('@platform/server/provisioning/reactivate-tenant-action');
 
 const runStarted = { startedAt: MOCK_RUN_STARTED_AT };
 
