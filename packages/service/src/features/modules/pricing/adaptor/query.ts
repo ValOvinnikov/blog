@@ -54,6 +54,7 @@ export const pricingModuleQuery = q
       }))
       .notNull(),
     footnote: getLocalizedField(sub, 'footnote'),
+    showPlanComparison: sub.field('showPlanComparison').nullable(true),
     ...ctaButtonsFragment,
     ...moduleContentAlignmentLeftCenterFragment,
     ...moduleWideLayoutFragment,

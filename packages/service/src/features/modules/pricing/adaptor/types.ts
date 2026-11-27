@@ -40,6 +40,7 @@ export type TPricingModule = TModuleAppearance & {
   headingBlock: THeadingBlock;
   tiers: TPricingTier[];
   footnote: TMaybeUndefined<string>;
+  showPlanComparison: boolean;
   ctaButtons: TCtaButton[];
   contentAlignment: TMaybeUndefined<TContentAlignmentOf<'LEFT' | 'CENTER'>>;
   layout: TMaybeUndefined<TWideLayout>;

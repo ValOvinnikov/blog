@@ -186,6 +186,18 @@ describe('pricingModuleQuery', () => {
     });
   });
 
+  it.each([
+    ['the stored switch', { showPlanComparison: false }, false],
+    ['null for an unset switch', {}, null],
+  ])('projects %s', async (_description, overrides, expected) => {
+    const pricing = await runPricing(
+      { ...MOCK_PRICING_DOCUMENT, ...overrides },
+      EN,
+    );
+
+    expect(pricing.showPlanComparison).toBe(expected);
+  });
+
   it('reads no appearance overrides from a document authored without them', async () => {
     const pricing = await runPricing(MOCK_PRICING_DOCUMENT, EN);
 

@@ -232,6 +232,21 @@ describe(toPricingModule, () => {
     });
   });
 
+  it.each([
+    ['off', false, false],
+    ['on', true, true],
+    ['unset', null, true],
+  ])(
+    'returns the plan comparison switch as %s',
+    (_description, showPlanComparison, expected) => {
+      const module = toPricingModule(
+        mockRawPricingModule({ showPlanComparison }),
+      );
+
+      expect(module.showPlanComparison).toBe(expected);
+    },
+  );
+
   it('maps the authored appearance overrides straight through', () => {
     const appearance = {
       cardStyle: CARD_STYLE.OUTLINED,
