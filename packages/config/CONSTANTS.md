@@ -1319,6 +1319,11 @@ Every key/value const an agent should reuse before writing a literal. The
 
 - **DEPROVISIONING_LOG**: `START_FAILED`=`"deprovisioning.start_failed"`, `STEP_FAILED`=`"deprovisioning.step_failed"`, `RUN_FAILED`=`"deprovisioning.run_failed"`, `TOKEN_REVOKE_FAILED`=`"deprovisioning.token_revoke_failed"`, `ALERT_NO_RECIPIENTS`=`"deprovisioning.alert_no_recipients"`, `ALERT_SEND_FAILED`=`"deprovisioning.alert_send_failed"`
 
+### `@worker/constants/document-cap` — `apps/worker/src/constants/document-cap.ts`
+
+- **DOCUMENT_CAP_LOG**: `SWEEP_NOT_CONFIGURED`=`"document_cap.sweep_not_configured"`, `SWEEP_FAILED`=`"document_cap.sweep_failed"`, `SWEEP_TENANT_FAILED`=`"document_cap.sweep_tenant_failed"`, `SWEEP_FINISHED`=`"document_cap.sweep_finished"`
+- **DOCUMENT_CAP_CHECK**: `NEARING`, `CLEAR`, `SKIPPED`
+
 ### `@worker/constants/downgrade-grace` — `apps/worker/src/constants/downgrade-grace.ts`
 
 - **DOWNGRADE_GRACE_LOG**: `FAILED`=`"downgrade_grace.failed"`, `STEP_FAILED`=`"downgrade_grace.step_failed"`, `OWNER_MISSING`=`"downgrade_grace.owner_missing"`, `SUBDOMAIN_MISSING`=`"downgrade_grace.subdomain_missing"`, `GRACE_END_FAILED`=`"downgrade_grace.grace_end_failed"`, `EMAIL_SEND_FAILED`=`"downgrade_grace.email_send_failed"`

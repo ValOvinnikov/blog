@@ -12,6 +12,7 @@ code:
   - packages/config/src/constants/finding.ts
   - packages/db/scripts/validate-tenant-documents/**
   - apps/worker/src/utils/provisioning-report/**
+  - apps/worker/src/utils/document-cap-sweep/**
   - packages/db/scripts/deprovision-tenant/lib/record-*-audit-event.ts
   - apps/platform/src/server/audit/**
   - apps/platform/src/server/findings/**
@@ -111,6 +112,12 @@ platform-wide Findings page. Tenant owners see neither.
     failed for 30 minutes in a row, with the error and the time the failures
     began as `details`, and resolve it on the next check that succeeds
     ([Tenant provisioning](tenant-provisioning.md)).
+  - The worker's daily document-cap sweep writes one `DOCUMENT_COUNT_CHECK` /
+    `DOCUMENT_CAP_APPROACHING` WARNING per FREE tenant whose Sanity documents
+    (drafts and versions included, image and file assets excluded) reach 80%
+    of the 10,000 cap, with `documentCount` and `documentCap` as `details`,
+    and resolves it once the count drops back under 80% or the tenant leaves
+    the FREE plan.
     The other declared sources and kinds have no writer yet.
   - The release actions (`RELEASE_STARTED`, `RELEASE_OVERRIDE`,
     `CONTRAST_CHECK_STARTED`, `TENANT_MIGRATIONS_STARTED`) and the `RELEASE`

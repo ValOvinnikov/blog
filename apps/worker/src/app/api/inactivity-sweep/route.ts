@@ -4,9 +4,8 @@ import { sanitizeLogMessage } from '@shinefold/insight';
 import { DOWNGRADE_GRACE_LOG } from '@worker/constants/downgrade-grace';
 import { ENQUEUE_ERROR } from '@worker/constants/enqueue-error';
 import { INACTIVITY_SWEEP_LOG } from '@worker/constants/inactivity-sweep';
-import { hasBearerSecret } from '@worker/utils/bearer-secret/bearer-secret';
+import { rejectCronRequest } from '@worker/utils/cron-request/cron-request';
 import { runDowngradeGraceSweep } from '@worker/utils/downgrade-grace/run-downgrade-grace-sweep';
-import { env } from '@worker/utils/env/env';
 import type { TInactivitySweepContext } from '@worker/utils/inactivity-sweep/inactivity-stages';
 import { getInactivitySweepEnv } from '@worker/utils/inactivity-sweep/inactivity-sweep-env';
 import { runInactivitySweep } from '@worker/utils/inactivity-sweep/run-inactivity-sweep';
@@ -31,17 +30,11 @@ async function runOrLog<TResult>(
 }
 
 export async function GET(request: Request): Promise<Response> {
-  const secret = env.CRON_SECRET;
-  if (!secret) {
-    logger.error(INACTIVITY_SWEEP_LOG.NOT_CONFIGURED);
-    return respondError(
-      HTTP_STATUS.INTERNAL_SERVER_ERROR,
-      ENQUEUE_ERROR.SERVER_ERROR,
-    );
-  }
-  if (!hasBearerSecret(request, secret)) {
-    return respondError(HTTP_STATUS.UNAUTHORIZED, ENQUEUE_ERROR.UNAUTHORIZED);
-  }
+  const rejection = rejectCronRequest(
+    request,
+    INACTIVITY_SWEEP_LOG.NOT_CONFIGURED,
+  );
+  if (rejection) return rejection;
 
   const now = new Date();
   const advanced = await runOrLog(

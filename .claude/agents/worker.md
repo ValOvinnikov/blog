@@ -71,8 +71,9 @@ default to zero".
   `POST /api/sample-content/remove`, `POST /api/newsletter/post-send`,
   `POST /api/scheduled-post-purge` and `POST /api/scheduled-post-skim`
   — every one authenticated by the shared enqueue secret. The other routes
-  are Vercel Cron's `GET /api/inactivity-sweep` and
-  `GET /api/owner-access-sweep`, authenticated by `CRON_SECRET`.
+  are Vercel Cron's `GET /api/inactivity-sweep`,
+  `GET /api/owner-access-sweep` and `GET /api/document-cap-sweep`,
+  authenticated by `CRON_SECRET` through `rejectCronRequest`.
 - **All relational reads and writes go through `@shinefold/db`'s exported
   functions** — no Drizzle, no Neon client, no SQL here. A missing query is a
   `db` request you report.

@@ -12,6 +12,10 @@
     {
       "path": "/api/owner-access-sweep",
       "schedule": "41 * * * *"
+    },
+    {
+      "path": "/api/document-cap-sweep",
+      "schedule": "29 4 * * *"
     }
   ]
 }

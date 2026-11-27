@@ -20,7 +20,6 @@
   "apps/web/src/utils/find-translated-path/find-translated-path.ts": 135,
   "apps/web/src/vitest-setup.ts": 147,
   "apps/worker/src/steps/verify-seeded-content.ts": 152,
-  "apps/worker/src/testing/owner-access/fixtures.ts": 121,
   "apps/worker/src/utils/owner-email/owner-email-copy.ts": 153,
   "packages/config/src/voice/voice-fixed-keys.ts": 164,
   "packages/db/scripts/deprovision-tenant/run.ts": 203,

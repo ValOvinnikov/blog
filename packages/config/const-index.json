@@ -3614,6 +3614,12 @@
         "file": "packages/db/src/constants/newsletter.ts"
       },
       {
+        "ref": "DOCUMENT_CAP_CHECK.SKIPPED",
+        "scope": "app:worker",
+        "from": "@worker/constants/document-cap",
+        "file": "apps/worker/src/constants/document-cap.ts"
+      },
+      {
         "ref": "NEWSLETTER_POST_STATE.SKIPPED",
         "scope": "app:worker",
         "from": "@worker/constants/newsletter-send",
@@ -11766,6 +11772,12 @@
         "scope": "app:platform",
         "from": "@platform/constants/upload",
         "file": "apps/platform/src/constants/upload.ts"
+      },
+      {
+        "ref": "DOCUMENT_CAP_CHECK.CLEAR",
+        "scope": "app:worker",
+        "from": "@worker/constants/document-cap",
+        "file": "apps/worker/src/constants/document-cap.ts"
       }
     ],
     "TAKEAWAYS": [
@@ -14466,6 +14478,46 @@
         "scope": "app:worker",
         "from": "@worker/constants/deprovisioning",
         "file": "apps/worker/src/constants/deprovisioning.ts"
+      }
+    ],
+    "document_cap.sweep_not_configured": [
+      {
+        "ref": "DOCUMENT_CAP_LOG.SWEEP_NOT_CONFIGURED",
+        "scope": "app:worker",
+        "from": "@worker/constants/document-cap",
+        "file": "apps/worker/src/constants/document-cap.ts"
+      }
+    ],
+    "document_cap.sweep_failed": [
+      {
+        "ref": "DOCUMENT_CAP_LOG.SWEEP_FAILED",
+        "scope": "app:worker",
+        "from": "@worker/constants/document-cap",
+        "file": "apps/worker/src/constants/document-cap.ts"
+      }
+    ],
+    "document_cap.sweep_tenant_failed": [
+      {
+        "ref": "DOCUMENT_CAP_LOG.SWEEP_TENANT_FAILED",
+        "scope": "app:worker",
+        "from": "@worker/constants/document-cap",
+        "file": "apps/worker/src/constants/document-cap.ts"
+      }
+    ],
+    "document_cap.sweep_finished": [
+      {
+        "ref": "DOCUMENT_CAP_LOG.SWEEP_FINISHED",
+        "scope": "app:worker",
+        "from": "@worker/constants/document-cap",
+        "file": "apps/worker/src/constants/document-cap.ts"
+      }
+    ],
+    "NEARING": [
+      {
+        "ref": "DOCUMENT_CAP_CHECK.NEARING",
+        "scope": "app:worker",
+        "from": "@worker/constants/document-cap",
+        "file": "apps/worker/src/constants/document-cap.ts"
       }
     ],
     "downgrade_grace.failed": [
