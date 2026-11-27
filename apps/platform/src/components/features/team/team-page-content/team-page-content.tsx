@@ -1,5 +1,6 @@
 import { TeamView } from '@platform/components/features/team/team-view';
 import type { TPlatformViewer } from '@platform/server/auth/platform-viewer';
+import { canOfferUpgrade } from '@platform/server/billing/can-offer-upgrade';
 import type { TPlatformTenant } from '@platform/utils/platform-tenant/platform-tenant';
 import { teamViewModel } from '@platform/utils/team-view-model/team-view-model';
 import { queries } from '@shinefold/db';
@@ -25,6 +26,7 @@ export const TeamPageContent = async ({
       tenantId={tenant.id}
       plan={tenant.plan}
       team={teamViewModel({ tenant, viewer, currentUserId, members, invites })}
+      canUpgrade={canOfferUpgrade(tenant, viewer)}
     />
   );
 };

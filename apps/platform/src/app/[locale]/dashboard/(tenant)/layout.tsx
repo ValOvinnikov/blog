@@ -3,12 +3,11 @@ import { DashboardBreadcrumb } from '@platform/components/features/layout/dashbo
 import { PlatformShell } from '@platform/components/features/layout/platform-shell';
 import { TenantSwitcher } from '@platform/components/features/layout/tenant-switcher';
 import { OwnerSuspensionBanner } from '@platform/components/features/tenants/owner-suspension-banner';
-import { UPGRADE_STATE } from '@platform/constants/billing';
 import { ShellStudioAccessProvider } from '@platform/context/shell-studio-access-provider';
 import { listSessionTenants } from '@platform/server/auth/list-session-tenants';
 import { resolveDashboardTenant } from '@platform/server/auth/resolve-dashboard-tenant';
 import { resolveTenantPageAccess } from '@platform/server/auth/resolve-tenant-page-access';
-import { upgradeStateFor } from '@platform/server/billing/upgrade-state-for';
+import { canOfferUpgrade } from '@platform/server/billing/can-offer-upgrade';
 import { loadPlatformShellChrome } from '@platform/server/layout/load-platform-shell-chrome';
 import { dashboardNavSections } from '@platform/utils/dashboard-nav-sections/dashboard-nav-sections';
 import { helpNavSection } from '@platform/utils/help-nav-section/help-nav-section';
@@ -62,9 +61,7 @@ export default async function DashboardTenantLayout({ children }: TProps) {
               tenant={tenant}
               canOpenBilling={access.billing}
               isOwner={viewer.isOwner}
-              canUpgrade={
-                upgradeStateFor(tenant, viewer) === UPGRADE_STATE.AVAILABLE
-              }
+              canUpgrade={canOfferUpgrade(tenant, viewer)}
             />
           </Suspense>
         </>

@@ -1,31 +1,32 @@
 import { InviteEditorControl } from '@platform/components/features/team/invite-editor-control';
 import { MembersTable } from '@platform/components/features/team/members-table';
-import { OverSeatsNotice } from '@platform/components/features/team/over-seats-notice';
 import { PendingInvitesTable } from '@platform/components/features/team/pending-invites-table';
-import { Alert } from '@platform/components/shared/alert';
 import { PageHeader } from '@platform/components/shared/page-header';
 import { Text } from '@platform/components/shared/text';
-import { TEAM_SEAT_NOTICE_ID } from '@platform/constants/team-access';
 import type { TTeamViewModel } from '@platform/utils/team-view-model/team-view-model';
-import { ALERT_TYPE } from '@shinefold/config';
 import type { TTenantPlan } from '@shinefold/config/constants';
 import { hasLength } from '@shinefold/utils/primitives';
 import { useTranslations } from 'next-intl';
 
+import { TeamSeatNotice } from './components/team-seat-notice/team-seat-notice';
 import { teamViewVariants } from './team-view-variants';
 
 export type TTeamViewProps = {
   tenantId: string;
   plan: TTenantPlan;
   team: TTeamViewModel;
+  canUpgrade: boolean;
 };
 
-export const TeamView = ({ tenantId, plan, team }: TTeamViewProps) => {
+export const TeamView = ({
+  tenantId,
+  plan,
+  team,
+  canUpgrade,
+}: TTeamViewProps) => {
   const t = useTranslations('teamPage');
-  const tPlan = useTranslations('planNames');
   const { root, headerActions } = teamViewVariants();
   const { seats, shownUsed, isFull, seatsOver, invites } = team;
-  const isOverSeats = seatsOver > 0;
 
   return (
     <div className={root()}>
@@ -37,7 +38,7 @@ export const TeamView = ({ tenantId, plan, team }: TTeamViewProps) => {
             <Text as="span" variant="meta">
               {t('seatsUsed', { used: shownUsed, seats })}
             </Text>
-            {!isOverSeats && (
+            {seatsOver === 0 && (
               <InviteEditorControl
                 tenantId={tenantId}
                 plan={plan}
@@ -47,18 +48,7 @@ export const TeamView = ({ tenantId, plan, team }: TTeamViewProps) => {
           </div>
         }
       />
-      {isOverSeats ? (
-        <OverSeatsNotice plan={plan} team={team} />
-      ) : (
-        isFull && (
-          <Alert
-            id={TEAM_SEAT_NOTICE_ID}
-            type={ALERT_TYPE.INFO}
-            title={t('seatLimitTitle')}
-            description={t('seatLimitBody', { plan: tPlan(plan), seats })}
-          />
-        )
-      )}
+      <TeamSeatNotice plan={plan} team={team} canUpgrade={canUpgrade} />
       <MembersTable tenantId={tenantId} team={team} />
       {hasLength(invites) && (
         <PendingInvitesTable tenantId={tenantId} invites={invites} />

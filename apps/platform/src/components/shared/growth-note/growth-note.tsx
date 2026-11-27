@@ -4,9 +4,8 @@ import { Collapsible } from '@base-ui/react/collapsible';
 import { buttonVariants } from '@platform/components/shared/button/button-variants';
 import { GrowthBadge } from '@platform/components/shared/growth-badge';
 import { Icon, STATUS_ICON } from '@platform/components/shared/icon';
-import { LinkButton } from '@platform/components/shared/link-button';
+import { UpgradeLinkButton } from '@platform/components/shared/upgrade-link-button';
 import { ICON_SIZE } from '@platform/constants/icon';
-import { adminRoutes } from '@platform/utils/routes/routes';
 import { ALERT_TYPE, ICONS, SIZE } from '@shinefold/config';
 import { useTranslations } from 'next-intl';
 import { useId, useState } from 'react';
@@ -65,9 +64,7 @@ export const GrowthNote = ({ items, closingLine }: TGrowthNoteProps) => {
             className={chevron()}
           />
         </Collapsible.Trigger>
-        <LinkButton href={adminRoutes.dashboardUpgrade()} size={SIZE.SM}>
-          {t('askAboutGrowth')}
-        </LinkButton>
+        <UpgradeLinkButton>{t('askAboutGrowth')}</UpgradeLinkButton>
       </div>
       <Collapsible.Panel id={panelId} keepMounted={true} className={panel()}>
         <ul aria-label={t('listLabel')} className={list()}>

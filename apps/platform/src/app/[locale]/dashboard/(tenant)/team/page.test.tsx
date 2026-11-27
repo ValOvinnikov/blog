@@ -3,6 +3,7 @@ import { customRenderAsync, screen } from '@platform/testing/custom-render';
 import { mockMembership } from '@platform/testing/memberships/fixtures';
 import { mockDbConstants } from '@platform/testing/mock-db-constants';
 import {
+  MOCK_JOINED_AT,
   MOCK_SEATS_OVER_ONE_SEAT,
   mockTenantMember,
 } from '@platform/testing/team/fixtures';
@@ -22,11 +23,13 @@ const {
   listMembershipsWithTenantsForUserMock,
   listTenantMembersMock,
   listPendingMembershipInvitesMock,
+  countSeatsInUseMock,
   countUnlockedSeatsInUseMock,
 } = vi.hoisted(() => ({
   listMembershipsWithTenantsForUserMock: vi.fn(),
   listTenantMembersMock: vi.fn(),
   listPendingMembershipInvitesMock: vi.fn(),
+  countSeatsInUseMock: vi.fn(),
   countUnlockedSeatsInUseMock: vi.fn(),
 }));
 
@@ -47,6 +50,7 @@ vi.mock('@shinefold/db', async () => ({
     },
     membershipInvites: {
       listPendingMembershipInvites: listPendingMembershipInvitesMock,
+      countSeatsInUse: countSeatsInUseMock,
       countUnlockedSeatsInUse: countUnlockedSeatsInUseMock,
     },
     admins: { getAdminByUserId: vi.fn(async () => undefined) },
@@ -71,6 +75,7 @@ describe(`<${DashboardTeamPage.name}/>`, () => {
       mockTenantMember({ role: MEMBERSHIP_ROLE.OWNER }),
     ]);
     listPendingMembershipInvitesMock.mockResolvedValue([]);
+    countSeatsInUseMock.mockResolvedValue(1);
     countUnlockedSeatsInUseMock.mockResolvedValue(1);
   });
 
@@ -101,6 +106,7 @@ describe(`<${DashboardTeamPage.name}/>`, () => {
 
   it('shows the owner of a Starter site over its seats its team, with no Invite editor', async () => {
     signInAs(MEMBERSHIP_ROLE.OWNER, TENANT_PLAN.STARTER);
+    countSeatsInUseMock.mockResolvedValue(MOCK_SEATS_OVER_ONE_SEAT);
     countUnlockedSeatsInUseMock.mockResolvedValue(MOCK_SEATS_OVER_ONE_SEAT);
     listTenantMembersMock.mockResolvedValue([
       mockTeamOwner(),
@@ -118,5 +124,23 @@ describe(`<${DashboardTeamPage.name}/>`, () => {
 
     expect(heading).toBeVisible();
     expect(invite).not.toBeInTheDocument();
+  });
+
+  it('shows a Free owner who is locked, with Upgrade', async () => {
+    signInAs(MEMBERSHIP_ROLE.OWNER, TENANT_PLAN.FREE);
+    countSeatsInUseMock.mockResolvedValue(MOCK_SEATS_OVER_ONE_SEAT);
+    listTenantMembersMock.mockResolvedValue([
+      mockTeamOwner(),
+      mockTenantMember({ lockedAt: MOCK_JOINED_AT }),
+    ]);
+
+    await setup();
+    const locked = screen.getByText('1 member is locked');
+    const upgrade = screen.getByRole('link', {
+      name: messages.teamPage.upgrade,
+    });
+
+    expect(locked).toBeVisible();
+    expect(upgrade).toBeVisible();
   });
 });

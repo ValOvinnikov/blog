@@ -17,6 +17,8 @@ import {
   mockTeamViewModel,
 } from '@platform/testing/team/team-view';
 import { MOCK_TENANT_ID } from '@platform/testing/tenants/fixtures';
+import { adminRoutes } from '@platform/utils/routes/routes';
+import type { TTeamViewModel } from '@platform/utils/team-view-model/team-view-model';
 import { ACTION_OUTCOME } from '@shinefold/config';
 import { STUDIO_ACCESS, TENANT_PLAN } from '@shinefold/config/constants';
 import { MEMBERSHIP_ROLE } from '@shinefold/db/constants';
@@ -43,11 +45,14 @@ const PENDING_INVITES = 'Pending invites';
 const SEAT_LIMIT_TITLE = 'Every seat is in use';
 const MOCK_READER_EMAIL = 'reader@example.com';
 const MOCK_PENDING_EMAIL = 'pending@example.com';
+const MOCK_LOCKED_EMAIL = 'locked@example.com';
+const UPGRADE = 'Upgrade';
 
 const setup = customRender(TeamView, {
   tenantId: MOCK_TENANT_ID,
   plan: TENANT_PLAN.GROWTH,
   team: mockTeamViewModel(),
+  canUpgrade: false,
 });
 
 describe(`<${TeamView.name}/>`, () => {
@@ -99,18 +104,22 @@ describe(`<${TeamView.name}/>`, () => {
   });
 
   describe('over the seats on Starter', () => {
-    const overSeats = (graceEndsAt?: Date) =>
+    const overSeats = ({
+      canUpgrade = false,
+      ...team
+    }: Partial<TTeamViewModel> & { canUpgrade?: boolean } = {}) =>
       setup({
         plan: TENANT_PLAN.STARTER,
+        canUpgrade,
         team: mockTeamViewModel({
           seats: 1,
           shownUsed: 3,
           isFull: true,
           freeSeats: 0,
           seatsOver: 2,
-          graceEndsAt,
           members: [mockTeamOwnerRow(), mockTeamMemberRow()],
           invites: [mockTeamInviteRow()],
+          ...team,
         }),
       });
 
@@ -147,13 +156,105 @@ describe(`<${TeamView.name}/>`, () => {
     });
 
     it('names the grace deadline while a grace runs', () => {
-      overSeats(MOCK_GRACE_ENDS_AT);
+      overSeats({ graceEndsAt: MOCK_GRACE_ENDS_AT });
 
       const deadline = screen.getByText(/loses Studio access/);
       const date = within(deadline).getByText(/2026/);
 
       expect(deadline).toBeVisible();
       expect(date.tagName).toBe('TIME');
+    });
+
+    it('names the members who lose access when the grace ends', () => {
+      overSeats({
+        graceEndsAt: MOCK_GRACE_ENDS_AT,
+        emailsLosingAccess: [MOCK_MEMBER_EMAIL, undefined],
+      });
+
+      const losing = screen.getByText(
+        new RegExp(`${MOCK_MEMBER_EMAIL} and this member lose Studio access`),
+      );
+      const date = within(losing).getByText(/2026/);
+
+      expect(losing).toBeVisible();
+      expect(date.tagName).toBe('TIME');
+    });
+
+    it.each([
+      [true, 1],
+      [false, 0],
+    ])(
+      'offers an upgrade only to an owner who can upgrade: %s',
+      (canUpgrade, links) => {
+        overSeats({ canUpgrade });
+
+        const upgrade = screen.queryAllByRole('link', { name: UPGRADE });
+
+        expect(upgrade).toHaveLength(links);
+      },
+    );
+  });
+
+  describe('with members locked after the grace', () => {
+    const locked = (canUpgrade: boolean) =>
+      setup({
+        plan: TENANT_PLAN.FREE,
+        canUpgrade,
+        team: mockTeamViewModel({
+          seats: 1,
+          shownUsed: 1,
+          isFull: true,
+          freeSeats: 0,
+          lockedCount: 2,
+          members: [
+            mockTeamOwnerRow(),
+            mockTeamMemberRow({
+              email: MOCK_LOCKED_EMAIL,
+              access: TEAM_ROW_ACCESS.LOCKED,
+            }),
+          ],
+        }),
+      });
+
+    describe('for an owner who can upgrade', () => {
+      beforeEach(() => {
+        locked(true);
+      });
+
+      it('says how many are locked and that upgrading restores them', () => {
+        const title = screen.getByText('2 members are locked');
+        const restore = screen.getByText(/they get their access back/);
+        const upgrade = screen.getByRole('link', { name: UPGRADE });
+        const full = screen.queryByText(SEAT_LIMIT_TITLE);
+
+        expect(title).toBeVisible();
+        expect(restore).toBeVisible();
+        expect(upgrade).toHaveAttribute('href', adminRoutes.dashboardUpgrade());
+        expect(full).not.toBeInTheDocument();
+      });
+
+      it('keeps Remove on a locked member and holds Invite editor', () => {
+        const remove = screen.getByRole('button', {
+          name: `Remove ${MOCK_LOCKED_EMAIL}`,
+        });
+        const invite = screen.getByRole('button', { name: INVITE_EDITOR });
+
+        expect(remove).toBeVisible();
+        expect(invite).toHaveAttribute(
+          ARIA_ATTRIBUTE.DESCRIBEDBY,
+          TEAM_SEAT_NOTICE_ID,
+        );
+      });
+    });
+
+    it('sends someone who cannot upgrade to the site owner', () => {
+      locked(false);
+
+      const askOwner = screen.getByText(/The site owner can upgrade/);
+      const upgrade = screen.queryByRole('link', { name: UPGRADE });
+
+      expect(askOwner).toBeVisible();
+      expect(upgrade).not.toBeInTheDocument();
     });
   });
 

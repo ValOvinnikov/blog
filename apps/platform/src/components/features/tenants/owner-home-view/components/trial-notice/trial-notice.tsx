@@ -1,9 +1,8 @@
 import { Alert } from '@platform/components/shared/alert';
-import { LinkButton } from '@platform/components/shared/link-button';
+import { UpgradeLinkButton } from '@platform/components/shared/upgrade-link-button';
 import { richDate } from '@platform/utils/rich-date/rich-date';
-import { adminRoutes } from '@platform/utils/routes/routes';
 import type { TTrial } from '@platform/utils/trial-for/trial-for';
-import { ALERT_TYPE, SIZE } from '@shinefold/config';
+import { ALERT_TYPE } from '@shinefold/config';
 import { TENANT_PLAN } from '@shinefold/config/constants';
 import { useLocale, useTranslations } from 'next-intl';
 
@@ -35,11 +34,7 @@ export const TrialNotice = ({
         },
       )}
       action={
-        canUpgrade && (
-          <LinkButton href={adminRoutes.dashboardUpgrade()} size={SIZE.SM}>
-            {t('trialUpgrade')}
-          </LinkButton>
-        )
+        canUpgrade && <UpgradeLinkButton>{t('trialUpgrade')}</UpgradeLinkButton>
       }
     />
   );

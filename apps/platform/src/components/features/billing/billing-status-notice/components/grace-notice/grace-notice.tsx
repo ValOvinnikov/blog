@@ -1,8 +1,7 @@
 import { Alert } from '@platform/components/shared/alert';
-import { LinkButton } from '@platform/components/shared/link-button';
+import { UpgradeLinkButton } from '@platform/components/shared/upgrade-link-button';
 import { richDate } from '@platform/utils/rich-date/rich-date';
-import { adminRoutes } from '@platform/utils/routes/routes';
-import { ALERT_TYPE, SIZE } from '@shinefold/config';
+import { ALERT_TYPE } from '@shinefold/config';
 import type { TTenantPlan } from '@shinefold/config/constants';
 import type { TGraceLocks } from '@shinefold/db/utils/grace-locks/grace-locks';
 import { useLocale, useTranslations } from 'next-intl';
@@ -52,11 +51,7 @@ export const GraceNotice = ({
         </>
       }
       action={
-        canUpgrade && (
-          <LinkButton href={adminRoutes.dashboardUpgrade()} size={SIZE.SM}>
-            {t('graceUpgrade')}
-          </LinkButton>
-        )
+        canUpgrade && <UpgradeLinkButton>{t('graceUpgrade')}</UpgradeLinkButton>
       }
     />
   );
