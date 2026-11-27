@@ -8358,6 +8358,14 @@
         "file": "apps/platform/src/constants/focus-ring.ts"
       }
     ],
+    "EDITABLE_FOCUS_VISIBLE": [
+      {
+        "ref": "FOCUS_RING_TRIGGER.EDITABLE_FOCUS_VISIBLE",
+        "scope": "app:platform",
+        "from": "@platform/constants/focus-ring",
+        "file": "apps/platform/src/constants/focus-ring.ts"
+      }
+    ],
     "EDITOR_INVITE": [
       {
         "ref": "GET_STARTED_STEP.EDITOR_INVITE",
