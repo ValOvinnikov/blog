@@ -90,6 +90,22 @@ export const DesktopItemHover: TStory = {
   },
 };
 
+export const DesktopShinefoldDarkItemHover: TStory = {
+  globals: SHINEFOLD_DARK_GLOBALS,
+  play: DesktopItemHover.play,
+};
+
+export const DesktopShinefoldDarkItemFocus: TStory = {
+  globals: SHINEFOLD_DARK_GLOBALS,
+  play: async ({ canvasElement }) => {
+    await userEvent.tab();
+    within(canvasElement)
+      .getAllByRole('link', { name: MOCK_SIDEBAR_NAV_ITEMS.at(0)?.label })
+      .at(0)!
+      .focus();
+  },
+};
+
 export const DesktopCurrentItemHover: TStory = {
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);

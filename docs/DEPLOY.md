@@ -190,17 +190,31 @@ new grant of preview database access while delivering nothing. Platform changes
 are reviewed on `platform.dev.{your-hosting}`, which deploys automatically on
 merge.
 
-Nothing to set per project in the dashboard for this anymore; only project
-linking + domains remain:
+Nothing to set per project in the dashboard for this anymore; project
+linking, domains and Skew Protection remain.
+
+**Skew Protection on every web and platform project.** A tab opened before a
+deploy calls Server Actions by the ids of the build that served it, and a new
+build changes them. With Skew Protection on, Vercel routes the old tab's
+requests to its own deployment until the max age runs out; after that the
+action is unrecognised and the page asks for a reload (§ "How a deploy
+happens" → deployment id). Turn it on in Settings → Advanced → Skew
+Protection, max age **12 hours**, on `web-dev`, `web-prod`, `platform-dev` and
+`platform-prod`. The worker serves no pages and needs none. CI already sets
+each build's deployment id, so nothing else is needed. Check the plan cost
+with `vercel pricing "skew protection"`; an old deployment keeps serving
+requests for the max age, billed as ordinary usage.
 
 - [ ] **`web-dev`**
   - [ ] From repo root: `npx vercel link` → select `web-dev`. Read the ids from
         `.vercel/project.json` → `VERCEL_ORG_ID`, `VERCEL_PROJECT_ID_WEB`.
         (Then delete the local `.vercel/` dir — it's gitignored scratch.)
+  - [x] Settings → Advanced → Skew Protection on, max age 12 hours.
 - [ ] **`web-prod`**
   - [ ] From repo root: `npx vercel link` → select `web-prod`. Read the ids
         from `.vercel/project.json` → `VERCEL_ORG_ID`, `VERCEL_PROJECT_ID_WEB`.
         (Then delete the local `.vercel/` dir — it's gitignored scratch.)
+  - [ ] Settings → Advanced → Skew Protection on, max age 12 hours.
 - [ ] **`platform-dev`**
   - [ ] From repo root: `npx vercel link` → select `platform-dev`. Read
         `VERCEL_PROJECT_ID` from `.vercel/project.json` → this is
@@ -208,6 +222,7 @@ linking + domains remain:
         (Then delete the local `.vercel/` dir.)
   - [ ] Settings → Domains → add `platform.dev.{your-hosting}`; add the DNS record
         it shows you, same as above.
+  - [ ] Settings → Advanced → Skew Protection on, max age 12 hours.
 - [ ] **`platform-prod`**
   - [ ] From repo root: `npx vercel link` → select `platform-prod`. Read
         `VERCEL_PROJECT_ID` from `.vercel/project.json` → this is
@@ -216,6 +231,7 @@ linking + domains remain:
   - [ ] Settings → Domains → add `platform.{your-hosting}`; add the DNS record it
         shows you, same as above. This must match the `PLATFORM_APP_BASE_URL`
         Variable in §4 exactly (no trailing slash).
+  - [ ] Settings → Advanced → Skew Protection on, max age 12 hours.
 - [ ] **`worker-dev`**
   - [ ] From repo root: `npx vercel link` → select `worker-dev`. Read
         `VERCEL_PROJECT_ID` from `.vercel/project.json` → this is
@@ -1182,10 +1198,11 @@ stage`: `deploy --prebuilt --prod --skip-domain → request`; see "A deploy
    limits (32 characters, letters, digits, `-` and `_`, no `dpl_` prefix).
    Unset, as in a local build, no `deploymentId` is set. It needs Next.js
    above 16.2.0-canary.15 and Vercel CLI above 50.3.3, and Skew Protection
-   switched on in each project's settings. The worker serves no pages and
-   builds without one. web-dev's Skew Protection max age is 12 hours, so a
-   tab from an older build gets the public site's out-of-date notice
-   (`docs/features/toasts.md`) instead of reaching its build.
+   switched on in each web and platform project's settings (§3, max age 12
+   hours). The worker serves no pages and builds without one. A tab from a
+   build older than the max age gets the out-of-date notice instead of
+   reaching its build — the public site's toast (`docs/features/toasts.md`),
+   the platform's reload dialog (`docs/features/platform-shell.md`).
 
    **A deploy goes live only after every app starts.** Each stage job ends
    in `scripts/vercel-deploy-checked.sh stage <app> <path>`. It deploys with

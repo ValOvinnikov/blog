@@ -63,10 +63,23 @@ export type Module_sectionPages = {
   _updatedAt: string;
   _rev: string;
   title?: string;
-  brandVariant?: 'PRIMARY' | 'SECONDARY' | 'BRAND_PRIMARY' | 'INK';
   headingBlock?: ModuleHeadingBlock;
+  brandVariant?: 'PRIMARY' | 'SECONDARY' | 'BRAND_PRIMARY' | 'INK';
   contentAlignment?: 'LEFT' | 'CENTER';
+  cardStyle?: 'ACCENT_BAR' | 'OUTLINED' | 'FILLED' | 'RAISED' | 'PLAIN';
+  radiusScale?: 'NONE' | 'SM' | 'MD' | 'LG' | 'XL';
+  density?: 'DEFAULT' | 'COMPACT';
+  columns?: 'TWO' | 'THREE' | 'FOUR';
   layout?: WideLayout;
+};
+
+export type WideLayout = {
+  _type: 'wideLayout';
+  spacingTop?: 'NONE' | 'SM' | 'MD' | 'LG' | 'XL';
+  spacingBottom?: 'NONE' | 'SM' | 'MD' | 'LG' | 'XL';
+  containerWidth?: 'WIDE' | 'FULL';
+  dividerTop?: boolean;
+  dividerBottom?: boolean;
 };
 
 export type Module_pricing = {
@@ -94,15 +107,6 @@ export type Module_pricing = {
   radiusScale?: 'NONE' | 'SM' | 'MD' | 'LG' | 'XL';
   density?: 'DEFAULT' | 'COMPACT';
   layout?: WideLayout;
-};
-
-export type WideLayout = {
-  _type: 'wideLayout';
-  spacingTop?: 'NONE' | 'SM' | 'MD' | 'LG' | 'XL';
-  spacingBottom?: 'NONE' | 'SM' | 'MD' | 'LG' | 'XL';
-  containerWidth?: 'WIDE' | 'FULL';
-  dividerTop?: boolean;
-  dividerBottom?: boolean;
 };
 
 export type InternationalizedArrayString = Array<
@@ -177,9 +181,6 @@ export type Module_cta = {
   _updatedAt: string;
   _rev: string;
   title?: string;
-  brandVariant?: 'PRIMARY' | 'SECONDARY' | 'BRAND_PRIMARY' | 'INK';
-  bandTone?: 'PRIMARY' | 'SECONDARY' | 'BRAND_PRIMARY' | 'INK';
-  variant?: 'BANNER' | 'SPLIT' | 'CALLOUT';
   headingBlock?: ModuleHeadingBlock;
   eyebrow?: InternationalizedArrayString;
   image?: LocalizedImageWithAlt;
@@ -190,10 +191,16 @@ export type Module_cta = {
     } & CtaButton
   >;
   footnote?: InternationalizedArrayString;
+  variant?: 'BANNER' | 'SPLIT' | 'CALLOUT';
+  brandVariant?: 'PRIMARY' | 'SECONDARY' | 'BRAND_PRIMARY' | 'INK';
+  bandTone?: 'PRIMARY' | 'SECONDARY' | 'BRAND_PRIMARY' | 'INK';
   contentAlignment?: 'LEFT' | 'CENTER' | 'RIGHT';
   contentPositionSplit?: 'LEFT' | 'RIGHT';
   contentPositionBanner?: 'LEFT' | 'CENTER' | 'RIGHT';
   mobileMediaOrder?: 'LAST' | 'FIRST';
+  cardStyle?: 'ACCENT_BAR' | 'OUTLINED' | 'FILLED' | 'RAISED' | 'PLAIN';
+  radiusScale?: 'NONE' | 'SM' | 'MD' | 'LG' | 'XL';
+  density?: 'DEFAULT' | 'COMPACT';
   layout?: CtaLayout;
 };
 
@@ -2722,8 +2729,8 @@ export type AllSanitySchemaTypes =
   | Embed
   | ModuleHeadingBlock
   | Module_sectionPages
-  | Module_pricing
   | WideLayout
+  | Module_pricing
   | InternationalizedArrayString
   | Module_cookieSettings
   | Module_contactForm

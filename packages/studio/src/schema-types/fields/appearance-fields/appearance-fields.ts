@@ -27,7 +27,7 @@ const APPEARANCE_GROUP = {
   title: 'Appearance',
 } satisfies FieldGroupDefinition;
 
-const CARDS_FIELDSET = {
+export const CARDS_FIELDSET = {
   name: 'cards',
   title: 'Cards',
   options: { collapsible: true, collapsed: false },
@@ -52,6 +52,29 @@ const inFieldset =
   ({ name }: FieldsetDefinition) =>
   (field: FieldDefinition): FieldDefinition => ({ ...field, fieldset: name });
 
+export const cardsFieldsetFields = (
+  ...args: Parameters<typeof cardFields>
+): FieldDefinition[] => cardFields(...args).map(inFieldset(CARDS_FIELDSET));
+
+type TModuleAppearanceOptions = {
+  content: readonly FieldDefinition[];
+  appearance: readonly FieldDefinition[];
+  fieldsets?: readonly FieldsetDefinition[];
+};
+
+export const moduleAppearance = ({
+  content,
+  appearance,
+  fieldsets = [],
+}: TModuleAppearanceOptions) => ({
+  fieldsets: [...fieldsets],
+  groups: [CONTENT_GROUP, APPEARANCE_GROUP],
+  fields: [
+    ...content.map(inGroup(CONTENT_GROUP)),
+    ...appearance.map(inGroup(APPEARANCE_GROUP)),
+  ],
+});
+
 const displayModeFields = (
   displayMode: TCardModuleAppearanceOptions['displayMode'],
 ) => {
@@ -69,12 +92,11 @@ export const cardModuleAppearance = ({
   afterHeadingAlignment = [],
   layout = wideLayoutField,
   hasColumns = true,
-}: TCardModuleAppearanceOptions) => ({
-  fieldsets: [...fieldsets, CARDS_FIELDSET],
-  groups: [CONTENT_GROUP, APPEARANCE_GROUP],
-  fields: [
-    ...content.map(inGroup(CONTENT_GROUP)),
-    ...[
+}: TCardModuleAppearanceOptions) =>
+  moduleAppearance({
+    content,
+    fieldsets: [...fieldsets, CARDS_FIELDSET],
+    appearance: [
       brandVariantField(),
       ...beforeDisplayMode,
       ...displayModeFields(displayMode),
@@ -83,10 +105,10 @@ export const cardModuleAppearance = ({
         title: 'Heading Alignment',
       }),
       ...afterHeadingAlignment,
-      ...cardFields(hasColumns, displayMode ? isCarouselMode : undefined).map(
-        inFieldset(CARDS_FIELDSET),
+      ...cardsFieldsetFields(
+        hasColumns,
+        displayMode ? isCarouselMode : undefined,
       ),
       layout,
-    ].map(inGroup(APPEARANCE_GROUP)),
-  ],
-});
+    ],
+  });

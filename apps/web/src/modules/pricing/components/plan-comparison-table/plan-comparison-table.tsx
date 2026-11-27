@@ -45,7 +45,7 @@ export const PlanComparisonTable = () => {
     <div className={s.root()}>
       <Heading
         level={3}
-        visual={TEXT_ROLE.TABLE_TITLE}
+        visual={TEXT_ROLE.ITEM_TITLE}
         id={PLAN_COMPARISON_ANCHOR_ID}
         className={s.heading()}
       >
