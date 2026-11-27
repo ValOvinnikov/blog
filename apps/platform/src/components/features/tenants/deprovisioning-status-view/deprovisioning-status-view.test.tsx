@@ -1,4 +1,5 @@
 import { ARIA_ATTRIBUTE } from '@platform/constants/aria-attribute';
+import { getTenantDeprovisioningStatusAction } from '@platform/server/provisioning/get-tenant-deprovisioning-status-action';
 import type { TClientTenant } from '@platform/server/tenants/to-client-tenant';
 import { act, customRender, screen } from '@platform/testing/custom-render';
 import {
@@ -39,16 +40,12 @@ const MOCK_RECOGNISED_ERROR =
   'Sanity Access API POST /access/project/xxxxx000/tokens failed: 403 {"statusCode":403,"error":"Forbidden","message":"Missing permission to revoke tokens."}';
 const MOCK_UNRECOGNISED_ERROR = 'CORS API is down';
 
-const { getTenantDeprovisioningStatusActionMock } = vi.hoisted(() => ({
-  getTenantDeprovisioningStatusActionMock: vi.fn(),
-}));
-
 vi.mock(
   '@platform/server/provisioning/get-tenant-deprovisioning-status-action',
-  () => ({
-    getTenantDeprovisioningStatusAction:
-      getTenantDeprovisioningStatusActionMock,
-  }),
+);
+
+const getTenantDeprovisioningStatusActionMock = vi.mocked(
+  getTenantDeprovisioningStatusAction,
 );
 
 type TWrapperProps = {

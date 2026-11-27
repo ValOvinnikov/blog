@@ -7,6 +7,7 @@ import dynamic from 'next/dynamic';
 import { useRouter } from 'next/navigation';
 
 import { StudioLoading } from './components/studio-loading';
+import { useRefreshOnTabReturn } from './use-refresh-on-tab-return';
 import { type TStudioSchemeProps, useStudioScheme } from './use-studio-scheme';
 
 // Sanity Studio cannot render on the server: its error boundary would fill the server HTML until hydration.
@@ -29,6 +30,7 @@ export const PlatformStudioMount = ({
 }: TPlatformStudioMountProps) => {
   const router = useRouter();
   const studioScheme = useStudioScheme();
+  useRefreshOnTabReturn();
 
   const recordFirstEntry = (tenantId: string) => () => {
     setPersistentCookie(studioEnteredCookie(tenantId), String(true));

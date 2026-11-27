@@ -918,7 +918,7 @@
       "PLAIN": "Kein Rahmen bis zum Überfahren"
     },
     "headerControlShapeLabel": "Form der Header-Schaltflächen",
-    "headerControlShapeDescription": "Die Umrissform der Schaltflächen für Sprache, Design, Menü und Konto.",
+    "headerControlShapeDescription": "Die Umrissform der Schaltflächen für Sprache, Design, Menü und Konto sowie der Header-Aktion.",
     "headerControlShapeOptionLabel": {
       "ROUND": "Rund",
       "ROUNDED": "Abgerundet",

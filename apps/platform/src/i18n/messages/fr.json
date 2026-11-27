@@ -918,7 +918,7 @@
       "PLAIN": "Aucun contour avant le survol"
     },
     "headerControlShapeLabel": "Forme des boutons d’en-tête",
-    "headerControlShapeDescription": "La forme du contour des boutons de langue, de thème, de menu et de compte.",
+    "headerControlShapeDescription": "La forme du contour des boutons de langue, de thème, de menu et de compte, ainsi que de l'action d'en-tête.",
     "headerControlShapeOptionLabel": {
       "ROUND": "Ronde",
       "ROUNDED": "Arrondie",

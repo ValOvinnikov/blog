@@ -918,7 +918,7 @@
       "PLAIN": "Geen rand tot je eroverheen beweegt"
     },
     "headerControlShapeLabel": "Vorm van headerknoppen",
-    "headerControlShapeDescription": "De omtrekvorm van de knoppen voor taal, thema, menu en account.",
+    "headerControlShapeDescription": "De omtrekvorm van de knoppen voor taal, thema, menu en account, en van de headeractie.",
     "headerControlShapeOptionLabel": {
       "ROUND": "Rond",
       "ROUNDED": "Afgerond",

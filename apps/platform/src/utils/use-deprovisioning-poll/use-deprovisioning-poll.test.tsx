@@ -38,7 +38,6 @@ const STEP_STATUS = TENANT_PROVISIONING_STEP_STATUS;
 
 vi.mock(
   '@platform/server/provisioning/get-tenant-deprovisioning-status-action',
-  () => ({ getTenantDeprovisioningStatusAction: vi.fn() }),
 );
 
 const getTenantDeprovisioningStatusActionMock = vi.mocked(

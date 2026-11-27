@@ -45,23 +45,14 @@ vi.mock('@shinefold/db', async () => ({
 
 vi.mock('@platform/server/tenants/resolve-is-platform-tenant');
 
-vi.mock('@platform/server/provisioning/deprovision-tenant-action', () => ({
-  deprovisionTenantAction: vi.fn(),
-}));
+vi.mock('@platform/server/provisioning/deprovision-tenant-action');
 
-vi.mock('@platform/server/provisioning/delete-tenant-action', () => ({
-  deleteTenantAction: vi.fn(),
-}));
+vi.mock('@platform/server/provisioning/delete-tenant-action');
 
-vi.mock('@platform/server/provisioning/reactivate-tenant-action', () => ({
-  reactivateTenantAction: vi.fn(),
-}));
+vi.mock('@platform/server/provisioning/reactivate-tenant-action');
 
 vi.mock(
   '@platform/server/provisioning/get-tenant-deprovisioning-status-action',
-  () => ({
-    getTenantDeprovisioningStatusAction: vi.fn(async () => undefined),
-  }),
 );
 
 const {
