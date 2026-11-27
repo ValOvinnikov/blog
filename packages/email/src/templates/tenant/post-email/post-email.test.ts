@@ -1,6 +1,10 @@
 import { faker } from '@faker-js/faker';
-import type { TPostSummary } from '@shinefold/config';
-import { EMAIL_FONT_STACK, FONT_CHOICE } from '@shinefold/config/constants';
+import { SITE_MESSAGES_BY_LOCALE, type TPostSummary } from '@shinefold/config';
+import {
+  EMAIL_FONT_STACK,
+  FONT_CHOICE,
+  LOCALE_ISO_CODES,
+} from '@shinefold/config/constants';
 import { POST_BOX_CLASS } from '@shinefold/email/templates/tenant/post-email-frame/post-email-frame';
 import { LIST_UNSUBSCRIBE_ONE_CLICK } from '@shinefold/email/templates/tenant/unsubscribe/unsubscribe';
 import {
@@ -54,6 +58,7 @@ const MOCK_INPUT: TPostEmailInput = {
   unsubscribeUrl: MOCK_UNSUBSCRIBE_URL,
   brand: MOCK_TENANT_EMAIL_BRAND,
   brandName: MOCK_TENANT_NAME,
+  locale: LOCALE_ISO_CODES.EN,
 };
 
 describe(buildPostEmail, () => {
@@ -150,6 +155,23 @@ describe(buildPostEmail, () => {
       );
     });
   });
+
+  it.each(Object.values(LOCALE_ISO_CODES))(
+    'heads the summary in the %s site language',
+    (locale) => {
+      const heading =
+        SITE_MESSAGES_BY_LOCALE[locale].blogPostPage.postSummary.button;
+
+      const { html, text } = buildPostEmail({
+        ...MOCK_INPUT,
+        locale,
+        summary: MOCK_SUMMARY,
+      });
+
+      expect(html).toContain(`>${heading}</h2>`);
+      expect(text).toContain(`${heading}\n\n${MOCK_SUMMARY_PARAGRAPH}`);
+    },
+  );
 
   it('renders no summary box for a summary with no text', () => {
     const { html } = buildPostEmail({

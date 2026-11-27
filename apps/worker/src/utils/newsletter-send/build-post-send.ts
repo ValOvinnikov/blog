@@ -52,6 +52,7 @@ export function buildPostSend(
     unsubscribeUrl: `${siteUrl}${routes.newsletterUnsubscribe(unsubscribeToken, locale)}`,
     coverImageUrl,
     summary,
+    locale,
     ...brand,
   });
 

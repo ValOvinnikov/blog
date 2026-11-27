@@ -1,5 +1,9 @@
-import type { TPostSummary, TTenantEmailBrand } from '@shinefold/config';
-import type { TFontChoice } from '@shinefold/config/constants';
+import {
+  SITE_MESSAGES_BY_LOCALE,
+  type TPostSummary,
+  type TTenantEmailBrand,
+} from '@shinefold/config';
+import type { TFontChoice, TLocaleIsoCode } from '@shinefold/config/constants';
 import { renderEmailDocument } from '@shinefold/email/html/email-document/email-document';
 import { buildPlainTextBody } from '@shinefold/email/plain-text/plain-text-body';
 import {
@@ -29,6 +33,7 @@ export type TPostEmailInput = {
   unsubscribeUrl: string;
   brand: TTenantEmailBrand;
   brandName: string;
+  locale: TLocaleIsoCode;
   darkBrand?: TTenantEmailBrand;
   headingFont?: TFontChoice;
   bodyFont?: TFontChoice;
@@ -57,6 +62,7 @@ export function buildPostEmail({
   unsubscribeUrl,
   brand,
   brandName,
+  locale,
   darkBrand,
   headingFont,
   bodyFont,
@@ -69,7 +75,15 @@ export function buildPostEmail({
 }: TPostEmailInput): TPostEmailContent {
   const bannerText = isTest ? testBannerText : undefined;
   const fonts = resolvePostEmailFonts(headingFont, bodyFont);
-  const card = { title, excerpt, summary, postUrl, coverImageUrl };
+  const card = {
+    title,
+    excerpt,
+    summary,
+    summaryHeading:
+      SITE_MESSAGES_BY_LOCALE[locale].blogPostPage.postSummary.button,
+    postUrl,
+    coverImageUrl,
+  };
   const unsubscribeAction = buildUnsubscribeAction(unsubscribeUrl);
   const footerLine = `You're getting this because you subscribed to ${brandName}.`;
 

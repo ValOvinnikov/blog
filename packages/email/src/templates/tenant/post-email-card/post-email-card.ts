@@ -25,6 +25,7 @@ export type TPostEmailCard = {
   title: string;
   excerpt: string;
   summary: TPostSummary;
+  summaryHeading: string;
   postUrl: string;
   coverImageUrl?: string;
 };
@@ -37,10 +38,11 @@ export function postCardAsPlainText({
   title,
   excerpt,
   summary,
+  summaryHeading,
   postUrl,
 }: TPostEmailCard): string {
   return buildPlainTextBody(
-    [title, ...postEmailSummaryAsPlainText(summary), excerpt],
+    [title, ...postEmailSummaryAsPlainText(summary, summaryHeading), excerpt],
     readPostAction(postUrl),
   );
 }
@@ -57,14 +59,21 @@ function renderCover(coverImageUrl?: string): string {
 }
 
 export function renderPostCard(
-  { title, excerpt, summary, postUrl, coverImageUrl }: TPostEmailCard,
+  {
+    title,
+    excerpt,
+    summary,
+    summaryHeading,
+    postUrl,
+    coverImageUrl,
+  }: TPostEmailCard,
   brand: TTenantEmailBrand,
   fonts: TPostEmailFonts,
 ): string {
   const content = renderEmailStack(
     [
       `<h1 class="${POST_TITLE_CLASS} ${POST_TEXT_CLASS}" style="margin:0;font-family:${fonts.heading};font-size:34px;font-weight:600;line-height:1.15;color:${brand.text};">${escapeHtml(title)}</h1>`,
-      renderPostEmailSummary(summary, brand),
+      renderPostEmailSummary(summary, summaryHeading, brand),
       `<p class="${POST_TEXT_CLASS}" style="margin:0;font-size:16px;line-height:1.6;color:${brand.text};">${escapeHtml(excerpt)}</p>`,
       renderEmailButton({
         ...readPostAction(postUrl),

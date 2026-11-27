@@ -99,6 +99,7 @@ export const sendNewsletterPostTest = async (
     postUrl: `${siteUrl}${routes.post(slug)}`,
     unsubscribeUrl: siteUrl,
     brandName: name,
+    locale,
     coverImageUrl,
     summary: takeaways,
     logoImageUrl: emailConfig?.logoAssetUrl ?? undefined,
