@@ -10,6 +10,7 @@ import {
 import { MOCK_MEMBERSHIP_ID } from '@worker/testing/member-access/fixtures';
 import { MOCK_QUEUE_DOWN } from '@worker/testing/outage/fixtures';
 import {
+  MOCK_OTHER_TENANT_ID,
   MOCK_TENANT_ID,
   mockProvisionedTenant,
 } from '@worker/testing/tenant/fixtures';
@@ -19,8 +20,6 @@ import { wakeOwnerAccess } from '@worker/utils/owner-access-run/owner-access-run
 
 import { revokeLockedMembers } from './revoke-locked-members';
 import { runOwnerAccessSweep } from './run-owner-access-sweep';
-
-const MOCK_OTHER_TENANT_ID = 'tenant-other';
 
 vi.mock('@shinefold/db/queries/memberships');
 vi.mock('@shinefold/db/queries/tenants');

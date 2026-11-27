@@ -1,9 +1,13 @@
 import { SANITY_PERSPECTIVE } from '@shinefold/config/constants';
 import type { TTenantSanityCredentials } from '@shinefold/db/queries/tenants';
-import { DOCUMENT_CAP_UNCOUNTED_TYPES } from '@worker/constants/document-cap';
+import {
+  DOCUMENT_CAP_UNCOUNTED_TYPE_PREFIX,
+  DOCUMENT_CAP_UNCOUNTED_TYPES,
+} from '@worker/constants/document-cap';
 import { createTenantSanityClient } from '@worker/utils/tenant-sanity-client/tenant-sanity-client';
 
-const COUNT_DOCUMENTS_QUERY = 'count(*[!(_type in $uncountedTypes)])';
+const COUNT_DOCUMENTS_QUERY =
+  'count(*[!(_type in $uncountedTypes) && !string::startsWith(_type, $uncountedPrefix)])';
 
 export async function countTenantDocuments({
   projectId,
@@ -18,5 +22,6 @@ export async function countTenantDocuments({
   });
   return client.fetch<number>(COUNT_DOCUMENTS_QUERY, {
     uncountedTypes: DOCUMENT_CAP_UNCOUNTED_TYPES,
+    uncountedPrefix: DOCUMENT_CAP_UNCOUNTED_TYPE_PREFIX,
   });
 }

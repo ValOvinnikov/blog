@@ -5,6 +5,7 @@ import {
 } from '@worker/constants/document-cap';
 import { MOCK_SANITY_OUTAGE } from '@worker/testing/outage/fixtures';
 import {
+  MOCK_OTHER_TENANT_ID,
   MOCK_TENANT_ID,
   mockProvisionedTenant,
 } from '@worker/testing/tenant/fixtures';
@@ -16,7 +17,6 @@ import { runDocumentCapSweep } from './run-document-cap-sweep';
 vi.mock('@shinefold/db/queries/tenants');
 vi.mock('./check-tenant-document-cap');
 
-const MOCK_OTHER_TENANT_ID = 'tenant-other';
 const MOCK_THIRD_TENANT_ID = 'tenant-third';
 
 describe(runDocumentCapSweep, () => {

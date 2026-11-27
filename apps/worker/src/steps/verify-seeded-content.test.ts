@@ -1,11 +1,8 @@
 import { faker } from '@faker-js/faker';
-import { LOCALE_ISO_CODES } from '@shinefold/config/constants';
-import {
-  TENANT_PROVISIONING_STATUS,
-  TENANT_STATUS,
-} from '@shinefold/db/constants';
+import { TENANT_PROVISIONING_STATUS } from '@shinefold/db/constants';
 import { getTenantSanityCredentials } from '@shinefold/db/queries/tenants';
 import type { TTenant } from '@shinefold/db/schema/tenants';
+import { mockTenantSanityCredentials } from '@shinefold/db/testing/tenant-sanity-credentials/fixtures';
 import { MOCK_NOW } from '@worker/testing/clock/frozen-clock';
 import {
   MOCK_PROVISION_ENV,
@@ -37,15 +34,12 @@ vi.mock('@worker/utils/tenant-management-token/tenant-management-token');
 
 const { vercelToken, vercelTeamId, vercelWebProjectId } = MOCK_PROVISION_ENV;
 
-const MOCK_CREDENTIALS = {
+const MOCK_CREDENTIALS = mockTenantSanityCredentials({
   projectId: MOCK_SANITY_PROJECT_ID,
   dataset: MOCK_SANITY_DATASET,
   token: MOCK_SANITY_READ_TOKEN,
-  status: TENANT_STATUS.ACTIVE,
-  deprovisionedAt: null,
   provisioningStatus: TENANT_PROVISIONING_STATUS.PROVISIONING,
-  defaultLocale: LOCALE_ISO_CODES.EN,
-};
+});
 const MOCK_VALID_HOME_PAGE = {
   headingBlock: { heading: faker.lorem.words(3) },
   seo: { metaTitle: faker.string.alpha(40) },
