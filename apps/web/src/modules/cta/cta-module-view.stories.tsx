@@ -1,5 +1,7 @@
 import {
   BRAND_VARIANT,
+  BUTTON_SHAPE,
+  CARD_STYLE,
   CONTENT_ALIGNMENT,
   CTA_VARIANT,
   SPACING_SCALE,
@@ -12,6 +14,7 @@ import {
 } from '@web/testing/modules/cta/fixtures';
 import { mockSanityImage } from '@web/testing/modules/hero/fixtures';
 import { mockHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
+import type { TSectionAppearance } from '@web/utils/build-section-scope-declarations';
 
 import { CtaModuleView } from './cta-module-view';
 
@@ -37,6 +40,11 @@ const BANNER_MODULE = mockCtaModuleData({
   contentPosition: CONTENT_ALIGNMENT.CENTER,
   contentAlignment: CONTENT_ALIGNMENT.CENTER,
 });
+
+const PLAIN_CARD_APPEARANCE: TSectionAppearance = {
+  overrides: { cardStyle: CARD_STYLE.PLAIN },
+  look: { cardStyle: CARD_STYLE.ACCENT_BAR, buttonShape: BUTTON_SHAPE.ROUNDED },
+};
 
 const meta = {
   title: 'Modules/CtaModule',
@@ -110,4 +118,20 @@ export const BannerBetweenSecondarySectionsSpacingXl: TStory = {
     },
   },
   render: BannerBetweenSecondarySectionsSpacingNone.render,
+};
+
+export const PlainCardOnEachBand: TStory = {
+  args: { appearance: PLAIN_CARD_APPEARANCE },
+  render: (args) => (
+    <>
+      {Object.values(BRAND_VARIANT).map((bandTone) => (
+        <CtaModuleView
+          key={bandTone}
+          {...args}
+          id={`cta-${bandTone}`}
+          module={{ ...args.module, bandTone }}
+        />
+      ))}
+    </>
+  ),
 };
