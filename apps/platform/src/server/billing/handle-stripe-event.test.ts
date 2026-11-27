@@ -34,7 +34,7 @@ import type Stripe from 'stripe';
 import { handleCatalogueEvent } from './catalogue/handle-catalogue-event';
 import { revalidatePlatformSite } from './catalogue/revalidate-platform-site';
 import { handleStripeEvent } from './handle-stripe-event';
-import { invoiceAwaitsAuthentication } from './invoice-awaits-authentication';
+import { invoiceWasDeclined } from './invoice-was-declined';
 import { sendPaymentFailedNotice } from './send-payment-failed-notice';
 import { sendPaymentReceipt } from './send-payment-receipt';
 import { syncStripeSubscription } from './sync-stripe-subscription';
@@ -64,8 +64,8 @@ vi.mock('./send-payment-receipt', () => ({ sendPaymentReceipt: vi.fn() }));
 vi.mock('./send-payment-failed-notice', () => ({
   sendPaymentFailedNotice: vi.fn(),
 }));
-vi.mock('./invoice-awaits-authentication', () => ({
-  invoiceAwaitsAuthentication: vi.fn(),
+vi.mock('./invoice-was-declined', () => ({
+  invoiceWasDeclined: vi.fn(),
 }));
 vi.mock('./catalogue/handle-catalogue-event', () => ({
   handleCatalogueEvent: vi.fn(),
@@ -259,7 +259,7 @@ describe(handleStripeEvent, () => {
 
   describe('a failed renewal payment', () => {
     beforeEach(() => {
-      vi.mocked(invoiceAwaitsAuthentication).mockResolvedValue(false);
+      vi.mocked(invoiceWasDeclined).mockResolvedValue(true);
     });
 
     it("emails the owner once on a declined payment's first attempt", async () => {
@@ -267,7 +267,7 @@ describe(handleStripeEvent, () => {
 
       await handle(event);
 
-      expect(invoiceAwaitsAuthentication).toHaveBeenCalledWith(
+      expect(invoiceWasDeclined).toHaveBeenCalledWith(
         MOCK_STRIPE_CLIENT,
         MOCK_STRIPE_INVOICE_ID,
       );
@@ -294,7 +294,7 @@ describe(handleStripeEvent, () => {
     });
 
     it('sends one email when a bank-check payment is both failed and needing action', async () => {
-      vi.mocked(invoiceAwaitsAuthentication).mockResolvedValue(true);
+      vi.mocked(invoiceWasDeclined).mockResolvedValue(false);
 
       await handle(paymentFailedEvent());
       await handle(paymentActionRequiredEvent());
@@ -307,32 +307,30 @@ describe(handleStripeEvent, () => {
       );
     });
 
-    it("sends nothing for a later retry needing the bank's check", async () => {
-      await handle(paymentActionRequiredEvent(MOCK_RETRY_ATTEMPT_COUNT));
+    it.each([
+      [
+        "a later retry needing the bank's check",
+        () => paymentActionRequiredEvent(MOCK_RETRY_ATTEMPT_COUNT),
+      ],
+      [
+        'a later retry of the same invoice',
+        () => paymentFailedEvent({ attemptCount: MOCK_RETRY_ATTEMPT_COUNT }),
+      ],
+      [
+        'a failed plan-change invoice',
+        () =>
+          paymentFailedEvent({
+            billingReason: STRIPE_BILLING_REASON.SUBSCRIPTION_UPDATE,
+          }),
+      ],
+    ])('sends nothing for %s', async (_label, event) => {
+      await handle(event());
 
       expect(sendPaymentFailedNotice).not.toHaveBeenCalled();
     });
 
-    it('sends nothing for a later retry of the same invoice', async () => {
-      await handle(
-        paymentFailedEvent({ attemptCount: MOCK_RETRY_ATTEMPT_COUNT }),
-      );
-
-      expect(sendPaymentFailedNotice).not.toHaveBeenCalled();
-    });
-
-    it('sends nothing for a failed plan-change invoice', async () => {
-      await handle(
-        paymentFailedEvent({
-          billingReason: STRIPE_BILLING_REASON.SUBSCRIPTION_UPDATE,
-        }),
-      );
-
-      expect(sendPaymentFailedNotice).not.toHaveBeenCalled();
-    });
-
-    it('logs a failed send without failing the webhook', async () => {
-      vi.mocked(invoiceAwaitsAuthentication).mockRejectedValue(new Error());
+    it('logs a failed payment read without failing the webhook', async () => {
+      vi.mocked(invoiceWasDeclined).mockRejectedValue(new Error());
 
       await expect(handle(paymentFailedEvent())).resolves.toBeUndefined();
       expect(logger.error).toHaveBeenCalledWith(

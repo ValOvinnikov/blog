@@ -6,7 +6,7 @@ import {
   PAYMENT_FAILURE,
   STRIPE_BILLING_REASON,
 } from '@platform/constants/stripe-payment';
-import { invoiceAwaitsAuthentication } from '@platform/server/billing/invoice-awaits-authentication';
+import { invoiceWasDeclined } from '@platform/server/billing/invoice-was-declined';
 import { sendPaymentFailedNotice } from '@platform/server/billing/send-payment-failed-notice';
 import { sendPaymentReceipt } from '@platform/server/billing/send-payment-receipt';
 import type { TSyncedSubscription } from '@platform/server/billing/sync-stripe-subscription';
@@ -27,16 +27,14 @@ const isFirstRenewalAttempt = ({
   attempt_count === 1 &&
   billing_reason === STRIPE_BILLING_REASON.SUBSCRIPTION_CYCLE;
 
-// A payment waiting on the bank may also raise `invoice.payment_failed`; `invoice.payment_action_required` emails for it, so this one stays silent.
+// A payment waiting on the bank may also raise `invoice.payment_failed`; `invoice.payment_action_required` emails for that one.
 const sendDeclinedNotice = async (
   stripe: Stripe,
   invoice: Stripe.Invoice,
   tenantId: string,
   plan: TTenantPlan,
 ): Promise<void> => {
-  if (invoice.id && (await invoiceAwaitsAuthentication(stripe, invoice.id))) {
-    return;
-  }
+  if (!invoice.id || !(await invoiceWasDeclined(stripe, invoice.id))) return;
   await sendPaymentFailedNotice(
     invoice,
     tenantId,

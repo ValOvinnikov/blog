@@ -80,7 +80,7 @@ describe(payOpenInvoiceAction, () => {
   it.each([ADMIN_ROLE.SUPERADMIN, ADMIN_ROLE.MODERATOR])(
     'lets the gate admit only the owner, never a %s',
     async (role) => {
-      await pay().catch(() => undefined);
+      await pay();
 
       const [tenantId, isAdminPermitted] =
         requireTenantOwnerOrAdminMock.mock.calls[0] ?? [];

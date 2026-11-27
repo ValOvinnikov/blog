@@ -37,10 +37,6 @@ const clickPay = async () => {
 };
 
 describe(`<${PayInvoiceButton.name}/>`, () => {
-  afterEach(() => {
-    vi.restoreAllMocks();
-  });
-
   it("opens the owner's payment page in a new tab", async () => {
     const { paymentTab, open } = mockPaymentTab();
     payOpenInvoiceActionMock.mockResolvedValueOnce({

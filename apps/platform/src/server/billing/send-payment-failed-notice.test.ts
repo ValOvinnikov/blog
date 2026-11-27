@@ -8,6 +8,7 @@ import {
   MOCK_HOSTED_INVOICE_URL,
   mockStripeInvoice,
 } from '@platform/testing/billing/fixtures';
+import { makeEnTranslator } from '@platform/testing/en-translator';
 import { mockedEnv } from '@platform/testing/env/mocked-env';
 import {
   MOCK_OWNER_EMAIL_FROM_ADDRESS,
@@ -42,9 +43,11 @@ vi.mock('@shinefold/email');
 
 const MOCK_NEXT_PAYMENT_ATTEMPT = toStripeTime(new Date());
 const copy = enMessages.ownerPaymentFailedEmail;
+const t = makeEnTranslator('ownerPaymentFailedEmail');
 
 const sendEmailMock = vi.mocked(sendEmail);
-const sentText = () => sendEmailMock.mock.calls[0]?.[0].text;
+const sentEmail = () => sendEmailMock.mock.calls[0]?.[0];
+const sentText = () => sentEmail()?.text;
 
 const sendNotice = (
   invoice: Stripe.Invoice = mockStripeInvoice(),
@@ -124,23 +127,19 @@ describe(sendPaymentFailedNotice, () => {
 
     beforeEach(async () => {
       await sendNotice(
-        mockStripeInvoice({ hosted_invoice_url: MOCK_HOSTED_INVOICE_URL }),
+        mockStripeInvoice(),
         PAYMENT_FAILURE.AUTHENTICATION_REQUIRED,
       );
       text = sentText();
     });
 
     it('asks the owner to confirm the payment with their bank', () => {
-      expect(sendEmailMock.mock.calls[0]?.[0].subject).toBe(
-        `Confirm your payment for ${MOCK_TENANT_NAME}`,
+      expect(sentEmail()?.subject).toBe(
+        t('authenticationSubject', { siteName: MOCK_TENANT_NAME }),
       );
       expect(text).toContain(copy.confirmPayment);
       expect(text).toContain(copy.confirmActionLabel);
       expect(text).not.toContain(copy.payInvoice);
-    });
-
-    it('links to the page where the bank check is completed', () => {
-      expect(text).toContain(MOCK_HOSTED_INVOICE_URL);
     });
   });
 

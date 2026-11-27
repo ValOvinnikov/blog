@@ -27,6 +27,8 @@ export const STRIPE_PENDING_PAYMENT_EXPAND = [
   'latest_invoice.payments',
 ];
 
+export const STRIPE_INVOICE_PAYMENTS_EXPAND = ['payments'];
+
 export const STRIPE_BILLING_REASON = {
   SUBSCRIPTION_CYCLE: 'subscription_cycle',
   SUBSCRIPTION_UPDATE: 'subscription_update',
