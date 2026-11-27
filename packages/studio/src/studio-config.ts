@@ -7,7 +7,6 @@ import {
 } from '@shinefold/config/constants';
 import { buildLoginProviderAuth } from '@shinefold/studio/auth/login-provider-auth';
 import { buildDocumentOptions } from '@shinefold/studio/document-actions/document-options/document-options';
-import { LOCALIZED_FIELD_TYPES } from '@shinefold/studio/localized-field-types';
 import { schemaTypes } from '@shinefold/studio/schema-types';
 import { LANGUAGE_FIELD } from '@shinefold/studio/schema-types/fields/language-field/language-field';
 import { createLanguageSwitcherField } from '@shinefold/studio/schema-types/inputs/language-switcher-field/language-switcher-field';
@@ -33,9 +32,9 @@ import { isSingleLanguage } from '@shinefold/studio/structure/locales/is-single-
 import { orderLocales } from '@shinefold/studio/structure/locales/order-locales';
 import { defineConfig, definePlugin } from 'sanity';
 import { structureTool } from 'sanity/structure';
-import { internationalizedArray } from 'sanity-plugin-internationalized-array';
 import { media, mediaAssetSource } from 'sanity-plugin-media';
 
+import { localizedFieldsPlugin } from './localized-fields-plugin';
 import type { TBuildStudioConfigParams } from './studio-config-params';
 import { createStudioStructure } from './studio-structure';
 import {
@@ -129,11 +128,7 @@ export const buildStudioConfig = ({
         schemaTypes: ONE_PER_LANGUAGE_DOCUMENT_TYPES,
         defaultLocale,
       }),
-      internationalizedArray({
-        languages,
-        defaultLanguages: [defaultLocale],
-        fieldTypes: LOCALIZED_FIELD_TYPES,
-      }),
+      localizedFieldsPlugin(languages, defaultLocale),
       ...(liveLocales
         ? [
             localizationNotices({ liveLocales, defaultLocale }),
