@@ -129,40 +129,28 @@ describe(`<${GrantsCard.name}/>`, () => {
     expect(meta).toBeVisible();
   });
 
-  it('names a language grant by how many languages it adds', () => {
-    setup({
-      grants: [
-        mockGrantRow({
-          kind: ENTITLEMENT_KIND.LOCALE_LIMIT,
-          key: ENTITLEMENT_KIND.LOCALE_LIMIT,
-          value: 4,
-        }),
-      ],
-    });
+  it.each([
+    {
+      grant: 'a language grant by how many languages it adds',
+      row: {
+        kind: ENTITLEMENT_KIND.LOCALE_LIMIT,
+        key: ENTITLEMENT_KIND.LOCALE_LIMIT,
+        value: 4,
+      },
+      itemName: makeEnTranslator('grantItemNames')('languages', { count: 3 }),
+      kindName: grantsCard.kind.LOCALE_LIMIT,
+    },
+    {
+      grant: 'a preset grant by the preset',
+      row: { kind: ENTITLEMENT_KIND.PRESET, key: PRESET_ID.SHINEFOLD },
+      itemName: en.grantItemNames.preset[PRESET_ID.SHINEFOLD],
+      kindName: grantsCard.kind.PRESET,
+    },
+  ])('names $grant', ({ row, itemName, kindName }) => {
+    setup({ grants: [mockGrantRow(row)] });
 
-    const item = screen.getByText(
-      makeEnTranslator('grantItemNames')('languages', { count: 3 }),
-    );
-    const kind = screen.getByText(grantsCard.kind.LOCALE_LIMIT);
-
-    expect(item).toBeVisible();
-    expect(kind).toBeVisible();
-  });
-
-  it('names a preset grant by the preset', () => {
-    setup({
-      grants: [
-        mockGrantRow({
-          kind: ENTITLEMENT_KIND.PRESET,
-          key: PRESET_ID.SHINEFOLD,
-        }),
-      ],
-    });
-
-    const item = screen.getByText(
-      en.grantItemNames.preset[PRESET_ID.SHINEFOLD],
-    );
-    const kind = screen.getByText(grantsCard.kind.PRESET);
+    const item = screen.getByText(itemName);
+    const kind = screen.getByText(kindName);
 
     expect(item).toBeVisible();
     expect(kind).toBeVisible();

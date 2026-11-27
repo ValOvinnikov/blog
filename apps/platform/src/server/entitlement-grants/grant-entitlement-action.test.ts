@@ -72,6 +72,14 @@ const MOCK_UNNEEDED_LOCALE_LIMIT_ITEM = {
   kind: ENTITLEMENT_KIND.LOCALE_LIMIT,
   value: 1,
 } as const;
+const MOCK_SHINEFOLD_PRESET_ITEM = {
+  kind: ENTITLEMENT_KIND.PRESET,
+  key: PRESET_ID.SHINEFOLD,
+} as const;
+const MOCK_OPEN_PRESET_ITEM = {
+  kind: ENTITLEMENT_KIND.PRESET,
+  key: PRESET_ID.CONSOLE,
+} as const;
 const MOCK_CONTACT_FORM_ITEM = {
   kind: ENTITLEMENT_KIND.CAPABILITY,
   key: CAPABILITY.CONTACT_FORM,
@@ -167,39 +175,16 @@ describe(grantEntitlementAction, () => {
     expect(grantEntitlement).not.toHaveBeenCalled();
   });
 
-  it('passes a language limit grant through as the item', async () => {
-    const result = await grant({ item: MOCK_LOCALE_LIMIT_ITEM });
+  it.each([
+    { item: 'a language limit grant', grantItem: MOCK_LOCALE_LIMIT_ITEM },
+    { item: 'a Shinefold preset grant', grantItem: MOCK_SHINEFOLD_PRESET_ITEM },
+  ])('passes $item through as the item', async ({ grantItem }) => {
+    const result = await grant({ item: grantItem });
 
     expect(result).toEqual({ outcome: ACTION_OUTCOME.SUCCESS });
     expect(grantEntitlement).toHaveBeenCalledWith(
-      expectedGrantInput({ item: MOCK_LOCALE_LIMIT_ITEM }),
+      expectedGrantInput({ item: grantItem }),
     );
-  });
-
-  it('passes a Shinefold preset grant through as the item', async () => {
-    const presetItem = {
-      kind: ENTITLEMENT_KIND.PRESET,
-      key: PRESET_ID.SHINEFOLD,
-    } as const;
-
-    const result = await grant({ item: presetItem });
-
-    expect(result).toEqual({ outcome: ACTION_OUTCOME.SUCCESS });
-    expect(grantEntitlement).toHaveBeenCalledWith(
-      expectedGrantInput({ item: presetItem }),
-    );
-  });
-
-  it('rejects a preset every tenant already has', async () => {
-    const result = await grant({
-      item: { kind: ENTITLEMENT_KIND.PRESET, key: PRESET_ID.CONSOLE },
-    });
-
-    expect(result).toEqual({
-      outcome: ACTION_OUTCOME.INVALID,
-      fieldErrors: {},
-    });
-    expect(grantEntitlement).not.toHaveBeenCalled();
   });
 
   it.each([
@@ -250,15 +235,23 @@ describe(grantEntitlementAction, () => {
     );
   });
 
-  it('rejects a language limit no plan could need', async () => {
-    const result = await grant({
-      item: MOCK_UNNEEDED_LOCALE_LIMIT_ITEM,
-    });
+  it.each([
+    {
+      item: 'a language limit no plan could need',
+      grantItem: MOCK_UNNEEDED_LOCALE_LIMIT_ITEM,
+    },
+    {
+      item: 'a preset every tenant already has',
+      grantItem: MOCK_OPEN_PRESET_ITEM,
+    },
+  ])('rejects $item', async ({ grantItem }) => {
+    const result = await grant({ item: grantItem });
 
     expect(result).toEqual({
       outcome: ACTION_OUTCOME.INVALID,
       fieldErrors: {},
     });
+    expect(grantEntitlement).not.toHaveBeenCalled();
   });
 
   it('passes on the refusal for an archived tenant without writing', async () => {

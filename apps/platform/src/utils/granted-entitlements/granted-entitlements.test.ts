@@ -11,7 +11,10 @@ import {
   LOOK_FIELD,
   PLAN_LOCALE_LIMIT,
 } from '@shinefold/db/constants';
-import { mockEntitlementGrant } from '@shinefold/db/testing/tenant-entitlement-grants/mock-entitlement-grant';
+import {
+  MOCK_SHINEFOLD_PRESET_GRANT,
+  mockEntitlementGrant,
+} from '@shinefold/db/testing/tenant-entitlement-grants/mock-entitlement-grant';
 
 import { grantedEntitlements } from './granted-entitlements';
 
@@ -111,8 +114,7 @@ describe(grantedEntitlements, () => {
 
   it('lists a granted preset with the end of its grant', () => {
     const { presets } = grantedOnStarter({
-      kind: ENTITLEMENT_KIND.PRESET,
-      key: PRESET_ID.SHINEFOLD,
+      ...MOCK_SHINEFOLD_PRESET_GRANT,
       expiresAt: IN_A_DAY,
     });
 
