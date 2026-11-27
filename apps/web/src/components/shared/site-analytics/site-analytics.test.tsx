@@ -3,6 +3,7 @@ import {
   MOCK_PLAUSIBLE_ANALYTICS,
 } from '@shinefold/db/testing/tenant-analytics/fixtures';
 import { PLAUSIBLE_ORIGIN } from '@web/config/analytics-origins';
+import { getRequestContext } from '@web/server/request-context/request-context';
 import { getSiteAnalytics } from '@web/server/site-config/get-site-analytics/get-site-analytics';
 import { customRenderAsync, screen } from '@web/testing/custom-render';
 import { SCRIPT_TEST_ID } from '@web/testing/shared/next-script/mock-next-script';
@@ -74,6 +75,17 @@ describe(SiteAnalytics, () => {
 
   it('renders nothing with Vercel analytics off and no analytics tool', async () => {
     mockEnv.WEB_ANALYTICS_ENABLED = 'false';
+
+    const { container } = await setup();
+
+    expect(container).toBeEmptyDOMElement();
+  });
+
+  it('renders nothing on a draft preview render', async () => {
+    vi.mocked(getRequestContext).mockResolvedValueOnce({
+      ...MOCK_REQUEST_CONTEXT,
+      isDraftPreview: true,
+    });
 
     const { container } = await setup();
 
