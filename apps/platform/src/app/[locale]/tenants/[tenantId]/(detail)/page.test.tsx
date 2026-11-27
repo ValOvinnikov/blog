@@ -1,8 +1,8 @@
 import { DOMAIN_VERIFICATION_STATUS } from '@platform/constants/domain';
 import messages from '@platform/i18n/messages/en.json';
-import { mockAdmin } from '@platform/testing/admins/fixtures';
+import { requireTenantById } from '@platform/server/auth/require-tenant-by-id';
 import { customRenderAsync, screen } from '@platform/testing/custom-render';
-import { mockViewer } from '@platform/testing/memberships/fixtures';
+import { mockTenantByIdContext } from '@platform/testing/memberships/fixtures';
 import { mockDbConstants } from '@platform/testing/mock-db-constants';
 import {
   MOCK_TENANT_ID,
@@ -15,13 +15,11 @@ import { noEntitlementGrantQueries } from '@platform/testing/tenants/no-entitlem
 import TenantOverviewPage from './page';
 
 const {
-  requireTenantByIdMock,
   getTenantOwnerMembershipMock,
   listAuditEventsForTargetMock,
   listFindingsForTenantMock,
   getDomainVerificationStatusMock,
 } = vi.hoisted(() => ({
-  requireTenantByIdMock: vi.fn(),
   getTenantOwnerMembershipMock: vi.fn(),
   listAuditEventsForTargetMock: vi.fn(),
   listFindingsForTenantMock: vi.fn(),
@@ -30,9 +28,9 @@ const {
 
 vi.mock('@platform/utils/env/env');
 
-vi.mock('@platform/server/auth/require-tenant-by-id', () => ({
-  requireTenantById: requireTenantByIdMock,
-}));
+vi.mock('@platform/server/auth/require-tenant-by-id');
+
+const requireTenantByIdMock = vi.mocked(requireTenantById);
 
 vi.mock('@platform/server/tenants/resolve-is-platform-tenant');
 
@@ -83,11 +81,9 @@ const setup = customRenderAsync(TenantOverviewPage, {
 
 describe(`<${TenantOverviewPage.name}/>`, () => {
   beforeEach(() => {
-    requireTenantByIdMock.mockResolvedValue({
-      tenant: mockTenant(),
-      admin: mockAdmin(),
-      viewer: mockViewer({ admin: mockAdmin() }),
-    });
+    requireTenantByIdMock.mockResolvedValue(
+      mockTenantByIdContext(mockTenant()),
+    );
     getTenantOwnerMembershipMock.mockResolvedValue(mockJoinedOwner());
     listAuditEventsForTargetMock.mockResolvedValue([]);
     listFindingsForTenantMock.mockResolvedValue([]);

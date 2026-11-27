@@ -4,11 +4,16 @@ import {
   toPlatformViewer,
   type TViewerRecords,
 } from '@platform/server/auth/platform-viewer';
+import type { TTenantByIdContext } from '@platform/server/auth/require-tenant-by-id';
 import type { TTenantMembershipContext } from '@platform/server/auth/require-tenant-membership';
 import { mockAdmin } from '@platform/testing/admins/fixtures';
 import { MOCK_TENANT_ID } from '@platform/testing/tenants/fixtures';
 import type { TPlatformTenant } from '@platform/utils/platform-tenant/platform-tenant';
-import { MEMBERSHIP_ROLE, type TAdminRole } from '@shinefold/db/constants';
+import {
+  ADMIN_ROLE,
+  MEMBERSHIP_ROLE,
+  type TAdminRole,
+} from '@shinefold/db/constants';
 import type { TMembership } from '@shinefold/db/schema/memberships';
 
 export const mockMembership = (
@@ -56,8 +61,20 @@ export const mockEditorMembershipContext = (
 
 export const mockOperatorMembershipContext = (
   tenant: TPlatformTenant,
-): TTenantMembershipContext =>
-  mockMembershipContext(
-    tenant,
-    buildVirtualAdminMembership(mockAdmin().userId, tenant.id),
-  );
+  role: TAdminRole = ADMIN_ROLE.ADMIN,
+): TTenantMembershipContext => {
+  const admin = mockAdmin({ role });
+  const membership = buildVirtualAdminMembership(admin.userId, tenant.id);
+
+  return { tenant, membership, viewer: mockViewer({ membership, admin }) };
+};
+
+export const mockTenantByIdContext = (
+  tenant: TPlatformTenant,
+  role: TAdminRole = ADMIN_ROLE.ADMIN,
+): TTenantByIdContext => {
+  const admin = mockAdmin({ role });
+  const viewer = mockViewer({ admin });
+
+  return { tenant, admin, viewer, canGrantEntitlements: viewer.isSuperAdmin };
+};

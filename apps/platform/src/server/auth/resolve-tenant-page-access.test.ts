@@ -1,7 +1,8 @@
+import { canManageSubscribers } from '@platform/server/subscribers/can-manage-subscribers';
 import {
   mockMembership,
-  mockOperatorViewer,
-  mockViewer,
+  mockMembershipContext,
+  mockOperatorMembershipContext,
 } from '@platform/testing/memberships/fixtures';
 import { MOCK_SEATS_OVER_ONE_SEAT } from '@platform/testing/team/fixtures';
 import {
@@ -13,10 +14,15 @@ import { queries } from '@shinefold/db';
 import {
   ADMIN_ROLE,
   MEMBERSHIP_ROLE,
+  type TAdminRole,
   type TMembershipRole,
 } from '@shinefold/db/constants';
 
 import { resolveTenantPageAccess } from './resolve-tenant-page-access';
+
+vi.mock('@platform/server/subscribers/can-manage-subscribers', () => ({
+  canManageSubscribers: vi.fn(async () => true),
+}));
 
 vi.mock('@shinefold/db', () => ({
   queries: {
@@ -33,8 +39,21 @@ const countUnlockedSeatsInUse = vi.mocked(
 
 const resolveFor = (plan: TTenantPlan, role: TMembershipRole) =>
   resolveTenantPageAccess(
-    mockReadyTenant({ id: MOCK_TENANT_ID, plan }),
-    mockViewer({ membership: mockMembership({ role }) }),
+    mockMembershipContext(
+      mockReadyTenant({ id: MOCK_TENANT_ID, plan }),
+      mockMembership({ role }),
+    ),
+  );
+
+const resolveAsOperator = (
+  role: TAdminRole,
+  plan: TTenantPlan = TENANT_PLAN.FREE,
+) =>
+  resolveTenantPageAccess(
+    mockOperatorMembershipContext(
+      mockReadyTenant({ id: MOCK_TENANT_ID, plan }),
+      role,
+    ),
   );
 
 describe(resolveTenantPageAccess, () => {
@@ -79,53 +98,54 @@ describe(resolveTenantPageAccess, () => {
     expect(leads).toBe(false);
   });
 
-  it.each([
-    [TENANT_PLAN.GROWTH, MEMBERSHIP_ROLE.OWNER, true],
-    [TENANT_PLAN.GROWTH, MEMBERSHIP_ROLE.EDITOR, false],
-    [TENANT_PLAN.STARTER, MEMBERSHIP_ROLE.OWNER, false],
-  ] as const)(
-    'gives Subscribers on %s to an %s: %s',
-    async (plan, role, isOpen) => {
-      const { subscribers } = await resolveFor(plan, role);
+  it.each([true, false])(
+    'takes Subscribers for a manager from the subscribers rule: %s',
+    async (isOpen) => {
+      vi.mocked(canManageSubscribers).mockResolvedValue(isOpen);
+
+      const { subscribers } = await resolveFor(
+        TENANT_PLAN.GROWTH,
+        MEMBERSHIP_ROLE.OWNER,
+      );
 
       expect(subscribers).toBe(isOpen);
     },
   );
 
-  it('opens Subscribers to an operator on Growth', async () => {
-    const { subscribers } = await resolveTenantPageAccess(
-      mockReadyTenant({ id: MOCK_TENANT_ID, plan: TENANT_PLAN.GROWTH }),
-      mockOperatorViewer(ADMIN_ROLE.MODERATOR),
+  it('closes Subscribers to an editor', async () => {
+    const { subscribers } = await resolveFor(
+      TENANT_PLAN.GROWTH,
+      MEMBERSHIP_ROLE.EDITOR,
     );
 
-    expect(subscribers).toBe(true);
+    expect(subscribers).toBe(false);
+    expect(canManageSubscribers).not.toHaveBeenCalled();
   });
 
   it('opens Leads to an operator on a plan with the contact form', async () => {
-    const { leads } = await resolveTenantPageAccess(
-      mockReadyTenant({ id: MOCK_TENANT_ID, plan: TENANT_PLAN.GROWTH }),
-      mockOperatorViewer(ADMIN_ROLE.MODERATOR),
+    const { leads } = await resolveAsOperator(
+      ADMIN_ROLE.MODERATOR,
+      TENANT_PLAN.GROWTH,
     );
 
     expect(leads).toBe(true);
   });
 
   it.each([
-    ['the real owner', mockViewer(), true],
+    [
+      'the real owner',
+      () => resolveFor(TENANT_PLAN.FREE, MEMBERSHIP_ROLE.OWNER),
+      true,
+    ],
     [
       'an editor',
-      mockViewer({
-        membership: mockMembership({ role: MEMBERSHIP_ROLE.EDITOR }),
-      }),
+      () => resolveFor(TENANT_PLAN.FREE, MEMBERSHIP_ROLE.EDITOR),
       false,
     ],
-    ['a super admin', mockOperatorViewer(ADMIN_ROLE.SUPERADMIN), true],
-    ['a moderator', mockOperatorViewer(ADMIN_ROLE.MODERATOR), false],
-  ])('opens Billing to %s: %s', async (_label, viewer, isOpen) => {
-    const { billing } = await resolveTenantPageAccess(
-      mockReadyTenant({ id: MOCK_TENANT_ID }),
-      viewer,
-    );
+    ['a super admin', () => resolveAsOperator(ADMIN_ROLE.SUPERADMIN), true],
+    ['a moderator', () => resolveAsOperator(ADMIN_ROLE.MODERATOR), false],
+  ])('opens Billing to %s: %s', async (_label, resolve, isOpen) => {
+    const { billing } = await resolve();
 
     expect(billing).toBe(isOpen);
   });

@@ -1,7 +1,9 @@
 import messages from '@platform/i18n/messages/en.json';
+import { requireTenantById } from '@platform/server/auth/require-tenant-by-id';
 import { resolveIsPlatformTenant } from '@platform/server/tenants/resolve-is-platform-tenant';
 import { mockAdmin } from '@platform/testing/admins/fixtures';
 import { customRenderAsync, screen } from '@platform/testing/custom-render';
+import { mockTenantByIdContext } from '@platform/testing/memberships/fixtures';
 import { mockDbConstants } from '@platform/testing/mock-db-constants';
 import { ARCHIVED_NOTICE_TEXT } from '@platform/testing/render-in-settings-form';
 import {
@@ -18,23 +20,19 @@ import { ADMIN_ROLE } from '@shinefold/db/constants';
 
 import TenantDangerPage from './page';
 
-const {
-  requireSuperAdminMock,
-  requireTenantByIdMock,
-  getLatestDeprovisionRequestedAtMock,
-} = vi.hoisted(() => ({
-  requireSuperAdminMock: vi.fn(),
-  requireTenantByIdMock: vi.fn(),
-  getLatestDeprovisionRequestedAtMock: vi.fn(),
-}));
+const { requireSuperAdminMock, getLatestDeprovisionRequestedAtMock } =
+  vi.hoisted(() => ({
+    requireSuperAdminMock: vi.fn(),
+    getLatestDeprovisionRequestedAtMock: vi.fn(),
+  }));
 
 vi.mock('@platform/server/auth/require-super-admin', () => ({
   requireSuperAdmin: requireSuperAdminMock,
 }));
 
-vi.mock('@platform/server/auth/require-tenant-by-id', () => ({
-  requireTenantById: requireTenantByIdMock,
-}));
+vi.mock('@platform/server/auth/require-tenant-by-id');
+
+const requireTenantByIdMock = vi.mocked(requireTenantById);
 
 vi.mock('@shinefold/db', async () => ({
   ...(await mockDbConstants()),
@@ -94,7 +92,9 @@ describe(`<${TenantDangerPage.name}/>`, () => {
     requireSuperAdminMock.mockResolvedValue(
       mockAdmin({ role: ADMIN_ROLE.SUPERADMIN }),
     );
-    requireTenantByIdMock.mockResolvedValue({ tenant: mockTenant() });
+    requireTenantByIdMock.mockResolvedValue(
+      mockTenantByIdContext(mockTenant()),
+    );
     getLatestDeprovisionRequestedAtMock.mockResolvedValue(undefined);
     vi.mocked(resolveIsPlatformTenant).mockResolvedValue(false);
   });
@@ -142,14 +142,16 @@ describe(`<${TenantDangerPage.name}/>`, () => {
     });
 
     it('ignores the request once a later reactivation superseded it', async () => {
-      requireTenantByIdMock.mockResolvedValueOnce({
-        tenant: mockTenant({
-          provisioningSteps: {
-            ...mockIdleProvisioningSteps(),
-            run: { startedAt: MOCK_RUN_PLUS_2_MIN_AT },
-          },
-        }),
-      });
+      requireTenantByIdMock.mockResolvedValueOnce(
+        mockTenantByIdContext(
+          mockTenant({
+            provisioningSteps: {
+              ...mockIdleProvisioningSteps(),
+              run: { startedAt: MOCK_RUN_PLUS_2_MIN_AT },
+            },
+          }),
+        ),
+      );
 
       await setup();
 
@@ -219,9 +221,11 @@ describe(`<${TenantDangerPage.name}/>`, () => {
   });
 
   it('renders the deprovisioning progress card once a run exists', async () => {
-    requireTenantByIdMock.mockResolvedValueOnce({
-      tenant: mockTenant({ deprovisioningSteps: MOCK_STARTED_RUN_STEPS }),
-    });
+    requireTenantByIdMock.mockResolvedValueOnce(
+      mockTenantByIdContext(
+        mockTenant({ deprovisioningSteps: MOCK_STARTED_RUN_STEPS }),
+      ),
+    );
 
     await setup();
 
@@ -233,11 +237,13 @@ describe(`<${TenantDangerPage.name}/>`, () => {
   });
 
   it('renders no deprovisioning progress card before any run has started', async () => {
-    requireTenantByIdMock.mockResolvedValueOnce({
-      tenant: mockTenant({
-        deprovisioningSteps: mockIdleDeprovisioningSteps(),
-      }),
-    });
+    requireTenantByIdMock.mockResolvedValueOnce(
+      mockTenantByIdContext(
+        mockTenant({
+          deprovisioningSteps: mockIdleDeprovisioningSteps(),
+        }),
+      ),
+    );
 
     await setup();
 
@@ -250,18 +256,20 @@ describe(`<${TenantDangerPage.name}/>`, () => {
 
   describe('for an archived tenant', () => {
     it('shows the archived notice, both archived controls and the teardown history', async () => {
-      requireTenantByIdMock.mockResolvedValueOnce({
-        tenant: mockTenant({
-          deprovisionedAt: MOCK_ARCHIVED_AT,
-          deprovisioningSteps: {
-            ...mockIdleDeprovisioningSteps(),
-            run: {
-              startedAt: MOCK_RUN_STARTED_AT,
-              finishedAt: MOCK_RUN_PLUS_2_MIN_AT,
+      requireTenantByIdMock.mockResolvedValueOnce(
+        mockTenantByIdContext(
+          mockTenant({
+            deprovisionedAt: MOCK_ARCHIVED_AT,
+            deprovisioningSteps: {
+              ...mockIdleDeprovisioningSteps(),
+              run: {
+                startedAt: MOCK_RUN_STARTED_AT,
+                finishedAt: MOCK_RUN_PLUS_2_MIN_AT,
+              },
             },
-          },
-        }),
-      });
+          }),
+        ),
+      );
 
       await setup();
 
@@ -297,9 +305,11 @@ describe(`<${TenantDangerPage.name}/>`, () => {
     });
 
     it('shows no teardown history when no deprovisioning run ever happened', async () => {
-      requireTenantByIdMock.mockResolvedValueOnce({
-        tenant: mockTenant({ deprovisionedAt: MOCK_ARCHIVED_AT }),
-      });
+      requireTenantByIdMock.mockResolvedValueOnce(
+        mockTenantByIdContext(
+          mockTenant({ deprovisionedAt: MOCK_ARCHIVED_AT }),
+        ),
+      );
 
       await setup();
 

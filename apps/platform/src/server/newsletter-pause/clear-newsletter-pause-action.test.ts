@@ -4,8 +4,10 @@ import {
   NEWSLETTER_PAUSE_REFUSAL,
 } from '@platform/constants/newsletter-pause';
 import { requireSuperAdmin } from '@platform/server/auth/require-super-admin';
+import { requireTenantById } from '@platform/server/auth/require-tenant-by-id';
 import { firstRecordedAuditEvent } from '@platform/testing/audit-events/recorded-audit-event';
 import { MOCK_NEWSLETTER_PAUSED_AT } from '@platform/testing/email/fixtures';
+import { mockTenantByIdContext } from '@platform/testing/memberships/fixtures';
 import { mockDbConstants } from '@platform/testing/mock-db-constants';
 import {
   mockTenant,
@@ -25,21 +27,16 @@ import { clearNewsletterPauseAction } from './clear-newsletter-pause-action';
 
 faker.seed(7254);
 
-const {
-  requireTenantByIdMock,
-  clearNewsletterPauseMock,
-  recordAuditEventMock,
-} = vi.hoisted(() => ({
-  requireTenantByIdMock: vi.fn(),
+const { clearNewsletterPauseMock, recordAuditEventMock } = vi.hoisted(() => ({
   clearNewsletterPauseMock: vi.fn(),
   recordAuditEventMock: vi.fn(),
 }));
 
 vi.mock('@platform/server/auth/require-super-admin');
 
-vi.mock('@platform/server/auth/require-tenant-by-id', () => ({
-  requireTenantById: requireTenantByIdMock,
-}));
+vi.mock('@platform/server/auth/require-tenant-by-id');
+
+const requireTenantByIdMock = vi.mocked(requireTenantById);
 
 vi.mock('@platform/server/audit/record-audit-event', () => ({
   recordAuditEvent: recordAuditEventMock,
@@ -60,9 +57,13 @@ const NOT_PAUSED_RESULT = {
 
 describe(clearNewsletterPauseAction, () => {
   beforeEach(() => {
-    requireTenantByIdMock.mockReset().mockResolvedValue({
-      tenant: mockTenant({ id: MOCK_TENANT_ID, name: MOCK_TENANT_NAME }),
-    });
+    requireTenantByIdMock
+      .mockReset()
+      .mockResolvedValue(
+        mockTenantByIdContext(
+          mockTenant({ id: MOCK_TENANT_ID, name: MOCK_TENANT_NAME }),
+        ),
+      );
     clearNewsletterPauseMock
       .mockReset()
       .mockResolvedValue(MOCK_NEWSLETTER_PAUSED_AT);

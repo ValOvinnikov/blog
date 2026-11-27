@@ -38,9 +38,9 @@ function toAdjacentPages({
     return undefined;
   }
 
-  const pages = toReadingOrder(sectionRoot).filter(
-    (page) => page._id === current._id || toBreadcrumb(page),
-  );
+  const pages = (sectionRoot.children ?? [])
+    .flatMap(toReadingOrder)
+    .filter((page) => page._id === current._id || toBreadcrumb(page));
   const index = pages.findIndex(({ _id }) => _id === current._id);
   if (index < 0) return undefined;
 

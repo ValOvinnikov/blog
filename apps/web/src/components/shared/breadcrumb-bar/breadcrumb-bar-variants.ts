@@ -2,7 +2,7 @@ import { tv } from '@shinefold/ui/lib/styling';
 
 export const breadcrumbBarVariants = tv({
   slots: {
-    root: ['w-full'],
+    root: ['hidden w-full md:block'],
     inner: ['mx-auto max-w-page px-gutter py-2.5'],
   },
   variants: {

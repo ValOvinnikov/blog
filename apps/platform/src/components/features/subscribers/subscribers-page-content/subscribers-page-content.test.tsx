@@ -81,6 +81,8 @@ const setup = customRenderAsync(SubscribersPageContent, {
   tenant,
   viewer: ownerViewer,
   page: 1,
+  pageHref: adminRoutes.dashboardSubscribers,
+  studioPagesHref: adminRoutes.dashboardStudioPages(),
   movedUpCeiling: undefined,
 });
 

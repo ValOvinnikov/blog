@@ -1,2 +1,2 @@
-export { createPostBodyOverride, type TAsideKindLabels } from './config';
+export { postBodyOverride } from './config';
 export { PortableText } from './portable-text';

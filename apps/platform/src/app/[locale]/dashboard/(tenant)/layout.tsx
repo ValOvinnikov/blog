@@ -28,7 +28,7 @@ export default async function DashboardTenantLayout({ children }: TProps) {
   const [{ admin: sessionAdmin }, chrome, access] = await Promise.all([
     listSessionTenants(),
     loadPlatformShellChrome(),
-    resolveTenantPageAccess(tenant, viewer),
+    resolveTenantPageAccess({ tenant, membership, viewer }),
   ]);
   const { isSidebarInitiallyCollapsed, tNavSections, userName, userEmail } =
     chrome;

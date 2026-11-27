@@ -1,43 +1,41 @@
 import { requireTenantManager } from '@platform/server/auth/require-tenant-manager';
 import { mockMembershipContext } from '@platform/testing/memberships/fixtures';
-import {
-  mockReadyTenant,
-  MOCK_TENANT_ID,
-} from '@platform/testing/tenants/fixtures';
-import {
-  NEXT_NAVIGATION_ERROR,
-  TENANT_PLAN,
-  type TTenantPlan,
-} from '@shinefold/config';
+import { mockPlatformNewsletterTenant } from '@platform/testing/subscribers/fixtures';
+import { MOCK_TENANT_ID } from '@platform/testing/tenants/fixtures';
+import { NEXT_NAVIGATION_ERROR } from '@shinefold/config';
 
+import { canManageSubscribers } from './can-manage-subscribers';
 import { requireSubscribersManager } from './require-subscribers-manager';
 
 vi.mock('@platform/server/auth/require-tenant-manager', () => ({
   requireTenantManager: vi.fn(),
 }));
+vi.mock('./can-manage-subscribers', () => ({
+  canManageSubscribers: vi.fn(),
+}));
 
-const contextOn = (plan: TTenantPlan) =>
-  mockMembershipContext(mockReadyTenant({ id: MOCK_TENANT_ID, plan }));
+const context = mockMembershipContext(mockPlatformNewsletterTenant());
 
 describe(requireSubscribersManager, () => {
-  it('admits a manager of a site whose plan includes the newsletter', async () => {
-    const context = contextOn(TENANT_PLAN.GROWTH);
+  beforeEach(() => {
     vi.mocked(requireTenantManager).mockResolvedValue(context);
+  });
+
+  it('returns the manager context the subscribers rule admits', async () => {
+    vi.mocked(canManageSubscribers).mockResolvedValue(true);
 
     await expect(requireSubscribersManager(MOCK_TENANT_ID)).resolves.toBe(
       context,
     );
     expect(requireTenantManager).toHaveBeenCalledWith(MOCK_TENANT_ID);
+    expect(canManageSubscribers).toHaveBeenCalledWith(context);
   });
 
-  it.each([TENANT_PLAN.FREE, TENANT_PLAN.STARTER])(
-    'refuses a %s site as not found',
-    async (plan) => {
-      vi.mocked(requireTenantManager).mockResolvedValue(contextOn(plan));
+  it('answers not found when the subscribers rule refuses', async () => {
+    vi.mocked(canManageSubscribers).mockResolvedValue(false);
 
-      await expect(requireSubscribersManager(MOCK_TENANT_ID)).rejects.toThrow(
-        NEXT_NAVIGATION_ERROR.NEXT_NOT_FOUND,
-      );
-    },
-  );
+    await expect(requireSubscribersManager(MOCK_TENANT_ID)).rejects.toThrow(
+      NEXT_NAVIGATION_ERROR.NEXT_NOT_FOUND,
+    );
+  });
 });

@@ -1987,7 +1987,9 @@ allows a language beyond the default; Email when `PLAN_REGISTRY` holds any of
 the site send email); Subscribers with `newsletter`; Team on `GROWTH` only. The tenant's own `/dashboard` sidebar omits what the plan
 cannot use, and a gated dashboard page answers 404 for such a tenant. The
 operator's `/tenants/{id}` view ignores the plan and shows every entry and
-page, so a downgraded tenant's data stays reachable. Comments has no entry
+page, so a downgraded tenant's data stays reachable — except Subscribers,
+which it shows only to a super admin, only on a site created from the
+platform, and only while the plan with grants includes `newsletter`. Comments has no entry
 until it is built; no entry carries a progress badge.
 
 **Email templates per language.** Each template's subject and body are

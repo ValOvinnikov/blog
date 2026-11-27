@@ -10,9 +10,11 @@ import {
   moveUpOfferFor,
   type TMoveUpOffer,
 } from '@platform/utils/move-up-offer/move-up-offer';
-import { resolveTotalPages } from '@platform/utils/pagination/pagination';
+import {
+  resolveTotalPages,
+  type TPageHref,
+} from '@platform/utils/pagination/pagination';
 import type { TPlatformTenant } from '@platform/utils/platform-tenant/platform-tenant';
-import { adminRoutes } from '@platform/utils/routes/routes';
 import {
   toSubscriberLimits,
   type TSubscriberLimits,
@@ -29,6 +31,7 @@ import { nextSubscriberBand } from '@shinefold/db/utils/next-subscriber-band/nex
 export type TSubscribersPageData = TSubscriberLimits & {
   list: TSubscribersPage;
   page: number;
+  pageHref: TPageHref;
   totalPages: number;
   emailNewPosts: boolean;
   pausedAt: TMaybeUndefined<Date>;
@@ -70,10 +73,15 @@ const readOffer = async (
     ? moveUpOfferFor(tenant, await queries.stripeCatalogue.listStripePrices())
     : undefined;
 
+export type TSubscribersPageQuery = {
+  page: number;
+  pageHref: TPageHref;
+  movedUpCeiling: TMaybeUndefined<number>;
+};
+
 export const loadSubscribersPage = async (
   tenant: TPlatformTenant,
-  page: number,
-  movedUpCeiling: TMaybeUndefined<number>,
+  { page, pageHref, movedUpCeiling }: TSubscribersPageQuery,
 ): Promise<TSubscribersPageData> => {
   const { id, subscriberBandCeiling } = tenant;
   const [list, limits, emailNewPosts, stop] = await Promise.all([
@@ -89,7 +97,7 @@ export const loadSubscribersPage = async (
     page,
     total: list.total,
     pageSize: SUBSCRIBERS_PAGE_SIZE,
-    pageHref: adminRoutes.dashboardSubscribers,
+    pageHref,
   });
   const subscriberLimits = toSubscriberLimits({
     limits,
@@ -106,6 +114,7 @@ export const loadSubscribersPage = async (
     ...subscriberLimits,
     list,
     page,
+    pageHref,
     totalPages,
     emailNewPosts,
     pausedAt: stop.pausedAt,

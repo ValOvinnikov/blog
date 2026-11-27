@@ -30,7 +30,7 @@ import {
 } from '@web/testing/shared/portable-text/fixtures';
 import { withSiteAnalytics } from '@web/testing/shared/site-analytics/with-site-analytics';
 
-import { createPostBodyOverride } from './config';
+import { postBodyOverride } from './config';
 import { PortableText } from './portable-text';
 
 vi.mock(
@@ -70,8 +70,6 @@ const MOCK_CODE_FILENAME = faker.system.commonFileName('ts');
 const MOCK_CODE_SOURCE = 'const x = 1;';
 const MOCK_IMAGE_ALT = faker.lorem.words(3);
 const MOCK_ASIDE_BODY_TEXT = faker.lorem.sentence();
-const MOCK_ASIDE_KIND_BODY_TEXT = faker.lorem.sentence();
-const MOCK_ASIDE_CONTEXT_TEXT = faker.lorem.sentence();
 const MOCK_NESTED_LINK_TEXT = faker.lorem.words(2);
 const MOCK_BOLD_TEXT = faker.lorem.words(2);
 const MOCK_CUSTOM_CODE_TEXT = faker.lorem.words(2);
@@ -80,7 +78,6 @@ const MOCK_COOKIE_LINK_TEXT = faker.lorem.words(2);
 const MOCK_SECTION_TITLE = faker.lorem.words(3);
 const MOCK_SECTION_BODY_TEXT = faker.lorem.sentence();
 const MOCK_SECTION_LINK_TEXT = faker.lorem.words(2);
-const MOCK_SECTION_ASIDE_LABEL = faker.lorem.word();
 const MOCK_COLUMN_HEADING = faker.lorem.words(2);
 const MOCK_CELL_TEXT = faker.lorem.words(2);
 const MOCK_CELL_LINK_TEXT = faker.lorem.words(2);
@@ -491,29 +488,31 @@ describe(`<${PortableText.name}/>`, () => {
     expect(asideBody).toBeVisible();
   });
 
-  it('labels an aside with its raw kind when no override supplies a label', () => {
-    const value: TPortableTextBody = [
-      mockAsideBlock(
-        [mockPortableTextBlock(MOCK_ASIDE_KIND_BODY_TEXT)],
-        ASIDE_KIND.DIGRESSION,
-      ),
-    ];
+  it.each(Object.values(ASIDE_KIND))(
+    'names a %s aside with its label in the reader language',
+    (kind) => {
+      setup({
+        value: [
+          mockAsideBlock([mockPortableTextBlock(MOCK_ASIDE_BODY_TEXT)], kind),
+        ],
+      });
 
-    setup({ value });
+      const aside = screen.getByRole('note', {
+        name: SITE_MESSAGES.blogPostPage.asideKind[kind],
+      });
+      expect(aside).toBeVisible();
+    },
+  );
 
-    const label = screen.getByText(ASIDE_KIND.DIGRESSION);
-    expect(label).toBeVisible();
-  });
+  it('names an aside with no kind as context', () => {
+    setup({
+      value: [mockAsideBlock([mockPortableTextBlock(MOCK_ASIDE_BODY_TEXT)])],
+    });
 
-  it('labels an aside with no kind as CONTEXT', () => {
-    const value: TPortableTextBody = [
-      mockAsideBlock([mockPortableTextBlock(MOCK_ASIDE_CONTEXT_TEXT)]),
-    ];
-
-    setup({ value });
-
-    const label = screen.getByText(ASIDE_KIND.CONTEXT);
-    expect(label).toBeVisible();
+    const aside = screen.getByRole('note', {
+      name: SITE_MESSAGES.blogPostPage.asideKind.CONTEXT,
+    });
+    expect(aside).toBeVisible();
   });
 
   it('renders a resolved linkRef annotation inside an aside as a link', () => {
@@ -574,14 +573,14 @@ describe(`<${PortableText.name}/>`, () => {
     });
   });
 
-  describe('with an expandable section and a post body override', () => {
+  describe('with an expandable section in a post body', () => {
     let user: UserEvent;
 
     beforeEach(() => {
       user = userEvent.setup();
     });
 
-    it('labels an aside inside the section from the override', async () => {
+    it('names an aside inside the section with its label', async () => {
       setup({
         value: [
           mockExpandableSectionBlock(MOCK_SECTION_TITLE, [
@@ -591,15 +590,15 @@ describe(`<${PortableText.name}/>`, () => {
             ),
           ]),
         ],
-        components: createPostBodyOverride({
-          [ASIDE_KIND.WHY_NOT]: MOCK_SECTION_ASIDE_LABEL,
-        }),
+        components: postBodyOverride,
       });
 
       await user.click(getSectionTrigger());
 
-      const label = screen.getByText(MOCK_SECTION_ASIDE_LABEL);
-      expect(label).toBeVisible();
+      const aside = screen.getByRole('note', {
+        name: SITE_MESSAGES.blogPostPage.asideKind.WHY_NOT,
+      });
+      expect(aside).toBeVisible();
     });
   });
 

@@ -1,5 +1,7 @@
 import messages from '@platform/i18n/messages/en.json';
+import { requireTenantById } from '@platform/server/auth/require-tenant-by-id';
 import { customRenderAsync, screen } from '@platform/testing/custom-render';
+import { mockTenantByIdContext } from '@platform/testing/memberships/fixtures';
 import { mockDbConstants } from '@platform/testing/mock-db-constants';
 import {
   MOCK_OWNER_EMAIL,
@@ -9,14 +11,13 @@ import {
 
 import TenantProvisioningPage from './page';
 
-const { requireTenantByIdMock, getTenantOwnerEmailMock } = vi.hoisted(() => ({
-  requireTenantByIdMock: vi.fn(),
+const { getTenantOwnerEmailMock } = vi.hoisted(() => ({
   getTenantOwnerEmailMock: vi.fn(),
 }));
 
-vi.mock('@platform/server/auth/require-tenant-by-id', () => ({
-  requireTenantById: requireTenantByIdMock,
-}));
+vi.mock('@platform/server/auth/require-tenant-by-id');
+
+const requireTenantByIdMock = vi.mocked(requireTenantById);
 
 vi.mock('@shinefold/db', async () => ({
   ...(await mockDbConstants()),
@@ -37,7 +38,9 @@ const setup = customRenderAsync(TenantProvisioningPage, {
 
 describe(`<${TenantProvisioningPage.name}/>`, () => {
   beforeEach(() => {
-    requireTenantByIdMock.mockResolvedValue({ tenant: mockTenant() });
+    requireTenantByIdMock.mockResolvedValue(
+      mockTenantByIdContext(mockTenant()),
+    );
     getTenantOwnerEmailMock.mockResolvedValue(MOCK_OWNER_EMAIL);
   });
 

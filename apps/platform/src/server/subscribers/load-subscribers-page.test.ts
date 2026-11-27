@@ -63,6 +63,11 @@ const tenant = mockReadyTenant({
 });
 const MOCK_ROWS = [mockConfirmedSubscriber()];
 const OVER_BAND_COUNT = MOCK_SUBSCRIBERS_LIMITS.bandCeiling + 1;
+const MOCK_FIRST_PAGE = {
+  page: 1,
+  pageHref: adminRoutes.dashboardSubscribers,
+  movedUpCeiling: undefined,
+};
 
 describe(loadSubscribersPage, () => {
   beforeEach(() => {
@@ -80,7 +85,7 @@ describe(loadSubscribersPage, () => {
   });
 
   it('reads the asked page of confirmed subscribers, 25 at a time', async () => {
-    const data = await loadSubscribersPage(tenant, 1, undefined);
+    const data = await loadSubscribersPage(tenant, MOCK_FIRST_PAGE);
 
     expect(listSubscribersPageMock).toHaveBeenCalledExactlyOnceWith(
       MOCK_TENANT_ID,
@@ -100,10 +105,13 @@ describe(loadSubscribersPage, () => {
   });
 
   it('sends a page past the end back to the last page', async () => {
-    await expect(loadSubscribersPage(tenant, 4, undefined)).rejects.toThrow(
-      NEXT_NAVIGATION_ERROR.NEXT_REDIRECT,
-    );
-    expect(redirect).toHaveBeenCalledWith(adminRoutes.dashboardSubscribers(1));
+    const pageHref = (page: number) =>
+      adminRoutes.tenantSubscribers(MOCK_TENANT_ID, page);
+
+    await expect(
+      loadSubscribersPage(tenant, { ...MOCK_FIRST_PAGE, page: 4, pageHref }),
+    ).rejects.toThrow(NEXT_NAVIGATION_ERROR.NEXT_REDIRECT);
+    expect(redirect).toHaveBeenCalledWith(pageHref(1));
   });
 
   it('reads the post the band pause skipped and the move-up prices', async () => {
@@ -112,7 +120,7 @@ describe(loadSubscribersPage, () => {
       activeCount: OVER_BAND_COUNT,
     });
 
-    const data = await loadSubscribersPage(tenant, 1, undefined);
+    const data = await loadSubscribersPage(tenant, MOCK_FIRST_PAGE);
 
     expect(data.notice).toBe(SUBSCRIBERS_NOTICE.BAND_PAUSED);
     expect(getLatestSkippedNewsletterPostMock).toHaveBeenCalledExactlyOnceWith(
@@ -126,8 +134,14 @@ describe(loadSubscribersPage, () => {
     const { bandCeiling } = MOCK_SUBSCRIBERS_LIMITS;
 
     const [current, stale] = await Promise.all([
-      loadSubscribersPage(tenant, 1, bandCeiling),
-      loadSubscribersPage(tenant, 1, bandCeiling - 1),
+      loadSubscribersPage(tenant, {
+        ...MOCK_FIRST_PAGE,
+        movedUpCeiling: bandCeiling,
+      }),
+      loadSubscribersPage(tenant, {
+        ...MOCK_FIRST_PAGE,
+        movedUpCeiling: bandCeiling - 1,
+      }),
     ]);
 
     expect(current.notice).toBe(SUBSCRIBERS_NOTICE.MOVED_UP);
@@ -141,7 +155,7 @@ describe(loadSubscribersPage, () => {
       pausedAt,
     });
 
-    const data = await loadSubscribersPage(tenant, 1, undefined);
+    const data = await loadSubscribersPage(tenant, MOCK_FIRST_PAGE);
 
     expect(data.notice).toBe(SUBSCRIBERS_NOTICE.OPERATOR_PAUSE);
     expect(data.pausedAt).toBe(pausedAt);
