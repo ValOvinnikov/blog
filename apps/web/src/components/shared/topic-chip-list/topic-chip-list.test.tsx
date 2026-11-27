@@ -10,8 +10,6 @@ import {
 
 import { TopicChipList } from './topic-chip-list';
 
-vi.mock('@web/i18n/navigation');
-
 faker.seed(5801);
 
 const { ariaLabel: NAV_NAME, all: ALL_CHIP_NAME } = SITE_MESSAGES.topicChipList;

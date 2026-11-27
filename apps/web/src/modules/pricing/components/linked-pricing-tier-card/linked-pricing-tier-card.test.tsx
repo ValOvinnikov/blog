@@ -29,8 +29,6 @@ const { useVisitorCurrencyMock } = vi.hoisted(() => ({
   useVisitorCurrencyMock: vi.fn(),
 }));
 
-vi.mock('@web/i18n/navigation');
-
 vi.mock('@web/hooks/use-visitor-currency', () => ({
   useVisitorCurrency: useVisitorCurrencyMock,
 }));

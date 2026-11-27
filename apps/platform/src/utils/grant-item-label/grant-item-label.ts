@@ -1,6 +1,10 @@
 import type { TLooseTranslator } from '@platform/utils/loose-translator/loose-translator';
 import type { TMaybeNull } from '@shinefold/config';
-import { CAPABILITY, MODULE_PACK } from '@shinefold/config/constants';
+import {
+  CAPABILITY,
+  GRANTABLE_PRESET_IDS,
+  MODULE_PACK,
+} from '@shinefold/config/constants';
 import {
   ENTITLEMENT_KIND,
   LOOK_FIELDS,
@@ -37,6 +41,9 @@ export const toGrantItemLabel = (
   }
   if (kind === ENTITLEMENT_KIND.MODULE_PACK && isOneOf(MODULE_PACKS, key)) {
     return tNames(`modulePack.${key}`);
+  }
+  if (kind === ENTITLEMENT_KIND.PRESET && isOneOf(GRANTABLE_PRESET_IDS, key)) {
+    return tNames(`preset.${key}`);
   }
   if (isOneOf(LOOK_FIELDS, key)) return tNames(`lookField.${key}`);
 

@@ -435,9 +435,10 @@ save still settles as the form's generic server error.
   unchanged. A primary button, an avatar and the active step put
   `on-brand-ink` on `brand`. Selected states follow the rule under
   "Selected is one rule per family" below. A
-  focused field takes a `brand-ink` border (near-black in Light, yellow in
-  Dark), kept over an invalid field's `bad-line` border, and a 3px
-  `focus-ring` glow (`shadow-platform-focus-glow`).
+  focused field keeps its own border (resting `control-line`, or `bad-line`
+  when invalid) and takes the shared offset focus ring outside it, as does an
+  open select. The `<body>` sets `text-platform-text`, so portalled popups
+  (dialogs, alerts, toasts) inherit the theme text colour.
   A link
   is `brand-ink` (or `brand-strong`) with a 2px `highlight` underline 3px
   below it. The sidebar's current row is `side-raised` with a

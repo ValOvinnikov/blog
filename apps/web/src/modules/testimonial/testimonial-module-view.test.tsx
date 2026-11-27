@@ -25,7 +25,6 @@ import {
 
 import { TestimonialModuleView } from './testimonial-module-view';
 
-vi.mock('@web/i18n/navigation');
 vi.mock('@shinefold/ui/components/organisms/carousel/use-carousel', () => ({
   useCarousel: () => ({ canScrollPrev: false, canScrollNext: false }),
 }));

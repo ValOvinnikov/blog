@@ -21,6 +21,7 @@ import { MOCK_MISSING_TENANT_ID } from '@shinefold/db/testing/tenants/fixtures';
 import { daysBeforeNow } from '@shinefold/db/testing/tenants/grace';
 import {
   MOCK_SELF_SERVE_OWNER_EMAIL_INDEX,
+  readCreatedFromPlatform,
   readSelfServeIndex,
 } from '@shinefold/db/testing/tenants/self-serve-fixtures';
 import { eq } from 'drizzle-orm';
@@ -287,6 +288,16 @@ describe(setTenantPlan, () => {
         previousPlan: TENANT_PLAN.FREE,
       });
       expect(await readSelfServeIndex(db(), tenantId)).toBeNull();
+    });
+
+    it('keeps a platform-created site marked as such on a move to a paid plan', async () => {
+      const { id } = await insertTestTenant(db(), {
+        createdFromPlatform: true,
+      });
+
+      await setTenantPlan(id, MOCK_MOVE_TO_GROWTH);
+
+      expect(await readCreatedFromPlatform(db(), id)).toBe(true);
     });
 
     it('reports the stored plan as the previous one when a write repeats it', async () => {

@@ -7,8 +7,6 @@ import { mockItemsWithIds } from '@web/testing/shared/items/fixtures';
 
 import { PostRelatedModuleView } from './post-related-module-view';
 
-vi.mock('@web/i18n/navigation');
-
 faker.seed(6011);
 
 const MOCK_DATA_TEST_ID = faker.lorem.slug();

@@ -1,9 +1,8 @@
 import type { TMaybeNull } from '@shinefold/config';
 import { isNull } from '@shinefold/utils/primitives';
-import { permanentRedirect } from '@web/i18n/navigation';
-import { getRequestContext } from '@web/server/request-context/request-context';
+import { localizeForRequest } from '@web/server/request-context/localize-for-request/localize-for-request';
 import { parsePageParam } from '@web/utils/parse-page-param';
-import { notFound } from 'next/navigation';
+import { notFound, permanentRedirect } from 'next/navigation';
 
 export const resolveNumberedPage = async (
   rawPage: string,
@@ -16,8 +15,7 @@ export const resolveNumberedPage = async (
   }
 
   if (page === 1) {
-    const { locale } = await getRequestContext();
-    permanentRedirect({ href: firstPageHref, locale });
+    permanentRedirect(await localizeForRequest(firstPageHref));
   }
 
   return page;

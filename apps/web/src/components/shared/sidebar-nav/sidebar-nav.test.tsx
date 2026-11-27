@@ -20,8 +20,6 @@ import {
 
 import { SidebarNav } from './sidebar-nav';
 
-vi.mock('@web/i18n/navigation');
-
 const ITEM_COUNT = MOCK_SIDEBAR_NAV_ITEMS.length;
 const PRICING_LABEL = MOCK_SIDEBAR_NAV_PRICING_ITEM.label;
 

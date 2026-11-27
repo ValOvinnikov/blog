@@ -17,8 +17,6 @@ const MOCK_TOPIC_SLUG = faker.lorem.slug();
 
 vi.mock('@web/server/request-context/request-context');
 
-vi.mock('@web/i18n/navigation');
-
 vi.mock('@web/metadata/topic-metadata', () => ({
   buildTopicMetadata: vi.fn(),
 }));

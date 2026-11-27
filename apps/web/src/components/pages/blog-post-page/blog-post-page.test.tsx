@@ -43,8 +43,6 @@ vi.mock('@shinefold/service', async (importOriginal) => {
   };
 });
 
-vi.mock('@web/i18n/navigation');
-
 vi.mock(
   '@web/server/settings-features/is-capability-enabled/is-capability-enabled',
   () => ({

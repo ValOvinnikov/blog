@@ -32,6 +32,8 @@ export const TENANT_MIGRATION_JOB_NAME = 'Migrate tenant content';
 
 export const GITHUB_COMPARE_FILE_LIMIT = 300;
 
+export const GITHUB_COMPARE_TOTAL_COMMITS_LIMIT = 10_000;
+
 export const RELEASE_OVERRIDE_REASON_MAX_LENGTH = 500;
 
 export const RELEASE_REFUSAL = {

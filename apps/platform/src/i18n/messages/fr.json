@@ -2700,6 +2700,7 @@
   "grantEntitlement": {
     "trigger": "Accorder à ce locataire",
     "triggerAriaLabel": "Accorder à ce locataire : {item}",
+    "presetTrigger": "Accorder le préréglage {preset}",
     "title": "Accorder {item} à {tenant}",
     "description": "{tenant} obtient {item} en dehors de sa formule {plan}. Son propriétaire le voit déverrouillé et peut l'activer. Rien n'est facturé.",
     "granted": "{item} accordé.",
@@ -2745,6 +2746,9 @@
       "CORE": "Modules Core",
       "STARTER": "Modules Starter",
       "GROWTH": "Modules Growth"
+    },
+    "preset": {
+      "SHINEFOLD": "Préréglage Shinefold"
     },
     "lookField": {
       "preset": "Préréglage",
@@ -2800,6 +2804,7 @@
     "kind": {
       "CAPABILITY": "Fonctionnalité",
       "LOOK_FIELD": "Apparence",
+      "PRESET": "Préréglage",
       "MODULE_PACK": "Pack de modules",
       "LOCALE_LIMIT": "Langues"
     },

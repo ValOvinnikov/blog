@@ -69,7 +69,7 @@ A tenant's site is published in one or more languages from a curated list — En
 - `NEXT_LOCALE` is written only by `/api/switch-language`. `buildTenantRouting` sets `localeCookie: false`, so no page request — a first visit, a link into another language, a page with no translation — changes the remembered language.
 - A page with no document in the requested language is a 404; a missing Home, blog, topics or tags list page in a non-default language redirects to the default language's home page instead. The switch goes to the current page's translation, else that language's list page for a post, topic or tag page, else that language's Home.
 - A missing field-level value falls back to the default language, field by field; a missing translation never blocks publishing. With fewer than two live languages Studio hides the language machinery entirely, including the switcher toggles.
-- All in-app links go through `SmartLink`, which prefixes the current language. A language outside `LOCALE_ISO_CODES` (another script, right-to-left) is a project, not a list entry.
+- All in-app links go through `SmartLink`, which prefixes the current language unless it is the tenant's own default; moved-page and page-1 redirects resolve the prefix the same way, so neither costs an extra hop. A language outside `LOCALE_ISO_CODES` (another script, right-to-left) is a project, not a list entry.
 - Every page carries `hreflang` alternates for its live translations plus `x-default`, a per-language canonical, `og:locale` and `og:locale:alternate`; a page with no live translation carries only its canonical.
 
 ## Dependencies

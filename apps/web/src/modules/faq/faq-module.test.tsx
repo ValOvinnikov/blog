@@ -21,8 +21,6 @@ const { getFaqModuleMock } = vi.hoisted(() => ({
   getFaqModuleMock: vi.fn(),
 }));
 
-vi.mock('@web/i18n/navigation');
-
 vi.mock('@shinefold/service', () => ({
   service: {
     modules: {

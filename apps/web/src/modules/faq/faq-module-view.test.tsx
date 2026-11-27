@@ -10,8 +10,6 @@ import {
 
 import { FaqModuleView } from './faq-module-view';
 
-vi.mock('@web/i18n/navigation');
-
 faker.seed(7231);
 
 const MOCK_FAQ_HEADING = faker.lorem.words(3);

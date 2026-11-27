@@ -6,8 +6,6 @@ import { mockSanityImage } from '@web/testing/modules/hero/fixtures';
 
 import { FeatureListCard } from './feature-list-card';
 
-vi.mock('@web/i18n/navigation');
-
 faker.seed(6011);
 
 const ICON_TEST_ID = 'feature-card-icon';

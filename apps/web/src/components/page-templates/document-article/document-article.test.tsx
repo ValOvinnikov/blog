@@ -10,8 +10,6 @@ import { DocumentArticle } from './document-article';
 
 faker.seed(6523);
 
-vi.mock('@web/i18n/navigation');
-
 const RAIL_NAME = SITE_MESSAGES.contentsRail.label;
 const MOCK_HEADING = faker.lorem.words(3);
 const MOCK_SUPPORTING_TEXT = faker.lorem.sentence();

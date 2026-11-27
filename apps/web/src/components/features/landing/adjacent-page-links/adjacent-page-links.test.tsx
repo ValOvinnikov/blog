@@ -10,8 +10,6 @@ import {
 
 import { AdjacentPageLinks } from './adjacent-page-links';
 
-vi.mock('@web/i18n/navigation');
-
 const NAV_NAME = SITE_MESSAGES.sectionNavigation.adjacentPages;
 const { previous: PREVIOUS, next: NEXT } = SITE_MESSAGES.pagination;
 const PREVIOUS_LINK_NAME = `${PREVIOUS} ${MOCK_SECTION_ROOT_TITLE}`;

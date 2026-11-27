@@ -7,8 +7,6 @@ import {
 
 import { TeamCarousel } from './team-carousel';
 
-vi.mock('@web/i18n/navigation');
-
 const CAROUSEL_LABEL = `${MOCK_TEAM_HEADING} carousel`;
 
 const setup = customRender(TeamCarousel, {

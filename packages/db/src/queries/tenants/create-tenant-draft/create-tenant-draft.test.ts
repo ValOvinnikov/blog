@@ -83,6 +83,7 @@ describe(createTenantDraft, () => {
         provisioningSteps,
         sanityProjectId,
         sanityDataset,
+        createdFromPlatform,
       } = row ?? {};
       expect(result).toEqual({ ok: true, data: row });
       expect({
@@ -95,6 +96,7 @@ describe(createTenantDraft, () => {
         provisioningSteps,
         sanityProjectId,
         sanityDataset,
+        createdFromPlatform,
       }).toEqual({
         name: MOCK_TENANT_VALUES.name,
         primaryDomain: MOCK_TENANT_DOMAIN,
@@ -105,6 +107,7 @@ describe(createTenantDraft, () => {
         provisioningSteps: MOCK_IDLE_PROVISIONING_STEPS,
         sanityProjectId: null,
         sanityDataset: null,
+        createdFromPlatform: true,
       });
     });
 

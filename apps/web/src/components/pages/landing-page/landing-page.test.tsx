@@ -5,7 +5,6 @@ import { service, type TLandingPage } from '@shinefold/service';
 import { errorResult, okResult } from '@shinefold/utils';
 import { LandingBreadcrumbs } from '@web/components/features/landing/landing-breadcrumbs';
 import { LANDING_PAGE_LOG } from '@web/constants/landing-page';
-import { permanentRedirect } from '@web/i18n/navigation';
 import { customRenderServerAsync } from '@web/testing/custom-render';
 import {
   mockLandingAdjacentPages,
@@ -18,11 +17,9 @@ import {
   mockFaqPageQuestion,
 } from '@web/testing/shared/json-ld/fixtures';
 import { readJsonLd } from '@web/testing/shared/json-ld/read-json-ld';
-import {
-  MOCK_REQUEST_CONTEXT,
-  MOCK_TENANT_SANITY_CONTEXT,
-} from '@web/testing/shared/tenant/fixtures';
+import { MOCK_TENANT_SANITY_CONTEXT } from '@web/testing/shared/tenant/fixtures';
 import { logger } from '@web/utils/logger/logger';
+import { permanentRedirect } from 'next/navigation';
 
 import { LandingModuleRenderer } from './landing-module-renderer';
 import { LandingPage } from './landing-page';
@@ -37,7 +34,6 @@ vi.mock('@shinefold/service', () => ({
   },
 }));
 
-vi.mock('@web/i18n/navigation');
 vi.mock('@web/components/features/landing/landing-breadcrumbs');
 vi.mock('./landing-module-renderer');
 
@@ -98,10 +94,7 @@ describe(`<${LandingPage.name}/>`, () => {
 
     await expect(setup()).rejects.toThrow(NEXT_NAVIGATION_ERROR.NEXT_REDIRECT);
 
-    expect(permanentRedirect).toHaveBeenCalledWith({
-      href: MOCK_MOVED_DESTINATION,
-      locale: MOCK_REQUEST_CONTEXT.locale,
-    });
+    expect(permanentRedirect).toHaveBeenCalledWith(MOCK_MOVED_DESTINATION);
   });
 
   it('logs and throws to the error boundary when the fetch fails', async () => {

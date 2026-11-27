@@ -41,8 +41,6 @@ vi.mock('@shinefold/service', () => ({
   },
 }));
 
-vi.mock('@web/i18n/navigation');
-
 const getIndexPageMock = vi.mocked(service.pages.blog.v1.getIndexPage);
 const getTopicsMock = vi.mocked(service.entities.topics.v1.getTopics);
 

@@ -6,8 +6,6 @@ import { mockPrivacySection } from '@web/testing/pages/account-page/privacy-sect
 
 import { PrivacySection } from './privacy-section';
 
-vi.mock('@web/i18n/navigation');
-
 vi.mock('@web/server/auth/auth');
 
 const MOCK_PROPS = mockPrivacySection();

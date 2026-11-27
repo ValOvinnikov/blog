@@ -10,6 +10,7 @@ import {
   mockTenantOwnerAccess,
   toTenantOwnerAccessColumns,
 } from '@shinefold/db/testing/tenants/owner-access';
+import { readCreatedFromPlatform } from '@shinefold/db/testing/tenants/self-serve-fixtures';
 
 import { setTenantOwnerAccess } from './set-tenant-owner-access';
 
@@ -99,6 +100,14 @@ describe(setTenantOwnerAccess, () => {
 
       expect(result).toEqual({ ok: true, data: ownerAccess });
     });
+  });
+
+  it('keeps a platform-created site marked as such', async () => {
+    const { id } = await insertTestTenant(db(), { createdFromPlatform: true });
+
+    await setTenantOwnerAccess(id, mockTenantOwnerAccess());
+
+    expect(await readCreatedFromPlatform(db(), id)).toBe(true);
   });
 
   it('returns DB_NOT_FOUND for a tenant id that does not exist', async () => {

@@ -13,8 +13,6 @@ import { TaxonomyListModuleView } from './taxonomy-list-module-view';
 
 faker.seed(6011);
 
-vi.mock('@web/i18n/navigation');
-
 const MOCK_HEADING = faker.lorem.words(3);
 const MOCK_TITLE_ID = faker.string.alphanumeric(10);
 const MOCK_DATA_TEST_ID = faker.string.alphanumeric(10);

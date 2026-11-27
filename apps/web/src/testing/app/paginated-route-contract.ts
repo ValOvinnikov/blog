@@ -1,12 +1,11 @@
 import {
-  LOCALE_ISO_CODES,
   NEXT_NAVIGATION_ERROR,
   type ITenantLocalizedParams,
 } from '@shinefold/config';
-import { permanentRedirect } from '@web/i18n/navigation';
 import { enterRequestContext } from '@web/server/request-context/request-context';
 import type { IRouteProps } from '@web/testing/app/page-route-contract';
 import { customRenderAsync } from '@web/testing/custom-render';
+import { permanentRedirect } from 'next/navigation';
 import type { ReactNode } from 'react';
 
 export const MOCK_SECOND_PAGE = '2';
@@ -32,10 +31,7 @@ export const testPaginatedRouteContract = <TParams extends TPageParams>({
         NEXT_NAVIGATION_ERROR.NEXT_REDIRECT,
       );
 
-      expect(permanentRedirect).toHaveBeenCalledWith({
-        href: firstPageHref,
-        locale: LOCALE_ISO_CODES.EN,
-      });
+      expect(permanentRedirect).toHaveBeenCalledWith(firstPageHref);
     });
 
     it('enters the request context before redirecting page 1', async () => {

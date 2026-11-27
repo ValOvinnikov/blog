@@ -12,8 +12,6 @@ import {
 
 import { SectionPagesModuleView } from './section-pages-module-view';
 
-vi.mock('@web/i18n/navigation');
-
 faker.seed(41);
 
 const MOCK_OTHER_PAGE_TITLE = faker.lorem.words(2);

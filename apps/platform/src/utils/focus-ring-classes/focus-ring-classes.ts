@@ -44,6 +44,8 @@ const FOCUS_RING_TRIGGER_CLASSES: Record<TFocusRingTrigger, string> = {
     'group-focus-visible:data-[highlighted]:shadow-platform-focus-ring forced-colors:group-focus-visible:data-[highlighted]:outline-2 forced-colors:group-focus-visible:data-[highlighted]:outline-offset-2 forced-colors:group-focus-visible:data-[highlighted]:outline-[Highlight]',
   [FOCUS_RING_TRIGGER.INNER_FOCUS_VISIBLE]:
     'has-[:focus-visible]:not-data-[dragging]:shadow-platform-focus-ring forced-colors:has-[:focus-visible]:outline-2 forced-colors:has-[:focus-visible]:outline-offset-2 forced-colors:has-[:focus-visible]:outline-[Highlight]',
+  [FOCUS_RING_TRIGGER.EDITABLE_FOCUS_VISIBLE]:
+    'has-[[contenteditable]:focus-visible]:shadow-platform-focus-ring forced-colors:has-[[contenteditable]:focus-visible]:outline-2 forced-colors:has-[[contenteditable]:focus-visible]:outline-offset-2 forced-colors:has-[[contenteditable]:focus-visible]:outline-[Highlight]',
 };
 
 // An inset shadow, so it stacks with the element's own drop shadow instead of replacing it.
@@ -54,6 +56,8 @@ const INSET_FOCUS_RING_TRIGGER_CLASSES: Record<TFocusRingTrigger, string> = {
     'group-focus-visible:data-[highlighted]:inset-shadow-platform-focus-ring forced-colors:group-focus-visible:data-[highlighted]:outline-2 forced-colors:group-focus-visible:data-[highlighted]:-outline-offset-2 forced-colors:group-focus-visible:data-[highlighted]:outline-[Highlight]',
   [FOCUS_RING_TRIGGER.INNER_FOCUS_VISIBLE]:
     'has-[:focus-visible]:not-data-[dragging]:inset-shadow-platform-focus-ring forced-colors:has-[:focus-visible]:outline-2 forced-colors:has-[:focus-visible]:-outline-offset-2 forced-colors:has-[:focus-visible]:outline-[Highlight]',
+  [FOCUS_RING_TRIGGER.EDITABLE_FOCUS_VISIBLE]:
+    'has-[[contenteditable]:focus-visible]:inset-shadow-platform-focus-ring forced-colors:has-[[contenteditable]:focus-visible]:outline-2 forced-colors:has-[[contenteditable]:focus-visible]:-outline-offset-2 forced-colors:has-[[contenteditable]:focus-visible]:outline-[Highlight]',
 };
 
 export const focusRingClasses = (

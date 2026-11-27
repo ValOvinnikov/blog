@@ -40,21 +40,27 @@ export const PresetChips = <TId extends string>({
       readOnly={isLocked}
       className={root()}
     >
-      {presets.map(({ id, name, description: text, swatch }) => {
+      {presets.map(({ id, name, description: text, swatch, badge }) => {
         const selected = id === value;
         const { chip, tick, description } = presetChipsVariants({ selected });
+        const nameId = `${idBase}-${id}-name`;
+        const badgeId = `${idBase}-${id}-badge`;
         const descriptionId = `${idBase}-${id}-description`;
 
         return (
           <Fragment key={id}>
             <Radio.Root
               value={id}
-              aria-describedby={descriptionId}
+              aria-labelledby={nameId}
+              aria-describedby={
+                badge ? `${badgeId} ${descriptionId}` : descriptionId
+              }
               aria-disabled={isLocked || undefined}
               className={chip()}
             >
               <PresetSwatch swatch={swatch} size={SIZE.SM} />
-              {name}
+              <span id={nameId}>{name}</span>
+              {badge && <span id={badgeId}>{badge}</span>}
               {selected && (
                 <Icon
                   name={ICONS.TICK}

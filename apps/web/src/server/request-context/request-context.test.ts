@@ -395,6 +395,7 @@ describe('request-context', () => {
       ).resolves.toEqual({
         tenantId: MOCK_TENANT_ID,
         locale: LOCALE_ISO_CODES.NL,
+        defaultLocale: LOCALE_ISO_CODES.EN,
       });
     });
 
@@ -409,6 +410,7 @@ describe('request-context', () => {
       ).resolves.toEqual({
         tenantId: MOCK_TENANT_ID,
         locale: LOCALE_ISO_CODES.DE,
+        defaultLocale: LOCALE_ISO_CODES.DE,
       });
     });
 
@@ -420,6 +422,7 @@ describe('request-context', () => {
       ).resolves.toEqual({
         tenantId: MOCK_TENANT_ID,
         locale: LOCALE_ISO_CODES.EN,
+        defaultLocale: LOCALE_ISO_CODES.EN,
       });
     });
 
@@ -431,6 +434,7 @@ describe('request-context', () => {
       ).resolves.toEqual({
         tenantId: MOCK_TENANT_ID,
         locale: LOCALE_ISO_CODES.NL,
+        defaultLocale: LOCALE_ISO_CODES.EN,
       });
     });
 
@@ -461,6 +465,7 @@ describe('request-context', () => {
         ).resolves.toEqual({
           tenantId: MOCK_TENANT_ID,
           locale: LOCALE_ISO_CODES.NL,
+          defaultLocale: LOCALE_ISO_CODES.EN,
         });
         const { logger } = await import('@web/utils/logger/logger');
         expect(vi.mocked(logger.error)).toHaveBeenCalledWith(event, {
@@ -484,7 +489,11 @@ describe('request-context', () => {
       ])('%s', async (_label, enteredLocale, servedLocale) => {
         await expect(
           enterAndReadNotFound(UNRESOLVED_TENANT_PLACEHOLDER, enteredLocale),
-        ).resolves.toEqual({ tenantId: undefined, locale: servedLocale });
+        ).resolves.toEqual({
+          tenantId: undefined,
+          locale: servedLocale,
+          defaultLocale: LOCALE_ISO_CODES.EN,
+        });
       });
     });
   });

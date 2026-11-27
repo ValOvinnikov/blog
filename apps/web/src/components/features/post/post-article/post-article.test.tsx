@@ -48,8 +48,6 @@ vi.mock('@web/server/request-context/request-context');
 
 vi.mock('@web/server/tenant/request-tenant/request-tenant');
 
-vi.mock('@web/i18n/navigation');
-
 vi.mock('@shinefold/service', async (importOriginal) => {
   const actual = await importOriginal<object>();
   return {

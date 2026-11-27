@@ -22,8 +22,6 @@ const { getPostIndexPageMock } = vi.hoisted(() => ({
   getPostIndexPageMock: vi.fn(),
 }));
 
-vi.mock('@web/i18n/navigation');
-
 vi.mock(
   '@web/server/post-index/get-post-index-page/get-post-index-page',
   () => ({

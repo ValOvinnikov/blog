@@ -7,6 +7,7 @@ import type {
   TWorkerProvisioningStep,
 } from '@shinefold/db/constants';
 import {
+  boolean,
   integer,
   jsonb,
   pgTable,
@@ -105,6 +106,9 @@ export const tenants = pgTable(
     siteType: siteTypeEnum('site_type'),
     siteTemplateVersion: integer('site_template_version'),
     selfServeOwnerEmailIndex: text('self_serve_owner_email_index'),
+    createdFromPlatform: boolean('created_from_platform')
+      .notNull()
+      .default(false),
     ...tenantOwnerAccessColumns,
     unsentReinviteFormerOwnerEmailEncrypted: text(
       'unsent_reinvite_former_owner_email_encrypted',

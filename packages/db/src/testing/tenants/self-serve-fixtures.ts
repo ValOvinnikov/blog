@@ -30,3 +30,11 @@ export async function readSelfServeIndex(db: TTestDb, tenantId: string) {
     .where(eq(tenants.id, tenantId));
   return row?.selfServeOwnerEmailIndex;
 }
+
+export async function readCreatedFromPlatform(db: TTestDb, tenantId: string) {
+  const [row] = await db
+    .select({ createdFromPlatform: tenants.createdFromPlatform })
+    .from(tenants)
+    .where(eq(tenants.id, tenantId));
+  return row?.createdFromPlatform;
+}
