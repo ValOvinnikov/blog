@@ -920,7 +920,7 @@
       "PLAIN": "Sin contorno hasta pasar el cursor"
     },
     "headerControlShapeLabel": "Forma de los botones de la cabecera",
-    "headerControlShapeDescription": "La forma del contorno de los botones de idioma, tema, menú y cuenta.",
+    "headerControlShapeDescription": "La forma del contorno de los botones de idioma, tema, menú y cuenta, y de la acción de la cabecera.",
     "headerControlShapeOptionLabel": {
       "ROUND": "Redonda",
       "ROUNDED": "Redondeada",

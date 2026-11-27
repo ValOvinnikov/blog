@@ -920,7 +920,7 @@
       "PLAIN": "No outline until hovered"
     },
     "headerControlShapeLabel": "Header buttons shape",
-    "headerControlShapeDescription": "The outline shape of the language, theme, menu and account buttons.",
+    "headerControlShapeDescription": "The outline shape of the language, theme, menu and account buttons, and of the header action.",
     "headerControlShapeOptionLabel": {
       "ROUND": "Round",
       "ROUNDED": "Rounded",
