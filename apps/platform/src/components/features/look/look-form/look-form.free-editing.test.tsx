@@ -101,8 +101,6 @@ describe(`<${LookForm.name}/>`, () => {
     });
 
     it('keeps the logo mark colour following the accent behind a locked switch', async () => {
-      await openLookRow(user, LOOK_ROW.COLOUR);
-      const accentSlider = screen.getByRole('slider', { name: ACCENT_HUE });
       await openLookRow(user, LOOK_ROW.BRAND);
       const followSwitch = screen.getByRole('switch', {
         name: `${FOLLOW_ACCENT_HUE} ${GROWTH_BADGE_TEXT}`,
@@ -121,6 +119,10 @@ describe(`<${LookForm.name}/>`, () => {
       );
       expect(readout).toBeVisible();
       expect(logoSlider).not.toBeInTheDocument();
+
+      await openLookRow(user, LOOK_ROW.COLOUR);
+      const accentSlider = screen.getByRole('slider', { name: ACCENT_HUE });
+
       expect(accentSlider).toBeEnabled();
     });
 

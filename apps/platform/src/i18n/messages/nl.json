@@ -1019,7 +1019,7 @@
       "PILL": "Een afgeronde omlijning als je eroverheen beweegt en op de huidige pagina"
     },
     "accountButtonStyleLabel": "Stijl van de accountknop",
-    "accountButtonStyleDescription": "De knop waarmee lezers inloggen en hun account openen, op brede schermen. Telefoons volgen de instelling ‘Op telefoons staat het account’ hieronder.",
+    "accountButtonStyleDescription": "De knop waarmee lezers inloggen en hun account openen, op brede schermen. Telefoons volgen de instelling ‘Account op telefoons’ hieronder.",
     "accountButtonStyleOptionLabel": {
       "PILL": "Pil met label",
       "CIRCLE": "Cirkel"

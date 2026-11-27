@@ -11,9 +11,9 @@ import { LOOK_ROW } from '@platform/constants/look-row';
 import { useSettingsFormState } from '@platform/context/settings-form-provider';
 import type { TBrandAssetKind } from '@platform/utils/brand-asset-limits/brand-asset-limits';
 import { joinIds } from '@platform/utils/join-ids/join-ids';
+import { lookFieldHintId } from '@platform/utils/look-field-hint-id/look-field-hint-id';
 import { BRAND_NAME_MAX_LENGTH, LOOK_FIELD } from '@shinefold/db/constants';
 import { useTranslations } from 'next-intl';
-import { useId } from 'react';
 
 import { brandCardVariants } from './brand-card-variants';
 
@@ -36,11 +36,6 @@ export const BrandCard = ({ summary }: TBrandCardProps) => {
     brandImageError,
   } = useLookForm();
   const t = useTranslations('lookForm');
-  const hintIds: Record<TBrandAssetKind, string> = {
-    logo: useId(),
-    logoDark: useId(),
-    favicon: useId(),
-  };
   const brandNameLock = useLookFieldLock('brandName');
   const logoHueLock = useLookFieldLock('logoHue');
   const { lockLine, hasGrowthBadge } = useLookRowLock(LOCKABLE_BRAND_FIELDS);
@@ -49,7 +44,6 @@ export const BrandCard = ({ summary }: TBrandCardProps) => {
     field: kind,
     label: t(`${kind}FieldLabel`),
     hint: t(`${kind}FieldHint`),
-    hintId: hintIds[kind],
     isGroup: true,
   });
 
@@ -59,7 +53,7 @@ export const BrandCard = ({ summary }: TBrandCardProps) => {
     control: {
       id: brandAssetFieldIds[kind],
       isLocked: isArchived,
-      describedBy: joinIds(hintIds[kind], archivedDescribedBy),
+      describedBy: joinIds(lookFieldHintId(kind), archivedDescribedBy),
     },
     error: brandImageError?.kind === kind ? brandImageError.message : undefined,
   });

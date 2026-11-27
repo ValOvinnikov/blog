@@ -38,6 +38,7 @@ export const buildLookRowSummaries = (
     footerBackground,
     footerSurface,
     cookieSettingsButton,
+    breadcrumbBackground,
     languageSwitcherStyle,
   } = values;
 
@@ -92,6 +93,7 @@ export const buildLookRowSummaries = (
     [LOOK_ROW.DETAILS]: join([
       t(`spinnerStyleOptionLabel.${spinnerStyle}`),
       t(`busyButtonStyleOptionLabel.${busyButtonStyle}`),
+      t(`skinLabel.${breadcrumbBackground}`),
       t(`cookieSettingsButtonSummary.${cookieSettingsButton}`),
     ]),
   };

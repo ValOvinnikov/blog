@@ -1019,7 +1019,7 @@
       "PILL": "A rounded outline on hover and on the current page"
     },
     "accountButtonStyleLabel": "Account button style",
-    "accountButtonStyleDescription": "The control readers sign in with and open their account from, on wide screens. Phones follow the “On phones, the account sits” setting below.",
+    "accountButtonStyleDescription": "The control readers sign in with and open their account from, on wide screens. Phones follow the “Account on phones” setting below.",
     "accountButtonStyleOptionLabel": {
       "PILL": "Pill with label",
       "CIRCLE": "Circle"

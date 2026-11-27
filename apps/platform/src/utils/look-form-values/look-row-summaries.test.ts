@@ -60,6 +60,7 @@ const seedValues = () => ({
   accountButtonStyle: ACCOUNT_BUTTON_STYLE.PILL,
   footerLayout: FOOTER_LAYOUT.COLUMNS,
   footerBackground: BRAND_VARIANT.BRAND_PRIMARY,
+  breadcrumbBackground: BRAND_VARIANT.PRIMARY,
   footerSurface: FOOTER_SURFACE.FULL_WIDTH,
   cookieSettingsButton: COOKIE_SETTINGS_BUTTON.SHOWN,
   languageSwitcherStyle: LANGUAGE_SWITCHER_STYLE.MENU_GLOBE,
@@ -78,7 +79,8 @@ describe(buildLookRowSummaries, () => {
       [LOOK_ROW.SHAPE]: 'Medium · Rounded · Comfortable · Accent bar',
       [LOOK_ROW.HEADER]: `${HEADER_LEAD} · Plain · Outlined · Globe · ${HEADER_TAIL}`,
       [LOOK_ROW.FOOTER]: 'Columns · Brand tint · Full width',
-      [LOOK_ROW.DETAILS]: 'Braille · Busy label · Cookie link and button',
+      [LOOK_ROW.DETAILS]:
+        'Braille · Busy label · Plain · Cookie link and button',
     });
   });
 
@@ -125,7 +127,7 @@ describe(buildLookRowSummaries, () => {
     const summaries = buildLookRowSummaries(values, t, MULTIPLE_LANGUAGES);
 
     expect(summaries[LOOK_ROW.DETAILS]).toBe(
-      'Braille · Progress edge · Cookie link and button',
+      'Braille · Progress edge · Plain · Cookie link and button',
     );
   });
 
@@ -173,7 +175,9 @@ describe(buildLookRowSummaries, () => {
 
     const summaries = buildLookRowSummaries(values, t, MULTIPLE_LANGUAGES);
 
-    expect(summaries[LOOK_ROW.DETAILS]).toBe(`Braille · Busy label · ${reads}`);
+    expect(summaries[LOOK_ROW.DETAILS]).toBe(
+      `Braille · Busy label · Plain · ${reads}`,
+    );
   });
 
   it('leaves the language switcher out of the header on a one-language site', () => {
