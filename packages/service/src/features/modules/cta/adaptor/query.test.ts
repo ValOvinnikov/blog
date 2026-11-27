@@ -1,7 +1,7 @@
 import { faker } from '@faker-js/faker';
 import { BRAND_VARIANT, CTA_VARIANT } from '@shinefold/config';
 import { LOCALE_ISO_CODES } from '@shinefold/config/constants';
-import { mockRawCtaModule } from '@shinefold/service/testing/modules/fixtures';
+import { mockRawCtaModule } from '@shinefold/service/testing/modules/cta/fixtures';
 import { evaluateModuleQuery } from '@shinefold/service/testing/shared/groq';
 import {
   MOCK_DUTCH_TEXT,
@@ -14,6 +14,7 @@ import {
   mockLocalizedValues,
   mockRawModuleHeadingBlock,
 } from '@shinefold/service/testing/shared/localized';
+import { MOCK_AUTHORED_CARD_APPEARANCE } from '@shinefold/service/testing/shared/module-appearance';
 
 import { ctaModuleQuery } from './query';
 
@@ -150,5 +151,24 @@ describe('ctaModuleQuery', () => {
     const cta = await runCta({ ...MOCK_CTA_DOCUMENT, headingBlock }, NL);
 
     expect(cta.headingBlock?.heading).toBeNull();
+  });
+
+  it('reads no card overrides from a document authored without them', async () => {
+    const cta = await runCta(MOCK_CTA_DOCUMENT, EN);
+
+    expect(cta).toMatchObject({
+      cardStyle: null,
+      radiusScale: null,
+      density: null,
+    });
+  });
+
+  it('reads the authored card overrides', async () => {
+    const cta = await runCta(
+      { ...MOCK_CTA_DOCUMENT, ...MOCK_AUTHORED_CARD_APPEARANCE },
+      EN,
+    );
+
+    expect(cta).toMatchObject(MOCK_AUTHORED_CARD_APPEARANCE);
   });
 });

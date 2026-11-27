@@ -10,8 +10,9 @@ import type {
   TPortableTextBlock,
 } from '@shinefold/config';
 import type { TCtaButton } from '@shinefold/service/shared/transformers/cta/to-cta-button';
+import type { TModuleAppearance } from '@shinefold/service/shared/transformers/module/to-module-appearance';
 
-export type TCtaModule = {
+export type TCtaModule = TModuleAppearance & {
   variant: TCtaVariant;
   brandVariant: TBrandVariant;
   bandTone: TBrandVariant;
