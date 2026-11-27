@@ -1,10 +1,10 @@
 import { tenantDetailsValuesOf } from '@platform/components/features/tenants/tenant-details-panel/tenant-details-values';
+import { ARIA_ATTRIBUTE } from '@platform/constants/aria-attribute';
 import {
   TENANT_FIELD_ERROR,
   TENANT_FIELD_LOCK_KIND,
 } from '@platform/constants/tenant';
 import messages from '@platform/i18n/messages/en.json';
-import { ARIA_DISABLED } from '@platform/testing/aria';
 import { customRender, screen } from '@platform/testing/custom-render';
 import { makeEnTranslator } from '@platform/testing/en-translator';
 import {
@@ -29,7 +29,6 @@ const { tenantDetailsPanel, tenantFieldErrors, languageNames, planNames } =
   messages;
 const t = makeEnTranslator();
 
-const ARIA_PRESSED = 'aria-pressed';
 const NAME_LABEL = tenantDetailsPanel.nameLabel;
 const PLAN_LABEL = tenantDetailsPanel.planLabel;
 const FREE_LABEL = planNames[TENANT_PLAN.FREE];
@@ -114,9 +113,9 @@ describe(`<${TenantDetailsFields.name}/>`, () => {
     expect(domainInput).toHaveValue(MOCK_TENANT_DOMAIN);
     expect(ownerEmailInput).toHaveValue(MOCK_OWNER_EMAIL);
     expect(ownerEmailInput).toHaveAttribute('type', 'email');
-    expect(freeButton).toHaveAttribute(ARIA_PRESSED, 'true');
+    expect(freeButton).toHaveAttribute(ARIA_ATTRIBUTE.PRESSED, 'true');
     expect(freeButton).toBeEnabled();
-    expect(englishButton).toHaveAttribute(ARIA_PRESSED, 'true');
+    expect(englishButton).toHaveAttribute(ARIA_ATTRIBUTE.PRESSED, 'true');
     expect(englishButton).toBeEnabled();
   });
 
@@ -151,7 +150,7 @@ describe(`<${TenantDetailsFields.name}/>`, () => {
     const domainInput = getTextbox(PRIMARY_DOMAIN_LABEL);
     const nameInput = getTextbox(NAME_LABEL);
 
-    expect(domainInput).toHaveAttribute(ARIA_DISABLED, 'true');
+    expect(domainInput).toHaveAttribute(ARIA_ATTRIBUTE.DISABLED, 'true');
     expect(domainInput).toHaveAccessibleDescription(MOCK_DOMAIN_LOCKED_HINT);
     expect(nameInput).toBeEnabled();
   });
@@ -165,7 +164,7 @@ describe(`<${TenantDetailsFields.name}/>`, () => {
 
     const domainInput = getTextbox(PRIMARY_DOMAIN_LABEL);
 
-    expect(domainInput).toHaveAttribute(ARIA_DISABLED, 'true');
+    expect(domainInput).toHaveAttribute(ARIA_ATTRIBUTE.DISABLED, 'true');
     expect(domainInput).toHaveAccessibleDescription(
       tenantDetailsPanel.fieldLockedReasonCustomMainDomain,
     );
@@ -187,8 +186,8 @@ describe(`<${TenantDetailsFields.name}/>`, () => {
     expect(planGroup).toHaveAccessibleDescription(
       tenantDetailsPanel.fieldLockedReasonSucceeded,
     );
-    expect(growthButton).toHaveAttribute(ARIA_DISABLED, 'true');
-    expect(growthButton).toHaveAttribute(ARIA_PRESSED, 'true');
+    expect(growthButton).toHaveAttribute(ARIA_ATTRIBUTE.DISABLED, 'true');
+    expect(growthButton).toHaveAttribute(ARIA_ATTRIBUTE.PRESSED, 'true');
     expect(englishButton).toBeEnabled();
   });
 

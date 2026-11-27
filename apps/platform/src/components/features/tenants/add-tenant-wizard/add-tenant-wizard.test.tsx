@@ -1,3 +1,4 @@
+import { ARIA_ATTRIBUTE } from '@platform/constants/aria-attribute';
 import { customRender, screen } from '@platform/testing/custom-render';
 import { MOCK_TENANT_ROOT_DOMAIN } from '@platform/testing/tenants/fixtures';
 import { CORE_PROVISIONING_STEPS } from '@shinefold/db/constants';
@@ -38,7 +39,7 @@ describe(`<${AddTenantWizard.name}/>`, () => {
     const items = screen.getAllByRole('listitem');
 
     expect(items).toHaveLength(CORE_PROVISIONING_STEPS.length + 1);
-    expect(items[0]).toHaveAttribute('aria-current', 'step');
+    expect(items[0]).toHaveAttribute(ARIA_ATTRIBUTE.CURRENT, 'step');
     expect(rail).toHaveTextContent('Details');
     expect(rail).toHaveTextContent('Create workspace');
     expect(rail).toHaveTextContent('Seed content');

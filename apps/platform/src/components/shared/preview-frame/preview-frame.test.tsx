@@ -1,4 +1,5 @@
 import { faker } from '@faker-js/faker';
+import { ARIA_ATTRIBUTE } from '@platform/constants/aria-attribute';
 import {
   PREVIEW_DEVICE,
   PREVIEW_DEVICE_WIDTH,
@@ -9,7 +10,6 @@ import {
   type TPreviewDevice,
   type TPreviewHeadingLayout,
 } from '@platform/constants/preview';
-import { ARIA_PRESSED } from '@platform/testing/aria';
 import {
   customRender,
   renderWithIntl,
@@ -315,8 +315,8 @@ describe(`<${PreviewFrame.name}/>`, () => {
       const tablet = screen.getByRole('button', { name: MOCK_TABLET_NAME });
       const dark = screen.getByRole('button', { name: MOCK_DARK_NAME });
 
-      expect(tablet).toHaveAttribute(ARIA_PRESSED, 'true');
-      expect(dark).toHaveAttribute(ARIA_PRESSED, 'true');
+      expect(tablet).toHaveAttribute(ARIA_ATTRIBUTE.PRESSED, 'true');
+      expect(dark).toHaveAttribute(ARIA_ATTRIBUTE.PRESSED, 'true');
     });
 
     it('lands the first Tab on the pressed device', async () => {

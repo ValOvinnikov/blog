@@ -1,7 +1,7 @@
 import { faker } from '@faker-js/faker';
+import { ARIA_ATTRIBUTE } from '@platform/constants/aria-attribute';
 import { EMAIL_SENDER_FIELD_ERROR } from '@platform/constants/email-sender';
 import en from '@platform/i18n/messages/en.json';
-import { ARIA_DISABLED } from '@platform/testing/aria';
 import { screen } from '@platform/testing/custom-render';
 import {
   mockEmailSender,
@@ -155,9 +155,12 @@ describe(`<${EmailSenderEditor.name}/>`, () => {
       await user.type(senderNameInput, senderNameLabel);
 
       expect(senderNameInput).toHaveFocus();
-      expect(senderNameInput).toHaveAttribute(ARIA_DISABLED, 'true');
-      expect(footerAddressInput).toHaveAttribute(ARIA_DISABLED, 'true');
-      expect(uploadButton).toHaveAttribute(ARIA_DISABLED, 'true');
+      expect(senderNameInput).toHaveAttribute(ARIA_ATTRIBUTE.DISABLED, 'true');
+      expect(footerAddressInput).toHaveAttribute(
+        ARIA_ATTRIBUTE.DISABLED,
+        'true',
+      );
+      expect(uploadButton).toHaveAttribute(ARIA_ATTRIBUTE.DISABLED, 'true');
       expect(onSenderChange).not.toHaveBeenCalled();
     });
 

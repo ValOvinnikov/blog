@@ -1,7 +1,7 @@
+import { ARIA_ATTRIBUTE } from '@platform/constants/aria-attribute';
 import { LOOK_EDIT_PANEL_TEST_ID } from '@platform/constants/look-form';
 import { LOOK_ROW } from '@platform/constants/look-row';
 import messages from '@platform/i18n/messages/en.json';
-import { ARIA_DISABLED } from '@platform/testing/aria';
 import { screen, within } from '@platform/testing/custom-render';
 import {
   ACCENT_HUE,
@@ -141,7 +141,7 @@ describe(`<${LookForm.name}/>`, () => {
       const bothButton = await cookieChoice(false);
       const note = screen.getByText(COOKIE_BANNER_OFF_NOTE);
 
-      expect(bothButton).toHaveAttribute(ARIA_DISABLED, 'true');
+      expect(bothButton).toHaveAttribute(ARIA_ATTRIBUTE.DISABLED, 'true');
       expect(note).toBeVisible();
     });
   });

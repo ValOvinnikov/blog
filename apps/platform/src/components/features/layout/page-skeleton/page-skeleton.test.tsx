@@ -1,3 +1,4 @@
+import { ARIA_ATTRIBUTE } from '@platform/constants/aria-attribute';
 import messages from '@platform/i18n/messages/en.json';
 import { customRender, screen } from '@platform/testing/custom-render';
 
@@ -22,7 +23,7 @@ describe(`<${PageSkeleton.name}/>`, () => {
     const shapes = screen.getAllByTestId(SKELETON_TEST_ID);
 
     for (const shape of shapes) {
-      expect(shape).toHaveAttribute('aria-hidden', 'true');
+      expect(shape).toHaveAttribute(ARIA_ATTRIBUTE.HIDDEN, 'true');
     }
   });
 });

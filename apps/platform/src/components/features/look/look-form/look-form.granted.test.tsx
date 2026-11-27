@@ -1,6 +1,6 @@
+import { ARIA_ATTRIBUTE } from '@platform/constants/aria-attribute';
 import { LOOK_ROW } from '@platform/constants/look-row';
 import messages from '@platform/i18n/messages/en.json';
-import { ARIA_DISABLED } from '@platform/testing/aria';
 import { screen, within } from '@platform/testing/custom-render';
 import { makeEnTranslator } from '@platform/testing/en-translator';
 import {
@@ -64,7 +64,7 @@ describe(`<${LookForm.name}/> granted fields`, () => {
       });
 
       expect(granted).toBeVisible();
-      expect(noneButton).not.toHaveAttribute(ARIA_DISABLED);
+      expect(noneButton).not.toHaveAttribute(ARIA_ATTRIBUTE.DISABLED);
     });
 
     it('keeps the Growth badge on a field that is not granted', () => {

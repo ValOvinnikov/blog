@@ -1,6 +1,6 @@
+import { ARIA_ATTRIBUTE } from '@platform/constants/aria-attribute';
 import { LOOK_ROW } from '@platform/constants/look-row';
 import messages from '@platform/i18n/messages/en.json';
-import { ARIA_CURRENT, ARIA_EXPANDED } from '@platform/testing/aria';
 import { screen, waitFor, within } from '@platform/testing/custom-render';
 import { PREVIEW_TAB } from '@platform/testing/look/look-form-fixtures';
 import {
@@ -67,17 +67,17 @@ describe(`<${LookForm.name}/>`, () => {
     it('marks Preset current while no row is open', () => {
       const preset = cardLink(LOOK_FORM.presetLabel);
 
-      expect(preset).toHaveAttribute(ARIA_CURRENT, CURRENT_LOCATION);
+      expect(preset).toHaveAttribute(ARIA_ATTRIBUTE.CURRENT, CURRENT_LOCATION);
     });
 
     it('opens a folded row from its link, focuses it and marks it current', async () => {
       await user.click(rowLink(LOOK_ROW.FOOTER));
 
       const trigger = lookRowTrigger(LOOK_ROW.FOOTER);
-      expect(trigger).toHaveAttribute(ARIA_EXPANDED, 'true');
+      expect(trigger).toHaveAttribute(ARIA_ATTRIBUTE.EXPANDED, 'true');
       await waitFor(() => expect(trigger).toHaveFocus());
       expect(rowLink(LOOK_ROW.FOOTER)).toHaveAttribute(
-        ARIA_CURRENT,
+        ARIA_ATTRIBUTE.CURRENT,
         CURRENT_LOCATION,
       );
     });
@@ -86,9 +86,9 @@ describe(`<${LookForm.name}/>`, () => {
       await openLookRow(user, LOOK_ROW.FOOTER);
 
       const preset = cardLink(LOOK_FORM.presetLabel);
-      expect(preset).not.toHaveAttribute(ARIA_CURRENT);
+      expect(preset).not.toHaveAttribute(ARIA_ATTRIBUTE.CURRENT);
       expect(rowLink(LOOK_ROW.FOOTER)).toHaveAttribute(
-        ARIA_CURRENT,
+        ARIA_ATTRIBUTE.CURRENT,
         CURRENT_LOCATION,
       );
     });
@@ -99,7 +99,7 @@ describe(`<${LookForm.name}/>`, () => {
       await user.click(rowLink(LOOK_ROW.HEADER));
 
       const colour = lookRowTrigger(LOOK_ROW.COLOUR);
-      expect(colour).toHaveAttribute(ARIA_EXPANDED, 'false');
+      expect(colour).toHaveAttribute(ARIA_ATTRIBUTE.EXPANDED, 'false');
     });
 
     it('scrolls to a group from its link', async () => {

@@ -1,3 +1,4 @@
+import { ARIA_ATTRIBUTE } from '@platform/constants/aria-attribute';
 import { MEDIA_QUERY } from '@platform/constants/media-query';
 import {
   VOICE_BAR_HEIGHT_PROPERTY,
@@ -8,17 +9,12 @@ import {
 } from '@platform/constants/voice';
 import messages from '@platform/i18n/messages/en.json';
 import {
-  ARIA_CONTROLS,
-  ARIA_CURRENT,
-  ARIA_EXPANDED,
-  ARIA_HIDDEN,
-} from '@platform/testing/aria';
-import {
   fireEvent,
   screen,
   waitFor,
   within,
 } from '@platform/testing/custom-render';
+import { USER_EVENT_KEY } from '@platform/testing/keyboard';
 import { stubMatchingMediaQuery } from '@platform/testing/match-media';
 import { mockRouterRefresh } from '@platform/testing/mock-router';
 import { MOCK_ARCHIVED_AT } from '@platform/testing/tenants/fixtures';
@@ -63,7 +59,7 @@ const barButton = (name: string) =>
 const expectEverySection = (isOpen: boolean) => {
   for (const name of [ERROR_PAGES_SECTION, EMPTY_STATES_SECTION]) {
     expect(voiceSectionHeader(name)).toHaveAttribute(
-      ARIA_EXPANDED,
+      ARIA_ATTRIBUTE.EXPANDED,
       String(isOpen),
     );
   }
@@ -132,22 +128,21 @@ describe(`<${VoiceSettings.name}/> section bar`, () => {
   });
 
   describe('with nothing customised', () => {
+    let errorPages: HTMLElement;
+    let emptyStates: HTMLElement;
+
     beforeEach(() => {
       setupVoiceSettings();
+      errorPages = voiceSectionChip(ERROR_PAGES_SECTION);
+      emptyStates = voiceSectionChip(EMPTY_STATES_SECTION);
     });
 
     it('links one chip to each section', () => {
-      const errorPages = voiceSectionChip(ERROR_PAGES_SECTION);
-      const emptyStates = voiceSectionChip(EMPTY_STATES_SECTION);
-
       expect(errorPages).toHaveAttribute(HREF, `#${ERRORS_IDS.section}`);
       expect(emptyStates).toHaveAttribute(HREF, `#${EMPTY_IDS.section}`);
     });
 
     it('shows no count on any chip', () => {
-      const errorPages = voiceSectionChip(ERROR_PAGES_SECTION);
-      const emptyStates = voiceSectionChip(EMPTY_STATES_SECTION);
-
       expect(errorPages).toHaveAccessibleName(ERROR_PAGES_SECTION);
       expect(emptyStates).toHaveAccessibleName(EMPTY_STATES_SECTION);
     });
@@ -157,11 +152,11 @@ describe(`<${VoiceSettings.name}/> section bar`, () => {
 
       await waitFor(() =>
         expect(voiceSectionChip(EMPTY_STATES_SECTION)).not.toHaveAttribute(
-          ARIA_CURRENT,
+          ARIA_ATTRIBUTE.CURRENT,
         ),
       );
       expect(voiceSectionChip(ERROR_PAGES_SECTION)).not.toHaveAttribute(
-        ARIA_CURRENT,
+        ARIA_ATTRIBUTE.CURRENT,
       );
     });
 
@@ -169,7 +164,7 @@ describe(`<${VoiceSettings.name}/> section bar`, () => {
       placeHeaders(-BELOW_LINE, -BELOW_LINE);
       await waitFor(() =>
         expect(voiceSectionChip(EMPTY_STATES_SECTION)).toHaveAttribute(
-          ARIA_CURRENT,
+          ARIA_ATTRIBUTE.CURRENT,
           ACTIVE,
         ),
       );
@@ -178,11 +173,11 @@ describe(`<${VoiceSettings.name}/> section bar`, () => {
 
       await waitFor(() =>
         expect(voiceSectionChip(EMPTY_STATES_SECTION)).not.toHaveAttribute(
-          ARIA_CURRENT,
+          ARIA_ATTRIBUTE.CURRENT,
         ),
       );
       expect(voiceSectionChip(ERROR_PAGES_SECTION)).not.toHaveAttribute(
-        ARIA_CURRENT,
+        ARIA_ATTRIBUTE.CURRENT,
       );
     });
 
@@ -191,12 +186,12 @@ describe(`<${VoiceSettings.name}/> section bar`, () => {
 
       await waitFor(() =>
         expect(voiceSectionChip(EMPTY_STATES_SECTION)).toHaveAttribute(
-          ARIA_CURRENT,
+          ARIA_ATTRIBUTE.CURRENT,
           ACTIVE,
         ),
       );
       expect(voiceSectionChip(ERROR_PAGES_SECTION)).not.toHaveAttribute(
-        ARIA_CURRENT,
+        ARIA_ATTRIBUTE.CURRENT,
       );
     });
 
@@ -206,7 +201,7 @@ describe(`<${VoiceSettings.name}/> section bar`, () => {
 
       await waitFor(() =>
         expect(voiceSectionChip(EMPTY_STATES_SECTION)).toHaveAttribute(
-          ARIA_CURRENT,
+          ARIA_ATTRIBUTE.CURRENT,
           ACTIVE,
         ),
       );
@@ -218,10 +213,10 @@ describe(`<${VoiceSettings.name}/> section bar`, () => {
       await user.click(voiceSectionChip(EMPTY_STATES_SECTION));
 
       const header = voiceSectionHeader(EMPTY_STATES_SECTION);
-      expect(header).toHaveAttribute(ARIA_EXPANDED, 'true');
+      expect(header).toHaveAttribute(ARIA_ATTRIBUTE.EXPANDED, 'true');
       expect(header).toHaveFocus();
       expect(voiceSectionChip(EMPTY_STATES_SECTION)).toHaveAttribute(
-        ARIA_CURRENT,
+        ARIA_ATTRIBUTE.CURRENT,
         ACTIVE,
       );
       expect(scrollIntoView).toHaveBeenLastCalledWith(SCROLL_TO_START);
@@ -237,7 +232,7 @@ describe(`<${VoiceSettings.name}/> section bar`, () => {
 
     it('jumps from a chip with Enter', async () => {
       voiceSectionChip(ERROR_PAGES_SECTION).focus();
-      await user.keyboard('{Enter}');
+      await user.keyboard(USER_EVENT_KEY.ENTER);
 
       expect(voiceSectionHeader(ERROR_PAGES_SECTION)).toHaveFocus();
     });
@@ -311,7 +306,7 @@ describe(`<${VoiceSettings.name}/> section bar`, () => {
           VOICE_SETTINGS.jumpTo,
         );
 
-        expect(label).toHaveAttribute(ARIA_HIDDEN, 'true');
+        expect(label).toHaveAttribute(ARIA_ATTRIBUTE.HIDDEN, 'true');
       });
 
       it('orders the chips, then the bar buttons, before the sections', async () => {
@@ -342,7 +337,10 @@ describe(`<${VoiceSettings.name}/> section bar`, () => {
         (name) => {
           const button = barButton(name);
 
-          expect(button).toHaveAttribute(ARIA_CONTROLS, SECTION_BODY_IDS);
+          expect(button).toHaveAttribute(
+            ARIA_ATTRIBUTE.CONTROLS,
+            SECTION_BODY_IDS,
+          );
           expect(button).toBeEnabled();
         },
       );
@@ -355,7 +353,7 @@ describe(`<${VoiceSettings.name}/> section bar`, () => {
       await user.click(voiceSectionChip(ERROR_PAGES_SECTION));
 
       expect(voiceSectionHeader(EMPTY_STATES_SECTION)).toHaveAttribute(
-        ARIA_EXPANDED,
+        ARIA_ATTRIBUTE.EXPANDED,
         'true',
       );
       expect(voiceSectionHeader(ERROR_PAGES_SECTION)).toHaveFocus();
@@ -365,73 +363,71 @@ describe(`<${VoiceSettings.name}/> section bar`, () => {
   describe('with the icon button shown below 1024', () => {
     const expandAllSections = () => barButton(VOICE_SETTINGS.expandAllSections);
 
-    it('lets the icon button control every section body', () => {
-      setupVoiceSettings();
-
-      expect(expandAllSections()).toHaveAttribute(
-        ARIA_CONTROLS,
-        SECTION_BODY_IDS,
-      );
-    });
-
-    it('expands every section, then names itself Collapse all sections and collapses them', async () => {
-      setupVoiceSettings();
-
-      await user.click(expandAllSections());
-      expectEverySection(true);
-
-      await user.click(barButton(VOICE_SETTINGS.collapseAllSections));
-      expectEverySection(false);
-      expect(expandAllSections()).toBeInTheDocument();
-    });
-
-    it('stays Expand all sections while any section is collapsed', async () => {
-      setupVoiceSettings();
-
-      await user.click(voiceSectionHeader(ERROR_PAGES_SECTION));
-
-      expect(expandAllSections()).toBeInTheDocument();
-    });
-
-    it('shows its current name as a tooltip at once on keyboard focus', async () => {
-      setupVoiceSettings();
-      barButton(VOICE_SETTINGS.collapseAll).focus();
-
-      await user.tab();
-
-      const tooltip = await screen.findByText(
-        VOICE_SETTINGS.expandAllSections,
-        { ignore: 'button' },
-      );
-      expect(expandAllSections()).toHaveFocus();
-      expect(tooltip).toBeVisible();
-    });
-
-    it('marks no chip active while the bar is in flow, even past a header', async () => {
-      setupVoiceSettings();
-      placeHeaders(-BELOW_LINE, -BELOW_LINE);
-      await waitFor(() =>
-        expect(voiceSectionChip(EMPTY_STATES_SECTION)).toHaveAttribute(
-          ARIA_CURRENT,
-          ACTIVE,
-        ),
-      );
-
-      const bar = voiceSectionBar();
-      placeHeaders(-BELOW_LINE, -BELOW_LINE, {
-        element: bar,
-        top: IN_FLOW_BAR_TOP,
-        bottom: IN_FLOW_BAR_TOP + BAR_HEIGHT,
+    describe('for a live tenant', () => {
+      beforeEach(() => {
+        setupVoiceSettings();
       });
 
-      await waitFor(() =>
-        expect(voiceSectionChip(EMPTY_STATES_SECTION)).not.toHaveAttribute(
-          ARIA_CURRENT,
-        ),
-      );
-      expect(voiceSectionChip(ERROR_PAGES_SECTION)).not.toHaveAttribute(
-        ARIA_CURRENT,
-      );
+      it('lets the icon button control every section body', () => {
+        expect(expandAllSections()).toHaveAttribute(
+          ARIA_ATTRIBUTE.CONTROLS,
+          SECTION_BODY_IDS,
+        );
+      });
+
+      it('expands every section, then collapses them as Collapse all sections', async () => {
+        await user.click(expandAllSections());
+        expectEverySection(true);
+
+        await user.click(barButton(VOICE_SETTINGS.collapseAllSections));
+        expectEverySection(false);
+        expect(expandAllSections()).toBeInTheDocument();
+      });
+
+      it('stays Expand all sections while any section is collapsed', async () => {
+        await user.click(voiceSectionHeader(ERROR_PAGES_SECTION));
+
+        expect(expandAllSections()).toBeInTheDocument();
+      });
+
+      it('shows its current name as a tooltip at once on keyboard focus', async () => {
+        barButton(VOICE_SETTINGS.collapseAll).focus();
+
+        await user.tab();
+
+        const tooltip = await screen.findByText(
+          VOICE_SETTINGS.expandAllSections,
+          { ignore: expandAllSections().localName },
+        );
+        expect(expandAllSections()).toHaveFocus();
+        expect(tooltip).toBeVisible();
+      });
+
+      it('marks no chip active while the bar is in flow, even past a header', async () => {
+        placeHeaders(-BELOW_LINE, -BELOW_LINE);
+        await waitFor(() =>
+          expect(voiceSectionChip(EMPTY_STATES_SECTION)).toHaveAttribute(
+            ARIA_ATTRIBUTE.CURRENT,
+            ACTIVE,
+          ),
+        );
+
+        const bar = voiceSectionBar();
+        placeHeaders(-BELOW_LINE, -BELOW_LINE, {
+          element: bar,
+          top: IN_FLOW_BAR_TOP,
+          bottom: IN_FLOW_BAR_TOP + BAR_HEIGHT,
+        });
+
+        await waitFor(() =>
+          expect(voiceSectionChip(EMPTY_STATES_SECTION)).not.toHaveAttribute(
+            ARIA_ATTRIBUTE.CURRENT,
+          ),
+        );
+        expect(voiceSectionChip(ERROR_PAGES_SECTION)).not.toHaveAttribute(
+          ARIA_ATTRIBUTE.CURRENT,
+        );
+      });
     });
 
     it('keeps the icon button operable for an archived tenant', async () => {

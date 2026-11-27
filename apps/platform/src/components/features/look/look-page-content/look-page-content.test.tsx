@@ -1,8 +1,8 @@
+import { ARIA_ATTRIBUTE } from '@platform/constants/aria-attribute';
 import { LOOK_ROW } from '@platform/constants/look-row';
 import messages from '@platform/i18n/messages/en.json';
 import { buildVirtualAdminMembership } from '@platform/server/auth/build-virtual-admin-membership';
 import { mockAdmin } from '@platform/testing/admins/fixtures';
-import { ARIA_DISABLED } from '@platform/testing/aria';
 import { expectArchivedOffersNoSave } from '@platform/testing/assert-archived-save';
 import { screen } from '@platform/testing/custom-render';
 import { makeEnTranslator } from '@platform/testing/en-translator';
@@ -122,7 +122,7 @@ describe(`<${LookPageContent.name}/>`, () => {
 
         expect(title).not.toBeInTheDocument();
         expect(badges.length).toBeGreaterThan(0);
-        expect(lockedRadius).toHaveAttribute(ARIA_DISABLED, 'true');
+        expect(lockedRadius).toHaveAttribute(ARIA_ATTRIBUTE.DISABLED, 'true');
       },
     );
   });

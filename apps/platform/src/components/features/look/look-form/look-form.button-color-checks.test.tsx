@@ -1,3 +1,4 @@
+import { ARIA_ATTRIBUTE } from '@platform/constants/aria-attribute';
 import { LOOK_ROW } from '@platform/constants/look-row';
 import messages from '@platform/i18n/messages/en.json';
 import { updateLookAction } from '@platform/server/site-config/update-look-action';
@@ -54,7 +55,7 @@ describe(`<${LookForm.name}/>`, () => {
       const error = screen.getByText(LOOK_FORM.buttonColorInvalid);
 
       expect(error).toBeVisible();
-      expect(hexInput).toHaveAttribute('aria-invalid', 'true');
+      expect(hexInput).toHaveAttribute(ARIA_ATTRIBUTE.INVALID, 'true');
     });
 
     it('refuses to save', async () => {

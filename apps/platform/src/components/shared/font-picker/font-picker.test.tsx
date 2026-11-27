@@ -1,6 +1,8 @@
 import { faker } from '@faker-js/faker';
 import { FONT_OPTIONS } from '@platform/config/fonts';
+import { ARIA_ATTRIBUTE } from '@platform/constants/aria-attribute';
 import { customRender, screen, within } from '@platform/testing/custom-render';
+import { USER_EVENT_KEY } from '@platform/testing/keyboard';
 import { pickNextOptionByKeyboard } from '@platform/testing/pick-next-option-by-keyboard';
 import { ARCHIVED_NOTICE_ID } from '@platform/testing/render-in-settings-form';
 import { FONT_CHOICE } from '@shinefold/config';
@@ -12,10 +14,14 @@ faker.seed(5995);
 
 const MOCK_ARIA_LABEL = faker.lorem.words(2);
 
+const onChange = vi.fn();
+const { label: FRAUNCES_LABEL, fontFamily: FRAUNCES_FONT_FAMILY } =
+  FONT_OPTIONS[FONT_CHOICE.FRAUNCES];
+
 const setup = customRender(FontPicker, {
   aria: { label: MOCK_ARIA_LABEL },
   value: FONT_CHOICE.SPACE_GROTESK,
-  onChange: vi.fn(),
+  onChange,
 });
 
 describe(`<${FontPicker.name}/>`, () => {
@@ -26,48 +32,17 @@ describe(`<${FontPicker.name}/>`, () => {
   });
 
   it('shows the current font on the trigger, set in its own font family', () => {
-    const { label, fontFamily } = FONT_OPTIONS[FONT_CHOICE.FRAUNCES];
     setup({ value: FONT_CHOICE.FRAUNCES });
 
     const trigger = screen.getByRole('combobox', { name: MOCK_ARIA_LABEL });
-    const triggerFont = within(trigger).getByText(label);
+    const triggerFont = within(trigger).getByText(FRAUNCES_LABEL);
 
     expect(triggerFont).toBeVisible();
-    expect(triggerFont).toHaveStyle({ fontFamily });
+    expect(triggerFont).toHaveStyle({ fontFamily: FRAUNCES_FONT_FAMILY });
   });
-
-  it('marks the current font as selected in the list', async () => {
-    setup();
-
-    const trigger = screen.getByRole('combobox', { name: MOCK_ARIA_LABEL });
-    await user.click(trigger);
-
-    const currentOption = await screen.findByRole('option', {
-      name: FONT_OPTIONS[FONT_CHOICE.SPACE_GROTESK].label,
-    });
-
-    expect(currentOption).toHaveAttribute('aria-selected', 'true');
-  });
-
-  it.each(Object.values(FONT_OPTIONS))(
-    'lists $label by name, set in its own font family',
-    async ({ label, fontFamily }) => {
-      setup();
-
-      const trigger = screen.getByRole('combobox', { name: MOCK_ARIA_LABEL });
-      await user.click(trigger);
-
-      const option = await screen.findByRole('option', { name: label });
-      const optionText = within(option).getByText(label);
-
-      expect(option).toBeVisible();
-      expect(optionText).toHaveStyle({ fontFamily });
-    },
-  );
 
   it('reports the font chosen from the list', async () => {
-    const handleChange = vi.fn();
-    setup({ value: FONT_CHOICE.NEWSREADER, onChange: handleChange });
+    setup({ value: FONT_CHOICE.NEWSREADER });
 
     const trigger = screen.getByRole('combobox', { name: MOCK_ARIA_LABEL });
     await user.click(trigger);
@@ -76,47 +51,71 @@ describe(`<${FontPicker.name}/>`, () => {
     });
     await user.click(interOption);
 
-    expect(handleChange).toHaveBeenCalledWith(FONT_CHOICE.INTER);
+    expect(onChange).toHaveBeenCalledWith(FONT_CHOICE.INTER);
   });
 
-  it('picks a font with the arrow keys and Enter', async () => {
-    const handleChange = vi.fn();
-    setup({ onChange: handleChange });
+  describe('with the default font', () => {
+    beforeEach(() => {
+      setup();
+    });
 
-    await pickNextOptionByKeyboard(
-      user,
-      FONT_OPTIONS[FONT_CHOICE.NEWSREADER].label,
-    );
+    it('picks a font with the arrow keys and Enter', async () => {
+      await pickNextOptionByKeyboard(
+        user,
+        FONT_OPTIONS[FONT_CHOICE.NEWSREADER].label,
+      );
 
-    expect(handleChange).toHaveBeenCalledWith(FONT_CHOICE.NEWSREADER);
+      expect(onChange).toHaveBeenCalledWith(FONT_CHOICE.NEWSREADER);
+    });
+
+    describe('once opened', () => {
+      beforeEach(async () => {
+        const trigger = screen.getByRole('combobox', { name: MOCK_ARIA_LABEL });
+        await user.click(trigger);
+      });
+
+      it('marks the current font as selected in the list', async () => {
+        const currentOption = await screen.findByRole('option', {
+          name: FONT_OPTIONS[FONT_CHOICE.SPACE_GROTESK].label,
+        });
+
+        expect(currentOption).toHaveAttribute(ARIA_ATTRIBUTE.SELECTED, 'true');
+      });
+
+      it.each(Object.values(FONT_OPTIONS))(
+        'lists $label by name, set in its own font family',
+        async ({ label, fontFamily }) => {
+          const option = await screen.findByRole('option', { name: label });
+          const optionText = within(option).getByText(label);
+
+          expect(option).toBeVisible();
+          expect(optionText).toHaveStyle({ fontFamily });
+        },
+      );
+    });
   });
 
   it('keeps the current font on a locked trigger that does not open', async () => {
-    const handleChange = vi.fn();
-    const { label, fontFamily } = FONT_OPTIONS[FONT_CHOICE.FRAUNCES];
     setup({
       value: FONT_CHOICE.FRAUNCES,
-      onChange: handleChange,
       isLocked: true,
     });
 
     await user.tab();
-    await user.keyboard('{Enter}');
+    await user.keyboard(USER_EVENT_KEY.ENTER);
     const trigger = screen.getByRole('combobox', { name: MOCK_ARIA_LABEL });
-    const triggerFont = within(trigger).getByText(label);
+    const triggerFont = within(trigger).getByText(FRAUNCES_LABEL);
     const listbox = screen.queryByRole('listbox');
 
     expect(trigger).toHaveFocus();
-    expect(trigger).toHaveAttribute('aria-disabled', 'true');
-    expect(triggerFont).toHaveStyle({ fontFamily });
+    expect(trigger).toHaveAttribute(ARIA_ATTRIBUTE.DISABLED, 'true');
+    expect(triggerFont).toHaveStyle({ fontFamily: FRAUNCES_FONT_FAMILY });
     expect(listbox).not.toBeInTheDocument();
-    expect(handleChange).not.toHaveBeenCalled();
+    expect(onChange).not.toHaveBeenCalled();
   });
 
   it('is disabled and described by the given notice when disabled', async () => {
-    const handleChange = vi.fn();
     setup({
-      onChange: handleChange,
       isDisabled: true,
       aria: { label: MOCK_ARIA_LABEL, describedBy: ARCHIVED_NOTICE_ID },
     });
@@ -126,8 +125,11 @@ describe(`<${FontPicker.name}/>`, () => {
 
     const listbox = screen.queryByRole('listbox');
 
-    expect(trigger).toHaveAttribute('aria-describedby', ARCHIVED_NOTICE_ID);
+    expect(trigger).toHaveAttribute(
+      ARIA_ATTRIBUTE.DESCRIBEDBY,
+      ARCHIVED_NOTICE_ID,
+    );
     expect(listbox).not.toBeInTheDocument();
-    expect(handleChange).not.toHaveBeenCalled();
+    expect(onChange).not.toHaveBeenCalled();
   });
 });

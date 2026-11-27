@@ -1,4 +1,5 @@
 import { faker } from '@faker-js/faker';
+import { ARIA_ATTRIBUTE } from '@platform/constants/aria-attribute';
 import { VIEW_TABS_VARIANT } from '@platform/constants/view-tabs';
 import {
   customRender,
@@ -7,7 +8,7 @@ import {
   within,
 } from '@platform/testing/custom-render';
 import { stubLgUpWindow } from '@platform/testing/match-media';
-import userEvent from '@testing-library/user-event';
+import userEvent, { type UserEvent } from '@testing-library/user-event';
 
 import { useViewTabs } from './use-view-tabs';
 import { ViewTabs } from './view-tabs';
@@ -18,7 +19,6 @@ const DEFAULT_NAME = 'Edit or preview';
 const EDIT_TAB = 'Edit';
 const PREVIEW_TAB = 'Preview';
 const MOCK_NAME = faker.lorem.words(2);
-const ARIA_SELECTED = 'aria-selected';
 const MOCK_IDS = {
   edit: { tab: faker.string.alpha(8), panel: faker.string.alpha(8) },
   preview: { tab: faker.string.alpha(8), panel: faker.string.alpha(8) },
@@ -35,6 +35,12 @@ afterEach(() => {
 });
 
 describe(`<${ViewTabs.name}/>`, () => {
+  let user: UserEvent;
+
+  beforeEach(() => {
+    user = userEvent.setup();
+  });
+
   it('names the tablist "Edit or preview" by default', () => {
     setup();
 
@@ -62,13 +68,12 @@ describe(`<${ViewTabs.name}/>`, () => {
       });
       const editTab = within(tabList).getByRole('tab', { name: EDIT_TAB });
 
-      expect(previewTab).toHaveAttribute(ARIA_SELECTED, 'true');
-      expect(editTab).toHaveAttribute(ARIA_SELECTED, 'false');
+      expect(previewTab).toHaveAttribute(ARIA_ATTRIBUTE.SELECTED, 'true');
+      expect(editTab).toHaveAttribute(ARIA_ATTRIBUTE.SELECTED, 'false');
     },
   );
 
   it('reports the tab the user picks', async () => {
-    const user = userEvent.setup();
     const onChange = vi.fn();
     setup({ variant: VIEW_TABS_VARIANT.UNDERLINE, isSticky: true, onChange });
 
@@ -95,24 +100,28 @@ describe(useViewTabs.name, () => {
     expect(result.current.panelProps('edit').role).toBe('tabpanel');
   });
 
-  it('drops the tabpanel roles from lg when the caller does not decide', () => {
-    stubLgUpWindow();
-    const { result } = renderHookWithIntl(() => useViewTabs());
+  describe('from lg', () => {
+    beforeEach(() => {
+      stubLgUpWindow();
+    });
 
-    expect(result.current.panelProps('edit').role).toBeUndefined();
-  });
+    it('drops the tabpanel roles when the caller does not decide', () => {
+      const { result } = renderHookWithIntl(() => useViewTabs());
 
-  it('keeps the tabpanel roles from lg while the caller says the layout is tabbed', () => {
-    stubLgUpWindow();
-    const { result } = renderHookWithIntl(() =>
-      useViewTabs({ isTabbed: true }),
-    );
-    const { panelProps, tabsProps } = result.current;
+      expect(result.current.panelProps('edit').role).toBeUndefined();
+    });
 
-    expect(panelProps('preview').role).toBe('tabpanel');
-    expect(panelProps('preview')['aria-labelledby']).toBe(
-      tabsProps.ids.preview.tab,
-    );
+    it('keeps the tabpanel roles while the caller says the layout is tabbed', () => {
+      const { result } = renderHookWithIntl(() =>
+        useViewTabs({ isTabbed: true }),
+      );
+      const { panelProps, tabsProps } = result.current;
+
+      expect(panelProps('preview').role).toBe('tabpanel');
+      expect(panelProps('preview')[ARIA_ATTRIBUTE.LABELLEDBY]).toBe(
+        tabsProps.ids.preview.tab,
+      );
+    });
   });
 
   it('drops the tabpanel roles below lg while the caller says the layout is not tabbed', () => {

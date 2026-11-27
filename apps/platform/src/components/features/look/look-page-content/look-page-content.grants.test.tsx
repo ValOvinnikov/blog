@@ -1,7 +1,7 @@
+import { ARIA_ATTRIBUTE } from '@platform/constants/aria-attribute';
 import { LOOK_ROW } from '@platform/constants/look-row';
 import { LOOK_SAMPLE_TOKENS_TEST_ID } from '@platform/constants/look-sample';
 import messages from '@platform/i18n/messages/en.json';
-import { ARIA_DISABLED, ARIA_PRESSED } from '@platform/testing/aria';
 import { screen } from '@platform/testing/custom-render';
 import { makeEnTranslator } from '@platform/testing/en-translator';
 import { openLookRow } from '@platform/testing/look/look-form-interactions';
@@ -67,8 +67,8 @@ describe(`<${LookPageContent.name}/> grants and Growth-only values`, () => {
         name: RADIUS_LABEL.MD,
       });
       const sampleTokens = screen.getByTestId(LOOK_SAMPLE_TOKENS_TEST_ID);
-      expect(presetRadius).toHaveAttribute(ARIA_PRESSED, 'true');
-      expect(presetRadius).toHaveAttribute(ARIA_DISABLED, 'true');
+      expect(presetRadius).toHaveAttribute(ARIA_ATTRIBUTE.PRESSED, 'true');
+      expect(presetRadius).toHaveAttribute(ARIA_ATTRIBUTE.DISABLED, 'true');
       expect(sampleTokens).not.toHaveStyle({ '--radius-md': '16px' });
     });
 
@@ -80,7 +80,7 @@ describe(`<${LookPageContent.name}/> grants and Growth-only values`, () => {
         name: RADIUS_LABEL.XL,
       });
       const sampleTokens = screen.getByTestId(LOOK_SAMPLE_TOKENS_TEST_ID);
-      expect(storedRadius).toHaveAttribute(ARIA_PRESSED, 'true');
+      expect(storedRadius).toHaveAttribute(ARIA_ATTRIBUTE.PRESSED, 'true');
       expect(storedRadius).toBeEnabled();
       expect(sampleTokens).toHaveStyle({ '--radius-md': '16px' });
     });

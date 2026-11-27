@@ -1,4 +1,5 @@
 import { faker } from '@faker-js/faker';
+import { ARIA_ATTRIBUTE } from '@platform/constants/aria-attribute';
 import { ARIA_ROLE } from '@platform/constants/aria-role';
 import { renderWithIntl, screen } from '@platform/testing/custom-render';
 import { SORT_DIRECTION } from '@shinefold/config/constants';
@@ -200,7 +201,10 @@ describe(`<${DataTableShell.name}/>`, () => {
       });
       await user.click(sortButton);
 
-      expect(header).toHaveAttribute('aria-sort', SORT_DIRECTION.ASCENDING);
+      expect(header).toHaveAttribute(
+        ARIA_ATTRIBUTE.SORT,
+        SORT_DIRECTION.ASCENDING,
+      );
       expect(onSort).toHaveBeenCalledOnce();
     });
 
@@ -211,7 +215,7 @@ describe(`<${DataTableShell.name}/>`, () => {
         name: MOCK_COLUMN_LABEL,
       });
 
-      expect(header).not.toHaveAttribute('aria-sort');
+      expect(header).not.toHaveAttribute(ARIA_ATTRIBUTE.SORT);
     });
   });
 

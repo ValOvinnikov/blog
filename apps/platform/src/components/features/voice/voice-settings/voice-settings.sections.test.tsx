@@ -1,4 +1,5 @@
 import { faker } from '@faker-js/faker';
+import { ARIA_ATTRIBUTE } from '@platform/constants/aria-attribute';
 import { MEDIA_QUERY } from '@platform/constants/media-query';
 import {
   VOICE_CARDS_TEST_ID,
@@ -6,8 +7,8 @@ import {
   VOICE_SECTION_ID,
 } from '@platform/constants/voice';
 import { saveVoiceOverridesAction } from '@platform/server/site-config/save-voice-overrides-action';
-import { ARIA_CONTROLS, ARIA_EXPANDED } from '@platform/testing/aria';
 import { screen, within } from '@platform/testing/custom-render';
+import { USER_EVENT_KEY } from '@platform/testing/keyboard';
 import { stubMatchingMediaQuery } from '@platform/testing/match-media';
 import { mockRouterRefresh } from '@platform/testing/mock-router';
 import {
@@ -86,14 +87,14 @@ describe(`<${VoiceSettings.name}/> sections`, () => {
       const emptyStates = voiceSectionHeader(EMPTY_STATES_SECTION);
       const cards = screen.queryAllByRole('heading', { level: 3 });
 
-      expect(errorPages).toHaveAttribute(ARIA_EXPANDED, 'false');
+      expect(errorPages).toHaveAttribute(ARIA_ATTRIBUTE.EXPANDED, 'false');
       expect(errorPages).toHaveAttribute(
-        ARIA_CONTROLS,
+        ARIA_ATTRIBUTE.CONTROLS,
         VOICE_SECTION_ID[VOICE_SECTION.ERROR_PAGES].body,
       );
-      expect(emptyStates).toHaveAttribute(ARIA_EXPANDED, 'false');
+      expect(emptyStates).toHaveAttribute(ARIA_ATTRIBUTE.EXPANDED, 'false');
       expect(emptyStates).toHaveAttribute(
-        ARIA_CONTROLS,
+        ARIA_ATTRIBUTE.CONTROLS,
         VOICE_SECTION_ID[VOICE_SECTION.EMPTY_STATES].body,
       );
       expect(cards).toHaveLength(0);
@@ -109,9 +110,9 @@ describe(`<${VoiceSettings.name}/> sections`, () => {
     });
 
     it('reads all default for a section nothing in is customised', () => {
-      const errorPages = voiceSectionHeader(ERROR_PAGES_SECTION);
-
-      expect(errorPages).toHaveTextContent(ERROR_PAGES_ALL_DEFAULT);
+      expect(voiceSectionHeader(ERROR_PAGES_SECTION)).toHaveTextContent(
+        ERROR_PAGES_ALL_DEFAULT,
+      );
     });
 
     it('counts an unsaved edit at once and drops it again on Reset', async () => {
@@ -143,9 +144,9 @@ describe(`<${VoiceSettings.name}/> sections`, () => {
       const lists = voiceCard(EMPTY_LISTS);
       const errorPages = voiceSectionHeader(ERROR_PAGES_SECTION);
 
-      expect(emptyStates).toHaveAttribute(ARIA_EXPANDED, 'true');
+      expect(emptyStates).toHaveAttribute(ARIA_ATTRIBUTE.EXPANDED, 'true');
       expect(lists).toBeVisible();
-      expect(errorPages).toHaveAttribute(ARIA_EXPANDED, 'false');
+      expect(errorPages).toHaveAttribute(ARIA_ATTRIBUTE.EXPANDED, 'false');
     });
 
     it('jumps from a summary row to its card, focusing the card heading', async () => {
@@ -157,7 +158,7 @@ describe(`<${VoiceSettings.name}/> sections`, () => {
       const heading = within(bookmarks).getByRole('heading', { level: 3 });
 
       expect(voiceSectionHeader(EMPTY_STATES_SECTION)).toHaveAttribute(
-        ARIA_EXPANDED,
+        ARIA_ATTRIBUTE.EXPANDED,
         'true',
       );
       expect(heading).toHaveFocus();
@@ -169,7 +170,7 @@ describe(`<${VoiceSettings.name}/> sections`, () => {
 
     it('jumps from a summary row with Enter', async () => {
       summaryRow(PAGE_NOT_FOUND).focus();
-      await user.keyboard('{Enter}');
+      await user.keyboard(USER_EVENT_KEY.ENTER);
 
       const heading = within(voiceCard(PAGE_NOT_FOUND)).getByRole('heading', {
         level: 3,
@@ -187,7 +188,7 @@ describe(`<${VoiceSettings.name}/> sections`, () => {
       await editVoiceHeadingAndSave(user, MOCK_EDIT_TEXT);
 
       expect(voiceSectionHeader(ERROR_PAGES_SECTION)).toHaveAttribute(
-        ARIA_EXPANDED,
+        ARIA_ATTRIBUTE.EXPANDED,
         'true',
       );
     });
@@ -222,7 +223,7 @@ describe(`<${VoiceSettings.name}/> sections`, () => {
         await user.click(saveButton);
 
         expect(voiceSectionHeader(ERROR_PAGES_SECTION)).toHaveAttribute(
-          ARIA_EXPANDED,
+          ARIA_ATTRIBUTE.EXPANDED,
           'true',
         );
         expect(notFoundHeadingField()).toBeVisible();
@@ -277,11 +278,11 @@ describe(`<${VoiceSettings.name}/> sections`, () => {
       await user.click(germanRadio);
 
       expect(voiceSectionHeader(EMPTY_STATES_SECTION)).toHaveAttribute(
-        ARIA_EXPANDED,
+        ARIA_ATTRIBUTE.EXPANDED,
         'true',
       );
       expect(voiceSectionHeader(ERROR_PAGES_SECTION)).toHaveAttribute(
-        ARIA_EXPANDED,
+        ARIA_ATTRIBUTE.EXPANDED,
         'false',
       );
     });
@@ -314,7 +315,7 @@ describe(`<${VoiceSettings.name}/> sections`, () => {
         const header = voiceSectionHeader(section);
         const shownCard = voiceCard(cardName);
 
-        expect(header).toHaveAttribute(ARIA_EXPANDED, 'true');
+        expect(header).toHaveAttribute(ARIA_ATTRIBUTE.EXPANDED, 'true');
         expect(shownCard).toBeVisible();
         expect(scrollIntoView).toHaveBeenCalledWith(SCROLL_TO_START);
       },
@@ -332,11 +333,11 @@ describe(`<${VoiceSettings.name}/> sections`, () => {
       await user.type(notFoundHeadingField(), MOCK_EDIT_TEXT);
 
       expect(voiceSectionHeader(ERROR_PAGES_SECTION)).toHaveAttribute(
-        ARIA_EXPANDED,
+        ARIA_ATTRIBUTE.EXPANDED,
         'true',
       );
       expect(voiceSectionHeader(EMPTY_STATES_SECTION)).toHaveAttribute(
-        ARIA_EXPANDED,
+        ARIA_ATTRIBUTE.EXPANDED,
         'false',
       );
     });

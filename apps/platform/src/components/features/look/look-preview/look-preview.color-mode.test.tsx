@@ -1,5 +1,5 @@
+import { ARIA_ATTRIBUTE } from '@platform/constants/aria-attribute';
 import messages from '@platform/i18n/messages/en.json';
-import { ARIA_PRESSED } from '@platform/testing/aria';
 import { screen } from '@platform/testing/custom-render';
 import { renderPreview } from '@platform/testing/look/look-preview-render';
 import {
@@ -51,7 +51,7 @@ describe(`<${LookPreview.name}/>`, () => {
         name: MOCK_TENANT_NAME,
       });
 
-      expect(shownButton).toHaveAttribute(ARIA_PRESSED, 'true');
+      expect(shownButton).toHaveAttribute(ARIA_ATTRIBUTE.PRESSED, 'true');
       expect(removedButton).not.toBeInTheDocument();
       expect(sampleThemeToggle()).not.toBeInTheDocument();
       sampleLogos.forEach((sampleLogo) => {

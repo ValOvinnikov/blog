@@ -1,6 +1,6 @@
 import { faker } from '@faker-js/faker';
+import { ARIA_ATTRIBUTE } from '@platform/constants/aria-attribute';
 import messages from '@platform/i18n/messages/en.json';
-import { ARIA_CONTROLS, ARIA_EXPANDED } from '@platform/testing/aria';
 import { customRender, screen } from '@platform/testing/custom-render';
 import { adminRoutes } from '@platform/utils/routes/routes';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
@@ -44,8 +44,8 @@ describe(`<${GrowthNote.name}/>`, () => {
     const list = screen.queryByRole('list', { name: growthNote.listLabel });
 
     expect(title).toBeVisible();
-    expect(button).toHaveAttribute(ARIA_EXPANDED, 'false');
-    expect(button).toHaveAttribute(ARIA_CONTROLS);
+    expect(button).toHaveAttribute(ARIA_ATTRIBUTE.EXPANDED, 'false');
+    expect(button).toHaveAttribute(ARIA_ATTRIBUTE.CONTROLS);
     expect(list).not.toBeInTheDocument();
   });
 
@@ -68,7 +68,7 @@ describe(`<${GrowthNote.name}/>`, () => {
 
       expect(list).toBeVisible();
       expect(closing).toBeVisible();
-      expect(hide).toHaveAttribute(ARIA_EXPANDED, 'true');
+      expect(hide).toHaveAttribute(ARIA_ATTRIBUTE.EXPANDED, 'true');
       expect(hide).toHaveFocus();
     });
 
@@ -80,7 +80,7 @@ describe(`<${GrowthNote.name}/>`, () => {
       const list = screen.queryByRole('list', { name: growthNote.listLabel });
       const closing = screen.getByText(MOCK_CLOSING_LINE);
 
-      expect(show).toHaveAttribute(ARIA_EXPANDED, 'false');
+      expect(show).toHaveAttribute(ARIA_ATTRIBUTE.EXPANDED, 'false');
       expect(show).toHaveFocus();
       expect(list).not.toBeInTheDocument();
       expect(closing).not.toBeVisible();

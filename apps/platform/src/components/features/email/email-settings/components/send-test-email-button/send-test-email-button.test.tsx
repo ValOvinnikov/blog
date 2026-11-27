@@ -1,11 +1,11 @@
 import { faker } from '@faker-js/faker';
+import { ARIA_ATTRIBUTE } from '@platform/constants/aria-attribute';
 import en from '@platform/i18n/messages/en.json';
 import {
   sendTestEmailAction,
   type TSendTestEmailResult,
 } from '@platform/server/email/send-test-email-action';
 import { MOCK_ADMIN_EMAIL } from '@platform/testing/admins/fixtures';
-import { ARIA_DISABLED } from '@platform/testing/aria';
 import { screen } from '@platform/testing/custom-render';
 import { SEND_TEST_TO_ME } from '@platform/testing/email/fixtures';
 import {
@@ -120,7 +120,7 @@ describe(`<${SendTestEmailButton.name}/>`, () => {
     const sendButton = screen.getByRole('button', { name: SEND_TEST_TO_ME });
     await user.click(sendButton);
 
-    expect(sendButton).toHaveAttribute(ARIA_DISABLED, 'true');
+    expect(sendButton).toHaveAttribute(ARIA_ATTRIBUTE.DISABLED, 'true');
     expect(sendButton).toHaveAccessibleDescription(ARCHIVED_NOTICE_TEXT);
     expect(sendTestEmailAction).not.toHaveBeenCalled();
   });

@@ -1,9 +1,10 @@
+import { ARIA_ATTRIBUTE } from '@platform/constants/aria-attribute';
 import { LOOK_ROW } from '@platform/constants/look-row';
 import { LOOK_SAMPLE_TOKENS_TEST_ID } from '@platform/constants/look-sample';
 import messages from '@platform/i18n/messages/en.json';
 import { updateLookAction } from '@platform/server/site-config/update-look-action';
-import { ARIA_PRESSED } from '@platform/testing/aria';
 import { screen } from '@platform/testing/custom-render';
+import { USER_EVENT_KEY } from '@platform/testing/keyboard';
 import {
   CONSOLE,
   EDITORIAL,
@@ -47,7 +48,7 @@ describe(`<${LookForm.name}/>`, () => {
       const consolePreset = screen.getByRole('radio', { name: CONSOLE });
       const editorialPreset = screen.getByRole('radio', { name: EDITORIAL });
       await user.click(consolePreset);
-      await user.keyboard('{ArrowRight}');
+      await user.keyboard(USER_EVENT_KEY.ARROW_RIGHT);
       await openLookRow(user, LOOK_ROW.COLOUR);
 
       const hueReadout = screen.getByText(hueValue(EDITORIAL_ACCENT_HUE));
@@ -97,7 +98,7 @@ describe(`<${LookForm.name}/>`, () => {
         name: LOOK_FORM.radiusScaleOptionLabel.SM,
       });
       const sampleTokens = screen.getByTestId(LOOK_SAMPLE_TOKENS_TEST_ID);
-      expect(smallButton).toHaveAttribute(ARIA_PRESSED, 'true');
+      expect(smallButton).toHaveAttribute(ARIA_ATTRIBUTE.PRESSED, 'true');
       expect(sampleTokens).toHaveStyle({ '--radius-md': '4px' });
     });
   });

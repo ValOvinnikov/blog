@@ -1,5 +1,5 @@
 import { faker } from '@faker-js/faker';
-import { ARIA_DISABLED } from '@platform/testing/aria';
+import { ARIA_ATTRIBUTE } from '@platform/constants/aria-attribute';
 import {
   customRender,
   renderWithIntl,
@@ -41,11 +41,17 @@ describe(`<${HueSlider.name}/>`, () => {
     });
 
     it('names the slider and reports its value', () => {
-      expect(getSlider()).toHaveAttribute('aria-valuenow', String(MOCK_HUE));
+      expect(getSlider()).toHaveAttribute(
+        ARIA_ATTRIBUTE.VALUENOW,
+        String(MOCK_HUE),
+      );
     });
 
     it('reads its value as hue text', () => {
-      expect(getSlider()).toHaveAttribute('aria-valuetext', `hue ${MOCK_HUE}°`);
+      expect(getSlider()).toHaveAttribute(
+        ARIA_ATTRIBUTE.VALUETEXT,
+        `hue ${MOCK_HUE}°`,
+      );
     });
   });
 
@@ -61,7 +67,7 @@ describe(`<${HueSlider.name}/>`, () => {
       </>,
     );
 
-    expect(getSlider()).not.toHaveAttribute('aria-label');
+    expect(getSlider()).not.toHaveAttribute(ARIA_ATTRIBUTE.LABEL);
   });
 
   it('reports an incremented value on ArrowRight', async () => {
@@ -81,15 +87,15 @@ describe(`<${HueSlider.name}/>`, () => {
     await user.keyboard(USER_EVENT_KEY.ARROW_RIGHT);
 
     expect(slider).toHaveFocus();
-    expect(slider).toHaveAttribute(ARIA_DISABLED, 'true');
+    expect(slider).toHaveAttribute(ARIA_ATTRIBUTE.DISABLED, 'true');
     expect(handleChange).not.toHaveBeenCalled();
   });
 
   it('is described by the element it is pointed at', () => {
-    setup({ 'aria-describedby': MOCK_DESCRIPTION_ID });
+    setup({ [ARIA_ATTRIBUTE.DESCRIBEDBY]: MOCK_DESCRIPTION_ID });
 
     expect(getSlider()).toHaveAttribute(
-      'aria-describedby',
+      ARIA_ATTRIBUTE.DESCRIBEDBY,
       MOCK_DESCRIPTION_ID,
     );
   });

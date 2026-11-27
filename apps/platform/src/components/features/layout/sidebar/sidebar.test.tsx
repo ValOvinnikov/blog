@@ -1,19 +1,15 @@
 import { faker } from '@faker-js/faker';
 import { SidebarCollapseProvider } from '@platform/components/features/layout/sidebar-collapse-provider';
+import { ARIA_ATTRIBUTE } from '@platform/constants/aria-attribute';
 import messages from '@platform/i18n/messages/en.json';
 import { usePathname } from '@platform/i18n/navigation';
-import {
-  ARIA_CURRENT,
-  ARIA_DESCRIBEDBY,
-  ARIA_DISABLED,
-  ARIA_HIDDEN,
-} from '@platform/testing/aria';
 import {
   renderWithIntl,
   screen,
   waitFor,
   within,
 } from '@platform/testing/custom-render';
+import { USER_EVENT_KEY } from '@platform/testing/keyboard';
 import {
   mockNavBadge,
   mockNavInertItem,
@@ -172,8 +168,8 @@ describe(`<${Sidebar.name}/>`, () => {
       const activeLink = screen.getByRole('link', { name: active.label });
       const inactiveLink = screen.getByRole('link', { name: inactive.label });
 
-      expect(activeLink).toHaveAttribute(ARIA_CURRENT, 'page');
-      expect(inactiveLink).not.toHaveAttribute(ARIA_CURRENT);
+      expect(activeLink).toHaveAttribute(ARIA_ATTRIBUTE.CURRENT, 'page');
+      expect(inactiveLink).not.toHaveAttribute(ARIA_ATTRIBUTE.CURRENT);
     },
   );
 
@@ -200,7 +196,7 @@ describe(`<${Sidebar.name}/>`, () => {
     const reason = screen.getByText(MOCK_DISABLED_REASON);
     const badge = screen.getByText(MOCK_BADGE.label);
 
-    expect(row).toHaveAttribute(ARIA_DISABLED, 'true');
+    expect(row).toHaveAttribute(ARIA_ATTRIBUTE.DISABLED, 'true');
     expect(row).not.toHaveAttribute('href');
     expect(label).toBeVisible();
     expect(reason).toBeVisible();
@@ -254,13 +250,13 @@ describe(`<${Sidebar.name}/>`, () => {
         const [, tooltip] = screen.getAllByText(MOCK_LOOK_ITEM.label);
 
         expect(link).toHaveFocus();
-        expect(tooltip).toHaveAttribute(ARIA_HIDDEN, 'true');
+        expect(tooltip).toHaveAttribute(ARIA_ATTRIBUTE.HIDDEN, 'true');
         expect(link).toHaveAccessibleName(MOCK_LOOK_ITEM.label);
         expect(link).not.toHaveAccessibleDescription();
       });
 
       it('hides the tooltip on Escape', async () => {
-        await user.keyboard('{Escape}');
+        await user.keyboard(USER_EVENT_KEY.ESCAPE);
 
         await waitFor(() => {
           const names = screen.getAllByText(MOCK_LOOK_ITEM.label);
@@ -315,12 +311,12 @@ describe(`<${Sidebar.name}/>`, () => {
 
         expect(link).toHaveFocus();
         expect(statusTexts).toHaveLength(2);
-        expect(statusTexts[1]).toHaveAttribute(ARIA_HIDDEN, 'true');
+        expect(statusTexts[1]).toHaveAttribute(ARIA_ATTRIBUTE.HIDDEN, 'true');
         expect(names).toHaveLength(1);
       });
 
       it('hides the status tooltip on Escape', async () => {
-        await user.keyboard('{Escape}');
+        await user.keyboard(USER_EVENT_KEY.ESCAPE);
 
         await waitFor(() => {
           const statusTexts = screen.getAllByText(MOCK_STATUS_TOOLTIP);
@@ -359,8 +355,8 @@ describe(`<${Sidebar.name}/>`, () => {
 
     expect(first).toHaveAccessibleDescription(MOCK_STATUS_TOOLTIP);
     expect(second).toHaveAccessibleDescription(MOCK_STATUS_TOOLTIP);
-    expect(first?.getAttribute(ARIA_DESCRIBEDBY)).not.toBe(
-      second?.getAttribute(ARIA_DESCRIBEDBY),
+    expect(first?.getAttribute(ARIA_ATTRIBUTE.DESCRIBEDBY)).not.toBe(
+      second?.getAttribute(ARIA_ATTRIBUTE.DESCRIBEDBY),
     );
   });
 });

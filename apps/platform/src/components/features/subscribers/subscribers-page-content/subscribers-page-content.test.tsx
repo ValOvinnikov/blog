@@ -1,8 +1,8 @@
 import { faker } from '@faker-js/faker';
+import { ARIA_ATTRIBUTE } from '@platform/constants/aria-attribute';
 import { SUBSCRIBERS_NOTICE } from '@platform/constants/subscribers';
 import messages from '@platform/i18n/messages/en.json';
 import { loadSubscribersPage } from '@platform/server/subscribers/load-subscribers-page';
-import { ARIA_VALUENOW } from '@platform/testing/aria';
 import { MOCK_MOVE_UP_OFFER } from '@platform/testing/billing/move-up';
 import { customRenderAsync, screen } from '@platform/testing/custom-render';
 import { makeEnTranslator } from '@platform/testing/en-translator';
@@ -287,8 +287,8 @@ describe(`<${SubscribersPageContent.name}/>`, () => {
       const emailsMeter = screen.getByRole('meter', EMAILS_METER);
       const bandMeter = screen.getByRole('meter', BAND_METER);
 
-      expect(emailsMeter).toHaveAttribute(ARIA_VALUENOW, '0');
-      expect(bandMeter).toHaveAttribute(ARIA_VALUENOW, '0');
+      expect(emailsMeter).toHaveAttribute(ARIA_ATTRIBUTE.VALUENOW, '0');
+      expect(bandMeter).toHaveAttribute(ARIA_ATTRIBUTE.VALUENOW, '0');
     });
 
     it('leaves both limit cards without notes', () => {

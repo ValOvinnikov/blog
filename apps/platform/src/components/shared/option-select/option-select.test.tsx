@@ -1,12 +1,12 @@
 import { faker } from '@faker-js/faker';
-import { KEY } from '@platform/constants/keyboard';
-import { ARIA_DISABLED } from '@platform/testing/aria';
+import { ARIA_ATTRIBUTE } from '@platform/constants/aria-attribute';
 import {
   customRender,
   renderWithIntl,
   screen,
   within,
 } from '@platform/testing/custom-render';
+import { USER_EVENT_KEY } from '@platform/testing/keyboard';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
 import type { Mock } from 'vitest';
 
@@ -169,7 +169,7 @@ describe(`<${OptionSelect.name}/>`, () => {
       });
       await user.click(disabledOption);
 
-      expect(disabledOption).toHaveAttribute(ARIA_DISABLED, 'true');
+      expect(disabledOption).toHaveAttribute(ARIA_ATTRIBUTE.DISABLED, 'true');
       expect(onChange).not.toHaveBeenCalled();
     });
   });
@@ -235,18 +235,20 @@ describe(`<${OptionSelect.name}/>`, () => {
         const trigger = screen.getByRole('combobox');
 
         expect(trigger).toHaveFocus();
-        expect(trigger).toHaveAttribute(ARIA_DISABLED, 'true');
+        expect(trigger).toHaveAttribute(ARIA_ATTRIBUTE.DISABLED, 'true');
         expect(trigger).toBeEnabled();
       });
 
-      it.each(['{Enter}', KEY.SPACE, '{ArrowDown}', '{ArrowUp}'])(
-        'does not open or change on %s',
-        async (key) => {
-          await user.keyboard(key);
+      it.each([
+        USER_EVENT_KEY.ENTER,
+        USER_EVENT_KEY.SPACE,
+        USER_EVENT_KEY.ARROW_DOWN,
+        USER_EVENT_KEY.ARROW_UP,
+      ])('does not open or change on %s', async (key) => {
+        await user.keyboard(key);
 
-          expectClosedAndUnchanged();
-        },
-      );
+        expectClosedAndUnchanged();
+      });
     });
   });
 });

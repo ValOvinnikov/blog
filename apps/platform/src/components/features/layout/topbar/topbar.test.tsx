@@ -1,7 +1,7 @@
 import { faker } from '@faker-js/faker';
 import { SidebarCollapseProvider } from '@platform/components/features/layout/sidebar-collapse-provider';
+import { ARIA_ATTRIBUTE } from '@platform/constants/aria-attribute';
 import messages from '@platform/i18n/messages/en.json';
-import { ARIA_HASPOPUP } from '@platform/testing/aria';
 import {
   renderWithIntl,
   screen,
@@ -56,7 +56,7 @@ describe(`<${Topbar.name}/>`, () => {
 
       expect(crumb).toBeVisible();
       expect(buttons).toHaveLength(2);
-      expect(menuButton).toHaveAttribute(ARIA_HASPOPUP, 'menu');
+      expect(menuButton).toHaveAttribute(ARIA_ATTRIBUTE.HASPOPUP, 'menu');
     });
 
     it('leads with the collapse toggle, before the crumb', () => {

@@ -1,6 +1,6 @@
+import { ARIA_ATTRIBUTE } from '@platform/constants/aria-attribute';
 import { LOOK_ROW } from '@platform/constants/look-row';
 import messages from '@platform/i18n/messages/en.json';
-import { ARIA_EXPANDED } from '@platform/testing/aria';
 import { screen, waitFor, within } from '@platform/testing/custom-render';
 import { lookRowTrigger } from '@platform/testing/look/look-form-interactions';
 import {
@@ -50,7 +50,7 @@ describe(`<${LookForm.name}/> Growth note`, () => {
         title.compareDocumentPosition(presets) &
           Node.DOCUMENT_POSITION_FOLLOWING,
       ).toBeTruthy();
-      expect(button).toHaveAttribute(ARIA_EXPANDED, 'false');
+      expect(button).toHaveAttribute(ARIA_ATTRIBUTE.EXPANDED, 'false');
     });
 
     describe('when opened', () => {
@@ -83,7 +83,7 @@ describe(`<${LookForm.name}/> Growth note`, () => {
         await user.click(footerLink);
 
         const trigger = lookRowTrigger(LOOK_ROW.FOOTER);
-        expect(trigger).toHaveAttribute(ARIA_EXPANDED, 'true');
+        expect(trigger).toHaveAttribute(ARIA_ATTRIBUTE.EXPANDED, 'true');
         await waitFor(() => expect(trigger).toHaveFocus());
       });
     });

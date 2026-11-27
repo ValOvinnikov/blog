@@ -1,6 +1,6 @@
 import { faker } from '@faker-js/faker';
+import { ARIA_ATTRIBUTE } from '@platform/constants/aria-attribute';
 import { EMAIL_SENDER_FIELD_ERROR } from '@platform/constants/email-sender';
-import { ARIA_SELECTED } from '@platform/testing/aria';
 import { screen, within } from '@platform/testing/custom-render';
 import {
   cleanUpEmailSettings,
@@ -157,7 +157,7 @@ describe(`<${EmailSettings.name}/>`, () => {
         const editTab = screen.getByRole('tab', { name: EDIT });
         const senderNameInput = screen.getByLabelText(SENDER_NAME);
 
-        expect(editTab).toHaveAttribute(ARIA_SELECTED, 'true');
+        expect(editTab).toHaveAttribute(ARIA_ATTRIBUTE.SELECTED, 'true');
         expect(senderNameInput).toHaveFocus();
       });
     });

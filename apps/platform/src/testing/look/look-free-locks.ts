@@ -1,5 +1,5 @@
+import { ARIA_ATTRIBUTE } from '@platform/constants/aria-attribute';
 import type { TLookRow } from '@platform/constants/look-row';
-import { ARIA_DISABLED, ARIA_PRESSED } from '@platform/testing/aria';
 import { screen, within } from '@platform/testing/custom-render';
 import { GROWTH_BADGE_TEXT } from '@platform/testing/look/look-form-fixtures';
 import { openLookRow } from '@platform/testing/look/look-form-interactions';
@@ -27,7 +27,7 @@ export const expectStyleGroupLockedAtDefault = async (
 
   await user.click(otherButton);
 
-  expect(currentButton).toHaveAttribute(ARIA_PRESSED, 'true');
-  expect(otherButton).toHaveAttribute(ARIA_DISABLED, 'true');
-  expect(otherButton).toHaveAttribute(ARIA_PRESSED, 'false');
+  expect(currentButton).toHaveAttribute(ARIA_ATTRIBUTE.PRESSED, 'true');
+  expect(otherButton).toHaveAttribute(ARIA_ATTRIBUTE.DISABLED, 'true');
+  expect(otherButton).toHaveAttribute(ARIA_ATTRIBUTE.PRESSED, 'false');
 };

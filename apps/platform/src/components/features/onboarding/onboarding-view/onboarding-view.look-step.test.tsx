@@ -1,5 +1,5 @@
+import { ARIA_ATTRIBUTE } from '@platform/constants/aria-attribute';
 import { LOOK_SAMPLE_TOKENS_TEST_ID } from '@platform/constants/look-sample';
-import { ARIA_VALUENOW } from '@platform/testing/aria';
 import { screen } from '@platform/testing/custom-render';
 import { USER_EVENT_KEY } from '@platform/testing/keyboard';
 import { completeAddressStep } from '@platform/testing/onboarding/address-step';
@@ -79,7 +79,9 @@ describe(`<${OnboardingView.name}/>`, () => {
         const accentSlider = screen.getByRole('slider', MOCK_ACCENT_SLIDER);
         await user.click(accentSlider);
         await user.keyboard(USER_EVENT_KEY.ARROW_RIGHT);
-        const movedHue = Number(accentSlider.getAttribute(ARIA_VALUENOW));
+        const movedHue = Number(
+          accentSlider.getAttribute(ARIA_ATTRIBUTE.VALUENOW),
+        );
         await clickContinue(user);
         await createAfterChangingSiteType(user, SITE_TYPES.DOCS);
 

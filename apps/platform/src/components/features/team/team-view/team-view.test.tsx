@@ -1,8 +1,8 @@
+import { ARIA_ATTRIBUTE } from '@platform/constants/aria-attribute';
 import {
   TEAM_ROW_ACCESS,
   TEAM_SEAT_NOTICE_ID,
 } from '@platform/constants/team-access';
-import { ARIA_DESCRIBEDBY, ARIA_DISABLED } from '@platform/testing/aria';
 import { MOCK_GRACE_ENDS_AT } from '@platform/testing/billing/grace';
 import { customRender, screen, within } from '@platform/testing/custom-render';
 import {
@@ -71,7 +71,7 @@ describe(`<${TeamView.name}/>`, () => {
       const notice = screen.queryByText(SEAT_LIMIT_TITLE);
 
       expect(seats).toBeVisible();
-      expect(invite).not.toHaveAttribute(ARIA_DISABLED);
+      expect(invite).not.toHaveAttribute(ARIA_ATTRIBUTE.DISABLED);
       expect(notice).not.toBeInTheDocument();
     });
 
@@ -91,8 +91,11 @@ describe(`<${TeamView.name}/>`, () => {
     const invite = screen.getByRole('button', { name: INVITE_EDITOR });
 
     expect(notice).toBeVisible();
-    expect(invite).toHaveAttribute(ARIA_DISABLED, 'true');
-    expect(invite).toHaveAttribute(ARIA_DESCRIBEDBY, TEAM_SEAT_NOTICE_ID);
+    expect(invite).toHaveAttribute(ARIA_ATTRIBUTE.DISABLED, 'true');
+    expect(invite).toHaveAttribute(
+      ARIA_ATTRIBUTE.DESCRIBEDBY,
+      TEAM_SEAT_NOTICE_ID,
+    );
   });
 
   describe('over the seats on Starter', () => {

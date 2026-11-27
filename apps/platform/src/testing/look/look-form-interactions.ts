@@ -1,7 +1,7 @@
 import { LOOK_ROW_TITLE_KEY } from '@platform/components/features/look/look-form/look-row-title-key';
+import { ARIA_ATTRIBUTE } from '@platform/constants/aria-attribute';
 import { LOOK_ROW, type TLookRow } from '@platform/constants/look-row';
 import messages from '@platform/i18n/messages/en.json';
-import { ARIA_EXPANDED } from '@platform/testing/aria';
 import { screen, within } from '@platform/testing/custom-render';
 import { USER_EVENT_KEY } from '@platform/testing/keyboard';
 import { EDITORIAL, GROWTH } from '@platform/testing/look/look-form-fixtures';
@@ -33,7 +33,7 @@ export const lookRowTrigger = (row: TLookRow) => {
 
 export const openLookRow = async (user: UserEvent, row: TLookRow) => {
   const trigger = lookRowTrigger(row);
-  if (trigger.getAttribute(ARIA_EXPANDED) === 'true') return;
+  if (trigger.getAttribute(ARIA_ATTRIBUTE.EXPANDED) === 'true') return;
   await user.click(trigger);
 };
 

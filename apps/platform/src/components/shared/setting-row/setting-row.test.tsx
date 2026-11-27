@@ -1,8 +1,8 @@
 import { faker } from '@faker-js/faker';
 import { LockedReason } from '@platform/components/shared/locked-reason';
 import { Switch } from '@platform/components/shared/switch';
+import { ARIA_ATTRIBUTE } from '@platform/constants/aria-attribute';
 import { ICON_TEST_ID } from '@platform/constants/icon';
-import { ARIA_HIDDEN } from '@platform/testing/aria';
 import {
   customRender,
   renderWithIntl,
@@ -67,7 +67,7 @@ describe(`<${SettingRow.name}/>`, () => {
     it('shows a decorative lock icon beside the locked reason', () => {
       const lockIcon = screen.getByTestId(ICON_TEST_ID);
 
-      expect(lockIcon).toHaveAttribute(ARIA_HIDDEN, 'true');
+      expect(lockIcon).toHaveAttribute(ARIA_ATTRIBUTE.HIDDEN, 'true');
     });
   });
 

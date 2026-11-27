@@ -1,7 +1,7 @@
+import { ARIA_ATTRIBUTE } from '@platform/constants/aria-attribute';
 import { TENANT_REFUSAL } from '@platform/constants/tenant';
 import { getTenantProvisioningStatusAction } from '@platform/server/provisioning/get-tenant-provisioning-status-action';
 import { retryProvisioningStepAction } from '@platform/server/provisioning/retry-provisioning-step-action';
-import { ARIA_DISABLED } from '@platform/testing/aria';
 import {
   act,
   customRender,
@@ -65,7 +65,6 @@ const RUNNING = 'Running…';
 const START_PROVISIONING = 'Start provisioning';
 const RETRY_PROVISIONING = 'Retry provisioning';
 const STEPS_TOGGLE_NAME = /Steps/;
-const ARIA_EXPANDED = 'aria-expanded';
 const QUEUED_NOTICE = 'Queued — the provisioning workflow is starting up';
 const MOCK_DOMAINS_FAILURE =
   'Vercel API POST /v9/projects/prj_web/domains failed: 500 internal_server_error';
@@ -570,7 +569,7 @@ describe(`<${ProvisioningStatusView.name}/>`, () => {
       });
 
       it('is aria-disabled and never dispatches on click', async () => {
-        expect(button).toHaveAttribute(ARIA_DISABLED, 'true');
+        expect(button).toHaveAttribute(ARIA_ATTRIBUTE.DISABLED, 'true');
 
         await user.click(button);
 
@@ -625,14 +624,14 @@ describe(`<${ProvisioningStatusView.name}/>`, () => {
         name: STEPS_TOGGLE_NAME,
       });
 
-      expect(stepsToggle).toHaveAttribute(ARIA_EXPANDED, 'true');
+      expect(stepsToggle).toHaveAttribute(ARIA_ATTRIBUTE.EXPANDED, 'true');
 
       await advance(STEP_POLL_INTERVAL_MS);
       for (let reveal = 0; reveal < REVEALS_UNTIL_ALL_DONE; reveal += 1) {
         await advance(STEP_REVEAL_DWELL_MS);
       }
 
-      expect(stepsToggle).toHaveAttribute(ARIA_EXPANDED, 'false');
+      expect(stepsToggle).toHaveAttribute(ARIA_ATTRIBUTE.EXPANDED, 'false');
     });
 
     it('shows the run as finished only once every step shows done', async () => {

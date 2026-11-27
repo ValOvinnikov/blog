@@ -1,6 +1,6 @@
 import { faker } from '@faker-js/faker';
+import { ARIA_ATTRIBUTE } from '@platform/constants/aria-attribute';
 import messages from '@platform/i18n/messages/en.json';
-import { ARIA_EXPANDED, ARIA_HASPOPUP } from '@platform/testing/aria';
 import { customRender, screen, within } from '@platform/testing/custom-render';
 import { makeEnTranslator } from '@platform/testing/en-translator';
 import { adminRoutes } from '@platform/utils/routes/routes';
@@ -123,7 +123,7 @@ describe(`<${PlatformShell.name}/>`, () => {
 
     expect(menuNavItem).toBeVisible();
     expect(menuSwitcher).toBeVisible();
-    expect(menuAccount).toHaveAttribute(ARIA_HASPOPUP, 'menu');
+    expect(menuAccount).toHaveAttribute(ARIA_ATTRIBUTE.HASPOPUP, 'menu');
   });
 
   it('can open with the sidebar collapsed', () => {
@@ -134,7 +134,7 @@ describe(`<${PlatformShell.name}/>`, () => {
     });
     const navLink = screen.getByRole('link', { name: MOCK_NAV_ITEM_LABEL });
 
-    expect(expandToggle).toHaveAttribute(ARIA_EXPANDED, 'false');
+    expect(expandToggle).toHaveAttribute(ARIA_ATTRIBUTE.EXPANDED, 'false');
     expect(navLink).toBeVisible();
   });
 });

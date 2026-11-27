@@ -1,6 +1,6 @@
 import { faker } from '@faker-js/faker';
+import { ARIA_ATTRIBUTE } from '@platform/constants/aria-attribute';
 import { METER_TONE } from '@platform/constants/meter';
-import { ARIA_VALUEMAX, ARIA_VALUENOW } from '@platform/testing/aria';
 import { customRender, screen } from '@platform/testing/custom-render';
 
 import { UsageMeter } from './usage-meter';
@@ -24,8 +24,8 @@ describe(`<${UsageMeter.name}/>`, () => {
 
     const meter = screen.getByRole('meter', { name: MOCK_LABEL });
 
-    expect(meter).toHaveAttribute(ARIA_VALUENOW, String(MOCK_VALUE));
-    expect(meter).toHaveAttribute(ARIA_VALUEMAX, String(MOCK_MAX));
+    expect(meter).toHaveAttribute(ARIA_ATTRIBUTE.VALUENOW, String(MOCK_VALUE));
+    expect(meter).toHaveAttribute(ARIA_ATTRIBUTE.VALUEMAX, String(MOCK_MAX));
   });
 
   it('caps a value over the maximum at the maximum', () => {
@@ -33,6 +33,6 @@ describe(`<${UsageMeter.name}/>`, () => {
 
     const meter = screen.getByRole('meter', { name: MOCK_LABEL });
 
-    expect(meter).toHaveAttribute(ARIA_VALUENOW, String(MOCK_MAX));
+    expect(meter).toHaveAttribute(ARIA_ATTRIBUTE.VALUENOW, String(MOCK_MAX));
   });
 });

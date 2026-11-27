@@ -1,7 +1,7 @@
+import { ARIA_ATTRIBUTE } from '@platform/constants/aria-attribute';
 import { LOOK_ROW } from '@platform/constants/look-row';
 import messages from '@platform/i18n/messages/en.json';
 import { updateLookAction } from '@platform/server/site-config/update-look-action';
-import { ARIA_SELECTED } from '@platform/testing/aria';
 import { screen } from '@platform/testing/custom-render';
 import { USER_EVENT_KEY } from '@platform/testing/keyboard';
 import {
@@ -94,7 +94,7 @@ describe(`<${LookForm.name}/>`, () => {
 
       const editTab = screen.getByRole('tab', { name: EDIT_TAB });
       const slider = screen.getByRole('slider', { name: ACCENT_HUE });
-      expect(editTab).toHaveAttribute(ARIA_SELECTED, 'true');
+      expect(editTab).toHaveAttribute(ARIA_ATTRIBUTE.SELECTED, 'true');
       expect(slider).toHaveFocus();
     });
   });

@@ -1,9 +1,9 @@
+import { ARIA_ATTRIBUTE } from '@platform/constants/aria-attribute';
 import messages from '@platform/i18n/messages/en.json';
 import {
   updateLookAction,
   type TUpdateLookResult,
 } from '@platform/server/site-config/update-look-action';
-import { ARIA_DISABLED } from '@platform/testing/aria';
 import { screen } from '@platform/testing/custom-render';
 import {
   clickSave,
@@ -57,8 +57,8 @@ describe(`<${LookForm.name}/>`, () => {
     await setupAndSaveNudgedHue(user);
 
     const saveButton = await screen.findByRole('button', { name: SAVING });
-    expect(saveButton).toHaveAttribute('aria-busy', 'true');
-    expect(saveButton).toHaveAttribute(ARIA_DISABLED, 'true');
+    expect(saveButton).toHaveAttribute(ARIA_ATTRIBUTE.BUSY, 'true');
+    expect(saveButton).toHaveAttribute(ARIA_ATTRIBUTE.DISABLED, 'true');
 
     resolveAction({ outcome: ACTION_OUTCOME.SUCCESS });
     await screen.findByText(ALL_CHANGES_SAVED);

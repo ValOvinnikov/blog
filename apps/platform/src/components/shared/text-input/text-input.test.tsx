@@ -5,7 +5,7 @@ import {
   FormField,
   FormFieldControlProvider,
 } from '@platform/components/shared/form-field';
-import { ARIA_DISABLED } from '@platform/testing/aria';
+import { ARIA_ATTRIBUTE } from '@platform/constants/aria-attribute';
 import { renderWithIntl, screen } from '@platform/testing/custom-render';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
 
@@ -75,7 +75,7 @@ describe(`<${TextInput.name}/>`, () => {
     await user.type(input, MOCK_VALUE);
 
     expect(input).toBeEnabled();
-    expect(input).toHaveAttribute(ARIA_DISABLED, 'true');
+    expect(input).toHaveAttribute(ARIA_ATTRIBUTE.DISABLED, 'true');
     expect(handleChange).not.toHaveBeenCalled();
   });
 

@@ -1,9 +1,11 @@
 import { faker } from '@faker-js/faker';
+import { ARIA_ATTRIBUTE } from '@platform/constants/aria-attribute';
 import {
   customRender,
   renderWithIntl,
   screen,
 } from '@platform/testing/custom-render';
+import { USER_EVENT_KEY } from '@platform/testing/keyboard';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
 
 import { Switch } from './switch';
@@ -122,21 +124,25 @@ describe(`<${Switch.name}/>`, () => {
       expect(toggle).toHaveAccessibleDescription(MOCK_BADGE);
     });
 
-    it('keeps its checked state, stays focusable and announces disabled', async () => {
-      await user.tab();
-      const toggle = screen.getByRole('switch');
+    describe('once focused', () => {
+      beforeEach(async () => {
+        await user.tab();
+      });
 
-      expect(toggle).toHaveFocus();
-      expect(toggle).toBeChecked();
-      expect(toggle).toBeEnabled();
-      expect(toggle).toHaveAttribute('aria-disabled', 'true');
-    });
+      it('keeps its checked state, stays focusable and announces disabled', () => {
+        const toggle = screen.getByRole('switch');
 
-    it('ignores Space', async () => {
-      await user.tab();
-      await user.keyboard(' ');
+        expect(toggle).toHaveFocus();
+        expect(toggle).toBeChecked();
+        expect(toggle).toBeEnabled();
+        expect(toggle).toHaveAttribute(ARIA_ATTRIBUTE.DISABLED, 'true');
+      });
 
-      expect(onCheckedChange).not.toHaveBeenCalled();
+      it('ignores Space', async () => {
+        await user.keyboard(USER_EVENT_KEY.SPACE);
+
+        expect(onCheckedChange).not.toHaveBeenCalled();
+      });
     });
 
     it.each([

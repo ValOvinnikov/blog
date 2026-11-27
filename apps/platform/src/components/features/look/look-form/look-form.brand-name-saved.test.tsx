@@ -1,5 +1,5 @@
+import { ARIA_ATTRIBUTE } from '@platform/constants/aria-attribute';
 import { LOOK_ROW } from '@platform/constants/look-row';
-import { ARIA_DISABLED } from '@platform/testing/aria';
 import {
   brandNameInput,
   MOCK_BRAND_NAME,
@@ -38,7 +38,7 @@ describe(`<${LookForm.name}/>`, () => {
     await user.type(input, MOCK_BRAND_NAME);
 
     expect(input).toHaveFocus();
-    expect(input).toHaveAttribute(ARIA_DISABLED, 'true');
+    expect(input).toHaveAttribute(ARIA_ATTRIBUTE.DISABLED, 'true');
     expect(input).toHaveValue('');
   });
 

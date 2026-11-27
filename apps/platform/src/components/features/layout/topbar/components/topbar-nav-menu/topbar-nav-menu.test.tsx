@@ -2,13 +2,9 @@ import { faker } from '@faker-js/faker';
 import { AccountMenu } from '@platform/components/features/layout/account-menu';
 import { SidebarCollapseProvider } from '@platform/components/features/layout/sidebar-collapse-provider';
 import { TenantSwitcher } from '@platform/components/features/layout/tenant-switcher';
+import { ARIA_ATTRIBUTE } from '@platform/constants/aria-attribute';
 import messages from '@platform/i18n/messages/en.json';
 import { usePathname } from '@platform/i18n/navigation';
-import {
-  ARIA_CURRENT,
-  ARIA_DISABLED,
-  ARIA_HIDDEN,
-} from '@platform/testing/aria';
 import {
   customRender,
   renderWithIntl,
@@ -16,6 +12,7 @@ import {
   waitFor,
   within,
 } from '@platform/testing/custom-render';
+import { USER_EVENT_KEY } from '@platform/testing/keyboard';
 import {
   mockAccount,
   mockDashboardStudioInnerPath,
@@ -54,10 +51,7 @@ const MOCK_ACCOUNT = mockAccount();
 const MOCK_ACTIVE_TENANT = mockTenantSwitcherItem();
 const MOCK_OTHER_TENANT = mockTenantSwitcherItem();
 
-const ARROW_DOWN = '{ArrowDown}';
-const ARROW_DOWN_TO_ACCOUNT = ARROW_DOWN.repeat(3);
-const ENTER = '{Enter}';
-const ESCAPE = '{Escape}';
+const ARROW_DOWN_TO_ACCOUNT = USER_EVENT_KEY.ARROW_DOWN.repeat(3);
 
 const MOCK_BAR_REF = createRef<HTMLElement>();
 
@@ -161,8 +155,8 @@ describe(`<${TopbarNavMenu.name}/>`, () => {
       name: MOCK_VOICE_ITEM.label,
     });
 
-    expect(activeItem).toHaveAttribute(ARIA_CURRENT, 'page');
-    expect(inactiveItem).not.toHaveAttribute(ARIA_CURRENT);
+    expect(activeItem).toHaveAttribute(ARIA_ATTRIBUTE.CURRENT, 'page');
+    expect(inactiveItem).not.toHaveAttribute(ARIA_ATTRIBUTE.CURRENT);
   });
 
   it('marks the Studio row current on a path inside the Studio', async () => {
@@ -174,7 +168,7 @@ describe(`<${TopbarNavMenu.name}/>`, () => {
       name: MOCK_STUDIO_ITEM.label,
     });
 
-    expect(studioItem).toHaveAttribute(ARIA_CURRENT, 'page');
+    expect(studioItem).toHaveAttribute(ARIA_ATTRIBUTE.CURRENT, 'page');
   });
 
   it('renders an item with no href as a disabled menu row with its badge', async () => {
@@ -187,7 +181,7 @@ describe(`<${TopbarNavMenu.name}/>`, () => {
     });
     const badge = within(inertRow).getByText(MOCK_BADGE.label);
 
-    expect(inertRow).toHaveAttribute(ARIA_DISABLED, 'true');
+    expect(inertRow).toHaveAttribute(ARIA_ATTRIBUTE.DISABLED, 'true');
     expect(inertRow).not.toHaveAttribute('href');
     expect(badge).toBeVisible();
   });
@@ -247,11 +241,11 @@ describe(`<${TopbarNavMenu.name}/>`, () => {
         const tooltip = screen.getByText(messages.topbarNavMenu.triggerLabel);
 
         expect(getMenuButton()).toHaveFocus();
-        expect(tooltip).toHaveAttribute(ARIA_HIDDEN, 'true');
+        expect(tooltip).toHaveAttribute(ARIA_ATTRIBUTE.HIDDEN, 'true');
       });
 
       it('hides the tooltip on Escape', async () => {
-        await user.keyboard(ESCAPE);
+        await user.keyboard(USER_EVENT_KEY.ESCAPE);
 
         await waitFor(() => {
           const tooltip = screen.queryByText(
@@ -265,16 +259,17 @@ describe(`<${TopbarNavMenu.name}/>`, () => {
 
     describe('once opened', () => {
       let menu: HTMLElement;
+      let lookLink: HTMLElement;
 
       beforeEach(async () => {
         menu = await openMenu();
+        lookLink = within(menu).getByRole('menuitem', {
+          name: MOCK_LOOK_ITEM.label,
+        });
       });
 
       it('closes the popup after clicking a link item', async () => {
-        const link = within(menu).getByRole('menuitem', {
-          name: MOCK_LOOK_ITEM.label,
-        });
-        await user.click(link);
+        await user.click(lookLink);
 
         expect(menu).not.toBeInTheDocument();
       });
@@ -292,11 +287,7 @@ describe(`<${TopbarNavMenu.name}/>`, () => {
       });
 
       it('titles a row by its label', () => {
-        const link = within(menu).getByRole('menuitem', {
-          name: MOCK_LOOK_ITEM.label,
-        });
-
-        expect(link).toHaveAttribute('title', MOCK_LOOK_ITEM.label);
+        expect(lookLink).toHaveAttribute('title', MOCK_LOOK_ITEM.label);
       });
     });
   });
@@ -310,7 +301,7 @@ describe(`<${TopbarNavMenu.name}/>`, () => {
     });
 
     it('highlights the switcher first by arrow key', async () => {
-      await user.keyboard(ARROW_DOWN);
+      await user.keyboard(USER_EVENT_KEY.ARROW_DOWN);
 
       expect(getSwitcherTrigger(menu)).toHaveFocus();
     });
@@ -337,7 +328,7 @@ describe(`<${TopbarNavMenu.name}/>`, () => {
 
       beforeEach(async () => {
         await user.keyboard(ARROW_DOWN_TO_ACCOUNT);
-        await user.keyboard(ENTER);
+        await user.keyboard(USER_EVENT_KEY.ENTER);
         accountMenu = await screen.findByRole('menu', {
           name: messages.account.menuLabel,
         });
@@ -358,7 +349,7 @@ describe(`<${TopbarNavMenu.name}/>`, () => {
 
       describe('after one Escape', () => {
         beforeEach(async () => {
-          await user.keyboard(ESCAPE);
+          await user.keyboard(USER_EVENT_KEY.ESCAPE);
         });
 
         it('closes only the account menu, returning focus to its trigger', async () => {
@@ -368,7 +359,7 @@ describe(`<${TopbarNavMenu.name}/>`, () => {
         });
 
         it('closes the Menu onto its button on a second Escape', async () => {
-          await user.keyboard(ESCAPE);
+          await user.keyboard(USER_EVENT_KEY.ESCAPE);
 
           await waitFor(() => expect(menu).not.toBeInTheDocument());
           expect(getMenuButton()).toHaveFocus();

@@ -1,6 +1,6 @@
+import { ARIA_ATTRIBUTE } from '@platform/constants/aria-attribute';
 import { LOOK_ROW } from '@platform/constants/look-row';
 import messages from '@platform/i18n/messages/en.json';
-import { ARIA_PRESSED } from '@platform/testing/aria';
 import { screen, within } from '@platform/testing/custom-render';
 import {
   FOOTER_LAYOUT_LABEL,
@@ -126,7 +126,7 @@ describe(`<${LookForm.name}/>`, () => {
         name: option,
       });
 
-      expect(optionButton).toHaveAttribute(ARIA_PRESSED, 'true');
+      expect(optionButton).toHaveAttribute(ARIA_ATTRIBUTE.PRESSED, 'true');
     });
   });
 });

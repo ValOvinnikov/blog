@@ -1,9 +1,5 @@
+import { ARIA_ATTRIBUTE } from '@platform/constants/aria-attribute';
 import { STEP_INDICATOR_STATE } from '@platform/constants/step-indicator';
-import {
-  ARIA_VALUEMAX,
-  ARIA_VALUENOW,
-  ARIA_VALUETEXT,
-} from '@platform/testing/aria';
 import {
   customRender,
   isInaccessible,
@@ -35,9 +31,18 @@ describe(`<${SegmentedProgress.name}/>`, () => {
       name: MOCK_ARIA_LABEL,
     });
 
-    expect(progressBar).toHaveAttribute(ARIA_VALUENOW, String(MOCK_VALUE));
-    expect(progressBar).toHaveAttribute(ARIA_VALUEMAX, String(MOCK_TOTAL));
-    expect(progressBar).toHaveAttribute(ARIA_VALUETEXT, MOCK_VALUE_TEXT);
+    expect(progressBar).toHaveAttribute(
+      ARIA_ATTRIBUTE.VALUENOW,
+      String(MOCK_VALUE),
+    );
+    expect(progressBar).toHaveAttribute(
+      ARIA_ATTRIBUTE.VALUEMAX,
+      String(MOCK_TOTAL),
+    );
+    expect(progressBar).toHaveAttribute(
+      ARIA_ATTRIBUTE.VALUETEXT,
+      MOCK_VALUE_TEXT,
+    );
   });
 
   it('shows its text without exposing it a second time', () => {

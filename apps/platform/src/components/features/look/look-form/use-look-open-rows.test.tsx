@@ -1,5 +1,5 @@
+import { ARIA_ATTRIBUTE } from '@platform/constants/aria-attribute';
 import { LOOK_ROW } from '@platform/constants/look-row';
-import { ARIA_EXPANDED } from '@platform/testing/aria';
 import {
   lookRowTrigger,
   openLookRow,
@@ -26,7 +26,7 @@ describe(useLookOpenRows, () => {
   it.each(Object.values(LOOK_ROW))('loads the %s row folded', (row) => {
     const trigger = lookRowTrigger(row);
 
-    expect(trigger).toHaveAttribute(ARIA_EXPANDED, 'false');
+    expect(trigger).toHaveAttribute(ARIA_ATTRIBUTE.EXPANDED, 'false');
   });
 
   it('folds an open Style row when a Site parts row opens', async () => {
@@ -35,7 +35,7 @@ describe(useLookOpenRows, () => {
 
     const colourTrigger = lookRowTrigger(LOOK_ROW.COLOUR);
     const headerTrigger = lookRowTrigger(LOOK_ROW.HEADER);
-    expect(colourTrigger).toHaveAttribute(ARIA_EXPANDED, 'false');
-    expect(headerTrigger).toHaveAttribute(ARIA_EXPANDED, 'true');
+    expect(colourTrigger).toHaveAttribute(ARIA_ATTRIBUTE.EXPANDED, 'false');
+    expect(headerTrigger).toHaveAttribute(ARIA_ATTRIBUTE.EXPANDED, 'true');
   });
 });

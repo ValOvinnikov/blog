@@ -1,3 +1,4 @@
+import { ARIA_ATTRIBUTE } from '@platform/constants/aria-attribute';
 import { customRender, screen } from '@platform/testing/custom-render';
 import {
   MOCK_RUN_PLUS_6_MIN_AT,
@@ -9,7 +10,6 @@ import { RunStepsCard } from './run-steps-card';
 
 const STEPS_TOGGLE_NAME = /Steps/;
 const SIX_MINUTES_AGO = '6m ago';
-const ARIA_EXPANDED = 'aria-expanded';
 const MOCK_ONLY_STEP_KEY = 'only';
 const MOCK_ONLY_STEP_TITLE = 'Only step';
 
@@ -69,7 +69,7 @@ describe(`<${RunStepsCard.name}/>`, () => {
     it('is expanded while the run is not done', () => {
       const toggle = screen.getByRole('button', { name: STEPS_TOGGLE_NAME });
 
-      expect(toggle).toHaveAttribute(ARIA_EXPANDED, 'true');
+      expect(toggle).toHaveAttribute(ARIA_ATTRIBUTE.EXPANDED, 'true');
     });
   });
 
@@ -136,7 +136,7 @@ describe(`<${RunStepsCard.name}/>`, () => {
 
     const toggle = screen.getByRole('button', { name: STEPS_TOGGLE_NAME });
 
-    expect(toggle).toHaveAttribute(ARIA_EXPANDED, 'false');
+    expect(toggle).toHaveAttribute(ARIA_ATTRIBUTE.EXPANDED, 'false');
   });
 
   it('labels every step as queued before the run has written any step', () => {

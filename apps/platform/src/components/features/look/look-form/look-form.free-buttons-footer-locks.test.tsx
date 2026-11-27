@@ -1,6 +1,6 @@
+import { ARIA_ATTRIBUTE } from '@platform/constants/aria-attribute';
 import { LOOK_ROW } from '@platform/constants/look-row';
 import messages from '@platform/i18n/messages/en.json';
-import { ARIA_DISABLED } from '@platform/testing/aria';
 import { screen } from '@platform/testing/custom-render';
 import {
   FOOTER_LAYOUT_LABEL,
@@ -100,7 +100,7 @@ describe(`<${LookForm.name}/>`, () => {
         await user.click(select);
 
         const listbox = screen.queryByRole('listbox');
-        expect(select).toHaveAttribute(ARIA_DISABLED, 'true');
+        expect(select).toHaveAttribute(ARIA_ATTRIBUTE.DISABLED, 'true');
         expect(select).toHaveAccessibleDescription(
           `${GROWTH_BADGE_TEXT} ${hint}`,
         );

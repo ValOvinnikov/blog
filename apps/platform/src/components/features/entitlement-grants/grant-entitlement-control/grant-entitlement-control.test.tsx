@@ -1,3 +1,4 @@
+import { ARIA_ATTRIBUTE } from '@platform/constants/aria-attribute';
 import {
   ENTITLEMENT_GRANT_EXPIRY,
   ENTITLEMENT_GRANT_NOTE_MAX_LENGTH,
@@ -6,7 +7,6 @@ import {
 import { TENANT_REFUSAL } from '@platform/constants/tenant';
 import en from '@platform/i18n/messages/en.json';
 import { grantEntitlementAction } from '@platform/server/entitlement-grants/grant-entitlement-action';
-import { ARIA_DISABLED } from '@platform/testing/aria';
 import { customRender, screen } from '@platform/testing/custom-render';
 import { makeEnTranslator } from '@platform/testing/en-translator';
 import { mockRouterRefresh } from '@platform/testing/mock-router';
@@ -148,7 +148,7 @@ describe(`<${GrantEntitlementControl.name}/>`, () => {
       });
       await user.click(pending);
 
-      expect(pending).toHaveAttribute(ARIA_DISABLED, 'true');
+      expect(pending).toHaveAttribute(ARIA_ATTRIBUTE.DISABLED, 'true');
       expect(grantEntitlementAction).toHaveBeenCalledTimes(1);
     });
 

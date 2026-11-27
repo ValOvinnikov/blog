@@ -1,7 +1,7 @@
 import { faker } from '@faker-js/faker';
 import { IconSoloButton } from '@platform/components/shared/icon-solo-button';
 import { IconSoloToggle } from '@platform/components/shared/icon-solo-toggle';
-import { ARIA_PRESSED } from '@platform/testing/aria';
+import { ARIA_ATTRIBUTE } from '@platform/constants/aria-attribute';
 import { customRender, screen } from '@platform/testing/custom-render';
 import { mockIconToggleOption } from '@platform/testing/icon-toggle-group/fixtures';
 import { USER_EVENT_KEY } from '@platform/testing/keyboard';
@@ -104,8 +104,11 @@ describe(`<${IconToolbar.name}/>`, () => {
   });
 
   describe('with the default props', () => {
+    let endButton: HTMLElement;
+
     beforeEach(() => {
       setup();
+      endButton = getButton(MOCK_END_LABEL);
     });
 
     it('renders a named toolbar with a named group per entry', () => {
@@ -123,8 +126,6 @@ describe(`<${IconToolbar.name}/>`, () => {
     });
 
     it('renders the end slot children', () => {
-      const endButton = getButton(MOCK_END_LABEL);
-
       expect(endButton).toBeVisible();
     });
 
@@ -137,9 +138,7 @@ describe(`<${IconToolbar.name}/>`, () => {
     });
 
     it('keeps a solo button free of a pressed state', () => {
-      const endButton = getButton(MOCK_END_LABEL);
-
-      expect(endButton).not.toHaveAttribute(ARIA_PRESSED);
+      expect(endButton).not.toHaveAttribute(ARIA_ATTRIBUTE.PRESSED);
     });
 
     it('lands the first Tab on the first group pressed button', async () => {

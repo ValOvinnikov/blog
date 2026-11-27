@@ -1,4 +1,5 @@
 import { faker } from '@faker-js/faker';
+import { ARIA_ATTRIBUTE } from '@platform/constants/aria-attribute';
 import { customRender, screen } from '@platform/testing/custom-render';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
 
@@ -29,7 +30,7 @@ describe(`<${FormTextInput.name}/>`, () => {
     const input = screen.getByRole('textbox', { name: MOCK_LABEL });
 
     expect(input).toBeVisible();
-    expect(input).not.toHaveAttribute('aria-label');
+    expect(input).not.toHaveAttribute(ARIA_ATTRIBUTE.LABEL);
   });
 
   it('describes the input with its hint and error', () => {
@@ -38,7 +39,7 @@ describe(`<${FormTextInput.name}/>`, () => {
     const input = screen.getByRole('textbox', { name: MOCK_LABEL });
 
     expect(input).toHaveAccessibleDescription(`${MOCK_HINT} ${MOCK_ERROR}`);
-    expect(input).toHaveAttribute('aria-invalid', 'true');
+    expect(input).toHaveAttribute(ARIA_ATTRIBUTE.INVALID, 'true');
   });
 
   it('calls onChange with the typed value', async () => {

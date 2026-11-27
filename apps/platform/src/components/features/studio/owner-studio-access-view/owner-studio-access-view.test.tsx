@@ -1,4 +1,4 @@
-import { ARIA_DISABLED } from '@platform/testing/aria';
+import { ARIA_ATTRIBUTE } from '@platform/constants/aria-attribute';
 import { customRender, screen } from '@platform/testing/custom-render';
 import { mockRouterRefresh } from '@platform/testing/mock-router';
 import { MOCK_TENANT_ID } from '@platform/testing/tenants/fixtures';
@@ -120,7 +120,10 @@ describe(`<${OwnerStudioAccessView.name}/>`, () => {
 
       const checkNowButton = screen.getByRole('button', { name: CHECK_NOW });
 
-      expect(resendInviteButton).toHaveAttribute(ARIA_DISABLED, 'true');
+      expect(resendInviteButton).toHaveAttribute(
+        ARIA_ATTRIBUTE.DISABLED,
+        'true',
+      );
       expect(checkNowButton).toBeDisabled();
     });
 

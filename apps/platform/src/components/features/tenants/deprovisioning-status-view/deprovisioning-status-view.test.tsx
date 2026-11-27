@@ -1,3 +1,4 @@
+import { ARIA_ATTRIBUTE } from '@platform/constants/aria-attribute';
 import type { TClientTenant } from '@platform/server/tenants/to-client-tenant';
 import { act, customRender, screen } from '@platform/testing/custom-render';
 import {
@@ -23,7 +24,6 @@ import { DeprovisioningStatusView } from './deprovisioning-status-view';
 
 const REMOVE_DOMAIN_LABEL = 'Remove domain';
 const REVOKE_SANITY_TOKENS_LABEL = 'Revoke Sanity tokens';
-const ARIA_EXPANDED = 'aria-expanded';
 const STARTING_BADGE = 'Starting…';
 const QUEUED_BADGE = 'Queued';
 const STEP_LABELS = [
@@ -245,32 +245,34 @@ describe(`<${DeprovisioningStatusView.name}/>`, () => {
   });
 
   describe('a failed step', () => {
-    it('shows the Failed badge, the failing step and the raw error', () => {
-      setupSteps(failedRunSteps(MOCK_RECOGNISED_ERROR));
-
-      const failedBadges = screen.getAllByText('Failed');
-      const failureHeading = screen.getByRole('heading', {
-        name: 'Missing permission to complete this step',
+    describe('with a recognised error', () => {
+      beforeEach(() => {
+        setupSteps(failedRunSteps(MOCK_RECOGNISED_ERROR));
       });
-      const failingStep = screen.getByText(
-        `Failed while running "${REVOKE_SANITY_TOKENS_LABEL}".`,
-      );
-      const technicalDetails = screen.getByText('Technical details');
-      const rawErrorText = screen.getByText(MOCK_RECOGNISED_ERROR);
 
-      expect(failedBadges.length).toBeGreaterThan(0);
-      expect(failureHeading).toBeVisible();
-      expect(failingStep).toBeVisible();
-      expect(technicalDetails).toBeVisible();
-      expect(rawErrorText).not.toBeVisible();
-    });
+      it('shows the Failed badge, the failing step and the raw error', () => {
+        const failedBadges = screen.getAllByText('Failed');
+        const failureHeading = screen.getByRole('heading', {
+          name: 'Missing permission to complete this step',
+        });
+        const failingStep = screen.getByText(
+          `Failed while running "${REVOKE_SANITY_TOKENS_LABEL}".`,
+        );
+        const technicalDetails = screen.getByText('Technical details');
+        const rawErrorText = screen.getByText(MOCK_RECOGNISED_ERROR);
 
-    it('offers no retry button', () => {
-      setupSteps(failedRunSteps(MOCK_RECOGNISED_ERROR));
+        expect(failedBadges.length).toBeGreaterThan(0);
+        expect(failureHeading).toBeVisible();
+        expect(failingStep).toBeVisible();
+        expect(technicalDetails).toBeVisible();
+        expect(rawErrorText).not.toBeVisible();
+      });
 
-      const retryButton = screen.queryByRole('button', { name: /retry/i });
+      it('offers no retry button', () => {
+        const retryButton = screen.queryByRole('button', { name: /retry/i });
 
-      expect(retryButton).not.toBeInTheDocument();
+        expect(retryButton).not.toBeInTheDocument();
+      });
     });
 
     it('falls back to a generic headline for an unrecognised failure', () => {
@@ -302,7 +304,7 @@ describe(`<${DeprovisioningStatusView.name}/>`, () => {
 
       const stepsToggle = getStepsToggle();
 
-      expect(stepsToggle).toHaveAttribute(ARIA_EXPANDED, 'true');
+      expect(stepsToggle).toHaveAttribute(ARIA_ATTRIBUTE.EXPANDED, 'true');
     });
 
     it('is collapsed by default when every step is already done on mount', () => {
@@ -310,25 +312,27 @@ describe(`<${DeprovisioningStatusView.name}/>`, () => {
 
       const stepsToggle = getStepsToggle();
 
-      expect(stepsToggle).toHaveAttribute(ARIA_EXPANDED, 'false');
+      expect(stepsToggle).toHaveAttribute(ARIA_ATTRIBUTE.EXPANDED, 'false');
     });
 
-    it('collapses by itself once the run completes', async () => {
-      await completeRunWhileMounted();
+    describe('once the run completes while mounted', () => {
+      let stepsToggle: HTMLElement;
 
-      const stepsToggle = getStepsToggle();
+      beforeEach(async () => {
+        await completeRunWhileMounted();
+        stepsToggle = getStepsToggle();
+      });
 
-      expect(stepsToggle).toHaveAttribute(ARIA_EXPANDED, 'false');
-    });
+      it('collapses by itself', () => {
+        expect(stepsToggle).toHaveAttribute(ARIA_ATTRIBUTE.EXPANDED, 'false');
+      });
 
-    it('stays open after a user reopens it and the poll refreshes', async () => {
-      await completeRunWhileMounted();
-      const stepsToggle = getStepsToggle();
+      it('stays open after a user reopens it and the poll refreshes', async () => {
+        await user.click(stepsToggle);
+        await advance(STEP_POLL_INTERVAL_MS * 3);
 
-      await user.click(stepsToggle);
-      await advance(STEP_POLL_INTERVAL_MS * 3);
-
-      expect(stepsToggle).toHaveAttribute(ARIA_EXPANDED, 'true');
+        expect(stepsToggle).toHaveAttribute(ARIA_ATTRIBUTE.EXPANDED, 'true');
+      });
     });
   });
 });

@@ -1,12 +1,13 @@
 import { SidebarCollapseProvider } from '@platform/components/features/layout/sidebar-collapse-provider';
+import { ARIA_ATTRIBUTE } from '@platform/constants/aria-attribute';
 import { SIDEBAR_ID } from '@platform/constants/sidebar';
 import messages from '@platform/i18n/messages/en.json';
-import { ARIA_HIDDEN } from '@platform/testing/aria';
 import {
   renderWithIntl,
   screen,
   waitFor,
 } from '@platform/testing/custom-render';
+import { USER_EVENT_KEY } from '@platform/testing/keyboard';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
 
 import { SidebarCollapseToggle } from './sidebar-collapse-toggle';
@@ -33,8 +34,8 @@ describe(`<${SidebarCollapseToggle.name}/>`, () => {
       const toggle = screen.getByRole('button', { name });
       const sidebar = screen.getByRole('complementary', { name: ariaLabel });
 
-      expect(toggle).toHaveAttribute('aria-expanded', expanded);
-      expect(toggle).toHaveAttribute('aria-controls', sidebar.id);
+      expect(toggle).toHaveAttribute(ARIA_ATTRIBUTE.EXPANDED, expanded);
+      expect(toggle).toHaveAttribute(ARIA_ATTRIBUTE.CONTROLS, sidebar.id);
       expect(toggle).not.toHaveAttribute('title');
     },
   );
@@ -68,12 +69,12 @@ describe(`<${SidebarCollapseToggle.name}/>`, () => {
         const tooltip = screen.getByText(collapseToggle);
 
         expect(toggle).toHaveFocus();
-        expect(tooltip).toHaveAttribute(ARIA_HIDDEN, 'true');
+        expect(tooltip).toHaveAttribute(ARIA_ATTRIBUTE.HIDDEN, 'true');
         expect(toggle).not.toHaveAccessibleDescription();
       });
 
       it('toggles on Enter and closes the tooltip', async () => {
-        await user.keyboard('{Enter}');
+        await user.keyboard(USER_EVENT_KEY.ENTER);
 
         const expandButton = screen.getByRole('button', { name: expandToggle });
         expect(expandButton).toHaveFocus();
@@ -85,7 +86,7 @@ describe(`<${SidebarCollapseToggle.name}/>`, () => {
       });
 
       it('hides the tooltip on Escape', async () => {
-        await user.keyboard('{Escape}');
+        await user.keyboard(USER_EVENT_KEY.ESCAPE);
 
         await waitFor(() => {
           const tooltip = screen.queryByText(collapseToggle);

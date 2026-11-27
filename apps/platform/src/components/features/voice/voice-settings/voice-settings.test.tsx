@@ -1,8 +1,9 @@
 import { faker } from '@faker-js/faker';
+import { ARIA_ATTRIBUTE } from '@platform/constants/aria-attribute';
 import en from '@platform/i18n/messages/en.json';
-import { ARIA_CONTROLS, ARIA_EXPANDED } from '@platform/testing/aria';
 import { expectArchivedOffersNoSave } from '@platform/testing/assert-archived-save';
 import { screen, within } from '@platform/testing/custom-render';
+import { USER_EVENT_KEY } from '@platform/testing/keyboard';
 import { mockRouterRefresh } from '@platform/testing/mock-router';
 import {
   ARCHIVED_NOTICE_DESCRIPTION,
@@ -437,15 +438,15 @@ describe(`<${VoiceSettings.name}/>`, () => {
           name: `Preview · ${BLOG_INDEX_PAGE}`,
         });
 
-        expect(toggle).toHaveAttribute(ARIA_CONTROLS, preview.id);
+        expect(toggle).toHaveAttribute(ARIA_ATTRIBUTE.CONTROLS, preview.id);
         expect(toggle).toHaveFocus();
         expect(toggle).toHaveAccessibleName('Hide preview');
-        expect(toggle).toHaveAttribute(ARIA_EXPANDED, 'true');
+        expect(toggle).toHaveAttribute(ARIA_ATTRIBUTE.EXPANDED, 'true');
 
         await user.click(toggle);
 
         expect(toggle).toHaveAccessibleName(SHOW_PREVIEW);
-        expect(toggle).toHaveAttribute(ARIA_EXPANDED, 'false');
+        expect(toggle).toHaveAttribute(ARIA_ATTRIBUTE.EXPANDED, 'false');
       });
 
       it.each([PAGE_NOT_FOUND, ERROR_PAGE, BOOKMARKS])(
@@ -515,10 +516,10 @@ describe(`<${VoiceSettings.name}/>`, () => {
       });
 
       await user.pointer({ keys: '[MouseLeft>]', target: row });
-      await user.keyboard('{Enter}');
+      await user.keyboard(USER_EVENT_KEY.ENTER);
 
       expect(row).toHaveFocus();
-      expect(row).toHaveAttribute(ARIA_EXPANDED, 'true');
+      expect(row).toHaveAttribute(ARIA_ATTRIBUTE.EXPANDED, 'true');
 
       await user.tab();
 

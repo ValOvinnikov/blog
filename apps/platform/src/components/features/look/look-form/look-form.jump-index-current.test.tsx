@@ -1,3 +1,4 @@
+import { ARIA_ATTRIBUTE } from '@platform/constants/aria-attribute';
 import { LOOK_CARD } from '@platform/constants/look-card';
 import {
   LOOK_INDEX_FADE_END_TEST_ID,
@@ -5,7 +6,6 @@ import {
 } from '@platform/constants/look-form';
 import { LOOK_ROW } from '@platform/constants/look-row';
 import messages from '@platform/i18n/messages/en.json';
-import { ARIA_CURRENT } from '@platform/testing/aria';
 import {
   act,
   fireEvent,
@@ -73,36 +73,40 @@ describe(`<${LookForm.name}/>`, () => {
 
       await waitFor(() =>
         expect(rowLink(LOOK_ROW.SHAPE)).toHaveAttribute(
-          ARIA_CURRENT,
+          ARIA_ATTRIBUTE.CURRENT,
           CURRENT_LOCATION,
         ),
       );
     });
 
-    it('keeps the open row current while a folded row takes focus', async () => {
-      await openLookRow(user, LOOK_ROW.FOOTER);
-      const languageSwitcher = lookRowTrigger(LOOK_ROW.LANGUAGE_SWITCHER);
+    describe('with the Footer row open', () => {
+      beforeEach(async () => {
+        await openLookRow(user, LOOK_ROW.FOOTER);
+      });
 
-      act(() => languageSwitcher.focus());
+      it('keeps the open row current while a folded row takes focus', async () => {
+        const languageSwitcher = lookRowTrigger(LOOK_ROW.LANGUAGE_SWITCHER);
 
-      expect(rowLink(LOOK_ROW.FOOTER)).toHaveAttribute(
-        ARIA_CURRENT,
-        CURRENT_LOCATION,
-      );
-    });
+        act(() => languageSwitcher.focus());
 
-    it('lets go of Preset once it scrolls out of view', async () => {
-      await openLookRow(user, LOOK_ROW.FOOTER);
-      await user.click(cardLink(LOOK_FORM.presetLabel));
-
-      scrollPastCardsAbove(LOOK_CARD.HEADER);
-
-      await waitFor(() =>
-        expect(rowLink(LOOK_ROW.HEADER)).toHaveAttribute(
-          ARIA_CURRENT,
+        expect(rowLink(LOOK_ROW.FOOTER)).toHaveAttribute(
+          ARIA_ATTRIBUTE.CURRENT,
           CURRENT_LOCATION,
-        ),
-      );
+        );
+      });
+
+      it('lets go of Preset once it scrolls out of view', async () => {
+        await user.click(cardLink(LOOK_FORM.presetLabel));
+
+        scrollPastCardsAbove(LOOK_CARD.HEADER);
+
+        await waitFor(() =>
+          expect(rowLink(LOOK_ROW.HEADER)).toHaveAttribute(
+            ARIA_ATTRIBUTE.CURRENT,
+            CURRENT_LOCATION,
+          ),
+        );
+      });
     });
 
     it('fades only the end while more links lie to the right', () => {

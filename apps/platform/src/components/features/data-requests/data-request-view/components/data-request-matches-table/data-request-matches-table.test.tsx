@@ -1,4 +1,5 @@
 import { faker } from '@faker-js/faker';
+import { ARIA_ATTRIBUTE } from '@platform/constants/aria-attribute';
 import {
   DATA_REQUEST_MATCH_KIND,
   DATA_REQUEST_MATCHES_PAGE_SIZE,
@@ -71,7 +72,7 @@ describe(`<${DataRequestMatchesTable.name}/>`, () => {
     expect(rows).toHaveLength(DATA_REQUEST_MATCHES_PAGE_SIZE);
     expect(firstRow).toHaveTextContent(NEWEST_SITE_NAME);
     expect(recordedHeader).toHaveAttribute(
-      'aria-sort',
+      ARIA_ATTRIBUTE.SORT,
       SORT_DIRECTION.DESCENDING,
     );
   });
@@ -108,19 +109,11 @@ describe(`<${DataRequestMatchesTable.name}/>`, () => {
       new Intl.Collator('en', { sensitivity: 'base' }).compare,
     );
 
-    expect(siteHeader).toHaveAttribute('aria-sort', SORT_DIRECTION.ASCENDING);
+    expect(siteHeader).toHaveAttribute(
+      ARIA_ATTRIBUTE.SORT,
+      SORT_DIRECTION.ASCENDING,
+    );
     expect(firstRow).toHaveTextContent(firstSite ?? '');
-  });
-
-  it('narrows the rows to those matching the search', async () => {
-    const searchField = screen.getByRole('searchbox', SEARCH_FIELD);
-    await user.type(searchField, OLDEST_SITE_NAME);
-
-    const rows = bodyRows();
-    const [onlyRow] = rows;
-
-    expect(rows).toHaveLength(1);
-    expect(onlyRow).toHaveTextContent(dataRequestMatchKind.LEAD);
   });
 
   it('shows only the chosen kind', async () => {
@@ -134,12 +127,29 @@ describe(`<${DataRequestMatchesTable.name}/>`, () => {
     expect(rows).toHaveLength(1);
   });
 
-  it('says so when nothing matches the search', async () => {
-    const searchField = screen.getByRole('searchbox', SEARCH_FIELD);
-    await user.type(searchField, faker.string.uuid());
+  describe('searching', () => {
+    let searchField: HTMLElement;
 
-    const noResults = screen.getByText(dataRequestMatchesTable.noResults);
+    beforeEach(() => {
+      searchField = screen.getByRole('searchbox', SEARCH_FIELD);
+    });
 
-    expect(noResults).toBeVisible();
+    it('narrows the rows to those matching the search', async () => {
+      await user.type(searchField, OLDEST_SITE_NAME);
+
+      const rows = bodyRows();
+      const [onlyRow] = rows;
+
+      expect(rows).toHaveLength(1);
+      expect(onlyRow).toHaveTextContent(dataRequestMatchKind.LEAD);
+    });
+
+    it('says so when nothing matches the search', async () => {
+      await user.type(searchField, faker.string.uuid());
+
+      const noResults = screen.getByText(dataRequestMatchesTable.noResults);
+
+      expect(noResults).toBeVisible();
+    });
   });
 });

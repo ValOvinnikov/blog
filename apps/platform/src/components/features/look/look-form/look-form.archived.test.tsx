@@ -1,6 +1,6 @@
+import { ARIA_ATTRIBUTE } from '@platform/constants/aria-attribute';
 import { LOOK_ROW } from '@platform/constants/look-row';
 import messages from '@platform/i18n/messages/en.json';
-import { ARIA_DISABLED } from '@platform/testing/aria';
 import { expectArchivedOffersNoSave } from '@platform/testing/assert-archived-save';
 import { screen, within } from '@platform/testing/custom-render';
 import {
@@ -66,12 +66,21 @@ describe(`<${LookForm.name}/>`, () => {
           name: UPLOAD_FAVICON,
         });
 
-        expect(consolePreset).toHaveAttribute(ARIA_DISABLED, 'true');
-        expect(editorialPreset).toHaveAttribute(ARIA_DISABLED, 'true');
-        expect(hueSlider).toHaveAttribute(ARIA_DISABLED, 'true');
-        expect(followSwitch).toHaveAttribute(ARIA_DISABLED, 'true');
-        expect(uploadLogoButton).toHaveAttribute(ARIA_DISABLED, 'true');
-        expect(uploadFaviconButton).toHaveAttribute(ARIA_DISABLED, 'true');
+        expect(consolePreset).toHaveAttribute(ARIA_ATTRIBUTE.DISABLED, 'true');
+        expect(editorialPreset).toHaveAttribute(
+          ARIA_ATTRIBUTE.DISABLED,
+          'true',
+        );
+        expect(hueSlider).toHaveAttribute(ARIA_ATTRIBUTE.DISABLED, 'true');
+        expect(followSwitch).toHaveAttribute(ARIA_ATTRIBUTE.DISABLED, 'true');
+        expect(uploadLogoButton).toHaveAttribute(
+          ARIA_ATTRIBUTE.DISABLED,
+          'true',
+        );
+        expect(uploadFaviconButton).toHaveAttribute(
+          ARIA_ATTRIBUTE.DISABLED,
+          'true',
+        );
       });
 
       it('locks the Header controls', async () => {
@@ -95,14 +104,17 @@ describe(`<${LookForm.name}/>`, () => {
           name: LOOK_FORM.navLinkStyleOptionLabel.UNDERLINE,
         });
 
-        expect(layoutSelect).toHaveAttribute(ARIA_DISABLED, 'true');
+        expect(layoutSelect).toHaveAttribute(ARIA_ATTRIBUTE.DISABLED, 'true');
         expect(layoutSelect).toHaveAccessibleDescription(
           `${ARCHIVED_NOTICE_DESCRIPTION} ${LOOK_FORM.headerLayoutDescription}`,
         );
-        expect(dropdownButton).toHaveAttribute(ARIA_DISABLED, 'true');
-        expect(floatingButton).toHaveAttribute(ARIA_DISABLED, 'true');
-        expect(softButton).toHaveAttribute(ARIA_DISABLED, 'true');
-        expect(underlineButton).toHaveAttribute(ARIA_DISABLED, 'true');
+        expect(dropdownButton).toHaveAttribute(ARIA_ATTRIBUTE.DISABLED, 'true');
+        expect(floatingButton).toHaveAttribute(ARIA_ATTRIBUTE.DISABLED, 'true');
+        expect(softButton).toHaveAttribute(ARIA_ATTRIBUTE.DISABLED, 'true');
+        expect(underlineButton).toHaveAttribute(
+          ARIA_ATTRIBUTE.DISABLED,
+          'true',
+        );
       });
 
       it('locks the Type, Corners & spacing and Cards controls', async () => {
@@ -129,14 +141,20 @@ describe(`<${LookForm.name}/>`, () => {
           name: OUTLINED,
         });
 
-        expect(headingFont).toHaveAttribute(ARIA_DISABLED, 'true');
+        expect(headingFont).toHaveAttribute(ARIA_ATTRIBUTE.DISABLED, 'true');
         expect(bodyFont).toHaveAccessibleDescription(
           ARCHIVED_NOTICE_DESCRIPTION,
         );
-        expect(smallButton).toHaveAttribute(ARIA_DISABLED, 'true');
-        expect(extraLargeButton).toHaveAttribute(ARIA_DISABLED, 'true');
-        expect(compactButton).toHaveAttribute(ARIA_DISABLED, 'true');
-        expect(outlinedCardTile).toHaveAttribute(ARIA_DISABLED, 'true');
+        expect(smallButton).toHaveAttribute(ARIA_ATTRIBUTE.DISABLED, 'true');
+        expect(extraLargeButton).toHaveAttribute(
+          ARIA_ATTRIBUTE.DISABLED,
+          'true',
+        );
+        expect(compactButton).toHaveAttribute(ARIA_ATTRIBUTE.DISABLED, 'true');
+        expect(outlinedCardTile).toHaveAttribute(
+          ARIA_ATTRIBUTE.DISABLED,
+          'true',
+        );
       });
     });
 
@@ -150,7 +168,7 @@ describe(`<${LookForm.name}/>`, () => {
 
       const resetButton = screen.getByRole('button', { name: RESET_TO_PRESET });
 
-      expect(resetButton).toHaveAttribute(ARIA_DISABLED, 'true');
+      expect(resetButton).toHaveAttribute(ARIA_ATTRIBUTE.DISABLED, 'true');
       expect(resetButton).toHaveAccessibleDescription(
         ARCHIVED_NOTICE_DESCRIPTION,
       );

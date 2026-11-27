@@ -1,7 +1,7 @@
+import { ARIA_ATTRIBUTE } from '@platform/constants/aria-attribute';
 import { ONBOARDING_SCROLL_AREA_TEST_ID } from '@platform/constants/onboarding';
 import { TENANT_FIELD_ERROR } from '@platform/constants/tenant';
 import { checkSiteAddressAction } from '@platform/server/onboarding/check-site-address-action';
-import { ARIA_DISABLED } from '@platform/testing/aria';
 import { act, screen } from '@platform/testing/custom-render';
 import { USER_EVENT_KEY } from '@platform/testing/keyboard';
 import {
@@ -95,7 +95,10 @@ describe(`<${OnboardingView.name}/>`, () => {
           const continueButton = screen.getByRole('button', MOCK_CONTINUE);
 
           expect(checking).toBeVisible();
-          expect(continueButton).toHaveAttribute(ARIA_DISABLED, 'true');
+          expect(continueButton).toHaveAttribute(
+            ARIA_ATTRIBUTE.DISABLED,
+            'true',
+          );
         });
 
         it('shows the status under the address input, apart from the actions', () => {

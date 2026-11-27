@@ -1,7 +1,7 @@
 import { faker } from '@faker-js/faker';
+import { ARIA_ATTRIBUTE } from '@platform/constants/aria-attribute';
 import { ICON_TEST_ID } from '@platform/constants/icon';
 import messages from '@platform/i18n/messages/en.json';
-import { ARIA_HIDDEN } from '@platform/testing/aria';
 import { customRender, screen } from '@platform/testing/custom-render';
 import { TOAST_TYPE } from '@shinefold/config';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
@@ -116,7 +116,7 @@ describe(`<${Toast.name}/>`, () => {
 
       const icon = screen.getByTestId(ICON_TEST_ID);
 
-      expect(icon).toHaveAttribute(ARIA_HIDDEN, 'true');
+      expect(icon).toHaveAttribute(ARIA_ATTRIBUTE.HIDDEN, 'true');
     },
   );
 

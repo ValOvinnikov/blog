@@ -1,3 +1,4 @@
+import { ARIA_ATTRIBUTE } from '@platform/constants/aria-attribute';
 import messages from '@platform/i18n/messages/en.json';
 import { customRender, screen, within } from '@platform/testing/custom-render';
 import {
@@ -32,8 +33,6 @@ const MOCK_ARCHIVED_TENANT: TTenantSwitcherItem = {
 
 const ACTIVE_TENANT_NAME = `${MOCK_TENANT_NAME}${MOCK_TENANT_DOMAIN}`;
 const ARCHIVED_TENANT_NAME = `${MOCK_OTHER_TENANT_NAME}${messages.tenantSwitcher.archived}${MOCK_OTHER_TENANT_DOMAIN}`;
-
-const ARIA_CURRENT = 'aria-current';
 
 const setup = customRender(TenantSwitcher, {
   tenants: [MOCK_ACTIVE_TENANT, MOCK_ARCHIVED_TENANT],
@@ -104,8 +103,8 @@ describe(`<${TenantSwitcher.name}/>`, () => {
         name: ARCHIVED_TENANT_NAME,
       });
 
-      expect(active).toHaveAttribute(ARIA_CURRENT, 'true');
-      expect(other).not.toHaveAttribute(ARIA_CURRENT);
+      expect(active).toHaveAttribute(ARIA_ATTRIBUTE.CURRENT, 'true');
+      expect(other).not.toHaveAttribute(ARIA_ATTRIBUTE.CURRENT);
     });
   });
 });

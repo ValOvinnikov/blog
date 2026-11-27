@@ -1,5 +1,5 @@
+import { ARIA_ATTRIBUTE } from '@platform/constants/aria-attribute';
 import { setTenantPinAction } from '@platform/server/tenants/set-tenant-pin-action';
-import { ARIA_EXPANDED } from '@platform/testing/aria';
 import { screen, within } from '@platform/testing/custom-render';
 import { makeEnTranslator } from '@platform/testing/en-translator';
 import { USER_EVENT_KEY } from '@platform/testing/keyboard';
@@ -238,7 +238,7 @@ describe(`<${PinnedTenants.name}/>`, () => {
     });
 
     it('offers a collapsed Show all button with the pin count', () => {
-      expect(showAll).toHaveAttribute(ARIA_EXPANDED, COLLAPSED);
+      expect(showAll).toHaveAttribute(ARIA_ATTRIBUTE.EXPANDED, COLLAPSED);
     });
 
     it('keeps the tiles past the first row out of reach', () => {
@@ -254,7 +254,7 @@ describe(`<${PinnedTenants.name}/>`, () => {
       });
 
       it('reads Show less and reports itself expanded', () => {
-        expect(showLess).toHaveAttribute(ARIA_EXPANDED, EXPANDED);
+        expect(showLess).toHaveAttribute(ARIA_ATTRIBUTE.EXPANDED, EXPANDED);
       });
 
       it('brings every tile within reach', () => {
@@ -266,7 +266,7 @@ describe(`<${PinnedTenants.name}/>`, () => {
 
         const collapsed = screen.getByRole('button', { name: SHOW_ALL });
 
-        expect(collapsed).toHaveAttribute(ARIA_EXPANDED, COLLAPSED);
+        expect(collapsed).toHaveAttribute(ARIA_ATTRIBUTE.EXPANDED, COLLAPSED);
       });
     });
   });

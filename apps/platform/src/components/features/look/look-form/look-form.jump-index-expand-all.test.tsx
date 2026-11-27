@@ -1,7 +1,7 @@
+import { ARIA_ATTRIBUTE } from '@platform/constants/aria-attribute';
 import { LOOK_CARD } from '@platform/constants/look-card';
 import { LOOK_ROW } from '@platform/constants/look-row';
 import messages from '@platform/i18n/messages/en.json';
-import { ARIA_CURRENT, ARIA_EXPANDED } from '@platform/testing/aria';
 import { act, waitFor } from '@platform/testing/custom-render';
 import { lookRowTrigger } from '@platform/testing/look/look-form-interactions';
 import { setupLookForm } from '@platform/testing/look/look-form-setup';
@@ -49,7 +49,10 @@ describe(`<${LookForm.name}/>`, () => {
 
       it('opens every row and reads Collapse all', () => {
         for (const row of LOOK_ROWS) {
-          expect(lookRowTrigger(row)).toHaveAttribute(ARIA_EXPANDED, 'true');
+          expect(lookRowTrigger(row)).toHaveAttribute(
+            ARIA_ATTRIBUTE.EXPANDED,
+            'true',
+          );
         }
         expect(toggleAllButton(LOOK_FORM.collapseAll)).toBeInTheDocument();
       });
@@ -59,7 +62,7 @@ describe(`<${LookForm.name}/>`, () => {
 
         await waitFor(() =>
           expect(rowLink(LOOK_ROW.BRAND)).toHaveAttribute(
-            ARIA_CURRENT,
+            ARIA_ATTRIBUTE.CURRENT,
             CURRENT_LOCATION,
           ),
         );
@@ -71,7 +74,7 @@ describe(`<${LookForm.name}/>`, () => {
         act(() => typeTrigger.focus());
 
         expect(rowLink(LOOK_ROW.TYPE)).toHaveAttribute(
-          ARIA_CURRENT,
+          ARIA_ATTRIBUTE.CURRENT,
           CURRENT_LOCATION,
         );
       });
@@ -80,7 +83,10 @@ describe(`<${LookForm.name}/>`, () => {
         await user.click(toggleAllButton(LOOK_FORM.collapseAll));
 
         for (const row of LOOK_ROWS) {
-          expect(lookRowTrigger(row)).toHaveAttribute(ARIA_EXPANDED, 'false');
+          expect(lookRowTrigger(row)).toHaveAttribute(
+            ARIA_ATTRIBUTE.EXPANDED,
+            'false',
+          );
         }
       });
 
@@ -89,7 +95,7 @@ describe(`<${LookForm.name}/>`, () => {
 
         expect(toggleAllButton(LOOK_FORM.expandAll)).toBeInTheDocument();
         expect(lookRowTrigger(LOOK_ROW.COLOUR)).toHaveAttribute(
-          ARIA_EXPANDED,
+          ARIA_ATTRIBUTE.EXPANDED,
           'true',
         );
       });

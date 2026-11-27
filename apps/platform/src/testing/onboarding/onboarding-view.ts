@@ -1,16 +1,7 @@
-import {
-  ONBOARDING_STEP,
-  type TOnboardingStep,
-} from '@platform/constants/onboarding';
 import messages from '@platform/i18n/messages/en.json';
 import { createSiteAction } from '@platform/server/onboarding/create-site-action';
-import {
-  ARIA_VALUEMAX,
-  ARIA_VALUENOW,
-  ARIA_VALUETEXT,
-} from '@platform/testing/aria';
 import { screen } from '@platform/testing/custom-render';
-import { makeEnTranslator } from '@platform/testing/en-translator';
+import { t } from '@platform/testing/onboarding/step-progress';
 import {
   MOCK_TENANT_NAME,
   MOCK_TENANT_ROOT_DOMAIN,
@@ -25,6 +16,7 @@ import {
 import type { UserEvent } from '@testing-library/user-event';
 
 export * from './render-onboarding-view';
+export * from './step-progress';
 
 export const createSiteMock = vi.mocked(createSiteAction);
 export const MOCK_SITE_ADDRESS = `${MOCK_TENANT_SLUG}.${MOCK_TENANT_ROOT_DOMAIN}`;
@@ -48,8 +40,6 @@ export const {
   siteAddressUnverified: ADDRESS_UNVERIFIED,
   accentLabel: ACCENT_LABEL,
   siteTypes: SITE_TYPES,
-  steps: STEPS,
-  stepsAriaLabel: STEPS_ARIA_LABEL,
   fieldErrors: { nameRequired: NAME_REQUIRED, siteAddressTaken: ADDRESS_TAKEN },
   failures: { tryAgainLater: TRY_AGAIN_LATER },
 } = messages.onboardingForm;
@@ -59,8 +49,6 @@ const { acceptTerms: ACCEPT_TERMS } = messages.termsAcceptance;
 export const { termsNotAccepted: TERMS_NOT_ACCEPTED } =
   messages.termsAcceptance;
 const [ACCEPT_TERMS_LEAD] = ACCEPT_TERMS.split('<');
-export const t = makeEnTranslator('onboardingForm');
-const STEP_ORDER = Object.values(ONBOARDING_STEP);
 
 export const MOCK_NAME_FIELD = { name: NAME_LABEL };
 export const MOCK_ADDRESS_FIELD = { name: SITE_ADDRESS_LABEL };
@@ -97,27 +85,6 @@ export const MOCK_CREATE_SITE_INPUT = {
 
 export const stepHeading = (name: string) =>
   screen.getByRole('heading', { level: 1, name });
-
-const stepProgress = () =>
-  screen.getByRole('progressbar', { name: STEPS_ARIA_LABEL });
-
-export const stepProgressText = (step: TOnboardingStep) =>
-  t('stepProgressNamed', {
-    n: STEP_ORDER.indexOf(step) + 1,
-    total: STEP_ORDER.length,
-    step: STEPS[step],
-  });
-
-export const expectProgressAt = (step: TOnboardingStep) => {
-  const progressBar = stepProgress();
-
-  expect(progressBar).toHaveAttribute(
-    ARIA_VALUENOW,
-    String(STEP_ORDER.indexOf(step) + 1),
-  );
-  expect(progressBar).toHaveAttribute(ARIA_VALUEMAX, String(STEP_ORDER.length));
-  expect(progressBar).toHaveAttribute(ARIA_VALUETEXT, stepProgressText(step));
-};
 
 export const clickContinue = async (user: UserEvent) => {
   const continueButton = screen.getByRole('button', MOCK_CONTINUE);

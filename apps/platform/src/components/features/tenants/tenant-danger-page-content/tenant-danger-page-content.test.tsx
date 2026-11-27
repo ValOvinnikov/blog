@@ -1,5 +1,5 @@
 import { faker } from '@faker-js/faker';
-import { ARIA_DISABLED } from '@platform/testing/aria';
+import { ARIA_ATTRIBUTE } from '@platform/constants/aria-attribute';
 import { act, customRender, screen } from '@platform/testing/custom-render';
 import {
   mockIdleDeprovisioningSteps,
@@ -89,7 +89,7 @@ describe(`<${TenantDangerPageContent.name}/>`, () => {
     const removeDomainStep = screen.queryByText('Remove domain');
 
     expect(trigger).toBeEnabled();
-    expect(trigger).not.toHaveAttribute(ARIA_DISABLED);
+    expect(trigger).not.toHaveAttribute(ARIA_ATTRIBUTE.DISABLED);
     expect(removeDomainStep).not.toBeInTheDocument();
     expect(getTenantDeprovisioningStatusActionMock).not.toHaveBeenCalled();
   });
@@ -111,7 +111,7 @@ describe(`<${TenantDangerPageContent.name}/>`, () => {
     const trigger = getTrigger();
 
     expect(startingState).toBeVisible();
-    expect(trigger).toHaveAttribute(ARIA_DISABLED, 'true');
+    expect(trigger).toHaveAttribute(ARIA_ATTRIBUTE.DISABLED, 'true');
     expect(trigger).not.toBeDisabled();
 
     await advancePoll();
@@ -121,7 +121,7 @@ describe(`<${TenantDangerPageContent.name}/>`, () => {
     expect(getTenantDeprovisioningStatusActionMock).toHaveBeenCalledWith(
       MOCK_TENANT_ID,
     );
-    expect(triggerAfterPoll).toHaveAttribute(ARIA_DISABLED, 'true');
+    expect(triggerAfterPoll).toHaveAttribute(ARIA_ATTRIBUTE.DISABLED, 'true');
   });
 
   it('blocks the trigger during a run and re-enables it once the run fails', async () => {
@@ -141,14 +141,17 @@ describe(`<${TenantDangerPageContent.name}/>`, () => {
 
     const triggerWhileRunning = getTrigger();
 
-    expect(triggerWhileRunning).toHaveAttribute(ARIA_DISABLED, 'true');
+    expect(triggerWhileRunning).toHaveAttribute(
+      ARIA_ATTRIBUTE.DISABLED,
+      'true',
+    );
 
     await advancePoll();
 
     const triggerAfterFailure = getTrigger();
 
     expect(triggerAfterFailure).toBeEnabled();
-    expect(triggerAfterFailure).not.toHaveAttribute(ARIA_DISABLED);
+    expect(triggerAfterFailure).not.toHaveAttribute(ARIA_ATTRIBUTE.DISABLED);
   });
 
   it('keeps the trigger enabled and stops polling for an already failed run', async () => {

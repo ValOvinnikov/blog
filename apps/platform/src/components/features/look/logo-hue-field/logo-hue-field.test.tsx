@@ -1,5 +1,5 @@
+import { ARIA_ATTRIBUTE } from '@platform/constants/aria-attribute';
 import messages from '@platform/i18n/messages/en.json';
-import { ARIA_DESCRIBEDBY, ARIA_DISABLED } from '@platform/testing/aria';
 import { customRender, screen, waitFor } from '@platform/testing/custom-render';
 import { makeEnTranslator } from '@platform/testing/en-translator';
 import { ARCHIVED_NOTICE_ID } from '@platform/testing/render-in-settings-form';
@@ -87,7 +87,7 @@ describe(`<${LogoHueField.name}/>`, () => {
       logoHue: MOCK_LOGO_HUE,
       onChange,
       isLocked: true,
-      'aria-describedby': ARCHIVED_NOTICE_ID,
+      [ARIA_ATTRIBUTE.DESCRIBEDBY]: ARCHIVED_NOTICE_ID,
     });
 
     const followSwitch = screen.getByRole('switch', {
@@ -97,10 +97,13 @@ describe(`<${LogoHueField.name}/>`, () => {
     await user.click(followSwitch);
 
     expect(followSwitch).toBeEnabled();
-    expect(followSwitch).toHaveAttribute(ARIA_DISABLED, 'true');
-    expect(followSwitch).toHaveAttribute(ARIA_DESCRIBEDBY, ARCHIVED_NOTICE_ID);
+    expect(followSwitch).toHaveAttribute(ARIA_ATTRIBUTE.DISABLED, 'true');
+    expect(followSwitch).toHaveAttribute(
+      ARIA_ATTRIBUTE.DESCRIBEDBY,
+      ARCHIVED_NOTICE_ID,
+    );
     expect(hueSlider).toBeEnabled();
-    expect(hueSlider).toHaveAttribute(ARIA_DISABLED, 'true');
+    expect(hueSlider).toHaveAttribute(ARIA_ATTRIBUTE.DISABLED, 'true');
     expect(onChange).not.toHaveBeenCalled();
   });
 });

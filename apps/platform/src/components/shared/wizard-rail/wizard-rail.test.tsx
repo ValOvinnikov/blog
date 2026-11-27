@@ -1,5 +1,5 @@
 import { faker } from '@faker-js/faker';
-import { ARIA_CURRENT } from '@platform/testing/aria';
+import { ARIA_ATTRIBUTE } from '@platform/constants/aria-attribute';
 import { customRender, screen } from '@platform/testing/custom-render';
 
 import { WizardRail } from './wizard-rail';
@@ -37,9 +37,9 @@ describe(`<${WizardRail.name}/>`, () => {
   it('marks only the active step as the current step', () => {
     const [firstItem, activeItem, lastItem] = screen.getAllByRole('listitem');
 
-    expect(activeItem).toHaveAttribute(ARIA_CURRENT, 'step');
-    expect(firstItem).not.toHaveAttribute(ARIA_CURRENT);
-    expect(lastItem).not.toHaveAttribute(ARIA_CURRENT);
+    expect(activeItem).toHaveAttribute(ARIA_ATTRIBUTE.CURRENT, 'step');
+    expect(firstItem).not.toHaveAttribute(ARIA_ATTRIBUTE.CURRENT);
+    expect(lastItem).not.toHaveAttribute(ARIA_ATTRIBUTE.CURRENT);
   });
 
   it('names the step list with the given label', () => {

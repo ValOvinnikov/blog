@@ -1,3 +1,4 @@
+import { ARIA_ATTRIBUTE } from '@platform/constants/aria-attribute';
 import {
   ENTITLEMENT_GRANT_EXPIRY,
   ENTITLEMENT_GRANT_EXPIRY_DAYS,
@@ -7,7 +8,6 @@ import {
 import en from '@platform/i18n/messages/en.json';
 import { grantEntitlementAction } from '@platform/server/entitlement-grants/grant-entitlement-action';
 import { revokeEntitlementGrantAction } from '@platform/server/entitlement-grants/revoke-entitlement-grant-action';
-import { ARIA_DISABLED } from '@platform/testing/aria';
 import { customRender, screen, within } from '@platform/testing/custom-render';
 import { makeEnTranslator } from '@platform/testing/en-translator';
 import { mockRouterRefresh } from '@platform/testing/mock-router';
@@ -308,7 +308,7 @@ describe(`<${GrantsCard.name}/>`, () => {
       });
       await user.click(pending);
 
-      expect(pending).toHaveAttribute(ARIA_DISABLED, 'true');
+      expect(pending).toHaveAttribute(ARIA_ATTRIBUTE.DISABLED, 'true');
       expect(revokeEntitlementGrantAction).toHaveBeenCalledTimes(1);
     });
 
@@ -447,7 +447,7 @@ describe(`<${GrantsCard.name}/>`, () => {
         }),
       });
 
-      expect(granted).toHaveAttribute(ARIA_DISABLED, 'true');
+      expect(granted).toHaveAttribute(ARIA_ATTRIBUTE.DISABLED, 'true');
     });
   });
 });

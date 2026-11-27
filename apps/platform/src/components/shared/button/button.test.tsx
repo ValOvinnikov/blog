@@ -1,12 +1,14 @@
 import { faker } from '@faker-js/faker';
-import { ARIA_DISABLED } from '@platform/testing/aria';
+import { ARIA_ATTRIBUTE } from '@platform/constants/aria-attribute';
 import {
   customRender,
   renderWithIntl,
   screen,
 } from '@platform/testing/custom-render';
+import { USER_EVENT_KEY } from '@platform/testing/keyboard';
 import { findServerEventHandlers } from '@platform/testing/server-event-handlers';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
+import type { Mock } from 'vitest';
 
 import { Button } from './button';
 
@@ -26,33 +28,67 @@ describe(`<${Button.name}/>`, () => {
     user = userEvent.setup();
   });
 
-  it('renders its children as the accessible name', () => {
-    setup();
+  describe('with the default props', () => {
+    let button: HTMLElement;
 
-    const button = screen.getByRole('button', { name: MOCK_LABEL });
+    beforeEach(() => {
+      setup();
+      button = screen.getByRole('button', { name: MOCK_LABEL });
+    });
 
-    expect(button).toBeVisible();
+    it('renders its children as the accessible name', () => {
+      expect(button).toBeVisible();
+    });
+
+    it('is enabled and not busy when not pending', () => {
+      expect(button).toBeEnabled();
+      expect(button).toHaveAttribute(ARIA_ATTRIBUTE.BUSY, 'false');
+    });
   });
 
-  it('calls the click handler when enabled', async () => {
-    const handleClick = vi.fn();
-    setup({ onClick: handleClick });
+  describe('with a click handler', () => {
+    let handleClick: Mock<() => void>;
 
-    const button = screen.getByRole('button', { name: MOCK_LABEL });
-    await user.click(button);
+    beforeEach(() => {
+      handleClick = vi.fn();
+    });
 
-    expect(handleClick).toHaveBeenCalledOnce();
-  });
+    it('calls the click handler when enabled', async () => {
+      setup({ onClick: handleClick });
 
-  it('renders disabled and ignores clicks', async () => {
-    const handleClick = vi.fn();
-    setup({ isDisabled: true, onClick: handleClick });
+      const button = screen.getByRole('button', { name: MOCK_LABEL });
+      await user.click(button);
 
-    const button = screen.getByRole('button', { name: MOCK_LABEL });
-    await user.click(button);
+      expect(handleClick).toHaveBeenCalledOnce();
+    });
 
-    expect(button).toBeDisabled();
-    expect(handleClick).not.toHaveBeenCalled();
+    it('renders disabled and ignores clicks', async () => {
+      setup({ isDisabled: true, onClick: handleClick });
+
+      const button = screen.getByRole('button', { name: MOCK_LABEL });
+      await user.click(button);
+
+      expect(button).toBeDisabled();
+      expect(handleClick).not.toHaveBeenCalled();
+    });
+
+    it('stays focusable but ignores clicks and Enter when aria-disabled', async () => {
+      setup({ isAriaDisabled: true, onClick: handleClick });
+
+      const button = screen.getByRole('button', { name: MOCK_LABEL });
+
+      expect(button).toHaveAttribute(ARIA_ATTRIBUTE.DISABLED, 'true');
+      expect(button).not.toBeDisabled();
+
+      await user.tab();
+
+      expect(button).toHaveFocus();
+
+      await user.click(button);
+      await user.keyboard(USER_EVENT_KEY.ENTER);
+
+      expect(handleClick).not.toHaveBeenCalled();
+    });
   });
 
   it('passes no event handler from a Server Component when given no onClick', () => {
@@ -61,25 +97,6 @@ describe(`<${Button.name}/>`, () => {
     );
 
     expect(handlers).toEqual([]);
-  });
-
-  it('stays focusable but ignores clicks and Enter when aria-disabled', async () => {
-    const handleClick = vi.fn();
-    setup({ isAriaDisabled: true, onClick: handleClick });
-
-    const button = screen.getByRole('button', { name: MOCK_LABEL });
-
-    expect(button).toHaveAttribute(ARIA_DISABLED, 'true');
-    expect(button).not.toBeDisabled();
-
-    await user.tab();
-
-    expect(button).toHaveFocus();
-
-    await user.click(button);
-    await user.keyboard('{Enter}');
-
-    expect(handleClick).not.toHaveBeenCalled();
   });
 
   it('keeps a decorative arrow out of the accessible name', () => {
@@ -105,24 +122,25 @@ describe(`<${Button.name}/>`, () => {
     expect(button).toHaveAccessibleDescription(MOCK_REASON);
   });
 
-  it('is enabled and not busy when not pending', () => {
-    setup();
-
-    const button = screen.getByRole('button', { name: MOCK_LABEL });
-
-    expect(button).toBeEnabled();
-    expect(button).toHaveAttribute('aria-busy', 'false');
-  });
-
   describe('pending', () => {
-    it('stays enabled, marked busy and aria-disabled', () => {
-      setup({ isPending: true });
+    describe('without a pending label', () => {
+      beforeEach(() => {
+        setup({ isPending: true });
+      });
 
-      const button = screen.getByRole('button', { name: MOCK_LABEL });
+      it('stays enabled, marked busy and aria-disabled', () => {
+        const button = screen.getByRole('button', { name: MOCK_LABEL });
 
-      expect(button).toBeEnabled();
-      expect(button).toHaveAttribute('aria-busy', 'true');
-      expect(button).toHaveAttribute(ARIA_DISABLED, 'true');
+        expect(button).toBeEnabled();
+        expect(button).toHaveAttribute(ARIA_ATTRIBUTE.BUSY, 'true');
+        expect(button).toHaveAttribute(ARIA_ATTRIBUTE.DISABLED, 'true');
+      });
+
+      it('renders no status region without a pending label', () => {
+        const status = screen.queryByRole('status');
+
+        expect(status).not.toBeInTheDocument();
+      });
     });
 
     it('keeps focus when it turns busy', async () => {
@@ -191,14 +209,6 @@ describe(`<${Button.name}/>`, () => {
 
       expect(button).toBeEnabled();
     });
-
-    it('renders no status region without a pending label', () => {
-      setup({ isPending: true });
-
-      const status = screen.queryByRole('status');
-
-      expect(status).not.toBeInTheDocument();
-    });
   });
 
   describe('status region', () => {
@@ -207,7 +217,7 @@ describe(`<${Button.name}/>`, () => {
 
       const status = screen.getByRole('status');
 
-      expect(status).toHaveAttribute('aria-live', 'polite');
+      expect(status).toHaveAttribute(ARIA_ATTRIBUTE.LIVE, 'polite');
       expect(status).toHaveTextContent('');
     });
 
