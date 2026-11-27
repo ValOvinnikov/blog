@@ -15,6 +15,7 @@ import {
   PrimaryNavigation,
   type TPrimaryNavigationAction,
 } from '@shinefold/ui/components/molecules/primary-navigation';
+import { HeaderControlShapes } from '@shinefold/ui/testing/header-control-shapes';
 import type { Decorator, Meta, StoryObj } from '@storybook/react-vite';
 import { useState } from 'react';
 import { keys } from 'remeda';
@@ -330,6 +331,42 @@ export const ActionPlainLink: TStory = {
       {...args}
       action={{ ...headerAction, style: HEADER_ACTION_STYLE.PLAIN }}
     />
+  ),
+};
+
+export const ActionHeaderControlShapes: TStory = {
+  args: { layout: HEADER_LAYOUT.CLASSIC },
+  render: (args) => (
+    <HeaderControlShapes>
+      {() => (
+        <>
+          <SiteHeader {...args} action={headerAction} />
+          <SiteHeader
+            {...args}
+            action={{ ...headerAction, style: HEADER_ACTION_STYLE.OUTLINED }}
+          />
+        </>
+      )}
+    </HeaderControlShapes>
+  ),
+};
+
+export const PhoneMenuActionHeaderControlShapes: TStory = {
+  globals: { viewport: 'phone' },
+  args: { layout: HEADER_LAYOUT.CLASSIC },
+  render: (args) => (
+    <HeaderControlShapes>
+      {() => (
+        <SiteHeader
+          {...args}
+          isMenuOpen={true}
+          action={{
+            ...headerAction,
+            phonePlacement: HEADER_ACTION_PHONE_PLACEMENT.MENU,
+          }}
+        />
+      )}
+    </HeaderControlShapes>
   ),
 };
 
