@@ -380,7 +380,8 @@
     "RECHECK_TENANT_OWNERS": "Owner recheck",
     "DOMAIN_VERIFICATION": "Domain verification",
     "SITE_CONFIG_REVALIDATION": "Site config revalidation",
-    "CONTRAST_CHECK": "Contrast check"
+    "CONTRAST_CHECK": "Contrast check",
+    "DOCUMENT_COUNT_CHECK": "Document count check"
   },
   "findingKindLabel": {
     "SCHEMA_VALIDATION_ERROR": "Schema validation error",
@@ -390,7 +391,8 @@
     "DOMAIN_NOT_ADDED": "Domain not added",
     "REVALIDATION_FAILED": "Revalidation failed",
     "CONTRAST_REGRESSION": "Contrast regression",
-    "OWNER_ACCESS_CHECK_FAILED": "Owner access check failing"
+    "OWNER_ACCESS_CHECK_FAILED": "Owner access check failing",
+    "DOCUMENT_CAP_APPROACHING": "Nearing document cap"
   },
   "ownerHomePage": {
     "description": "Your site at a glance. Everything here is live.",

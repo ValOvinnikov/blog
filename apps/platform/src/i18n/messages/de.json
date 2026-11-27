@@ -380,7 +380,8 @@
     "RECHECK_TENANT_OWNERS": "Inhaberprüfung",
     "DOMAIN_VERIFICATION": "Domainverifizierung",
     "SITE_CONFIG_REVALIDATION": "Revalidierung der Website-Konfiguration",
-    "CONTRAST_CHECK": "Kontrastprüfung"
+    "CONTRAST_CHECK": "Kontrastprüfung",
+    "DOCUMENT_COUNT_CHECK": "Prüfung der Dokumentanzahl"
   },
   "findingKindLabel": {
     "SCHEMA_VALIDATION_ERROR": "Schema-Validierungsfehler",
@@ -390,7 +391,8 @@
     "DOMAIN_NOT_ADDED": "Domain nicht hinzugefügt",
     "REVALIDATION_FAILED": "Revalidierung fehlgeschlagen",
     "CONTRAST_REGRESSION": "Kontrastregression",
-    "OWNER_ACCESS_CHECK_FAILED": "Prüfung des Inhaberzugriffs schlägt fehl"
+    "OWNER_ACCESS_CHECK_FAILED": "Prüfung des Inhaberzugriffs schlägt fehl",
+    "DOCUMENT_CAP_APPROACHING": "Dokumentlimit bald erreicht"
   },
   "ownerHomePage": {
     "description": "Ihre Website auf einen Blick. Alles hier ist live.",
