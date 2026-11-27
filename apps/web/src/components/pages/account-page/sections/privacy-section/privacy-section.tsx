@@ -1,31 +1,23 @@
-import { routes } from '@shinefold/config';
-import { LinkButton } from '@shinefold/ui/components/molecules/link-button';
 import { Panel } from '@shinefold/ui/components/molecules/panel';
 import { SettingRow } from '@shinefold/ui/components/molecules/setting-row';
 import { DeleteAccountControl } from '@web/components/shared/delete-account-control';
-import { SmartLink } from '@web/components/shared/smart-link';
+
+import { ExportAccountDataControl } from './components/export-account-data-control/export-account-data-control';
 
 export interface IPrivacySectionProps {
   handle: string;
   heading: string;
   exportLabel: string;
   exportDescription: string;
-  exportButton: string;
   deleteLabel: string;
   deleteDescription: string;
 }
 
-/**
- * Needs no wrapper/view split since it does no data
- * fetching of its own; `AccountPage` resolves the session-derived `handle`
- * and every translated string and passes them straight in.
- */
 export const PrivacySection = ({
   handle,
   heading,
   exportLabel,
   exportDescription,
-  exportButton,
   deleteLabel,
   deleteDescription,
 }: IPrivacySectionProps) => (
@@ -33,15 +25,7 @@ export const PrivacySection = ({
     <Panel.Header headingLevel={2}>{heading}</Panel.Header>
     <Panel.Body>
       <SettingRow label={exportLabel} description={exportDescription}>
-        <LinkButton
-          as={SmartLink}
-          href={routes.accountExport()}
-          prefetch={false}
-          download={true}
-          variant="ghost"
-        >
-          {exportButton}
-        </LinkButton>
+        <ExportAccountDataControl />
       </SettingRow>
       <SettingRow
         tone="danger"

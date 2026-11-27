@@ -4,3 +4,5 @@ export const ARIA_CONTROLS = 'aria-controls';
 export const ARIA_PRESSED = 'aria-pressed';
 export const ARIA_LABELLEDBY_ATTRIBUTE = 'aria-labelledby';
 export const ARIA_INVALID = 'aria-invalid';
+export const ARIA_BUSY = 'aria-busy';
+export const ARIA_DISABLED = 'aria-disabled';

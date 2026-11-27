@@ -6,7 +6,6 @@ import {
   MOCK_PERCENT_OFF,
   MOCK_PROMOTION_CODE,
 } from '@shinefold/db/testing/stripe-catalogue/fixtures';
-import { isUndefined } from '@shinefold/utils/primitives';
 import { PRICING_LOG, PRICING_SEARCH_PARAM } from '@web/constants/pricing';
 import { PromotionCodeProvider } from '@web/context/promotion-code-provider';
 import { customRender, screen } from '@web/testing/custom-render';
@@ -18,6 +17,7 @@ import {
   formatMockUnitAmount,
   percentOffUnitAmount,
 } from '@web/testing/modules/pricing/live-price-fixtures';
+import { respondWith } from '@web/testing/shared/fetch/respond-with';
 import { reportClientError } from '@web/utils/report-client-error';
 
 import {
@@ -57,13 +57,6 @@ const setup = customRender(LinkedCardWithPromotion, {
   card: mockPricingCard({ ctaButtons: [MOCK_CTA_PRIMARY_ACTION] }),
   livePrice: mockLivePlanPrice(),
 });
-
-const respondWith = (status: number, body?: unknown) =>
-  vi.fn().mockResolvedValue(
-    new Response(isUndefined(body) ? null : JSON.stringify(body), {
-      status,
-    }),
-  );
 
 describe(`<${LinkedPricingTierCard.name}/>`, () => {
   beforeEach(() => {

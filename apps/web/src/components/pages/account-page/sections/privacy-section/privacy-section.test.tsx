@@ -1,4 +1,4 @@
-import { routes, SITE_MESSAGES } from '@shinefold/config';
+import { SITE_MESSAGES } from '@shinefold/config';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
 import { ToastProvider } from '@web/context/toast-provider';
 import { renderElement, screen } from '@web/testing/custom-render';
@@ -32,15 +32,6 @@ describe(`<${PrivacySection.name}/>`, () => {
     });
 
     expect(privacyHeading).toBeVisible();
-  });
-
-  it('renders the export row as a download link to the export route', () => {
-    const exportLink = screen.getByRole('link', {
-      name: MOCK_PROPS.exportButton,
-    });
-
-    expect(exportLink).toHaveAttribute('href', routes.accountExport());
-    expect(exportLink).toHaveAttribute('download');
   });
 
   it('arms the delete button once the handle is typed', async () => {

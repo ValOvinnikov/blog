@@ -53,7 +53,6 @@ export const AccountPage = async () => {
           heading={tPrivacy('heading')}
           exportLabel={tPrivacy('exportLabel')}
           exportDescription={tPrivacy('exportDescription')}
-          exportButton={tPrivacy('exportButton')}
           deleteLabel={tPrivacy('deleteLabel')}
           deleteDescription={tPrivacy('deleteDescription')}
         />

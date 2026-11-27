@@ -5,6 +5,7 @@ import { HTTP_STATUS } from '@shinefold/config';
 import { BILLING_CURRENCY } from '@shinefold/db/constants';
 import { PRICING_LOG } from '@web/constants/pricing';
 import { renderHook, waitFor } from '@web/testing/custom-render';
+import { respondWith } from '@web/testing/shared/fetch/respond-with';
 import { VISITOR_CURRENCY_PATH } from '@web/utils/visitor-currency';
 
 const { reportClientErrorMock } = vi.hoisted(() => ({
@@ -16,9 +17,6 @@ vi.mock('@web/utils/report-client-error', () => ({
 }));
 
 const DEFAULT_CURRENCY = BILLING_CURRENCY.USD;
-
-const respondWith = (status: number, body: unknown = {}) =>
-  vi.fn().mockResolvedValue(new Response(JSON.stringify(body), { status }));
 
 const neverRespondUntilAborted = () =>
   vi.fn(
@@ -54,7 +52,7 @@ describe('useVisitorCurrency', () => {
   });
 
   it('falls back to the default currency for a country with none', async () => {
-    vi.stubGlobal('fetch', respondWith(HTTP_STATUS.OK));
+    vi.stubGlobal('fetch', respondWith(HTTP_STATUS.OK, {}));
     const render = await loadHook();
 
     const { result } = render();
@@ -87,7 +85,7 @@ describe('useVisitorCurrency', () => {
   });
 
   it('reports a failed lookup and falls back to the default currency', async () => {
-    vi.stubGlobal('fetch', respondWith(HTTP_STATUS.INTERNAL_SERVER_ERROR));
+    vi.stubGlobal('fetch', respondWith(HTTP_STATUS.INTERNAL_SERVER_ERROR, {}));
     const render = await loadHook();
 
     const { result } = render();

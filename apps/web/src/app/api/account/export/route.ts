@@ -1,6 +1,6 @@
 import { HTTP_STATUS, MEDIA_TYPE } from '@shinefold/config/constants';
 import { queries } from '@shinefold/db';
-import { ACCOUNT_LOG } from '@web/constants/account';
+import { ACCOUNT_EXPORT_FILE_NAME, ACCOUNT_LOG } from '@web/constants/account';
 import { auth } from '@web/server/auth/auth';
 import { resolveTenantId } from '@web/server/tenant/resolve-tenant/resolve-tenant';
 import { logger } from '@web/utils/logger/logger';
@@ -45,7 +45,7 @@ export async function GET(): Promise<NextResponse> {
       status: HTTP_STATUS.OK,
       headers: {
         'Content-Type': MEDIA_TYPE.JSON,
-        'Content-Disposition': 'attachment; filename="account-data.json"',
+        'Content-Disposition': `attachment; filename="${ACCOUNT_EXPORT_FILE_NAME}"`,
       },
     });
   } catch (error) {
