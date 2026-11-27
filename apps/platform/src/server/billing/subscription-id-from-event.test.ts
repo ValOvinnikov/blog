@@ -22,6 +22,7 @@ describe(subscriptionIdFromEvent, () => {
   it.each([
     STRIPE_EVENT_TYPE.INVOICE_PAID,
     STRIPE_EVENT_TYPE.INVOICE_PAYMENT_FAILED,
+    STRIPE_EVENT_TYPE.INVOICE_PAYMENT_ACTION_REQUIRED,
   ])('reads the invoice subscription from %s', (type) => {
     expect(
       subscriptionIdFromEvent(mockStripeEvent(type, mockStripeInvoice())),

@@ -2408,7 +2408,12 @@
     "planLabel": "Tarif",
     "nextRetryLabel": "Nächster Versuch",
     "planEnding": "Wir versuchen es nicht erneut. Ihr Tarif endet, wenn Sie die Rechnung nicht bezahlen.",
-    "actionLabel": "Rechnung bezahlen"
+    "actionLabel": "Rechnung bezahlen",
+    "authenticationSubject": "Bestätigen Sie Ihre Zahlung für {siteName}",
+    "authenticationPreviewText": "Ihre Bank möchte, dass Sie {amount} für {siteName} bestätigen.",
+    "authenticationRequired": "Ihre Bank möchte, dass Sie Ihre Zahlung für {siteName} bestätigen, bevor wir sie einziehen können.",
+    "confirmPayment": "Öffnen Sie die Zahlungsseite der Rechnung und bestätigen Sie die Zahlung bei Ihrer Bank, um Ihren Tarif zu behalten.",
+    "confirmActionLabel": "Zahlung bestätigen"
   },
   "suspensionCategory": {
     "ABUSE": "Missbrauch",

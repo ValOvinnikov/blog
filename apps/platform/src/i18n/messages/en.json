@@ -2408,7 +2408,12 @@
     "planLabel": "Plan",
     "nextRetryLabel": "Next attempt",
     "planEnding": "We will not try again, so your plan ends unless you pay the invoice.",
-    "actionLabel": "Pay invoice"
+    "actionLabel": "Pay invoice",
+    "authenticationSubject": "Confirm your payment for {siteName}",
+    "authenticationPreviewText": "Your bank needs you to confirm {amount} for {siteName}.",
+    "authenticationRequired": "Your bank needs you to confirm your payment for {siteName} before we can take it.",
+    "confirmPayment": "Open the invoice's payment page and confirm the payment with your bank to keep your plan.",
+    "confirmActionLabel": "Confirm payment"
   },
   "suspensionCategory": {
     "ABUSE": "Abuse",

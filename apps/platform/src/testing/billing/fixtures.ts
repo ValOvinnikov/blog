@@ -31,6 +31,9 @@ export const MOCK_STRIPE_PRICE_ID = `price_${billingFaker.string.alphanumeric(24
 export const MOCK_STRIPE_PROMOTION_CODE_ID = `promo_${billingFaker.string.alphanumeric(24)}`;
 export const MOCK_CHECKOUT_CLIENT_SECRET = `cs_test_${billingFaker.string.alphanumeric(32)}`;
 export const MOCK_PAYMENT_INTENT_ID = `pi_${billingFaker.string.alphanumeric(24)}`;
+export const MOCK_INVOICE_PAYMENTS = {
+  data: [{ payment: { payment_intent: MOCK_PAYMENT_INTENT_ID } }],
+};
 export const MOCK_PAYMENT_CLIENT_SECRET = `${MOCK_PAYMENT_INTENT_ID}_secret_${billingFaker.string.alphanumeric(24)}`;
 export const MOCK_CHECKOUT_SESSION_ID = `cs_test_${billingFaker.string.alphanumeric(24)}`;
 export const MOCK_CHECKOUT_RETURN_URL = billingFaker.internet.url();

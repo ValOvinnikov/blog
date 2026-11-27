@@ -27,7 +27,14 @@ export const STRIPE_PENDING_PAYMENT_EXPAND = [
   'latest_invoice.payments',
 ];
 
+export const STRIPE_INVOICE_PAYMENTS_EXPAND = ['payments'];
+
 export const STRIPE_BILLING_REASON = {
   SUBSCRIPTION_CYCLE: 'subscription_cycle',
   SUBSCRIPTION_UPDATE: 'subscription_update',
+} as const;
+
+export const PAYMENT_FAILURE = {
+  DECLINED: 'DECLINED',
+  AUTHENTICATION_REQUIRED: 'AUTHENTICATION_REQUIRED',
 } as const;

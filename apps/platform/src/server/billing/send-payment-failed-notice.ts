@@ -1,6 +1,7 @@
 import 'server-only';
 
 import { BILLING_LOG } from '@platform/constants/billing';
+import { PAYMENT_FAILURE } from '@platform/constants/stripe-payment';
 import { fromStripeTime } from '@platform/server/billing/stripe-time';
 import { loadOwnerEmailRecipient } from '@platform/server/owner-email/load-owner-email-recipient';
 import { env } from '@platform/utils/env/env';
@@ -9,6 +10,7 @@ import { logger } from '@platform/utils/logger/logger';
 import { adminRoutes } from '@platform/utils/routes/routes';
 import { formatStripeAmount } from '@shinefold/config';
 import { EMAIL_ACCOUNT, type TTenantPlan } from '@shinefold/config/constants';
+import type { TValueOf } from '@shinefold/config/utils';
 import {
   buildOwnerPaymentFailedEmail,
   PLATFORM_EMAIL_BRAND_NAME,
@@ -17,10 +19,28 @@ import {
 import { getTranslations } from 'next-intl/server';
 import type Stripe from 'stripe';
 
+const FAILURE_COPY = {
+  [PAYMENT_FAILURE.DECLINED]: {
+    subject: 'subject',
+    previewText: 'previewText',
+    failed: 'failed',
+    nextStep: 'payInvoice',
+    actionLabel: 'actionLabel',
+  },
+  [PAYMENT_FAILURE.AUTHENTICATION_REQUIRED]: {
+    subject: 'authenticationSubject',
+    previewText: 'authenticationPreviewText',
+    failed: 'authenticationRequired',
+    nextStep: 'confirmPayment',
+    actionLabel: 'confirmActionLabel',
+  },
+} as const;
+
 export const sendPaymentFailedNotice = async (
   invoice: Stripe.Invoice,
   tenantId: string,
   plan: TTenantPlan,
+  failure: TValueOf<typeof PAYMENT_FAILURE>,
 ): Promise<void> => {
   const baseUrl = env.PLATFORM_APP_BASE_URL;
   if (!baseUrl) {
@@ -50,6 +70,7 @@ export const sendPaymentFailedNotice = async (
     locale,
   );
   const values = { siteName, amount };
+  const copy = FAILURE_COPY[failure];
 
   await sendEmail({
     account: EMAIL_ACCOUNT.PLATFORM,
@@ -57,9 +78,9 @@ export const sendPaymentFailedNotice = async (
     from,
     ...buildOwnerPaymentFailedEmail({
       brandName: PLATFORM_EMAIL_BRAND_NAME,
-      subject: t('subject', values),
-      previewText: t('previewText', values),
-      paragraphs: [t('failed', values), t('payInvoice')],
+      subject: t(copy.subject, values),
+      previewText: t(copy.previewText, values),
+      paragraphs: [t(copy.failed, values), t(copy.nextStep)],
       details: [
         { label: t('amountLabel'), value: amount },
         { label: t('planLabel'), value: tPlan(plan) },
@@ -72,7 +93,7 @@ export const sendPaymentFailedNotice = async (
         : undefined,
       planEndingNotice: t('planEnding'),
       action: {
-        label: t('actionLabel'),
+        label: t(copy.actionLabel),
         url:
           hosted_invoice_url ??
           new URL(adminRoutes.dashboardBilling(), baseUrl).toString(),

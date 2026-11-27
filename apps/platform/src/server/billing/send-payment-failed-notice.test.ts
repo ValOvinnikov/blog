@@ -1,4 +1,5 @@
 import { BILLING_LOG } from '@platform/constants/billing';
+import { PAYMENT_FAILURE } from '@platform/constants/stripe-payment';
 import enMessages from '@platform/i18n/messages/en.json';
 import nlMessages from '@platform/i18n/messages/nl.json';
 import { toStripeTime } from '@platform/server/billing/stripe-time';
@@ -7,6 +8,7 @@ import {
   MOCK_HOSTED_INVOICE_URL,
   mockStripeInvoice,
 } from '@platform/testing/billing/fixtures';
+import { makeEnTranslator } from '@platform/testing/en-translator';
 import { mockedEnv } from '@platform/testing/env/mocked-env';
 import {
   MOCK_OWNER_EMAIL_FROM_ADDRESS,
@@ -27,6 +29,7 @@ import { logger } from '@platform/utils/logger/logger';
 import { adminRoutes } from '@platform/utils/routes/routes';
 import { LOCALE_ISO_CODES, type TMaybeUndefined } from '@shinefold/config';
 import { TENANT_PLAN } from '@shinefold/config/constants';
+import type { TValueOf } from '@shinefold/config/utils';
 import { sendEmail } from '@shinefold/email';
 import type Stripe from 'stripe';
 
@@ -40,12 +43,17 @@ vi.mock('@shinefold/email');
 
 const MOCK_NEXT_PAYMENT_ATTEMPT = toStripeTime(new Date());
 const copy = enMessages.ownerPaymentFailedEmail;
+const t = makeEnTranslator('ownerPaymentFailedEmail');
 
 const sendEmailMock = vi.mocked(sendEmail);
-const sentText = () => sendEmailMock.mock.calls[0]?.[0].text;
+const sentEmail = () => sendEmailMock.mock.calls[0]?.[0];
+const sentText = () => sentEmail()?.text;
 
-const sendNotice = (invoice: Stripe.Invoice = mockStripeInvoice()) =>
-  sendPaymentFailedNotice(invoice, MOCK_TENANT_ID, TENANT_PLAN.GROWTH);
+const sendNotice = (
+  invoice: Stripe.Invoice = mockStripeInvoice(),
+  failure: TValueOf<typeof PAYMENT_FAILURE> = PAYMENT_FAILURE.DECLINED,
+) =>
+  sendPaymentFailedNotice(invoice, MOCK_TENANT_ID, TENANT_PLAN.GROWTH, failure);
 
 describe(sendPaymentFailedNotice, () => {
   beforeEach(() => {
@@ -111,6 +119,27 @@ describe(sendPaymentFailedNotice, () => {
         new URL(adminRoutes.dashboardBilling(), MOCK_PLATFORM_APP_BASE_URL)
           .href,
       );
+    });
+  });
+
+  describe("a payment waiting on the bank's check", () => {
+    let text: TMaybeUndefined<string>;
+
+    beforeEach(async () => {
+      await sendNotice(
+        mockStripeInvoice(),
+        PAYMENT_FAILURE.AUTHENTICATION_REQUIRED,
+      );
+      text = sentText();
+    });
+
+    it('asks the owner to confirm the payment with their bank', () => {
+      expect(sentEmail()?.subject).toBe(
+        t('authenticationSubject', { siteName: MOCK_TENANT_NAME }),
+      );
+      expect(text).toContain(copy.confirmPayment);
+      expect(text).toContain(copy.confirmActionLabel);
+      expect(text).not.toContain(copy.payInvoice);
     });
   });
 

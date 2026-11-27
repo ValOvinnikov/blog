@@ -12,7 +12,8 @@ export const subscriptionIdFromEvent = (
     case STRIPE_EVENT_TYPE.SUBSCRIPTION_DELETED:
       return event.data.object.id;
     case STRIPE_EVENT_TYPE.INVOICE_PAID:
-    case STRIPE_EVENT_TYPE.INVOICE_PAYMENT_FAILED: {
+    case STRIPE_EVENT_TYPE.INVOICE_PAYMENT_FAILED:
+    case STRIPE_EVENT_TYPE.INVOICE_PAYMENT_ACTION_REQUIRED: {
       const subscription =
         event.data.object.parent?.subscription_details?.subscription;
       return subscription ? stripeIdOf(subscription) : undefined;

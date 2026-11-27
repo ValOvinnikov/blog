@@ -4,6 +4,7 @@ export const STRIPE_EVENT_TYPE = {
   SUBSCRIPTION_DELETED: 'customer.subscription.deleted',
   INVOICE_PAID: 'invoice.paid',
   INVOICE_PAYMENT_FAILED: 'invoice.payment_failed',
+  INVOICE_PAYMENT_ACTION_REQUIRED: 'invoice.payment_action_required',
   PRICE_CREATED: 'price.created',
   PRICE_UPDATED: 'price.updated',
   PRICE_DELETED: 'price.deleted',

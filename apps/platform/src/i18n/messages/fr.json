@@ -2408,7 +2408,12 @@
     "planLabel": "Formule",
     "nextRetryLabel": "Prochaine tentative",
     "planEnding": "Nous ne réessaierons pas : votre formule prendra fin si vous ne réglez pas la facture.",
-    "actionLabel": "Régler la facture"
+    "actionLabel": "Régler la facture",
+    "authenticationSubject": "Confirmez votre paiement pour {siteName}",
+    "authenticationPreviewText": "Votre banque vous demande de confirmer {amount} pour {siteName}.",
+    "authenticationRequired": "Votre banque vous demande de confirmer votre paiement pour {siteName} avant que nous puissions le prélever.",
+    "confirmPayment": "Ouvrez la page de paiement de la facture et confirmez le paiement auprès de votre banque pour conserver votre formule.",
+    "confirmActionLabel": "Confirmer le paiement"
   },
   "suspensionCategory": {
     "ABUSE": "Abus",
