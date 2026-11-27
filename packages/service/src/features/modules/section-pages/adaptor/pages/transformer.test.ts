@@ -2,7 +2,7 @@ import { faker } from '@faker-js/faker';
 import {
   MOCK_SECTION_PAGES_PARENT_PATH,
   mockRawSectionPage,
-} from '@shinefold/service/testing/modules/fixtures';
+} from '@shinefold/service/testing/modules/section-pages/fixtures';
 import {
   mockRawHeadingBlock,
   mockSanityImageView,
