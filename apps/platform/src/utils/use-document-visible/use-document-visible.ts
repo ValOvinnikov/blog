@@ -1,11 +1,11 @@
 import { useSyncExternalStore } from 'react';
 
-const subscribeToVisibilityChange = (onChange: () => void) => {
+export const subscribeToVisibilityChange = (onChange: () => void) => {
   document.addEventListener('visibilitychange', onChange);
   return () => document.removeEventListener('visibilitychange', onChange);
 };
 
-const isDocumentVisible = () => document.visibilityState !== 'hidden';
+export const isDocumentVisible = () => document.visibilityState !== 'hidden';
 
 const isDocumentVisibleOnServer = () => true;
 

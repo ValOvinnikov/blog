@@ -164,6 +164,15 @@ Seeded starter content is badged: `SampleBadge` (`packages/studio/src/document-b
   never remounts the Studio. It is a hint, not a record, and no database
   column backs it. Since the sidebar stopped showing Ready, no surface reads
   it.
+- **An open Studio picks up settings changed elsewhere.** `PlatformStudioMount`
+  refreshes the route once each time the tab returns — it becomes visible
+  again, or the window regains focus from another window — through
+  `useRefreshOnTabReturn`. The server re-reads live languages, the default
+  language, enabled features, plan entitlements, plan linking and the sign-in
+  provider, and `StudioMount` rebuilds its config only when one of them
+  changed, so a return with nothing changed keeps open panes and unsaved
+  edits. Focus moving into a frame on the page does not count as leaving, and
+  nothing is requested while the tab stays focused.
 - `apps/platform` reaches Sanity only through `StudioMount`. ESLint bans
   `sanity`, `next-sanity`, `@sanity/*`, `groqd` and `@shinefold/service` there.
 - **The Studio renders only in the browser.** `PlatformStudioMount` loads
