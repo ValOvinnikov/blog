@@ -3,6 +3,7 @@ import userEvent, { type UserEvent } from '@testing-library/user-event';
 import { ACCOUNT_EXPORT_FILE_NAME } from '@web/constants/account';
 import { customRender, screen, waitFor } from '@web/testing/custom-render';
 import { withToastProvider } from '@web/testing/providers';
+import { ARIA_BUSY, ARIA_DISABLED } from '@web/testing/shared/aria/constants';
 import { respondWith } from '@web/testing/shared/fetch/respond-with';
 import { findToastStatus } from '@web/testing/shared/toast/find-toast-status';
 import type { MockInstance } from 'vitest';
@@ -16,8 +17,7 @@ const {
 } = SITE_MESSAGES.accountPage.privacy;
 
 const MOCK_OBJECT_URL = 'blob:account-data';
-const ARIA_BUSY = 'aria-busy';
-const ARIA_DISABLED = 'aria-disabled';
+const { createObjectURL, revokeObjectURL } = URL;
 
 const setup = customRender(withToastProvider(ExportAccountDataControl), {});
 
@@ -41,6 +41,7 @@ describe(`<${ExportAccountDataControl.name}/>`, () => {
   afterEach(() => {
     vi.unstubAllGlobals();
     vi.restoreAllMocks();
+    Object.assign(URL, { createObjectURL, revokeObjectURL });
   });
 
   it('saves the export as a file and announces it once', async () => {

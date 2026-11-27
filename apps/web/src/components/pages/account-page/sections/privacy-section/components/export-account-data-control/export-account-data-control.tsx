@@ -20,7 +20,8 @@ const saveBlob = (blob: Blob) => {
   link.href = url;
   link.download = ACCOUNT_EXPORT_FILE_NAME;
   link.click();
-  URL.revokeObjectURL(url);
+  // Older Safari and Firefox drop a download whose URL is revoked in the same tick as the click.
+  setTimeout(() => URL.revokeObjectURL(url), 0);
 };
 
 export const ExportAccountDataControl = () => {
