@@ -16,45 +16,44 @@ import { isUndefined } from '@shinefold/utils/primitives';
 
 export const CARD_FIELDS = {
   [LOOK_CARD.PRESET]: ['preset'],
-  [LOOK_ROW.COLOUR]: ['accentHue', 'logoHue', LOOK_FIELD.COLOR_MODE],
+  [LOOK_ROW.BRAND]: ['brandName', 'logo', 'logoDark', 'logoHue', 'favicon'],
+  [LOOK_ROW.COLOUR]: [
+    'accentHue',
+    'buttonColor',
+    'buttonColorDark',
+    LOOK_FIELD.COLOR_MODE,
+  ],
   [LOOK_ROW.TYPE]: ['headingFont', 'bodyFont', 'headingWeight', 'headingCase'],
   [LOOK_ROW.SHAPE]: [
     'radiusScale',
+    'buttonShape',
     'density',
+    'cardStyle',
     'imageProportion',
     'dividerWidth',
   ],
-  [LOOK_ROW.CARDS]: ['cardStyle'],
   [LOOK_ROW.HEADER]: [
     'headerLayout',
-    'headerSubmenuStyle',
     'headerBarStyle',
     'headerBackground',
-    'breadcrumbBackground',
+    'headerSubmenuStyle',
     'navLinkStyle',
     'headerControlStyle',
     'headerControlShape',
+    LOOK_FIELD.LANGUAGE_SWITCHER_STYLE,
     'headerActionStyle',
     'headerActionPhonePlacement',
     'accountButtonStyle',
     'accountPanelStyle',
     'accountPhonePlacement',
   ],
-  [LOOK_ROW.BUTTONS]: [
-    'buttonShape',
-    'buttonColor',
-    'buttonColorDark',
-    'busyButtonStyle',
+  [LOOK_ROW.FOOTER]: ['footerLayout', 'footerBackground', 'footerSurface'],
+  [LOOK_ROW.DETAILS]: [
     'spinnerStyle',
-  ],
-  [LOOK_ROW.FOOTER]: [
-    'footerLayout',
-    'footerBackground',
-    'footerSurface',
+    'busyButtonStyle',
+    'breadcrumbBackground',
     'cookieSettingsButton',
   ],
-  [LOOK_ROW.BRAND]: ['brandName', 'logo', 'logoDark', 'favicon'],
-  [LOOK_ROW.LANGUAGE_SWITCHER]: ['languageSwitcherStyle'],
 } as const satisfies Record<TLookCard, readonly (keyof TLookFormValues)[]>;
 
 const BRAND_ASSET_KINDS = brandAssetKindSchema.options;

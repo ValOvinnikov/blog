@@ -38,7 +38,7 @@ describe(`<${LookForm.name}/>`, () => {
   describe('on Growth', () => {
     beforeEach(async () => {
       setupLookForm();
-      await openLookRow(user, LOOK_ROW.BUTTONS);
+      await openLookRow(user, LOOK_ROW.COLOUR);
     });
 
     it('keeps the buttons on the accent until a colour is picked', () => {

@@ -44,34 +44,36 @@ describe(`<${LookForm.name}/> follow`, () => {
     vi.restoreAllMocks();
   });
 
-  it('waits for a Site parts card on first load', () => {
+  it('waits for the Header or Footer card on first load', () => {
     expect(followStatusText()).toBe(LOOK_FOLLOW.idle);
     expect(outline()).not.toBeInTheDocument();
   });
 
-  it('outlines the part of an opened Site parts card', async () => {
+  it('outlines the part of the opened Footer card', async () => {
     await openLookRow(user, LOOK_ROW.FOOTER);
 
     expect(outline()).toHaveTextContent(LOOK_FORM.footerHeading);
   });
 
-  it('outlines the header under the Language switcher name', async () => {
-    await openLookRow(user, LOOK_ROW.LANGUAGE_SWITCHER);
-
-    expect(outline()).toHaveTextContent(LOOK_FORM.languageSwitcherLabel);
-  });
-
-  it('outlines what an opened Style card changes under its name', async () => {
-    await openLookRow(user, LOOK_ROW.CARDS);
+  it('outlines the busy button and breadcrumb row under the Small details name', async () => {
+    await openLookRow(user, LOOK_ROW.DETAILS);
 
     const tag = screen.getByTestId(LOOK_FOLLOW_TEST_ID.TAG);
-    const line = followLine('styleOutlined', { card: LOOK_FORM.cardsHeading });
 
-    expect(followStatusText()).toBe(line);
-    expect(tag).toHaveTextContent(LOOK_FORM.cardsHeading);
+    expect(tag).toHaveTextContent(LOOK_FORM.detailsHeading);
   });
 
-  it('holds the frame still for a whole-page Style card', async () => {
+  it('outlines what an opened card changes under its name', async () => {
+    await openLookRow(user, LOOK_ROW.SHAPE);
+
+    const tag = screen.getByTestId(LOOK_FOLLOW_TEST_ID.TAG);
+    const line = followLine('styleOutlined', { card: LOOK_FORM.shapeHeading });
+
+    expect(followStatusText()).toBe(line);
+    expect(tag).toHaveTextContent(LOOK_FORM.shapeHeading);
+  });
+
+  it('holds the frame still for a whole-page card', async () => {
     await openLookRow(user, LOOK_ROW.TYPE);
 
     const line = followLine('styleCard', { card: LOOK_FORM.typeHeading });

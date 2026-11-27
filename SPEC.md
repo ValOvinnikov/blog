@@ -1583,9 +1583,9 @@ density and card-style values live in `@shinefold/config`'s theme declaration ta
 surface, which also carries the `dark` class so the tenant's dark ramp wins
 over `theme.css`'s static `.dark` values. `apps/web`'s
 `buildThemeStyleBlock` reads the same tables. The
-Look page's Cards card sets the card style (Accent bar, Outlined, Filled,
-Raised or Plain),
-apart from radius and density in Corners & spacing; picking a preset re-seeds it from
+Look page's Shapes and spacing card sets the card style (Accent bar, Outlined,
+Filled, Raised or Plain),
+beside Corners and Spacing in the same card; picking a preset re-seeds it from
 `PRESET_REGISTRY`'s `cardStyle`, and the preview's linked and static cards show
 it before saving. The
 Look form and `updateLookAction` both refuse an accent hue
@@ -3274,7 +3274,7 @@ which resolves on the element that declares it, so it follows the radius scale
 only when declared beside it. A component never overrides the shape with its
 own `rounded-*` class.
 
-**Navigation links** style first-level header links only, through six
+**Current-link highlight** styles first-level header links only, through six
 inherited `--nav-link-*` properties that only `NAV_LINK` reads, so footer
 links, language codes, sub-menu items and phone-menu rows never change. The
 tenant stores the style on the Look (`site_config.nav_link_style`: `PLAIN`
@@ -3284,7 +3284,7 @@ its preset's Plain), and `buildThemeStyleBlock` always declares
 `--nav-link-radius` resolves against. `theme.css` declares Plain's other five
 static values; the radius falls back to `var(--radius-sm)` at the element.
 
-**Header buttons shape** sets the corners of every header control — the
+**Header button shape** sets the corners of every header control — the
 language switcher's trigger and codes pill (and the current-language chip
 inside it, whose `rounded-header-control-inner` corner is the frame's radius
 less the 3px gap, never below 0), the theme toggle, the menu button and the

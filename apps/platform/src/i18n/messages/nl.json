@@ -787,8 +787,8 @@
     "close": "Sluiten"
   },
   "logoHueField": {
-    "followAccentHue": "Accenttint volgen",
-    "logoHueAriaLabel": "Logotint",
+    "followAccentHue": "Accentkleur volgen",
+    "logoHueAriaLabel": "Logokleur",
     "followsAccent": "volgt accent",
     "hueValue": "tint {hue}°"
   },
@@ -799,17 +799,15 @@
   "lookForm": {
     "heading": "Uiterlijk",
     "subtitle": "Geef deze site een eigen stijl. De voorbeeldweergave toont je wijzigingen — niets is live tot je opslaat.",
-    "styleGroupHeading": "Stijl",
-    "sitePartsGroupHeading": "Sitedelen",
     "viewTabsAriaLabel": "Look-weergave",
     "jumpIndexAriaLabel": "Look-onderdelen",
-    "growthAddsColour": "Een eigen tint voor het logo, en een site die vast licht of donker blijft",
+    "growthAddsBrand": "Een eigen logokleur",
+    "growthAddsColour": "Knopkleuren, en een site die vast licht of donker blijft",
     "growthAddsType": "Lettertypen, dikte en hoofdletters van koppen",
-    "growthAddsShape": "Hoeken, ruimte, beeldverhoudingen en scheidingslijnen",
-    "growthAddsCards": "Kaartstijl",
-    "growthAddsButtons": "Bezig-status en spinner",
-    "growthAddsHeader": "Indeling, submenu’s, balk, headerknoppen en accountknoppen",
-    "growthAddsFooter": "Indeling, achtergrond en vlak",
+    "growthAddsShape": "Hoeken, knopvorm, ruimte, kaartstijl, beeldverhoudingen en scheidingslijnen",
+    "growthAddsHeader": "Indeling, breedte, submenu’s, headerknoppen, de actieknop en accountknoppen",
+    "growthAddsFooter": "Indeling, achtergrond en breedte",
+    "growthAddsDetails": "Laadspinner, knop tijdens opslaan en achtergrond van het kruimelpad",
     "growthAddsClosing": "Growth voegt ook meer talen toe (met keuze uit taalwisselaarstijlen) en meer sitefuncties.",
     "jumpIndexUnsaved": ", niet-opgeslagen wijzigingen",
     "expandAll": "Alles uitklappen",
@@ -820,36 +818,36 @@
     "alertSuccess": "Uiterlijk opgeslagen.",
     "alertError": "Uiterlijk-instellingen konden niet worden opgeslagen. Probeer het opnieuw.",
     "presetLabel": "Voorinstelling",
-    "presetDescription": "Stelt accenttint, kop- en tekstlettertype, afronding en dichtheid in.",
-    "accentHueLabel": "Accenttint",
+    "presetDescription": "Een voorinstelling bepaalt de beginwaarde van de meeste opties op deze pagina.",
+    "accentHueLabel": "Accentkleur",
     "accentHueDescription": "Kleurt links, knoppen en accenten op de hele site.",
     "accentHueInaccessible": "Met deze tint blijft lopende tekst op de getinte vlakken niet leesbaar, dus de site zou hem vervangen. Kies een andere tint.",
-    "logoHueLabel": "Logotint",
-    "logoHueDescription": "Kleurt het woordmerk. Volgt de accenttint, tenzij er een andere is gekozen.",
-    "colorModeLabel": "Kleurmodus",
+    "logoHueLabel": "Logokleur",
+    "logoHueDescription": "Kleurt het woordmerk. Volgt de accentkleur, tenzij er een andere is gekozen.",
+    "colorModeLabel": "Lichte en donkere modus",
     "colorModeDescription": "Of lezers wisselen tussen licht en donker, of de site altijd één modus toont.",
     "colorModeOptionLabel": {
       "READER": "Lezer kiest",
       "LIGHT": "Altijd licht",
       "DARK": "Altijd donker"
     },
-    "brandImagesDescription": "Afbeeldingen worden gebruikt zoals ze zijn geüpload — er wordt niets verkleind of bijgesneden.",
+    "brandImagesDescription": "Afbeeldingen worden getoond zoals je ze uploadt, dus snijd ze eerst bij en pas het formaat aan.",
     "brandNameLabel": "Merknaam",
-    "brandNameHint": "De naam van je site. Laat leeg om de accountnaam te gebruiken.",
+    "brandNameHint": "Getoond in je koptekst, voettekst en e-mails. Leeg gebruikt de naam waarmee je je hebt aangemeld.",
     "brandNameTooLong": "Gebruik maximaal {max} tekens.",
     "brandNameUnset": "Accountnaam",
     "logoFieldLabel": "Logo",
+    "logoFieldHint": "PNG, JPEG, WebP of SVG. Zonder logo toont je site de beginletter en de naam.",
     "logoDarkFieldLabel": "Logo voor donkere modus",
-    "logoDarkFieldHint": "Wordt getoond als een lezer de donkere modus gebruikt. Zonder dit logo wordt het hoofdlogo gebruikt.",
+    "logoDarkFieldHint": "Getoond in de donkere modus. Zonder dit logo wordt het hoofdlogo gebruikt.",
     "faviconFieldLabel": "Favicon",
-    "brandFieldsHint": "Logo: PNG, JPEG, WebP of SVG. Favicon: een vierkante afbeelding.",
-    "optionalTag": "optioneel",
+    "faviconFieldHint": "Een vierkante afbeelding, getoond in het browsertabblad. Zonder favicon toont het tabblad je beginletter op een tegel in je logokleur.",
     "fieldUnsavedLabel": "Niet-opgeslagen wijziging",
     "headingFontLabel": "Koplettertype",
     "bodyFontLabel": "Tekstlettertype",
-    "radiusScaleLabel": "Afrondingsschaal",
+    "radiusScaleLabel": "Hoeken",
     "radiusScaleDescription": "Rondt elke kaart, elk paneel, menu, elke tabel en afbeelding af.",
-    "densityLabel": "Dichtheid",
+    "densityLabel": "Ruimte",
     "densityDescription": "Witruimte en grootte van bedieningselementen.",
     "cardStyleLabel": "Kaartstijl",
     "cardStyleDescription": "Omlijst elke inhoudskaart: berichten, onderwerpen, citaten, prijzen, veelgestelde vragen en call-to-actionblokken.",
@@ -887,7 +885,7 @@
       "CLASSIC": "Klassiek",
       "SQUARE": "Vierkant"
     },
-    "dividerWidthLabel": "Sectiescheidingen",
+    "dividerWidthLabel": "Dikte van scheidingslijnen",
     "dividerWidthDescription": "Hoe dik de lijn is tussen secties die een scheiding tonen.",
     "dividerWidthOptionLabel": {
       "HAIRLINE": "Haarlijn",
@@ -907,7 +905,7 @@
       "RAISED": "Een dunne omlijning met een zachte schaduw",
       "PLAIN": "Geen kader; witruimte scheidt de kaarten"
     },
-    "headerControlStyleLabel": "Headerknoppen",
+    "headerControlStyleLabel": "Stijl van headerknoppen",
     "headerControlStyleDescription": "De knoppen voor taal, thema, menu en Inloggen, op elk schermformaat.",
     "headerControlStyleOptionLabel": {
       "OUTLINED": "Omlijnd",
@@ -931,26 +929,25 @@
       "ROUNDED": "Hoeken volgen de instelling Hoeken van de site",
       "SQUARE": "Vierkante hoeken"
     },
-    "headerActionStyleLabel": "Stijl van de headeractie",
+    "headerActionStyleLabel": "Stijl van de actieknop",
     "headerActionStyleDescription": "Hoe de actielink in de header wordt getekend. Gevuld en Omlijnd nemen de kleur en vorm van de knoppen over.",
     "headerActionStyleOptionLabel": {
       "FILLED": "Gevuld",
       "OUTLINED": "Omlijnd",
       "PLAIN": "Gewone link"
     },
-    "headerActionPhonePlacementLabel": "Op telefoons",
+    "headerActionPhonePlacementLabel": "Actieknop op telefoons",
     "headerActionPhonePlacementDescription": "Waar de headeractie op telefoons staat: in de balk naast de menuknop, of bovenaan in het menu.",
     "headerActionPhonePlacementOptionLabel": {
       "BAR": "In de balk",
       "MENU": "Bovenaan in het menu"
     },
-    "languageSwitcherLabel": "Taalkeuze",
-    "languageSwitcherStyleLabel": "Stijl",
+    "languageSwitcherStyleLabel": "Stijl van de taalkiezer",
     "languageSwitcherDescription": "Hoe de taalkeuze er op desktop uitziet, in de header en footer.",
-    "languageSwitcherSingleLanguage": "Voeg eerst een andere taal toe bij Talen om een stijl te kiezen.",
+    "languageSwitcherSingleLanguage": "Voeg eerst een andere taal toe bij Talen om een stijl voor de taalkiezer te kiezen.",
     "languageSwitcherFreeDescription": "Je abonnement publiceert één taal. Upgrade om talen toe te voegen en een stijl voor de taalkeuze te kiezen.",
     "lockLineGrowthFields": "Velden met Growth houden de waarde van de voorinstelling {preset}.",
-    "lockLineTypeFonts": "Met dit abonnement houdt Lettertype de lettertypen en kopstijl van de voorinstelling {preset}. Een andere voorinstelling kiezen verandert ze.",
+    "lockLineTypeFonts": "Met dit abonnement houdt Tekst de lettertypen en kopstijl van de voorinstelling {preset}. Een andere voorinstelling kiezen verandert ze.",
     "languageSwitcherOptionLabel": {
       "MENU_CODE": "Code",
       "MENU_GLOBE": "Wereldbol",
@@ -961,16 +958,19 @@
       "MENU_GLOBE": "Een wereldbolicoon opent het taalmenu",
       "CODES": "Taalcodes naast elkaar, voor een paar talen"
     },
-    "colourHeading": "Kleur",
-    "colourDescription": "Kies de accenttint en of lezers zelf licht of donker kiezen. Tekst blijft in beide gevallen leesbaar.",
-    "typeHeading": "Lettertype",
+    "colourHeading": "Kleuren",
+    "colourDescription": "Je accentkleur, de knopkleuren en of lezers zelf licht of donker kiezen. Tekst blijft in beide gevallen leesbaar.",
+    "typeHeading": "Tekst",
     "typeDescription": "Elk lettertype wordt in zijn eigen stijl getoond.",
-    "shapeHeading": "Hoeken & ruimte",
-    "cardsHeading": "Kaarten",
-    "shapeDescription": "Hoe rond hoeken zijn en hoeveel ruimte er rond elementen zit, op de hele site.",
-    "cardsDescription": "Hoe inhoudskaarten op de hele site worden omlijst.",
+    "shapeHeading": "Vormen en ruimte",
+    "shapeDescription": "Hoe rond hoeken zijn, welke vorm knoppen en kaarten hebben en hoeveel ruimte er rond elementen zit, op de hele site.",
     "headerHeading": "Koptekst",
     "headerDescription": "Hoe de bovenbalk van uw site is ingedeeld en hoe de submenu’s openen.",
+    "headerLayoutHeading": "Indeling",
+    "headerLinksHeading": "Links",
+    "headerButtonsHeading": "Knoppen",
+    "headerActionHeading": "Actieknop",
+    "headerAccountHeading": "Account",
     "headerLayoutLabel": "Indeling",
     "headerLayoutDescription": "Waar logo, links en knoppen op brede schermen staan. Op telefoons krijgt u altijd de balk met een menuknop.",
     "headerPreviewDeviceNote": {
@@ -986,13 +986,13 @@
       "CENTRED_BRAND": "Gecentreerd merk",
       "MENU_BUTTON": "Menuknop"
     },
-    "headerSubmenuStyleLabel": "Submenu’s",
+    "headerSubmenuStyleLabel": "Submenustijl",
     "headerSubmenuStyleDescription": "Hoe een link met subitems opent op brede schermen.",
     "headerSubmenuStyleOptionLabel": {
       "DROPDOWN": "Dropdown",
       "WIDE_PANEL": "Breed paneel"
     },
-    "headerBarStyleLabel": "Balk",
+    "headerBarStyleLabel": "Breedte",
     "headerBarStyleDescription": "Of de balk de hele pagina beslaat of als kaart erboven zweeft.",
     "headerBackgroundLabel": "Achtergrond",
     "headerBackgroundDescription": "De kleur van de kop en van de menu’s en panelen die daaruit openen. Elke kleur volgt het lichte of donkere thema van de lezer.",
@@ -1003,7 +1003,7 @@
       "FULL_WIDTH": "Volledige breedte",
       "FLOATING": "Zwevend"
     },
-    "navLinkStyleLabel": "Navigatielinks",
+    "navLinkStyleLabel": "Markering van de huidige link",
     "navLinkStyleDescription": "Hoe het menu de pagina waarop je bent en de link onder de aanwijzer markeert. Links in de voettekst veranderen niet.",
     "navLinkStyleGlyphWord": "Link",
     "navLinkStyleOptionLabel": {
@@ -1018,7 +1018,7 @@
       "SOFT": "Een getinte achtergrond als je eroverheen beweegt en op de huidige pagina",
       "PILL": "Een afgeronde omlijning als je eroverheen beweegt en op de huidige pagina"
     },
-    "accountButtonStyleLabel": "Accountknop",
+    "accountButtonStyleLabel": "Stijl van de accountknop",
     "accountButtonStyleDescription": "De knop waarmee lezers inloggen en hun account openen, op brede schermen. Telefoons volgen de instelling ‘Op telefoons staat het account’ hieronder.",
     "accountButtonStyleOptionLabel": {
       "PILL": "Pil met label",
@@ -1031,16 +1031,13 @@
       "PROFILE": "Profiel",
       "HUB": "Hub"
     },
-    "accountPhonePlacementLabel": "Op telefoons staat het account",
+    "accountPhonePlacementLabel": "Account op telefoons",
     "accountPhonePlacementDescription": "In de balk als cirkel, of als laatste rij van het menu.",
     "accountPhonePlacementOptionLabel": {
       "BAR": "In de balk",
       "MENU": "In het menu"
     },
-    "buttonsHeading": "Knoppen",
-    "buttonsDescription": "Hoe knoppen zijn gevormd en gekleurd, hoe ze eruitzien terwijl ze bezig zijn, en welke spinner ze tonen.",
-    "buttonsWhileWorkingHeading": "Tijdens het werk",
-    "buttonShapeLabel": "Vorm",
+    "buttonShapeLabel": "Knopvorm",
     "buttonShapeDescription": "Hoeken van knoppen en labels.",
     "buttonShapeOptionLabel": {
       "SQUARE": "Vierkant",
@@ -1057,14 +1054,14 @@
     "buttonColorInvalid": "Voer een hexkleur in, zoals #1a73e8.",
     "buttonColorFaint": "Knoppen zijn vaag op {grounds}, dus lezers kunnen ze daar missen.",
     "buttonColorFaintGround": "{skin} in de {scheme, select, DARK {donkere modus} other {lichte modus}}",
-    "busyButtonStyleLabel": "Tijdens het werken",
+    "busyButtonStyleLabel": "Knop tijdens opslaan",
     "busyButtonStyleDescription": "Wat een knop toont tijdens opslaan of verzenden. Hij behoudt zijn plek en blijft in volle kleur.",
     "busyButtonStyleOptionLabel": {
       "LABEL": "Bezig-tekst",
       "KEPT": "Tekst behouden",
       "EDGE": "Voortgangsrand"
     },
-    "spinnerStyleLabel": "Spinner",
+    "spinnerStyleLabel": "Laadspinner",
     "spinnerStyleDescription": "De spinner op de knoppen en laadstatussen van uw site.",
     "spinnerEdgeNote": "Bezige knoppen tonen in deze stijl geen spinner. Meldingen en laadstatussen gebruiken hem nog wel.",
     "spinnerStyleOptionLabel": {
@@ -1074,8 +1071,10 @@
       "PULSE": "Puls"
     },
     "footerHeading": "Voettekst",
-    "footerDescription": "Hoe de onderkant van je site is ingedeeld, de achtergrond en hoe lezers de cookie-instellingen opnieuw openen.",
-    "footerLayoutLabel": "Indeling van de voettekst",
+    "detailsHeading": "Kleine details",
+    "footerDescription": "Hoe de onderkant van je site is ingedeeld, de achtergrond en de breedte.",
+    "detailsDescription": "Hoe je site laat zien dat hij bezig is, de kruimelpadrij en hoe lezers de cookie-instellingen opnieuw openen.",
+    "footerLayoutLabel": "Indeling",
     "footerLayoutDescription": "Waar het merk, de linkgroepen en de kleine lettertjes staan. Compact toont geen groepen, introtekst of adres.",
     "footerLayoutOptionLabel": {
       "COLUMNS": "Kolommen",
@@ -1091,13 +1090,13 @@
       "BRAND_PRIMARY": "Merktint",
       "INK": "Inkt"
     },
-    "footerSurfaceLabel": "Oppervlak",
+    "footerSurfaceLabel": "Breedte",
     "footerSurfaceDescription": "Of de voettekst de hele breedte beslaat of als kaart wordt getoond.",
     "footerSurfaceOptionLabel": {
       "FULL_WIDTH": "Volle breedte",
       "CARD": "Kaart"
     },
-    "cookieSettingsButtonLabel": "Cookie-instellingen",
+    "cookieSettingsButtonLabel": "Knop voor cookie-instellingen",
     "cookieSettingsButtonDescription": "Hoe lezers de cookie-instellingen opnieuw openen nadat ze de cookiebanner hebben beantwoord: een link in de voettekst, een ronde knop linksonder, of beide.",
     "cookieSettingsButtonOptionLabel": {
       "HIDDEN": "Link in voettekst",
@@ -1127,8 +1126,7 @@
       "FILLED": "Gevulde actie",
       "OUTLINED": "Omlijnde actie",
       "PLAIN": "Actie als link"
-    },
-    "summaryOneLanguage": "Eén taal"
+    }
   },
   "previewModeControl": {
     "modeLight": "Licht",
@@ -1235,9 +1233,9 @@
     "topOfPage": "Bovenaan de pagina",
     "styleCard": "<strong>{card}</strong> verandert de hele pagina, dus het kader blijft waar het is.",
     "styleOutlined": "Gemarkeerd: wat <strong>{card}</strong> verandert.",
-    "idle": "Open een kaart bij Sitedelen en het kader scrolt ernaartoe.",
+    "idle": "Open de kaart Koptekst of Voettekst en het kader scrolt ernaartoe.",
     "off": "Volgen staat uit. Het kader blijft waar je het laat.",
-    "allOpen": "Alle kaarten zijn open. Focus een kaart bij Sitedelen en het kader scrolt ernaartoe.",
+    "allOpen": "Alle kaarten zijn open. Focus de kaart Koptekst of Voettekst en het kader scrolt ernaartoe.",
     "freeSample": "Het voorbeeld gebruikt de waarden van de voorinstelling {preset}, die dit abonnement publiceert."
   },
   "lookFullscreen": {

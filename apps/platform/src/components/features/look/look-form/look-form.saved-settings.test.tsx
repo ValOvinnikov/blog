@@ -81,7 +81,7 @@ describe(`<${LookForm.name}/>`, () => {
     });
     it.each([
       {
-        row: LOOK_ROW.BUTTONS,
+        row: LOOK_ROW.DETAILS,
         select: SPINNER_LABEL,
         option: LOOK_FORM.spinnerStyleOptionLabel.DOTS,
       },
@@ -94,7 +94,7 @@ describe(`<${LookForm.name}/>`, () => {
     });
     it.each([
       {
-        row: LOOK_ROW.BUTTONS,
+        row: LOOK_ROW.DETAILS,
         group: LOOK_FORM.busyButtonStyleLabel,
         option: LOOK_FORM.busyButtonStyleOptionLabel.KEPT,
       },
@@ -114,7 +114,7 @@ describe(`<${LookForm.name}/>`, () => {
         option: LOOK_FORM.footerSurfaceOptionLabel.CARD,
       },
       {
-        row: LOOK_ROW.FOOTER,
+        row: LOOK_ROW.DETAILS,
         group: LOOK_FORM.cookieSettingsButtonLabel,
         option: LOOK_FORM.cookieSettingsButtonOptionLabel.SHOWN,
       },

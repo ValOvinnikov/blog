@@ -10,7 +10,10 @@ import { DEVICE_FRAME_FIT } from '@platform/constants/device-frame';
 import { MEDIA_QUERY } from '@platform/constants/media-query';
 import { PREVIEW_HEADING_LAYOUT } from '@platform/constants/preview';
 import { withPresetButtonColor } from '@platform/utils/button-colors/button-colors';
-import type { TLookFollowTarget } from '@platform/utils/look-follow-target/look-follow-target';
+import type {
+  TLookFollowOutline,
+  TLookFollowTarget,
+} from '@platform/utils/look-follow-target/look-follow-target';
 import { toSampleFooterStyle } from '@platform/utils/sample-footer-style/sample-footer-style';
 import { buildSitePreviewTheme } from '@platform/utils/theme-preview-tokens/theme-preview-tokens';
 import { useMediaQuery } from '@platform/utils/use-media-query/use-media-query';
@@ -65,6 +68,7 @@ export const LookPreview = ({
   const { onHandScroll } = follow;
   const theme = buildSitePreviewTheme(withPresetButtonColor(values), isDark);
   const footer = toSampleFooterStyle(values, hasCookieBanner);
+  const followOutline = follow.isFollowing ? follow.outline : undefined;
 
   const solos = (
     <LookPreviewSolos
@@ -74,20 +78,22 @@ export const LookPreview = ({
     />
   );
   const sample = (
-    <>
-      <LookPreviewSample
-        theme={theme}
-        footer={footer}
-        liveLocales={liveLocales}
-        reader={{ hasAccounts: hasReaderAccounts, hasBookmarks, isSignedIn }}
-      />
-      {footer.hasCookieSettingsButton && (
-        <DeviceFrame.Overlay>
-          <SampleCookieButton theme={theme} />
-        </DeviceFrame.Overlay>
-      )}
-    </>
+    <LookPreviewSample
+      theme={theme}
+      footer={footer}
+      liveLocales={liveLocales}
+      reader={{ hasAccounts: hasReaderAccounts, hasBookmarks, isSignedIn }}
+    />
   );
+  const cookieButton = (outline?: TLookFollowOutline) =>
+    footer.hasCookieSettingsButton && (
+      <DeviceFrame.Overlay>
+        <SampleCookieButton theme={theme} />
+        {outline && (
+          <LookFollowMark outline={outline} scale={scale} isTagShown={false} />
+        )}
+      </DeviceFrame.Overlay>
+    );
 
   return (
     <div ref={rootRef}>
@@ -124,8 +130,9 @@ export const LookPreview = ({
             listeners={{ onScaleChange: setScale, onHandScroll }}
           >
             {sample}
-            {follow.isFollowing && follow.outline && (
-              <LookFollowMark outline={follow.outline} scale={scale} />
+            {cookieButton(followOutline)}
+            {followOutline && (
+              <LookFollowMark outline={followOutline} scale={scale} />
             )}
           </DeviceFrame>
         </PreviewFrame.Stage>
@@ -139,6 +146,7 @@ export const LookPreview = ({
         finalFocus={fullscreenTriggerRef}
       >
         {sample}
+        {cookieButton()}
       </LookFullscreenDialog>
     </div>
   );

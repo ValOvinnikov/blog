@@ -13,13 +13,13 @@ export type TLookGrowthNoteProps = {
 };
 
 const GROWTH_ROWS = [
+  { row: LOOK_ROW.BRAND, descriptionKey: 'growthAddsBrand' },
   { row: LOOK_ROW.COLOUR, descriptionKey: 'growthAddsColour' },
   { row: LOOK_ROW.TYPE, descriptionKey: 'growthAddsType' },
   { row: LOOK_ROW.SHAPE, descriptionKey: 'growthAddsShape' },
-  { row: LOOK_ROW.CARDS, descriptionKey: 'growthAddsCards' },
-  { row: LOOK_ROW.BUTTONS, descriptionKey: 'growthAddsButtons' },
   { row: LOOK_ROW.HEADER, descriptionKey: 'growthAddsHeader' },
   { row: LOOK_ROW.FOOTER, descriptionKey: 'growthAddsFooter' },
+  { row: LOOK_ROW.DETAILS, descriptionKey: 'growthAddsDetails' },
 ] as const;
 
 export const LookGrowthNote = ({ onSelectCard }: TLookGrowthNoteProps) => {

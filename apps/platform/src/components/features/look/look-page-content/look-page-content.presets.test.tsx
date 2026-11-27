@@ -117,7 +117,7 @@ describe(`<${LookPageContent.name}/> the Shinefold preset`, () => {
       mockSiteConfig({ preset: PRESET_ID.SHINEFOLD, buttonColor: undefined }),
     );
     await setup({ tenant: GRANTED_TENANT });
-    await openLookRow(user, LOOK_ROW.BUTTONS);
+    await openLookRow(user, LOOK_ROW.COLOUR);
 
     const presetSwitch = followSwitch(BUTTON_COLOR_FOLLOWS_PRESET);
     expect(presetSwitch).toBeChecked();

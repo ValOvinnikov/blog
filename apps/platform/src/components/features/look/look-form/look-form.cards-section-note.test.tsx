@@ -38,7 +38,7 @@ describe(`<${LookForm.name}/> card style section note`, () => {
   describe('on a paid plan', () => {
     beforeEach(async () => {
       setupLookForm();
-      await openLookRow(user, LOOK_ROW.CARDS);
+      await openLookRow(user, LOOK_ROW.SHAPE);
     });
 
     it('shows the note after the selected card style line', () => {
@@ -83,7 +83,7 @@ describe(`<${LookForm.name}/> card style section note`, () => {
 
   it('shows the note on Free with Card style locked', async () => {
     setupLookForm(withLookPlan(TENANT_PLAN.FREE));
-    await openLookRow(user, LOOK_ROW.CARDS);
+    await openLookRow(user, LOOK_ROW.SHAPE);
 
     const note = screen.getByText(SECTION_NOTE);
 

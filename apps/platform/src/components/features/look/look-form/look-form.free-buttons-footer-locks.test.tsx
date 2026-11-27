@@ -43,13 +43,13 @@ describe(`<${LookForm.name}/>`, () => {
 
     it.each([
       {
-        row: LOOK_ROW.BUTTONS,
+        row: LOOK_ROW.SHAPE,
         group: LOOK_FORM.buttonShapeLabel,
         current: LOOK_FORM.buttonShapeOptionLabel.ROUNDED,
         other: LOOK_FORM.buttonShapeOptionLabel.PILL,
       },
       {
-        row: LOOK_ROW.BUTTONS,
+        row: LOOK_ROW.DETAILS,
         group: LOOK_FORM.busyButtonStyleLabel,
         current: LOOK_FORM.busyButtonStyleOptionLabel.LABEL,
         other: LOOK_FORM.busyButtonStyleOptionLabel.EDGE,
@@ -84,7 +84,7 @@ describe(`<${LookForm.name}/>`, () => {
         hint: LOOK_FORM.headerLayoutDescription,
       },
       {
-        row: LOOK_ROW.BUTTONS,
+        row: LOOK_ROW.DETAILS,
         label: SPINNER_LABEL,
         current: LOOK_FORM.spinnerStyleOptionLabel.BRAILLE,
         hint: LOOK_FORM.spinnerStyleDescription,

@@ -9,7 +9,7 @@ import {
   pickLogo,
 } from '@platform/testing/look/brand-image-interactions';
 import {
-  BRAND_IMAGES_HINT,
+  LOGO_HINT,
   EDIT_TAB,
   hueValue,
   NUDGED_ACCENT_HUE,
@@ -70,7 +70,7 @@ describe(`<${LookForm.name}/>`, () => {
         });
         const saveButton = screen.getByRole('button', { name: SAVE_CHANGES });
         expect(replaceLogoButton).toHaveAccessibleDescription(
-          `${BRAND_IMAGES_HINT} ${LOGO_UPLOAD_FAILED}`,
+          `${LOGO_HINT} ${LOGO_UPLOAD_FAILED}`,
         );
         expect(saveButton).toBeEnabled();
         expect(updateLookAction).not.toHaveBeenCalled();

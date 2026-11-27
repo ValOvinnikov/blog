@@ -10,7 +10,7 @@ import {
   stageAssetRemoval,
 } from '@platform/testing/look/brand-image-interactions';
 import {
-  BRAND_IMAGES_HINT,
+  FAVICON_HINT,
   UPLOAD_FAVICON,
 } from '@platform/testing/look/look-form-fixtures';
 import { clickSave } from '@platform/testing/look/look-form-interactions';
@@ -89,7 +89,7 @@ describe(`<${LookForm.name}/>`, () => {
         expect(uploadFaviconButton).toHaveFocus();
       });
       expect(uploadFaviconButton).toHaveAccessibleDescription(
-        `${BRAND_IMAGES_HINT} ${FAVICON_REMOVE_FAILED}`,
+        `${FAVICON_HINT} ${FAVICON_REMOVE_FAILED}`,
       );
     });
   });

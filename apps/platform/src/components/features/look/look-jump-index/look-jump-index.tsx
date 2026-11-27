@@ -17,8 +17,6 @@ import { useTranslations } from 'next-intl';
 import { useRef } from 'react';
 
 import { JumpCardLink } from './components/jump-card-link';
-import { JumpGroupItem } from './components/jump-group-item';
-import { LOOK_INDEX_ENTRIES } from './look-index-entries';
 import {
   LOOK_INDEX_FADE_WIDTH_PX,
   lookJumpIndexVariants,
@@ -70,26 +68,16 @@ export const LookJumpIndex = ({
             onScroll={onScroll}
             className={styles.list()}
           >
-            {LOOK_INDEX_ENTRIES.map((entry) =>
-              'card' in entry ? (
-                <JumpCardLink
-                  key={entry.card}
-                  ref={setItemRef(LOOK_CARDS.indexOf(entry.card))}
-                  card={entry.card}
-                  isCurrent={entry.card === current}
-                  isPhone={isPhone}
-                  onSelect={selectCard}
-                />
-              ) : (
-                <JumpGroupItem
-                  key={entry.group}
-                  group={entry.group}
-                  title={t(entry.titleKey)}
-                  isPhone={isPhone}
-                  onSelect={scrollToLookAnchor}
-                />
-              ),
-            )}
+            {LOOK_CARDS.map((card, index) => (
+              <JumpCardLink
+                key={card}
+                ref={setItemRef(index)}
+                card={card}
+                isCurrent={card === current}
+                isPhone={isPhone}
+                onSelect={selectCard}
+              />
+            ))}
           </ul>
           {hasMoreStart && (
             <span

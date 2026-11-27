@@ -24,7 +24,7 @@ describe(`<${LookForm.name}/>`, () => {
   });
 
   it('focuses a select from its title and leaves its list closed', async () => {
-    await openLookRow(user, LOOK_ROW.BUTTONS);
+    await openLookRow(user, LOOK_ROW.DETAILS);
 
     const title = screen.getByText(LOOK_FORM.spinnerStyleLabel);
     await user.click(title);

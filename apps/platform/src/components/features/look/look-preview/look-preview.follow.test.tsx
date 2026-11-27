@@ -17,6 +17,7 @@ import {
 } from '@platform/testing/look/look-preview-render';
 import { stubLgUpWindow } from '@platform/testing/match-media';
 import {
+  COOKIE_SETTINGS_BUTTON,
   RADIUS_DECLARATIONS,
   RADIUS_SCALE,
   SKIN_REGISTRY,
@@ -120,9 +121,11 @@ describe(`<${LookPreview.name}/> follow`, () => {
     });
 
     it.each([
-      { row: LOOK_ROW.CARDS, partCount: 6 + BAND_COUNT * CARDS_PER_BAND },
-      { row: LOOK_ROW.SHAPE, partCount: 8 + BAND_COUNT * CARDS_PER_BAND },
-      { row: LOOK_ROW.BUTTONS, partCount: 6 + BAND_COUNT * BUTTONS_PER_BAND },
+      {
+        row: LOOK_ROW.SHAPE,
+        partCount: 13 + BAND_COUNT * (CARDS_PER_BAND + BUTTONS_PER_BAND),
+      },
+      { row: LOOK_ROW.DETAILS, partCount: 2 },
       { row: LOOK_ROW.BRAND, partCount: 2 },
     ])(
       'outlines all $partCount sample parts $row changes under one tag',
@@ -137,6 +140,18 @@ describe(`<${LookPreview.name}/> follow`, () => {
         expect(outlines()[0]).toHaveTextContent(cardName);
       },
     );
+
+    it('outlines the floating cookie settings button for Small details, untagged', () => {
+      renderPreview({
+        values: { cookieSettingsButton: COOKIE_SETTINGS_BUTTON.SHOWN },
+        followTarget: mockOpenRowTarget(LOOK_ROW.DETAILS),
+      });
+
+      const tags = screen.getAllByTestId(LOOK_FOLLOW_TEST_ID.TAG);
+
+      expect(outlines()).toHaveLength(3);
+      expect(tags).toHaveLength(1);
+    });
 
     it('re-rounds the outlines when the corners change', async () => {
       stubPartCornersFromTokens();

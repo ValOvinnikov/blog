@@ -45,13 +45,13 @@ describe(`<${LookForm.name}/>`, () => {
 
     it.each([
       {
-        row: LOOK_ROW.BUTTONS,
+        row: LOOK_ROW.SHAPE,
         group: LOOK_FORM.buttonShapeLabel,
         option: LOOK_FORM.buttonShapeOptionLabel.PILL,
         saved: { buttonShape: BUTTON_SHAPE.PILL },
       },
       {
-        row: LOOK_ROW.BUTTONS,
+        row: LOOK_ROW.DETAILS,
         group: LOOK_FORM.busyButtonStyleLabel,
         option: LOOK_FORM.busyButtonStyleOptionLabel.EDGE,
         saved: { busyButtonStyle: BUSY_BUTTON_STYLE.EDGE },
@@ -75,13 +75,13 @@ describe(`<${LookForm.name}/>`, () => {
         saved: { footerSurface: FOOTER_SURFACE.CARD },
       },
       {
-        row: LOOK_ROW.FOOTER,
+        row: LOOK_ROW.DETAILS,
         group: LOOK_FORM.cookieSettingsButtonLabel,
         option: LOOK_FORM.cookieSettingsButtonOptionLabel.ONLY,
         saved: { cookieSettingsButton: COOKIE_SETTINGS_BUTTON.ONLY },
       },
       {
-        row: LOOK_ROW.LANGUAGE_SWITCHER,
+        row: LOOK_ROW.HEADER,
         group: LOOK_FORM.languageSwitcherStyleLabel,
         option: LOOK_FORM.languageSwitcherOptionLabel.CODES,
         saved: { languageSwitcherStyle: LANGUAGE_SWITCHER_STYLE.CODES },

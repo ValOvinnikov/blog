@@ -47,12 +47,12 @@ describe(`<${LookForm.name}/>`, () => {
     it('summarises a folded row and drops the summary once it opens', async () => {
       const colourTrigger = lookRowTrigger(LOOK_ROW.COLOUR);
       expect(colourTrigger).toHaveTextContent(
-        `Hue ${DEFAULT_ACCENT_HUE} · logo follows accent`,
+        `Hue ${DEFAULT_ACCENT_HUE} · ${LOOK_FORM.colorModeOptionLabel.READER}`,
       );
 
       await openLookRow(user, LOOK_ROW.COLOUR);
 
-      expect(colourTrigger).not.toHaveTextContent(/logo follows accent/);
+      expect(colourTrigger).not.toHaveTextContent(`Hue ${DEFAULT_ACCENT_HUE}`);
     });
 
     it('updates the Colour summary and its swatch as the accent hue changes', async () => {
@@ -66,7 +66,7 @@ describe(`<${LookForm.name}/>`, () => {
       await user.click(lookRowTrigger(LOOK_ROW.COLOUR));
 
       expect(lookRowTrigger(LOOK_ROW.COLOUR)).toHaveTextContent(
-        `Hue ${NUDGED_ACCENT_HUE} · logo follows accent`,
+        `Hue ${NUDGED_ACCENT_HUE} · ${LOOK_FORM.colorModeOptionLabel.READER}`,
       );
       expect(swatchBackground()).not.toBe(savedBackground);
     });
@@ -81,14 +81,14 @@ describe(`<${LookForm.name}/>`, () => {
 
     it('reads a staged logo as uploaded before saving', async () => {
       expect(lookRowTrigger(LOOK_ROW.BRAND)).toHaveTextContent(
-        'No logo · No dark-mode logo · No favicon',
+        'No logo · No dark-mode logo · logo follows accent · No favicon',
       );
 
       await pickLogo(user);
       await user.click(lookRowTrigger(LOOK_ROW.BRAND));
 
       expect(lookRowTrigger(LOOK_ROW.BRAND)).toHaveTextContent(
-        'Logo uploaded · No dark-mode logo · No favicon',
+        'Logo uploaded · No dark-mode logo · logo follows accent · No favicon',
       );
     });
   });
@@ -98,14 +98,8 @@ describe(`<${LookForm.name}/>`, () => {
       setupLookForm({ liveLocales: [LOCALE_ISO_CODES.EN] });
     });
 
-    it('adds One language to the Language switcher summary', () => {
-      expect(lookRowTrigger(LOOK_ROW.LANGUAGE_SWITCHER)).toHaveTextContent(
-        /· One language$/,
-      );
-    });
-
     it('shows a single-language note and no switcher choice', async () => {
-      await openLookRow(user, LOOK_ROW.LANGUAGE_SWITCHER);
+      await openLookRow(user, LOOK_ROW.HEADER);
 
       const note = screen.getByText(LOOK_FORM.languageSwitcherSingleLanguage);
       const compactCodesButton = screen.queryByRole('button', {

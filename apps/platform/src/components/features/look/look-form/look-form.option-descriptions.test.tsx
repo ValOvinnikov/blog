@@ -54,7 +54,7 @@ describe(`<${LookForm.name}/> option descriptions`, () => {
 
   it.each([
     {
-      row: LOOK_ROW.LANGUAGE_SWITCHER,
+      row: LOOK_ROW.HEADER,
       label: LOOK_FORM.languageSwitcherStyleLabel,
       initialDescription: LOOK_FORM.languageSwitcherOptionDescription.MENU_CODE,
       option: LOOK_FORM.languageSwitcherOptionLabel.MENU_GLOBE,
@@ -93,7 +93,7 @@ describe(`<${LookForm.name}/> option descriptions`, () => {
   );
 
   it('describes the Card style tiles by the chosen option below them', async () => {
-    await openLookRow(user, LOOK_ROW.CARDS);
+    await openLookRow(user, LOOK_ROW.SHAPE);
     const tiles = screen.getByRole('radiogroup', {
       name: LOOK_FORM.cardStyleLabel,
     });

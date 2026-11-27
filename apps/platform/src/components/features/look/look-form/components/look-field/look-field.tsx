@@ -7,7 +7,6 @@ import { UnsavedDot } from '@platform/components/shared/unsaved-dot';
 import { LOOK_FIELD_LABEL_TEST_ID } from '@platform/constants/look-form';
 import type { TLookFormValues } from '@platform/utils/default-look-values/default-look-values';
 import { grantFocusId } from '@platform/utils/grant-focus-id/grant-focus-id';
-import { isBrandAssetKind } from '@platform/utils/look-form-values/look-form-values';
 import type { IWithChildren } from '@shinefold/config/react';
 import { useTranslations } from 'next-intl';
 import { useId } from 'react';
@@ -19,6 +18,7 @@ export type TLookFieldProps = IWithChildren & {
   field: keyof TLookFormValues;
   label: string;
   hint?: string;
+  hintId?: string;
   error?: string;
   isGroup?: boolean;
   lock?: TLookFieldLock;
@@ -28,6 +28,7 @@ export const LookField = ({
   field,
   label,
   hint,
+  hintId: givenHintId,
   error,
   isGroup = false,
   lock,
@@ -36,13 +37,13 @@ export const LookField = ({
   const { hasFieldChanged } = useLookForm();
   const { labelId, growthBadgeId } = lock ?? {};
   const t = useTranslations('lookForm');
-  const hintId = useId();
+  const ownHintId = useId();
+  const hintId = givenHintId ?? ownHintId;
   const {
     field: fieldSlot,
     labelRow,
     label: labelSlot,
     labelText,
-    optional,
     hint: hintSlot,
     error: errorSlot,
   } = lookFieldVariants();
@@ -56,12 +57,6 @@ export const LookField = ({
       >
         {label}
       </span>
-      {isBrandAssetKind(field) && (
-        <>
-          {' '}
-          <span className={optional()}>{t('optionalTag')}</span>
-        </>
-      )}
       {hasFieldChanged(field) && (
         <>
           {' '}

@@ -39,7 +39,7 @@ describe(`<${LookForm.name}/>`, () => {
         saved: { headerBackground: BRAND_VARIANT.INK },
       },
       {
-        row: LOOK_ROW.HEADER,
+        row: LOOK_ROW.DETAILS,
         group: LOOK_FORM.breadcrumbBackgroundLabel,
         option: LOOK_FORM.skinLabel.BRAND_PRIMARY,
         saved: { breadcrumbBackground: BRAND_VARIANT.BRAND_PRIMARY },

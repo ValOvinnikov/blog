@@ -27,8 +27,8 @@ const FOOTER_TARGET = {
   row: LOOK_ROW.FOOTER,
 } as const;
 const FOOTER_OUTLINE = toLookFollowOutline(FOOTER_TARGET);
-const CARDS_TARGET = mockOpenRowTarget(LOOK_ROW.CARDS);
-const CARDS_OUTLINE = toLookFollowOutline(CARDS_TARGET);
+const SHAPE_TARGET = mockOpenRowTarget(LOOK_ROW.SHAPE);
+const SHAPE_OUTLINE = toLookFollowOutline(SHAPE_TARGET);
 const AT_END: TLookFollowSettled = {
   outcome: LOOK_FOLLOW_OUTCOME.AT_END,
   overflow: 0,
@@ -78,13 +78,13 @@ describe(`<${LookFollowStatus.name}/>`, () => {
     expect(followStatusText()).toBe(line);
   });
 
-  it('names the Style card whose reach is outlined', () => {
+  it('names the card whose reach is outlined', () => {
     setup({
-      target: CARDS_TARGET,
-      follow: mockLookFollow({ outline: CARDS_OUTLINE, isFollowing: true }),
+      target: SHAPE_TARGET,
+      follow: mockLookFollow({ outline: SHAPE_OUTLINE, isFollowing: true }),
     });
 
-    const line = followLine('styleOutlined', { card: LOOK_FORM.cardsHeading });
+    const line = followLine('styleOutlined', { card: LOOK_FORM.shapeHeading });
 
     expect(followStatusText()).toBe(line);
   });
@@ -166,9 +166,9 @@ describe(`<${LookFollowStatus.name}/>`, () => {
   it.each([
     { target: FOOTER_TARGET, outline: FOOTER_OUTLINE, part: FOOTER },
     {
-      target: CARDS_TARGET,
-      outline: CARDS_OUTLINE,
-      part: LOOK_FORM.cardsHeading,
+      target: SHAPE_TARGET,
+      outline: SHAPE_OUTLINE,
+      part: LOOK_FORM.shapeHeading,
     },
   ])(
     'offers a way back to $part once paused',

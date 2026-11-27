@@ -43,6 +43,7 @@ describe(`<${LookForm.name}/>`, () => {
   });
 
   it('previews the chosen breadcrumb background before saving', async () => {
+    await openLookRow(user, LOOK_ROW.DETAILS);
     await chooseSegment(
       user,
       LOOK_FORM.breadcrumbBackgroundLabel,

@@ -32,7 +32,7 @@ const FOOTER: TLookFollowTarget = {
   row: LOOK_ROW.FOOTER,
 };
 const TYPE = mockOpenRowTarget(LOOK_ROW.TYPE);
-const CARDS = mockOpenRowTarget(LOOK_ROW.CARDS);
+const SHAPE = mockOpenRowTarget(LOOK_ROW.SHAPE);
 const DESKTOP_SAMPLE_HEIGHT = 920;
 const DESKTOP_OVERFLOW = 120;
 const TALL_SAMPLE_HEIGHT = 2400;
@@ -150,11 +150,11 @@ describe(useLookFollow, () => {
       expect(current().settled?.outcome).toBe(LOOK_FOLLOW_OUTCOME.IN_VIEW);
     });
 
-    it('follows an outlining Style card without scrolling the frame', () => {
-      update({ target: CARDS });
+    it('follows an outlining card without scrolling the frame', () => {
+      update({ target: SHAPE });
 
       expect(current().isFollowing).toBe(true);
-      expect(current().outline?.row).toBe(LOOK_ROW.CARDS);
+      expect(current().outline?.row).toBe(LOOK_ROW.SHAPE);
       expect(scrollTo).not.toHaveBeenCalled();
     });
   });
@@ -288,8 +288,8 @@ describe(useLookFollow, () => {
 
   describe('after a hand scroll', () => {
     it.each([
-      { name: 'a Site parts card', target: FOOTER },
-      { name: 'an outlining Style card', target: CARDS },
+      { name: 'the Footer card', target: FOOTER },
+      { name: 'an outlining card', target: SHAPE },
     ])('pauses following $name', ({ target }) => {
       const { current, update } = setup();
       update({ target });

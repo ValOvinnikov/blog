@@ -787,8 +787,8 @@
     "close": "Schließen"
   },
   "logoHueField": {
-    "followAccentHue": "Akzentfarbton übernehmen",
-    "logoHueAriaLabel": "Logo-Farbton",
+    "followAccentHue": "Akzentfarbe übernehmen",
+    "logoHueAriaLabel": "Logo-Farbe",
     "followsAccent": "folgt Akzent",
     "hueValue": "Farbton {hue}°"
   },
@@ -799,17 +799,15 @@
   "lookForm": {
     "heading": "Erscheinungsbild",
     "subtitle": "Gestalte diese Website. Die Vorschau zeigt deine Änderungen — live ist erst, was du speicherst.",
-    "styleGroupHeading": "Stil",
-    "sitePartsGroupHeading": "Website-Bereiche",
     "viewTabsAriaLabel": "Look-Ansicht",
     "jumpIndexAriaLabel": "Look-Abschnitte",
-    "growthAddsColour": "Ein eigener Logo-Farbton und eine Website, die fest hell oder dunkel bleibt",
+    "growthAddsBrand": "Eine eigene Logo-Farbe",
+    "growthAddsColour": "Schaltflächenfarben und eine Website, die fest hell oder dunkel bleibt",
     "growthAddsType": "Schriften, Stärke und Schreibweise der Überschriften",
-    "growthAddsShape": "Ecken, Abstände, Bildproportionen und Trennlinien",
-    "growthAddsCards": "Kartenstil",
-    "growthAddsButtons": "Ladezustand und Spinner",
-    "growthAddsHeader": "Layout, Untermenüs, Leiste, Header-Schaltflächen und Kontosteuerung",
-    "growthAddsFooter": "Layout, Hintergrund und Fläche",
+    "growthAddsShape": "Ecken, Schaltflächenform, Abstände, Kartenstil, Bildproportionen und Trennlinien",
+    "growthAddsHeader": "Layout, Breite, Untermenüs, Header-Schaltflächen, die Aktionsschaltfläche und Kontosteuerung",
+    "growthAddsFooter": "Layout, Hintergrund und Breite",
+    "growthAddsDetails": "Ladeanzeige, Schaltfläche beim Speichern und Breadcrumb-Hintergrund",
     "growthAddsClosing": "Mit Growth kommen außerdem weitere Sprachen (mit Auswahl des Sprachumschalter-Stils) und weitere Website-Funktionen hinzu.",
     "jumpIndexUnsaved": ", ungespeicherte Änderungen",
     "expandAll": "Alle aufklappen",
@@ -820,36 +818,36 @@
     "alertSuccess": "Erscheinungsbild gespeichert.",
     "alertError": "Die Einstellungen zum Erscheinungsbild konnten nicht gespeichert werden — bitte erneut versuchen.",
     "presetLabel": "Vorlage",
-    "presetDescription": "Legt Akzentfarbton, Überschriften- und Fließtextschrift, Eckenradius und Dichte fest.",
-    "accentHueLabel": "Akzentfarbton",
+    "presetDescription": "Eine Vorlage legt den Startwert der meisten Optionen auf dieser Seite fest.",
+    "accentHueLabel": "Akzentfarbe",
     "accentHueDescription": "Färbt Links, Schaltflächen und Hervorhebungen auf der ganzen Website.",
     "accentHueInaccessible": "Mit diesem Farbton bleibt Fließtext auf seinen getönten Flächen nicht lesbar, daher würde die Website ihn ersetzen. Wählen Sie einen anderen Farbton.",
-    "logoHueLabel": "Logo-Farbton",
-    "logoHueDescription": "Färbt die Wortmarke. Folgt dem Akzentfarbton, solange kein anderer gewählt ist.",
-    "colorModeLabel": "Farbmodus",
+    "logoHueLabel": "Logo-Farbe",
+    "logoHueDescription": "Färbt die Wortmarke. Folgt der Akzentfarbe, solange keine andere gewählt ist.",
+    "colorModeLabel": "Hell- und Dunkelmodus",
     "colorModeDescription": "Ob Leser zwischen hell und dunkel wechseln oder die Website immer einen Modus zeigt.",
     "colorModeOptionLabel": {
       "READER": "Leser wählen",
       "LIGHT": "Immer hell",
       "DARK": "Immer dunkel"
     },
-    "brandImagesDescription": "Bilder werden genau so verwendet, wie sie hochgeladen werden — nichts wird verkleinert oder zugeschnitten.",
+    "brandImagesDescription": "Bilder werden so gezeigt, wie Sie sie hochladen. Schneiden Sie sie also vorher zu und passen Sie die Größe an.",
     "brandNameLabel": "Markenname",
-    "brandNameHint": "Der Name Ihrer Website. Leer lassen, um den Kontonamen zu verwenden.",
+    "brandNameHint": "Wird in Header, Fußzeile und E-Mails angezeigt. Leer bleibt der Name, mit dem Sie sich registriert haben.",
     "brandNameTooLong": "Verwenden Sie höchstens {max} Zeichen.",
     "brandNameUnset": "Kontoname",
     "logoFieldLabel": "Logo",
+    "logoFieldHint": "PNG, JPEG, WebP oder SVG. Ohne Logo zeigt Ihre Website ihren Anfangsbuchstaben und Namen.",
     "logoDarkFieldLabel": "Logo für den Dunkelmodus",
-    "logoDarkFieldHint": "Wird angezeigt, wenn Leser den Dunkelmodus nutzen. Ohne dieses Logo wird das Hauptlogo verwendet.",
+    "logoDarkFieldHint": "Wird im Dunkelmodus angezeigt. Ohne dieses Logo wird das Hauptlogo verwendet.",
     "faviconFieldLabel": "Favicon",
-    "brandFieldsHint": "Logo: PNG, JPEG, WebP oder SVG. Favicon: ein quadratisches Bild.",
-    "optionalTag": "optional",
+    "faviconFieldHint": "Ein quadratisches Bild, das im Browser-Tab erscheint. Ohne Favicon zeigt der Tab Ihren Anfangsbuchstaben auf einer Kachel in Ihrer Logo-Farbe.",
     "fieldUnsavedLabel": "Ungespeicherte Änderung",
     "headingFontLabel": "Überschriftenschrift",
     "bodyFontLabel": "Fließtextschrift",
-    "radiusScaleLabel": "Eckenradius",
+    "radiusScaleLabel": "Ecken",
     "radiusScaleDescription": "Rundet jede Karte, jedes Panel, Menü, jede Tabelle und jedes Bild.",
-    "densityLabel": "Dichte",
+    "densityLabel": "Abstände",
     "densityDescription": "Abstände und Größe der Bedienelemente.",
     "cardStyleLabel": "Kartenstil",
     "cardStyleDescription": "Rahmt jede Inhaltskarte: Beiträge, Themen, Zitate, Preise, FAQ-Einträge und Call-to-Action-Boxen.",
@@ -887,7 +885,7 @@
       "CLASSIC": "Klassisch",
       "SQUARE": "Quadrat"
     },
-    "dividerWidthLabel": "Abschnittstrenner",
+    "dividerWidthLabel": "Trennliniendicke",
     "dividerWidthDescription": "Wie dick die Linie zwischen Abschnitten ist, die einen Trenner zeigen.",
     "dividerWidthOptionLabel": {
       "HAIRLINE": "Haarlinie",
@@ -907,7 +905,7 @@
       "RAISED": "Ein dünner Rahmen mit sanftem Schatten",
       "PLAIN": "Kein Rahmen; Abstände trennen die Karten"
     },
-    "headerControlStyleLabel": "Header-Schaltflächen",
+    "headerControlStyleLabel": "Stil der Header-Schaltflächen",
     "headerControlStyleDescription": "Die Schaltflächen für Sprache, Design, Menü und Anmelden, auf jeder Bildschirmgröße.",
     "headerControlStyleOptionLabel": {
       "OUTLINED": "Umrandet",
@@ -931,26 +929,25 @@
       "ROUNDED": "Ecken folgen der Ecken-Einstellung der Website",
       "SQUARE": "Eckige Ecken"
     },
-    "headerActionStyleLabel": "Stil der Header-Aktion",
+    "headerActionStyleLabel": "Stil der Aktionsschaltfläche",
     "headerActionStyleDescription": "Wie der Aktionslink im Header gezeichnet wird. Gefüllt und Umrandet übernehmen Farbe und Form der Schaltflächen.",
     "headerActionStyleOptionLabel": {
       "FILLED": "Gefüllt",
       "OUTLINED": "Umrandet",
       "PLAIN": "Einfacher Link"
     },
-    "headerActionPhonePlacementLabel": "Auf Telefonen",
+    "headerActionPhonePlacementLabel": "Aktionsschaltfläche auf Telefonen",
     "headerActionPhonePlacementDescription": "Wo die Header-Aktion auf Telefonen sitzt: in der Leiste neben der Menü-Schaltfläche oder ganz oben im Menü.",
     "headerActionPhonePlacementOptionLabel": {
       "BAR": "In der Leiste",
       "MENU": "Oben im Menü"
     },
-    "languageSwitcherLabel": "Sprachauswahl",
-    "languageSwitcherStyleLabel": "Stil",
+    "languageSwitcherStyleLabel": "Stil des Sprachwechslers",
     "languageSwitcherDescription": "Wie die Sprachauswahl auf dem Desktop in Kopf- und Fußzeile aussieht.",
-    "languageSwitcherSingleLanguage": "Fügen Sie unter Sprachen eine weitere Sprache hinzu, um einen Stil zu wählen.",
+    "languageSwitcherSingleLanguage": "Fügen Sie unter Sprachen eine weitere Sprache hinzu, um einen Stil für den Sprachwechsler zu wählen.",
     "languageSwitcherFreeDescription": "Ihr Tarif veröffentlicht eine Sprache. Mit einem Upgrade können Sie Sprachen hinzufügen und einen Stil für die Sprachauswahl wählen.",
     "lockLineGrowthFields": "Mit Growth markierte Felder behalten den Wert der Vorlage {preset}.",
-    "lockLineTypeFonts": "In diesem Tarif behält Schrift die Schriften und den Überschriftenstil der Vorlage {preset}. Eine andere Vorlage ändert sie.",
+    "lockLineTypeFonts": "In diesem Tarif behält Text die Schriften und den Überschriftenstil der Vorlage {preset}. Eine andere Vorlage ändert sie.",
     "languageSwitcherOptionLabel": {
       "MENU_CODE": "Code",
       "MENU_GLOBE": "Globus",
@@ -961,16 +958,19 @@
       "MENU_GLOBE": "Ein Globus-Symbol öffnet das Sprachmenü",
       "CODES": "Sprachcodes nebeneinander, für wenige Sprachen"
     },
-    "colourHeading": "Farbe",
-    "colourDescription": "Akzentfarbton wählen und festlegen, ob Leser zwischen hell und dunkel wählen. Text bleibt in beiden Fällen lesbar.",
-    "typeHeading": "Schrift",
+    "colourHeading": "Farben",
+    "colourDescription": "Ihre Akzentfarbe, die Schaltflächenfarben und ob Leser zwischen hell und dunkel wählen. Text bleibt in beiden Fällen lesbar.",
+    "typeHeading": "Text",
     "typeDescription": "Jede Schrift wird in ihrem eigenen Schnitt gezeigt.",
-    "shapeHeading": "Ecken & Abstände",
-    "cardsHeading": "Karten",
-    "shapeDescription": "Wie rund Ecken sind und wie viel Raum die Elemente auf der ganzen Website umgibt.",
-    "cardsDescription": "Wie Inhaltskarten auf der ganzen Website gerahmt sind.",
+    "shapeHeading": "Formen und Abstände",
+    "shapeDescription": "Wie rund Ecken sind, welche Form Schaltflächen und Karten haben und wie viel Raum die Elemente auf der ganzen Website umgibt.",
     "headerHeading": "Header",
     "headerDescription": "Wie die obere Leiste Ihrer Website aufgebaut ist und wie sich ihre Untermenüs öffnen.",
+    "headerLayoutHeading": "Layout",
+    "headerLinksHeading": "Links",
+    "headerButtonsHeading": "Schaltflächen",
+    "headerActionHeading": "Aktionsschaltfläche",
+    "headerAccountHeading": "Konto",
     "headerLayoutLabel": "Layout",
     "headerLayoutDescription": "Wo Logo, Links und Schaltflächen auf breiten Bildschirmen sitzen. Auf dem Handy gibt es immer die Leiste mit Menü-Schaltfläche.",
     "headerPreviewDeviceNote": {
@@ -986,13 +986,13 @@
       "CENTRED_BRAND": "Zentrierte Marke",
       "MENU_BUTTON": "Menü-Schaltfläche"
     },
-    "headerSubmenuStyleLabel": "Untermenüs",
+    "headerSubmenuStyleLabel": "Untermenü-Stil",
     "headerSubmenuStyleDescription": "Wie sich ein Link mit Unterpunkten auf breiten Bildschirmen öffnet.",
     "headerSubmenuStyleOptionLabel": {
       "DROPDOWN": "Dropdown",
       "WIDE_PANEL": "Breites Panel"
     },
-    "headerBarStyleLabel": "Leiste",
+    "headerBarStyleLabel": "Breite",
     "headerBarStyleDescription": "Ob die Leiste die ganze Seite überspannt oder als Karte darüber schwebt.",
     "headerBackgroundLabel": "Hintergrund",
     "headerBackgroundDescription": "Die Farbe der Kopfzeile und der Menüs und Bereiche, die sich daraus öffnen. Jede folgt dem hellen oder dunklen Design der Leser.",
@@ -1003,7 +1003,7 @@
       "FULL_WIDTH": "Volle Breite",
       "FLOATING": "Schwebend"
     },
-    "navLinkStyleLabel": "Navigationslinks",
+    "navLinkStyleLabel": "Hervorhebung des aktuellen Links",
     "navLinkStyleDescription": "Wie das Menü die aktuelle Seite und den Link unter dem Mauszeiger hervorhebt. Links in der Fußzeile bleiben unverändert.",
     "navLinkStyleGlyphWord": "Link",
     "navLinkStyleOptionLabel": {
@@ -1018,7 +1018,7 @@
       "SOFT": "Ein getönter Hintergrund beim Überfahren und auf der aktuellen Seite",
       "PILL": "Ein abgerundeter Rahmen beim Überfahren und auf der aktuellen Seite"
     },
-    "accountButtonStyleLabel": "Konto-Schaltfläche",
+    "accountButtonStyleLabel": "Stil der Konto-Schaltfläche",
     "accountButtonStyleDescription": "Die Schaltfläche, mit der sich Leser anmelden und ihr Konto öffnen, auf breiten Bildschirmen. Telefone folgen der Einstellung „Auf Telefonen sitzt das Konto“ weiter unten.",
     "accountButtonStyleOptionLabel": {
       "PILL": "Pille mit Beschriftung",
@@ -1031,16 +1031,13 @@
       "PROFILE": "Profil",
       "HUB": "Hub"
     },
-    "accountPhonePlacementLabel": "Auf Telefonen sitzt das Konto",
+    "accountPhonePlacementLabel": "Konto auf Telefonen",
     "accountPhonePlacementDescription": "In der Leiste als Kreis oder als letzte Zeile des Menüs.",
     "accountPhonePlacementOptionLabel": {
       "BAR": "In der Leiste",
       "MENU": "Im Menü"
     },
-    "buttonsHeading": "Schaltflächen",
-    "buttonsDescription": "Wie Schaltflächen geformt und gefärbt sind, wie sie aussehen, während sie arbeiten, und welchen Spinner sie zeigen.",
-    "buttonsWhileWorkingHeading": "Während der Arbeit",
-    "buttonShapeLabel": "Form",
+    "buttonShapeLabel": "Schaltflächenform",
     "buttonShapeDescription": "Ecken von Schaltflächen und Tags.",
     "buttonShapeOptionLabel": {
       "SQUARE": "Eckig",
@@ -1057,14 +1054,14 @@
     "buttonColorInvalid": "Geben Sie eine Hex-Farbe ein, etwa #1a73e8.",
     "buttonColorFaint": "Schaltflächen sind auf {grounds} blass, Leser übersehen sie dort leicht.",
     "buttonColorFaintGround": "{skin} im {scheme, select, DARK {dunklen Modus} other {hellen Modus}}",
-    "busyButtonStyleLabel": "Bei Beschäftigung",
+    "busyButtonStyleLabel": "Schaltfläche beim Speichern",
     "busyButtonStyleDescription": "Was eine Schaltfläche beim Speichern oder Senden zeigt. Sie behält ihren Platz und bleibt in voller Farbe.",
     "busyButtonStyleOptionLabel": {
       "LABEL": "Beschäftigt-Text",
       "KEPT": "Text bleibt",
       "EDGE": "Fortschrittskante"
     },
-    "spinnerStyleLabel": "Spinner",
+    "spinnerStyleLabel": "Ladeanzeige",
     "spinnerStyleDescription": "Der Spinner auf den Schaltflächen und Ladezuständen Ihrer Website.",
     "spinnerEdgeNote": "Beschäftigte Schaltflächen zeigen in diesem Stil keinen Spinner. Toasts und Ladezustände nutzen ihn weiterhin.",
     "spinnerStyleOptionLabel": {
@@ -1074,8 +1071,10 @@
       "PULSE": "Puls"
     },
     "footerHeading": "Fußzeile",
-    "footerDescription": "Wie der untere Bereich Ihrer Website aufgebaut ist, sein Hintergrund und wie Leser die Cookie-Einstellungen wieder öffnen.",
-    "footerLayoutLabel": "Fußzeilen-Layout",
+    "detailsHeading": "Kleine Details",
+    "footerDescription": "Wie der untere Bereich Ihrer Website aufgebaut ist, sein Hintergrund und seine Breite.",
+    "detailsDescription": "Wie Ihre Website zeigt, dass sie arbeitet, die Breadcrumb-Zeile und wie Leser die Cookie-Einstellungen wieder öffnen.",
+    "footerLayoutLabel": "Layout",
     "footerLayoutDescription": "Wo Marke, Linkgruppen und Kleingedrucktes stehen. Kompakt zeigt keine Gruppen, keinen Info-Text und keine Adresse.",
     "footerLayoutOptionLabel": {
       "COLUMNS": "Spalten",
@@ -1091,13 +1090,13 @@
       "BRAND_PRIMARY": "Markenton",
       "INK": "Tinte"
     },
-    "footerSurfaceLabel": "Fläche",
+    "footerSurfaceLabel": "Breite",
     "footerSurfaceDescription": "Ob die Fußzeile die ganze Breite einnimmt oder als Karte erscheint.",
     "footerSurfaceOptionLabel": {
       "FULL_WIDTH": "Volle Breite",
       "CARD": "Karte"
     },
-    "cookieSettingsButtonLabel": "Cookie-Einstellungen",
+    "cookieSettingsButtonLabel": "Schaltfläche für Cookie-Einstellungen",
     "cookieSettingsButtonDescription": "Wie Leser die Cookie-Einstellungen wieder öffnen, nachdem sie das Cookie-Banner beantwortet haben: über einen Link in der Fußzeile, eine runde Schaltfläche unten links oder beides.",
     "cookieSettingsButtonOptionLabel": {
       "HIDDEN": "Link in der Fußzeile",
@@ -1127,8 +1126,7 @@
       "FILLED": "Gefüllte Aktion",
       "OUTLINED": "Umrandete Aktion",
       "PLAIN": "Aktion als Link"
-    },
-    "summaryOneLanguage": "Eine Sprache"
+    }
   },
   "previewModeControl": {
     "modeLight": "Hell",
@@ -1235,9 +1233,9 @@
     "topOfPage": "Seitenanfang",
     "styleCard": "<strong>{card}</strong> ändert die ganze Seite, daher bleibt der Rahmen, wo er ist.",
     "styleOutlined": "Markiert: was <strong>{card}</strong> ändert.",
-    "idle": "Öffne eine Karte unter Website-Bereiche, und der Rahmen scrollt dorthin.",
+    "idle": "Öffne die Karte Header oder Fußzeile, und der Rahmen scrollt dorthin.",
     "off": "Folgen ist aus. Der Rahmen bleibt, wo du ihn lässt.",
-    "allOpen": "Alle Karten sind geöffnet. Fokussiere eine Karte unter Website-Bereiche, und der Rahmen scrollt dorthin.",
+    "allOpen": "Alle Karten sind geöffnet. Fokussiere die Karte Header oder Fußzeile, und der Rahmen scrollt dorthin.",
     "freeSample": "Das Beispiel verwendet die Werte der Vorlage {preset}, also die, die dieser Tarif veröffentlicht."
   },
   "lookFullscreen": {

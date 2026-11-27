@@ -1,5 +1,9 @@
 import { LOOK_SAMPLE_BREADCRUMBS_TEST_ID } from '@platform/constants/look-sample';
 import { SAMPLE_LINK_HREF } from '@platform/constants/sample-link';
+import {
+  SAMPLE_PART,
+  SAMPLE_PART_ATTRIBUTE,
+} from '@platform/constants/sample-part';
 import { BRAND_VARIANT, type TBrandVariant } from '@shinefold/config';
 import { Breadcrumbs } from '@shinefold/ui/components/molecules/breadcrumbs';
 import { useTranslations } from 'next-intl';
@@ -25,6 +29,7 @@ export const LookSampleBreadcrumbs = ({
       className={root()}
       data-skin={isPlain ? undefined : background}
       data-testid={LOOK_SAMPLE_BREADCRUMBS_TEST_ID}
+      {...{ [SAMPLE_PART_ATTRIBUTE]: SAMPLE_PART.BREADCRUMBS }}
     >
       <div className={inner()}>
         <Breadcrumbs

@@ -3,7 +3,7 @@ import { ASSET_UPLOAD_INPUT_TEST_ID } from '@platform/constants/asset-upload';
 import { LOOK_ROW } from '@platform/constants/look-row';
 import messages from '@platform/i18n/messages/en.json';
 import { screen, waitFor } from '@platform/testing/custom-render';
-import { BRAND_IMAGES_HINT } from '@platform/testing/look/look-form-fixtures';
+import { LOGO_HINT } from '@platform/testing/look/look-form-fixtures';
 import {
   clickSave,
   openLookRow,
@@ -59,7 +59,7 @@ export const findLogoPickerWithError = async (message: string) => {
   });
   await waitFor(() => {
     expect(replaceLogoButton).toHaveAccessibleDescription(
-      `${BRAND_IMAGES_HINT} ${message}`,
+      `${LOGO_HINT} ${message}`,
     );
   });
   return replaceLogoButton;

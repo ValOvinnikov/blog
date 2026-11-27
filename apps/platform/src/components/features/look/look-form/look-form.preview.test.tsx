@@ -85,7 +85,7 @@ describe(`<${LookForm.name}/>`, () => {
     });
 
     it('shows the chosen busy style and spinner on the preview busy button', async () => {
-      await openLookRow(user, LOOK_ROW.BUTTONS);
+      await openLookRow(user, LOOK_ROW.DETAILS);
       await chooseOption(
         user,
         SPINNER_LABEL,

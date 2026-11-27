@@ -63,9 +63,9 @@ describe(findTopmostLookCard, () => {
       title: 'falls back to the last card once every card is above',
       bottoms: {
         [LOOK_CARD.PRESET]: ABOVE_INDEX,
-        [LOOK_CARD.LANGUAGE_SWITCHER]: ABOVE_INDEX,
+        [LOOK_CARD.DETAILS]: ABOVE_INDEX,
       },
-      expected: LOOK_CARD.LANGUAGE_SWITCHER,
+      expected: LOOK_CARD.DETAILS,
     },
   ])('$title', ({ bottoms, expected }) => {
     stubCardBottoms(bottoms);

@@ -42,13 +42,6 @@ export const buildLookRowSummaries = (
   } = values;
 
   return {
-    [LOOK_ROW.COLOUR]: join([
-      t('summaryHue', { hue: accentHue }),
-      isUndefined(logoHue)
-        ? t('summaryLogoFollowsAccent')
-        : t('summaryLogoHue', { hue: logoHue }),
-      t(`colorModeOptionLabel.${colorMode}`),
-    ]),
     [LOOK_ROW.BRAND]: join([
       t(isUndefined(logo.url) ? 'summaryNoLogo' : 'summaryLogoUploaded'),
       t(
@@ -56,11 +49,18 @@ export const buildLookRowSummaries = (
           ? 'summaryNoLogoDark'
           : 'summaryLogoDarkUploaded',
       ),
+      isUndefined(logoHue)
+        ? t('summaryLogoFollowsAccent')
+        : t('summaryLogoHue', { hue: logoHue }),
       t(
         isUndefined(favicon.url)
           ? 'summaryNoFavicon'
           : 'summaryFaviconUploaded',
       ),
+    ]),
+    [LOOK_ROW.COLOUR]: join([
+      t('summaryHue', { hue: accentHue }),
+      t(`colorModeOptionLabel.${colorMode}`),
     ]),
     [LOOK_ROW.TYPE]: join([
       FONT_OPTIONS[headingFont].label,
@@ -68,13 +68,9 @@ export const buildLookRowSummaries = (
     ]),
     [LOOK_ROW.SHAPE]: join([
       t(`radiusScaleOptionLabel.${radiusScale}`),
-      t(`densityOptionLabel.${density}`),
-    ]),
-    [LOOK_ROW.CARDS]: t(`cardStyleOptionLabel.${cardStyle}`),
-    [LOOK_ROW.BUTTONS]: join([
       t(`buttonShapeOptionLabel.${buttonShape}`),
-      t(`busyButtonStyleOptionLabel.${busyButtonStyle}`),
-      t(`spinnerStyleOptionLabel.${spinnerStyle}`),
+      t(`densityOptionLabel.${density}`),
+      t(`cardStyleOptionLabel.${cardStyle}`),
     ]),
     [LOOK_ROW.HEADER]: join([
       t(`headerLayoutOptionLabel.${headerLayout}`),
@@ -82,6 +78,9 @@ export const buildLookRowSummaries = (
       t(`headerSubmenuStyleOptionLabel.${headerSubmenuStyle}`),
       t(`navLinkStyleOptionLabel.${navLinkStyle}`),
       t(`headerControlStyleOptionLabel.${headerControlStyle}`),
+      ...(hasMultipleLanguages
+        ? [t(`languageSwitcherOptionLabel.${languageSwitcherStyle}`)]
+        : []),
       t(`headerActionStyleSummary.${headerActionStyle}`),
       t(`accountButtonStyleOptionLabel.${accountButtonStyle}`),
     ]),
@@ -89,11 +88,11 @@ export const buildLookRowSummaries = (
       t(`footerLayoutOptionLabel.${footerLayout}`),
       t(`skinLabel.${footerBackground}`),
       t(`footerSurfaceOptionLabel.${footerSurface}`),
-      t(`cookieSettingsButtonSummary.${cookieSettingsButton}`),
     ]),
-    [LOOK_ROW.LANGUAGE_SWITCHER]: join([
-      t(`languageSwitcherOptionLabel.${languageSwitcherStyle}`),
-      ...(hasMultipleLanguages ? [] : [t('summaryOneLanguage')]),
+    [LOOK_ROW.DETAILS]: join([
+      t(`spinnerStyleOptionLabel.${spinnerStyle}`),
+      t(`busyButtonStyleOptionLabel.${busyButtonStyle}`),
+      t(`cookieSettingsButtonSummary.${cookieSettingsButton}`),
     ]),
   };
 };

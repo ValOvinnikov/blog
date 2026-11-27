@@ -1,6 +1,7 @@
 import { LOOK_CARD } from '@platform/constants/look-card';
 import { LOOK_FOLLOW_TARGET } from '@platform/constants/look-follow';
 import { LOOK_ROW, type TLookRow } from '@platform/constants/look-row';
+import { SAMPLE_PART } from '@platform/constants/sample-part';
 import { mockOpenRowTarget } from '@platform/testing/look/look-follow';
 import { LOOK_ROWS } from '@platform/utils/look-open-rows/look-open-rows';
 
@@ -27,20 +28,20 @@ describe(toLookFollowTarget, () => {
     });
   });
 
-  it('follows the focused Site parts card after Expand all', () => {
+  it('follows the focused Footer card after Expand all', () => {
     expect(toLookFollowTarget(LOOK_ROWS, LOOK_ROW.FOOTER, true)).toEqual({
       kind: LOOK_FOLLOW_TARGET.PART,
       row: LOOK_ROW.FOOTER,
     });
   });
 
-  it('keeps following the open Site parts card while the preset card is focused', () => {
+  it('keeps following the open Header card while the preset card is focused', () => {
     expect(
       toLookFollowTarget([LOOK_ROW.HEADER], LOOK_CARD.PRESET, false),
     ).toEqual({ kind: LOOK_FOLLOW_TARGET.PART, row: LOOK_ROW.HEADER });
   });
 
-  it('follows an open Style card with nothing to outline for a whole-page card', () => {
+  it('follows an open card with nothing to outline for a whole-page card', () => {
     expect(toLookFollowTarget([LOOK_ROW.TYPE], LOOK_ROW.TYPE, false)).toEqual({
       kind: LOOK_FOLLOW_TARGET.STYLE,
       row: LOOK_ROW.TYPE,
@@ -59,6 +60,14 @@ describe(toLookFollowOutline, () => {
       expect(openOnly(row)).toBeUndefined();
     },
   );
+
+  it('outlines the busy button, breadcrumb row and cookie button for Small details', () => {
+    expect(openOnly(LOOK_ROW.DETAILS)?.parts).toEqual([
+      SAMPLE_PART.BUSY_BUTTON,
+      SAMPLE_PART.BREADCRUMBS,
+      SAMPLE_PART.COOKIE_BUTTON,
+    ]);
+  });
 
   it('outlines nothing while nothing is followed', () => {
     expect(toLookFollowOutline(IDLE)).toBeUndefined();
