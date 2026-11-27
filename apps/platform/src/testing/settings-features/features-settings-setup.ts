@@ -5,7 +5,7 @@ import { updateFeaturesAction } from '@platform/server/settings-features/update-
 import { customRender, screen } from '@platform/testing/custom-render';
 import { makeEnTranslator } from '@platform/testing/en-translator';
 import { mockRouterRefresh } from '@platform/testing/mock-router';
-import { SAVE_CHANGES } from '@platform/testing/render-in-settings-form';
+import { SAVE } from '@platform/testing/render-in-settings-form';
 import {
   mockFeaturesFormValues,
   mockSettingsFeaturesValues,
@@ -55,6 +55,6 @@ export const prepareFeaturesSettings = () => {
 };
 
 export const saveFeaturesSettings = async (user: UserEvent) => {
-  const saveButton = screen.getByRole('button', { name: SAVE_CHANGES });
+  const saveButton = screen.getByRole('button', { name: SAVE });
   await user.click(saveButton);
 };

@@ -13,7 +13,7 @@ import { USER_EVENT_KEY } from '@platform/testing/keyboard';
 import {
   ALL_CHANGES_SAVED,
   ARCHIVED_NOTICE_DESCRIPTION,
-  SAVE_CHANGES,
+  SAVE,
   UNSAVED_CHANGES,
   ONE_UNSAVED_CHANGE,
 } from '@platform/testing/render-in-settings-form';
@@ -153,7 +153,7 @@ describe(`<${FeaturesSettings.name}/>`, () => {
     });
 
     it('offers no Save while the values are unchanged', () => {
-      const saveButton = screen.queryByRole('button', { name: SAVE_CHANGES });
+      const saveButton = screen.queryByRole('button', { name: SAVE });
       const allSaved = screen.queryByText(ALL_CHANGES_SAVED);
 
       expect(saveButton).not.toBeInTheDocument();
@@ -170,7 +170,7 @@ describe(`<${FeaturesSettings.name}/>`, () => {
       });
 
       it('saves the current toggle state', async () => {
-        const saveButton = screen.getByRole('button', { name: SAVE_CHANGES });
+        const saveButton = screen.getByRole('button', { name: SAVE });
 
         await user.click(saveButton);
 
@@ -188,7 +188,7 @@ describe(`<${FeaturesSettings.name}/>`, () => {
       });
 
       it('counts an unsaved toggle and withdraws Save once it is toggled back', async () => {
-        const saveButton = screen.getByRole('button', { name: SAVE_CHANGES });
+        const saveButton = screen.getByRole('button', { name: SAVE });
         const unsavedRegion = screen.getByRole('region', {
           name: UNSAVED_CHANGES,
         });
@@ -199,7 +199,7 @@ describe(`<${FeaturesSettings.name}/>`, () => {
         await user.click(contactFormSwitch);
 
         const withdrawnSaveButton = screen.queryByRole('button', {
-          name: SAVE_CHANGES,
+          name: SAVE,
         });
 
         expect(withdrawnSaveButton).not.toBeInTheDocument();
@@ -223,7 +223,7 @@ describe(`<${FeaturesSettings.name}/>`, () => {
       beforeEach(async () => {
         await user.click(contactFormSwitch);
 
-        const saveButton = screen.getByRole('button', { name: SAVE_CHANGES });
+        const saveButton = screen.getByRole('button', { name: SAVE });
 
         await user.click(saveButton);
       });
@@ -231,7 +231,7 @@ describe(`<${FeaturesSettings.name}/>`, () => {
       it('withdraws Save after a successful save, without a remount', async () => {
         await waitFor(() => {
           const saveButton = screen.queryByRole('button', {
-            name: SAVE_CHANGES,
+            name: SAVE,
           });
 
           expect(saveButton).not.toBeInTheDocument();
@@ -368,7 +368,7 @@ describe(`<${FeaturesSettings.name}/>`, () => {
     });
 
     it('clears the failure once a retry saves', async () => {
-      const saveButton = screen.getByRole('button', { name: SAVE_CHANGES });
+      const saveButton = screen.getByRole('button', { name: SAVE });
       await user.click(saveButton);
 
       await screen.findByText(ALL_CHANGES_SAVED);
@@ -385,7 +385,7 @@ describe(`<${FeaturesSettings.name}/>`, () => {
             resolveAction = resolve;
           }),
       );
-      const saveButton = screen.getByRole('button', { name: SAVE_CHANGES });
+      const saveButton = screen.getByRole('button', { name: SAVE });
       await user.click(saveButton);
 
       await screen.findByRole('button', { name: saveBar.saving });

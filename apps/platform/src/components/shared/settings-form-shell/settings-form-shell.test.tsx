@@ -13,7 +13,7 @@ import {
   ARCHIVED_NOTICE_ID,
   ARCHIVED_NOTICE_TEXT,
   DISCARD,
-  SAVE_CHANGES,
+  SAVE,
   UNSAVED_CHANGES,
 } from '@platform/testing/render-in-settings-form';
 import {
@@ -266,7 +266,7 @@ describe(`<${SettingsFormShell.name}/>`, () => {
     });
 
     it('calls onSave from the Save button', async () => {
-      const saveButton = screen.getByRole('button', { name: SAVE_CHANGES });
+      const saveButton = screen.getByRole('button', { name: SAVE });
       await user.click(saveButton);
 
       expect(onSave).toHaveBeenCalledTimes(1);
@@ -351,7 +351,7 @@ describe(`<${SettingsFormShell.name}/>`, () => {
     beforeEach(async () => {
       renderWithIntl(<TaglineSettings />);
       await editTagline(user);
-      const saveButton = screen.getByRole('button', { name: SAVE_CHANGES });
+      const saveButton = screen.getByRole('button', { name: SAVE });
       await user.click(saveButton);
     });
 
@@ -389,7 +389,7 @@ describe(`<${SettingsFormShell.name}/>`, () => {
   it('shows no saved status after a save when the page opts out of it', async () => {
     renderWithIntl(<TaglineSettings hasSavedStatus={false} />);
     await editTagline(user);
-    const saveButton = screen.getByRole('button', { name: SAVE_CHANGES });
+    const saveButton = screen.getByRole('button', { name: SAVE });
     await user.click(saveButton);
 
     await waitFor(() => {
@@ -747,7 +747,7 @@ describe(`<${SettingsFormShell.name}/>`, () => {
       });
 
       it('forgets the draft once the changes are saved', async () => {
-        const saveButton = screen.getByRole('button', { name: SAVE_CHANGES });
+        const saveButton = screen.getByRole('button', { name: SAVE });
         await user.click(saveButton);
         await waitFor(() => expect(baseSave).toHaveBeenCalledTimes(1));
         unmount();
@@ -778,7 +778,7 @@ describe(`<${SettingsFormShell.name}/>`, () => {
         draft: draftFor(MOCK_EDITED_VALUES),
       });
 
-      const saveButton = screen.getByRole('button', { name: SAVE_CHANGES });
+      const saveButton = screen.getByRole('button', { name: SAVE });
       await user.click(saveButton);
 
       expect(onSave).toHaveBeenCalledTimes(1);
@@ -793,7 +793,7 @@ describe(`<${SettingsFormShell.name}/>`, () => {
     const saveFromBar = async () => {
       const region = screen.getByRole('region', { name: UNSAVED_CHANGES });
       const saveButton = within(region).getByRole('button', {
-        name: SAVE_CHANGES,
+        name: SAVE,
       });
       await user.click(saveButton);
       return saveButton;
@@ -835,7 +835,7 @@ describe(`<${SettingsFormShell.name}/>`, () => {
       });
     });
 
-    it('stays on Save changes after a failed save', async () => {
+    it('stays on Save after a failed save', async () => {
       renderShell({ changeCount: 1, save: vi.fn().mockResolvedValue(false) });
 
       const saveButton = await saveFromBar();

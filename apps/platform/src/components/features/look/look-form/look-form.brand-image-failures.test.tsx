@@ -23,7 +23,7 @@ import {
   prepareBrandImageForm,
   setupLookFormWithFailingUpload,
 } from '@platform/testing/look/look-form-setup';
-import { SAVE_CHANGES } from '@platform/testing/render-in-settings-form';
+import { SAVE } from '@platform/testing/render-in-settings-form';
 import { REPLACE_LOGO } from '@platform/testing/site-config/fixtures';
 import type { UserEvent } from '@testing-library/user-event';
 
@@ -68,7 +68,7 @@ describe(`<${LookForm.name}/>`, () => {
         await waitFor(() => {
           expect(replaceLogoButton).toHaveFocus();
         });
-        const saveButton = screen.getByRole('button', { name: SAVE_CHANGES });
+        const saveButton = screen.getByRole('button', { name: SAVE });
         expect(replaceLogoButton).toHaveAccessibleDescription(
           `${LOGO_HINT} ${LOGO_UPLOAD_FAILED}`,
         );

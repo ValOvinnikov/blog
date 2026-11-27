@@ -5,7 +5,7 @@ import { saveVoiceOverridesAction } from '@platform/server/site-config/save-voic
 import { screen, waitFor, within } from '@platform/testing/custom-render';
 import { mockRouterRefresh } from '@platform/testing/mock-router';
 import {
-  SAVE_CHANGES,
+  SAVE,
   UNSAVED_CHANGES,
 } from '@platform/testing/render-in-settings-form';
 import { TOPIC_FIELD } from '@platform/testing/voice/fixtures';
@@ -106,7 +106,7 @@ describe(`<${VoiceSettings.name}/> section errors`, () => {
     await user.click(voiceSectionHeader(ERROR_PAGES_SECTION));
     const saveBar = screen.getByRole('region', { name: UNSAVED_CHANGES });
     const saveButton = within(saveBar).getByRole('button', {
-      name: SAVE_CHANGES,
+      name: SAVE,
     });
     await user.click(saveButton);
 

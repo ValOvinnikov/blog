@@ -10,7 +10,7 @@ import { mockRouterRefresh } from '@platform/testing/mock-router';
 import {
   DISCARD,
   ONE_FIELD_NEEDS_ATTENTION,
-  SAVE_CHANGES,
+  SAVE,
   SAVING,
   UNSAVED_CHANGES,
 } from '@platform/testing/render-in-settings-form';
@@ -103,7 +103,7 @@ describe(`<${VoiceSettings.name}/> saving`, () => {
 
       const saveBar = screen.getByRole('region', { name: UNSAVED_CHANGES });
       const barSave = within(saveBar).getByRole('button', {
-        name: SAVE_CHANGES,
+        name: SAVE,
       });
       await user.click(barSave);
 
@@ -132,7 +132,7 @@ describe(`<${VoiceSettings.name}/> saving`, () => {
 
       const saveBar = screen.getByRole('region', { name: UNSAVED_CHANGES });
       const discard = within(saveBar).getByRole('button', { name: DISCARD });
-      const save = within(saveBar).getByRole('button', { name: SAVE_CHANGES });
+      const save = within(saveBar).getByRole('button', { name: SAVE });
 
       expect(save).toBeVisible();
       await user.click(discard);
@@ -196,7 +196,7 @@ describe(`<${VoiceSettings.name}/> saving`, () => {
 
         const saveBar = screen.getByRole('region', { name: UNSAVED_CHANGES });
         const barSave = within(saveBar).getByRole('button', {
-          name: SAVE_CHANGES,
+          name: SAVE,
         });
         await user.click(barSave);
 
