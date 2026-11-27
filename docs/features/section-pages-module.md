@@ -6,7 +6,7 @@ code:
   - apps/web/src/modules/section-pages/**
   - packages/studio/src/schema-types/modules/section-pages/**
   - packages/service/src/features/modules/section-pages/**
-epics: []
+epics: [8246]
 ---
 
 # Section Pages module
@@ -23,16 +23,16 @@ Section Pages turns a landing page into a hub for the pages nested under it. Pla
 
 ## Data
 
-- **`module_sectionPages`** — `title`, `brandVariant`, optional `headingBlock` (the only module whose heading is optional), `contentAlignment` (Left/Center), `layout` (`wideLayout`). There is no list of pages to author: the children are derived.
+- **`module_sectionPages`** — Content group: `title`, optional `headingBlock` (the only module whose heading is optional). Appearance group: `brandVariant`, `contentAlignment` (Heading Alignment), the Cards fieldset — optional `cardStyle`, `radiusScale`, `density` and `columns`, each empty for Site default (Auto for columns) — and `layout` (`wideLayout`). Built with `cardModuleAppearance`. There is no list of pages to author: the children are derived.
 - **Children** — `page_landing` documents whose `parent` is the current page and whose `language` is the request language, ordered by `orderRank`. Each card reads the child's `slug`, its `headingBlock` heading (title) and supporting text (summary), and `seo.openGraph.ogImage` (image).
 - **Context** — the landing renderer passes `landingPage { id, path }`; the module uses `id` to find children and `path` to build their links.
 - **Caching** — the module query is tagged `modules:sectionPages` + `module:<id>`; the children query `page_landing`, so publishing any landing page refreshes every Section Pages grid. Fallback revalidate 86400s (`SANITY_CONTENT_REVALIDATE_SECONDS`).
 
 ## Configuration
 
-- Editors add the module to a landing template and choose its background, heading, alignment and layout. Which cards appear follows the landing page tree, not the module.
+- Editors add the module to a landing template and choose its heading under Content, and its background, heading alignment, card overrides, columns and layout under Appearance. Which cards appear follows the landing page tree, not the module.
 - No plan or capability gate; no Voice strings.
-- Look: card style, radius and density restyle the cards ([look](./look.md)).
+- Look: card style, radius and density restyle the cards ([look](./look.md)); the module's Appearance fields can override them per section. The web side does not yet read the per-module overrides or `columns`.
 
 ## Constraints and invariants
 
@@ -65,4 +65,4 @@ Section Pages turns a landing page into a hub for the pages nested under it. Pla
 
 ## Related
 
-No open epic or issue changes this module.
+- Epic #8246 — the Section Pages module gets an Appearance section.
