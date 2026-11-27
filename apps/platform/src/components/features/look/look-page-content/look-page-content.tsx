@@ -40,7 +40,10 @@ export const LookPageContent = async ({
           siteHost: tenant.primaryDomain,
           grants: {
             target: toGrantTarget(tenant, canGrantEntitlements),
-            granted: tenant.grantedEntitlements.lookFields,
+            granted: {
+              ...tenant.grantedEntitlements.lookFields,
+              ...tenant.grantedEntitlements.presets,
+            },
           },
           lookFields: tenant.entitlements.lookFields,
           unlockedPresets: tenant.entitlements.unlockedPresets,

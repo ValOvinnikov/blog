@@ -10,7 +10,9 @@ type TGrantedFeatureItem = Extract<
   TEntitlementGrantInput['item'],
   {
     kind:
-      typeof ENTITLEMENT_KIND.CAPABILITY | typeof ENTITLEMENT_KIND.LOOK_FIELD;
+      | typeof ENTITLEMENT_KIND.CAPABILITY
+      | typeof ENTITLEMENT_KIND.LOOK_FIELD
+      | typeof ENTITLEMENT_KIND.PRESET;
   }
 >;
 
@@ -19,6 +21,7 @@ export type TGrantEntitlementControlProps = {
   item: TGrantedFeatureItem;
   itemLabel: string;
   returnFocusId: string;
+  triggerLabel?: string;
 };
 
 export const GrantEntitlementControl = ({
@@ -26,6 +29,7 @@ export const GrantEntitlementControl = ({
   item,
   itemLabel,
   returnFocusId,
+  triggerLabel,
 }: TGrantEntitlementControlProps) => {
   const t = useTranslations('grantEntitlement');
   const tPlan = useTranslations('planNames');
@@ -37,8 +41,10 @@ export const GrantEntitlementControl = ({
       item={item}
       returnFocusId={returnFocusId}
       labels={{
-        trigger: t('trigger'),
-        triggerAriaLabel: t('triggerAriaLabel', { item: itemLabel }),
+        trigger: triggerLabel ?? t('trigger'),
+        triggerAriaLabel: triggerLabel
+          ? undefined
+          : t('triggerAriaLabel', { item: itemLabel }),
         title: t('title', { item: itemLabel, tenant: tenantName }),
         description: t('description', {
           item: itemLabel,

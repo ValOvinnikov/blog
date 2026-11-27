@@ -2,6 +2,7 @@ import { MOCK_TENANT_CREATED_AT } from '@platform/testing/tenants/fixtures';
 import {
   CAPABILITY,
   MODULE_PACK,
+  PRESET_ID,
   TENANT_PLAN,
 } from '@shinefold/config/constants';
 import {
@@ -10,7 +11,10 @@ import {
   LOOK_FIELD,
   PLAN_LOCALE_LIMIT,
 } from '@shinefold/db/constants';
-import { mockEntitlementGrant } from '@shinefold/db/testing/tenant-entitlement-grants/mock-entitlement-grant';
+import {
+  MOCK_SHINEFOLD_PRESET_GRANT,
+  mockEntitlementGrant,
+} from '@shinefold/db/testing/tenant-entitlement-grants/mock-entitlement-grant';
 
 import { grantedEntitlements } from './granted-entitlements';
 
@@ -106,6 +110,15 @@ describe(grantedEntitlements, () => {
       [LOOK_FIELD.RADIUS_SCALE]: { expiresAt: IN_A_DAY },
     });
     expect(modulePacks).toEqual({ [MODULE_PACK.GROWTH]: { expiresAt: null } });
+  });
+
+  it('lists a granted preset with the end of its grant', () => {
+    const { presets } = grantedOnStarter({
+      ...MOCK_SHINEFOLD_PRESET_GRANT,
+      expiresAt: IN_A_DAY,
+    });
+
+    expect(presets).toEqual({ [PRESET_ID.SHINEFOLD]: { expiresAt: IN_A_DAY } });
   });
 
   it('lists nothing for a pack or look field the plan already includes', () => {

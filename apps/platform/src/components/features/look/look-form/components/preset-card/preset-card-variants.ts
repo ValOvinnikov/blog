@@ -7,6 +7,9 @@ export const presetCardVariants = tv({
     ],
     heading: ['flex min-w-0 flex-col gap-0.5 lg:col-start-1 lg:row-start-1'],
     strip: ['min-w-0 lg:col-span-2 lg:row-start-2'],
-    reset: ['w-full lg:col-start-2 lg:row-start-1 lg:w-auto'],
+    actions: [
+      'flex flex-col gap-2 lg:col-start-2 lg:row-start-1 lg:flex-row lg:items-center',
+    ],
+    reset: ['w-full lg:w-auto'],
   },
 });

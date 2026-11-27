@@ -14,6 +14,7 @@ import {
   DIVIDER_WIDTH_DECLARATIONS,
   formatButtonStyleBlock,
   formatOklchRamp,
+  formatPresetSurfaceBlock,
   HEADER_CONTROL_SHAPE,
   HEADER_CONTROL_SHAPE_DECLARATIONS,
   HEADER_CONTROL_STYLE,
@@ -31,6 +32,7 @@ import {
   LOGO_RAMP_LIGHT,
   NAV_LINK_STYLE,
   NAV_LINK_STYLE_DECLARATIONS,
+  PRESET_ID,
   RADIUS_SCALE,
 } from '@shinefold/config';
 import {
@@ -206,6 +208,7 @@ describe(buildSitePreviewTheme, () => {
       tokenStyle: buildThemePreviewStyle(values, true),
       skinScopeTokens: undefined,
       buttonStyleBlock: undefined,
+      presetStyleBlock: undefined,
       isDark: true,
       headingFontFamily: FONT_OPTIONS[values.headingFont].fontFamily,
       bodyFontFamily: FONT_OPTIONS[values.bodyFont].fontFamily,
@@ -226,6 +229,17 @@ describe(buildSitePreviewTheme, () => {
           darkGroundColor: MOCK_PINK_HEX,
         }),
       ),
+    );
+  });
+
+  it('draws the Shinefold preset surfaces', () => {
+    const values = {
+      ...defaultLookFormValues(),
+      preset: PRESET_ID.SHINEFOLD,
+    };
+
+    expect(buildSitePreviewTheme(values, true).presetStyleBlock).toBe(
+      formatPresetSurfaceBlock(PRESET_ID.SHINEFOLD),
     );
   });
 

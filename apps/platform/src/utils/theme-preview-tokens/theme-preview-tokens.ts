@@ -14,6 +14,7 @@ import {
   BRAND_PALETTE,
   formatButtonStyleBlock,
   formatOklchRamp,
+  formatPresetSurfaceBlock,
   HUE_MAX,
   HUE_MIN,
   IMAGE_SCRIM_RAMP,
@@ -21,6 +22,7 @@ import {
   LOGO_RAMP_LIGHT,
   type TFontChoice,
   type TMaybeUndefined,
+  type TPresetId,
   type TThemeDeclarations,
 } from '@shinefold/config';
 import type { CSSProperties } from 'react';
@@ -56,12 +58,14 @@ export type TSitePreviewThemeValues = TThemePreviewValues &
   TButtonColorValues & {
     headingFont: TFontChoice;
     bodyFont: TFontChoice;
+    preset?: TPresetId;
   };
 
 export type TSitePreviewTheme = {
   tokenStyle: CSSProperties;
   skinScopeTokens: TMaybeUndefined<TThemeDeclarations>;
   buttonStyleBlock: TMaybeUndefined<string>;
+  presetStyleBlock: TMaybeUndefined<string>;
   isDark: boolean;
   headingFontFamily: string;
   bodyFontFamily: string;
@@ -72,6 +76,9 @@ const formatButtonStyle = (values: TButtonColorValues) => {
   return colors && formatButtonStyleBlock(colors);
 };
 
+const formatPresetStyle = (preset: TMaybeUndefined<TPresetId>) =>
+  (preset && formatPresetSurfaceBlock(preset)) || undefined;
+
 export const buildSitePreviewTheme = (
   values: TSitePreviewThemeValues,
   isDark: boolean,
@@ -79,6 +86,7 @@ export const buildSitePreviewTheme = (
   tokenStyle: buildThemePreviewStyle(values, isDark),
   skinScopeTokens: buildSkinScopeOverrideTokens(values),
   buttonStyleBlock: formatButtonStyle(values),
+  presetStyleBlock: formatPresetStyle(values.preset),
   isDark,
   headingFontFamily: FONT_OPTIONS[values.headingFont].fontFamily,
   bodyFontFamily: FONT_OPTIONS[values.bodyFont].fontFamily,

@@ -2700,6 +2700,7 @@
   "grantEntitlement": {
     "trigger": "Conceder a este cliente",
     "triggerAriaLabel": "Conceder a este cliente: {item}",
+    "presetTrigger": "Conceder el ajuste predefinido {preset}",
     "title": "Conceder {item} a {tenant}",
     "description": "{tenant} obtiene {item} fuera de su plan {plan}. Su propietario lo ve desbloqueado y puede activarlo. No se cobra nada.",
     "granted": "{item} concedido.",
@@ -2745,6 +2746,9 @@
       "CORE": "Módulos Core",
       "STARTER": "Módulos Starter",
       "GROWTH": "Módulos Growth"
+    },
+    "preset": {
+      "SHINEFOLD": "Ajuste predefinido Shinefold"
     },
     "lookField": {
       "preset": "Ajuste predefinido",
@@ -2800,6 +2804,7 @@
     "kind": {
       "CAPABILITY": "Función",
       "LOOK_FIELD": "Aspecto",
+      "PRESET": "Ajuste predefinido",
       "MODULE_PACK": "Paquete de módulos",
       "LOCALE_LIMIT": "Idiomas"
     },

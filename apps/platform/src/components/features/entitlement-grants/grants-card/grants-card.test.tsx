@@ -25,6 +25,7 @@ import { ACTION_OUTCOME, LOCALE_ISO_CODES } from '@shinefold/config';
 import {
   CAPABILITY,
   MODULE_PACK,
+  PRESET_ID,
   TENANT_PLAN,
 } from '@shinefold/config/constants';
 import { DAY_MS, ENTITLEMENT_KIND } from '@shinefold/db/constants';
@@ -128,21 +129,28 @@ describe(`<${GrantsCard.name}/>`, () => {
     expect(meta).toBeVisible();
   });
 
-  it('names a language grant by how many languages it adds', () => {
-    setup({
-      grants: [
-        mockGrantRow({
-          kind: ENTITLEMENT_KIND.LOCALE_LIMIT,
-          key: ENTITLEMENT_KIND.LOCALE_LIMIT,
-          value: 4,
-        }),
-      ],
-    });
+  it.each([
+    {
+      grant: 'a language grant by how many languages it adds',
+      row: {
+        kind: ENTITLEMENT_KIND.LOCALE_LIMIT,
+        key: ENTITLEMENT_KIND.LOCALE_LIMIT,
+        value: 4,
+      },
+      itemName: makeEnTranslator('grantItemNames')('languages', { count: 3 }),
+      kindName: grantsCard.kind.LOCALE_LIMIT,
+    },
+    {
+      grant: 'a preset grant by the preset',
+      row: { kind: ENTITLEMENT_KIND.PRESET, key: PRESET_ID.SHINEFOLD },
+      itemName: en.grantItemNames.preset[PRESET_ID.SHINEFOLD],
+      kindName: grantsCard.kind.PRESET,
+    },
+  ])('names $grant', ({ row, itemName, kindName }) => {
+    setup({ grants: [mockGrantRow(row)] });
 
-    const item = screen.getByText(
-      makeEnTranslator('grantItemNames')('languages', { count: 3 }),
-    );
-    const kind = screen.getByText(grantsCard.kind.LOCALE_LIMIT);
+    const item = screen.getByText(itemName);
+    const kind = screen.getByText(kindName);
 
     expect(item).toBeVisible();
     expect(kind).toBeVisible();

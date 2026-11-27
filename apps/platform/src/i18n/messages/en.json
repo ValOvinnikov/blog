@@ -2700,6 +2700,7 @@
   "grantEntitlement": {
     "trigger": "Grant to this tenant",
     "triggerAriaLabel": "Grant to this tenant: {item}",
+    "presetTrigger": "Grant the {preset} preset",
     "title": "Grant {item} to {tenant}",
     "description": "{tenant} gets {item} outside its {plan} plan. Its owner sees it unlocked and can switch it on. Nothing is charged.",
     "granted": "{item} granted.",
@@ -2745,6 +2746,9 @@
       "CORE": "Core modules",
       "STARTER": "Starter modules",
       "GROWTH": "Growth modules"
+    },
+    "preset": {
+      "SHINEFOLD": "Shinefold preset"
     },
     "lookField": {
       "preset": "Preset",
@@ -2800,6 +2804,7 @@
     "kind": {
       "CAPABILITY": "Feature",
       "LOOK_FIELD": "Look",
+      "PRESET": "Preset",
       "MODULE_PACK": "Module pack",
       "LOCALE_LIMIT": "Languages"
     },

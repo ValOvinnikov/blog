@@ -26,8 +26,9 @@ export const PresetListOption = <TId extends string>({
   onChoose,
   onHighlight,
 }: TPresetListOptionProps<TId>) => {
-  const { name, description, swatch } = preset;
+  const { name, description, swatch, badge } = preset;
   const nameId = `${id}-name`;
+  const badgeId = `${id}-badge`;
   const descriptionId = `${id}-description`;
   const {
     option,
@@ -43,7 +44,7 @@ export const PresetListOption = <TId extends string>({
       role="option"
       aria-selected={isSelected}
       aria-labelledby={nameId}
-      aria-describedby={descriptionId}
+      aria-describedby={badge ? `${badgeId} ${descriptionId}` : descriptionId}
       data-highlighted={isHighlighted ? '' : undefined}
       onClick={onChoose}
       onPointerMove={onHighlight}
@@ -58,6 +59,7 @@ export const PresetListOption = <TId extends string>({
           {description}
         </span>
       </span>
+      {badge && <span id={badgeId}>{badge}</span>}
       {isSelected && (
         <Icon
           name={ICONS.TICK}
