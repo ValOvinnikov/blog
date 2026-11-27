@@ -39,6 +39,13 @@ export const Dark: TStory = {
   ],
 };
 
+export const ScrollsSideways: TStory = {
+  args: {
+    code: `const greetings = ['${'hello, '.repeat(30)}'];`,
+    filename: undefined,
+  },
+};
+
 export const WithHighlightedLines: TStory = {
   args: { highlightedLines: [3] },
 };
