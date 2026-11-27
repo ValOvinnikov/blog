@@ -125,7 +125,7 @@ describe(`<${LookPreview.name}/> full screen`, () => {
       });
 
       it('opens a modal dialog named Live preview', () => {
-        expect(dialog()).toHaveAttribute('aria-modal', 'true');
+        expect(dialog()).toHaveAttribute(ARIA_ATTRIBUTE.MODAL, 'true');
       });
 
       it('moves focus to the pressed device button', () => {

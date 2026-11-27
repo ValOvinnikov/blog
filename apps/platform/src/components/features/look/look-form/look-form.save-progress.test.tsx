@@ -57,7 +57,7 @@ describe(`<${LookForm.name}/>`, () => {
     await setupAndSaveNudgedHue(user);
 
     const saveButton = await screen.findByRole('button', { name: SAVING });
-    expect(saveButton).toHaveAttribute('aria-busy', 'true');
+    expect(saveButton).toHaveAttribute(ARIA_ATTRIBUTE.BUSY, 'true');
     expect(saveButton).toHaveAttribute(ARIA_ATTRIBUTE.DISABLED, 'true');
 
     resolveAction({ outcome: ACTION_OUTCOME.SUCCESS });

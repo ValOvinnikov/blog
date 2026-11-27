@@ -9,6 +9,7 @@ import {
   waitFor,
   within,
 } from '@platform/testing/custom-render';
+import { USER_EVENT_KEY } from '@platform/testing/keyboard';
 import {
   mockNavBadge,
   mockNavInertItem,
@@ -255,7 +256,7 @@ describe(`<${Sidebar.name}/>`, () => {
       });
 
       it('hides the tooltip on Escape', async () => {
-        await user.keyboard('{Escape}');
+        await user.keyboard(USER_EVENT_KEY.ESCAPE);
 
         await waitFor(() => {
           const names = screen.getAllByText(MOCK_LOOK_ITEM.label);
@@ -315,7 +316,7 @@ describe(`<${Sidebar.name}/>`, () => {
       });
 
       it('hides the status tooltip on Escape', async () => {
-        await user.keyboard('{Escape}');
+        await user.keyboard(USER_EVENT_KEY.ESCAPE);
 
         await waitFor(() => {
           const statusTexts = screen.getAllByText(MOCK_STATUS_TOOLTIP);

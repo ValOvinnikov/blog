@@ -67,7 +67,7 @@ describe(`<${HueSlider.name}/>`, () => {
       </>,
     );
 
-    expect(getSlider()).not.toHaveAttribute('aria-label');
+    expect(getSlider()).not.toHaveAttribute(ARIA_ATTRIBUTE.LABEL);
   });
 
   it('reports an incremented value on ArrowRight', async () => {

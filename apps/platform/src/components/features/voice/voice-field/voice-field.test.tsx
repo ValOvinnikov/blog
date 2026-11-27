@@ -29,7 +29,6 @@ import { VoiceField } from './voice-field';
 faker.seed(5994);
 
 const HEADING = 'Heading';
-const ARIA_INVALID = 'aria-invalid';
 const MOCK_ERROR = faker.lorem.sentence();
 const MOCK_HEADING = faker.lorem.words(3);
 const { reset: RESET } = messages.fieldStatus;
@@ -103,7 +102,7 @@ describe(`<${VoiceField.name}/>`, () => {
 
     const input = screen.getByRole('textbox', { name: HEADING });
 
-    expect(input).toHaveAttribute(ARIA_INVALID, 'true');
+    expect(input).toHaveAttribute(ARIA_ATTRIBUTE.INVALID, 'true');
     expect(input).toHaveAttribute(
       'id',
       `${MOCK_FIELD_ID_PREFIX}-notFoundHeading`,
@@ -168,7 +167,7 @@ describe(`<${VoiceField.name}/>`, () => {
       'id',
       `${MOCK_FIELD_ID_PREFIX}-notFoundSupportingText`,
     );
-    expect(editor).toHaveAttribute(ARIA_INVALID, 'true');
+    expect(editor).toHaveAttribute(ARIA_ATTRIBUTE.INVALID, 'true');
   });
 
   it('marks a draft that differs from the saved value as unsaved', () => {

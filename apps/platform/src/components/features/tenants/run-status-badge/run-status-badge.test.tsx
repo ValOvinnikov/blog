@@ -1,3 +1,4 @@
+import { ARIA_ATTRIBUTE } from '@platform/constants/aria-attribute';
 import { customRender, screen } from '@platform/testing/custom-render';
 import { TENANT_PROVISIONING_STEP_STATUS } from '@shinefold/db/constants';
 
@@ -13,7 +14,7 @@ describe(`<${RunStatusBadge.name}/>`, () => {
 
     const liveRegion = screen.getByTestId('run-status-live');
 
-    expect(liveRegion).toHaveAttribute('aria-live', 'polite');
+    expect(liveRegion).toHaveAttribute(ARIA_ATTRIBUTE.LIVE, 'polite');
     expect(liveRegion).toHaveTextContent('Running…');
   });
 

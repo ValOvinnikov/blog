@@ -1,6 +1,7 @@
 import { faker } from '@faker-js/faker';
 import { ARIA_ATTRIBUTE } from '@platform/constants/aria-attribute';
 import { customRender, screen } from '@platform/testing/custom-render';
+import { USER_EVENT_KEY } from '@platform/testing/keyboard';
 import { pickNextOptionByKeyboard } from '@platform/testing/pick-next-option-by-keyboard';
 import { EMAIL_SENDER_ITEM } from '@platform/utils/email-draft/email-draft';
 import { EMAIL_TEMPLATE_TYPE } from '@shinefold/config';
@@ -118,7 +119,7 @@ describe(`<${ItemSelect.name}/>`, () => {
 
       it('closes on Escape without changing the selection', async () => {
         await screen.findByRole('listbox');
-        await user.keyboard('{Escape}');
+        await user.keyboard(USER_EVENT_KEY.ESCAPE);
 
         const listbox = screen.queryByRole('listbox');
 

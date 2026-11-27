@@ -8,6 +8,7 @@ import {
   screen,
   within,
 } from '@platform/testing/custom-render';
+import { USER_EVENT_KEY } from '@platform/testing/keyboard';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
 import { useRef, useState } from 'react';
 
@@ -158,7 +159,7 @@ describe(`<${Accordion.name}/>`, () => {
       });
 
       it('opens a row with the keyboard', async () => {
-        await user.keyboard('{Enter}');
+        await user.keyboard(USER_EVENT_KEY.ENTER);
 
         expect(firstTrigger).toHaveAttribute(ARIA_ATTRIBUTE.EXPANDED, 'true');
       });

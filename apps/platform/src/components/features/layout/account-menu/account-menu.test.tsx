@@ -11,6 +11,7 @@ import {
   within,
 } from '@platform/testing/custom-render';
 import { makeEnTranslator } from '@platform/testing/en-translator';
+import { USER_EVENT_KEY } from '@platform/testing/keyboard';
 import { mockAccount } from '@platform/testing/layout/fixtures';
 import {
   DATA_THEME_ATTRIBUTE,
@@ -116,7 +117,7 @@ describe(`<${AccountMenu.name}/>`, () => {
       });
 
       it('returns focus to the trigger on Escape', async () => {
-        await user.keyboard('{Escape}');
+        await user.keyboard(USER_EVENT_KEY.ESCAPE);
 
         await waitFor(() => {
           expect(trigger).toHaveFocus();

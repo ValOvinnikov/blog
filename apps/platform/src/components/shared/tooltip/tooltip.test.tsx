@@ -1,6 +1,7 @@
 import { faker } from '@faker-js/faker';
 import { ARIA_ATTRIBUTE } from '@platform/constants/aria-attribute';
 import { render, screen, waitFor } from '@platform/testing/custom-render';
+import { USER_EVENT_KEY } from '@platform/testing/keyboard';
 import { TOOLTIP_HOVER_TIMEOUT } from '@platform/testing/tooltip';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
 
@@ -59,7 +60,7 @@ describe(`<${Tooltip.name}/>`, () => {
     });
 
     it('closes on Escape', async () => {
-      await user.keyboard('{Escape}');
+      await user.keyboard(USER_EVENT_KEY.ESCAPE);
 
       await expectTooltipClosed();
     });
@@ -71,7 +72,7 @@ describe(`<${Tooltip.name}/>`, () => {
     });
 
     it('closes when the trigger is activated', async () => {
-      await user.keyboard('{Enter}');
+      await user.keyboard(USER_EVENT_KEY.ENTER);
 
       await expectTooltipClosed();
     });

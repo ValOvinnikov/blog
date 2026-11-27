@@ -8,6 +8,7 @@ import {
 } from '@platform/constants/voice';
 import { saveVoiceOverridesAction } from '@platform/server/site-config/save-voice-overrides-action';
 import { screen, within } from '@platform/testing/custom-render';
+import { USER_EVENT_KEY } from '@platform/testing/keyboard';
 import { stubMatchingMediaQuery } from '@platform/testing/match-media';
 import { mockRouterRefresh } from '@platform/testing/mock-router';
 import {
@@ -169,7 +170,7 @@ describe(`<${VoiceSettings.name}/> sections`, () => {
 
     it('jumps from a summary row with Enter', async () => {
       summaryRow(PAGE_NOT_FOUND).focus();
-      await user.keyboard('{Enter}');
+      await user.keyboard(USER_EVENT_KEY.ENTER);
 
       const heading = within(voiceCard(PAGE_NOT_FOUND)).getByRole('heading', {
         level: 3,

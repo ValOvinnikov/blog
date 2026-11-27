@@ -505,7 +505,7 @@ Every key/value const an agent should reuse before writing a literal. The
 
 ### `@platform/constants/aria-attribute` — `apps/platform/src/constants/aria-attribute.ts`
 
-- **ARIA_ATTRIBUTE**: `CONTROLS`=`"aria-controls"`, `CURRENT`=`"aria-current"`, `DESCRIBEDBY`=`"aria-describedby"`, `DISABLED`=`"aria-disabled"`, `EXPANDED`=`"aria-expanded"`, `HASPOPUP`=`"aria-haspopup"`, `HIDDEN`=`"aria-hidden"`, `PRESSED`=`"aria-pressed"`, `READONLY`=`"aria-readonly"`, `SELECTED`=`"aria-selected"`, `VALUEMAX`=`"aria-valuemax"`, `VALUENOW`=`"aria-valuenow"`, `VALUETEXT`=`"aria-valuetext"`
+- **ARIA_ATTRIBUTE**: `ACTIVEDESCENDANT`=`"aria-activedescendant"`, `BUSY`=`"aria-busy"`, `CHECKED`=`"aria-checked"`, `CONTROLS`=`"aria-controls"`, `CURRENT`=`"aria-current"`, `DESCRIBEDBY`=`"aria-describedby"`, `DISABLED`=`"aria-disabled"`, `EXPANDED`=`"aria-expanded"`, `HASPOPUP`=`"aria-haspopup"`, `HIDDEN`=`"aria-hidden"`, `INVALID`=`"aria-invalid"`, `LABEL`=`"aria-label"`, `LABELLEDBY`=`"aria-labelledby"`, `LIVE`=`"aria-live"`, `MODAL`=`"aria-modal"`, `MULTILINE`=`"aria-multiline"`, `POSINSET`=`"aria-posinset"`, `PRESSED`=`"aria-pressed"`, `READONLY`=`"aria-readonly"`, `SELECTED`=`"aria-selected"`, `SETSIZE`=`"aria-setsize"`, `SORT`=`"aria-sort"`, `VALUEMAX`=`"aria-valuemax"`, `VALUENOW`=`"aria-valuenow"`, `VALUETEXT`=`"aria-valuetext"`
 
 ### `@platform/constants/aria-role` — `apps/platform/src/constants/aria-role.ts`
 

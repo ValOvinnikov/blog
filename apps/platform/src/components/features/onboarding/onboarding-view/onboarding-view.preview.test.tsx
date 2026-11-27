@@ -138,7 +138,9 @@ describe(`<${OnboardingView.name}/> preview`, () => {
     it('offers only the device and colour scheme groups', () => {
       const groups = within(previewToolbar()).getAllByRole('group');
 
-      expect(groups.map((group) => group.getAttribute('aria-label'))).toEqual([
+      expect(
+        groups.map((group) => group.getAttribute(ARIA_ATTRIBUTE.LABEL)),
+      ).toEqual([
         tDevice('deviceGroupAriaLabel'),
         tMode('previewColorSchemeAriaLabel'),
       ]);

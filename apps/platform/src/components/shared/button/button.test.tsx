@@ -5,6 +5,7 @@ import {
   renderWithIntl,
   screen,
 } from '@platform/testing/custom-render';
+import { USER_EVENT_KEY } from '@platform/testing/keyboard';
 import { findServerEventHandlers } from '@platform/testing/server-event-handlers';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
 import type { Mock } from 'vitest';
@@ -41,7 +42,7 @@ describe(`<${Button.name}/>`, () => {
 
     it('is enabled and not busy when not pending', () => {
       expect(button).toBeEnabled();
-      expect(button).toHaveAttribute('aria-busy', 'false');
+      expect(button).toHaveAttribute(ARIA_ATTRIBUTE.BUSY, 'false');
     });
   });
 
@@ -84,7 +85,7 @@ describe(`<${Button.name}/>`, () => {
       expect(button).toHaveFocus();
 
       await user.click(button);
-      await user.keyboard('{Enter}');
+      await user.keyboard(USER_EVENT_KEY.ENTER);
 
       expect(handleClick).not.toHaveBeenCalled();
     });
@@ -131,7 +132,7 @@ describe(`<${Button.name}/>`, () => {
         const button = screen.getByRole('button', { name: MOCK_LABEL });
 
         expect(button).toBeEnabled();
-        expect(button).toHaveAttribute('aria-busy', 'true');
+        expect(button).toHaveAttribute(ARIA_ATTRIBUTE.BUSY, 'true');
         expect(button).toHaveAttribute(ARIA_ATTRIBUTE.DISABLED, 'true');
       });
 
@@ -216,7 +217,7 @@ describe(`<${Button.name}/>`, () => {
 
       const status = screen.getByRole('status');
 
-      expect(status).toHaveAttribute('aria-live', 'polite');
+      expect(status).toHaveAttribute(ARIA_ATTRIBUTE.LIVE, 'polite');
       expect(status).toHaveTextContent('');
     });
 

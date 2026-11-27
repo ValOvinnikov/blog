@@ -3,6 +3,7 @@ import { ARIA_ATTRIBUTE } from '@platform/constants/aria-attribute';
 import en from '@platform/i18n/messages/en.json';
 import { expectArchivedOffersNoSave } from '@platform/testing/assert-archived-save';
 import { screen, within } from '@platform/testing/custom-render';
+import { USER_EVENT_KEY } from '@platform/testing/keyboard';
 import { mockRouterRefresh } from '@platform/testing/mock-router';
 import {
   ARCHIVED_NOTICE_DESCRIPTION,
@@ -515,7 +516,7 @@ describe(`<${VoiceSettings.name}/>`, () => {
       });
 
       await user.pointer({ keys: '[MouseLeft>]', target: row });
-      await user.keyboard('{Enter}');
+      await user.keyboard(USER_EVENT_KEY.ENTER);
 
       expect(row).toHaveFocus();
       expect(row).toHaveAttribute(ARIA_ATTRIBUTE.EXPANDED, 'true');

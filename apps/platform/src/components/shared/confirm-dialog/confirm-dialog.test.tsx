@@ -199,7 +199,7 @@ describe(`<${ConfirmDialog.name}/>`, () => {
 
     it('names the confirm field after the expected value, with the hint', () => {
       expect(confirmField).toHaveAccessibleDescription(t('confirmHint'));
-      expect(confirmField).not.toHaveAttribute('aria-label');
+      expect(confirmField).not.toHaveAttribute(ARIA_ATTRIBUTE.LABEL);
     });
 
     it('enables confirm only once the typed value matches exactly', async () => {
@@ -299,7 +299,7 @@ describe(`<${ConfirmDialog.name}/>`, () => {
         const status = screen.getByRole('status');
 
         expect(pendingButton).toHaveAttribute(ARIA_ATTRIBUTE.DISABLED, 'true');
-        expect(pendingButton).toHaveAttribute('aria-busy', 'true');
+        expect(pendingButton).toHaveAttribute(ARIA_ATTRIBUTE.BUSY, 'true');
         expect(status).toHaveTextContent(MOCK_CONFIRMING_LABEL);
       });
 
@@ -372,8 +372,8 @@ describe(`<${ConfirmDialog.name}/>`, () => {
 
     it('never opens the dialog by click or keyboard', async () => {
       await user.click(trigger);
-      await user.keyboard('{Enter}');
-      await user.keyboard(' ');
+      await user.keyboard(USER_EVENT_KEY.ENTER);
+      await user.keyboard(USER_EVENT_KEY.SPACE);
 
       const dialog = screen.queryByRole('alertdialog');
       expect(dialog).not.toBeInTheDocument();

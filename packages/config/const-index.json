@@ -6506,6 +6506,30 @@
         "file": "apps/platform/src/constants/activity.ts"
       }
     ],
+    "aria-activedescendant": [
+      {
+        "ref": "ARIA_ATTRIBUTE.ACTIVEDESCENDANT",
+        "scope": "app:platform",
+        "from": "@platform/constants/aria-attribute",
+        "file": "apps/platform/src/constants/aria-attribute.ts"
+      }
+    ],
+    "aria-busy": [
+      {
+        "ref": "ARIA_ATTRIBUTE.BUSY",
+        "scope": "app:platform",
+        "from": "@platform/constants/aria-attribute",
+        "file": "apps/platform/src/constants/aria-attribute.ts"
+      }
+    ],
+    "aria-checked": [
+      {
+        "ref": "ARIA_ATTRIBUTE.CHECKED",
+        "scope": "app:platform",
+        "from": "@platform/constants/aria-attribute",
+        "file": "apps/platform/src/constants/aria-attribute.ts"
+      }
+    ],
     "aria-controls": [
       {
         "ref": "ARIA_ATTRIBUTE.CONTROLS",
@@ -6562,6 +6586,62 @@
         "file": "apps/platform/src/constants/aria-attribute.ts"
       }
     ],
+    "aria-invalid": [
+      {
+        "ref": "ARIA_ATTRIBUTE.INVALID",
+        "scope": "app:platform",
+        "from": "@platform/constants/aria-attribute",
+        "file": "apps/platform/src/constants/aria-attribute.ts"
+      }
+    ],
+    "aria-label": [
+      {
+        "ref": "ARIA_ATTRIBUTE.LABEL",
+        "scope": "app:platform",
+        "from": "@platform/constants/aria-attribute",
+        "file": "apps/platform/src/constants/aria-attribute.ts"
+      }
+    ],
+    "aria-labelledby": [
+      {
+        "ref": "ARIA_ATTRIBUTE.LABELLEDBY",
+        "scope": "app:platform",
+        "from": "@platform/constants/aria-attribute",
+        "file": "apps/platform/src/constants/aria-attribute.ts"
+      }
+    ],
+    "aria-live": [
+      {
+        "ref": "ARIA_ATTRIBUTE.LIVE",
+        "scope": "app:platform",
+        "from": "@platform/constants/aria-attribute",
+        "file": "apps/platform/src/constants/aria-attribute.ts"
+      }
+    ],
+    "aria-modal": [
+      {
+        "ref": "ARIA_ATTRIBUTE.MODAL",
+        "scope": "app:platform",
+        "from": "@platform/constants/aria-attribute",
+        "file": "apps/platform/src/constants/aria-attribute.ts"
+      }
+    ],
+    "aria-multiline": [
+      {
+        "ref": "ARIA_ATTRIBUTE.MULTILINE",
+        "scope": "app:platform",
+        "from": "@platform/constants/aria-attribute",
+        "file": "apps/platform/src/constants/aria-attribute.ts"
+      }
+    ],
+    "aria-posinset": [
+      {
+        "ref": "ARIA_ATTRIBUTE.POSINSET",
+        "scope": "app:platform",
+        "from": "@platform/constants/aria-attribute",
+        "file": "apps/platform/src/constants/aria-attribute.ts"
+      }
+    ],
     "aria-pressed": [
       {
         "ref": "ARIA_ATTRIBUTE.PRESSED",
@@ -6581,6 +6661,22 @@
     "aria-selected": [
       {
         "ref": "ARIA_ATTRIBUTE.SELECTED",
+        "scope": "app:platform",
+        "from": "@platform/constants/aria-attribute",
+        "file": "apps/platform/src/constants/aria-attribute.ts"
+      }
+    ],
+    "aria-setsize": [
+      {
+        "ref": "ARIA_ATTRIBUTE.SETSIZE",
+        "scope": "app:platform",
+        "from": "@platform/constants/aria-attribute",
+        "file": "apps/platform/src/constants/aria-attribute.ts"
+      }
+    ],
+    "aria-sort": [
+      {
+        "ref": "ARIA_ATTRIBUTE.SORT",
         "scope": "app:platform",
         "from": "@platform/constants/aria-attribute",
         "file": "apps/platform/src/constants/aria-attribute.ts"

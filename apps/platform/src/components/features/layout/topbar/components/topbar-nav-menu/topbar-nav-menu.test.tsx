@@ -12,6 +12,7 @@ import {
   waitFor,
   within,
 } from '@platform/testing/custom-render';
+import { USER_EVENT_KEY } from '@platform/testing/keyboard';
 import {
   mockAccount,
   mockDashboardStudioInnerPath,
@@ -50,10 +51,7 @@ const MOCK_ACCOUNT = mockAccount();
 const MOCK_ACTIVE_TENANT = mockTenantSwitcherItem();
 const MOCK_OTHER_TENANT = mockTenantSwitcherItem();
 
-const ARROW_DOWN = '{ArrowDown}';
-const ARROW_DOWN_TO_ACCOUNT = ARROW_DOWN.repeat(3);
-const ENTER = '{Enter}';
-const ESCAPE = '{Escape}';
+const ARROW_DOWN_TO_ACCOUNT = USER_EVENT_KEY.ARROW_DOWN.repeat(3);
 
 const MOCK_BAR_REF = createRef<HTMLElement>();
 
@@ -247,7 +245,7 @@ describe(`<${TopbarNavMenu.name}/>`, () => {
       });
 
       it('hides the tooltip on Escape', async () => {
-        await user.keyboard(ESCAPE);
+        await user.keyboard(USER_EVENT_KEY.ESCAPE);
 
         await waitFor(() => {
           const tooltip = screen.queryByText(
@@ -303,7 +301,7 @@ describe(`<${TopbarNavMenu.name}/>`, () => {
     });
 
     it('highlights the switcher first by arrow key', async () => {
-      await user.keyboard(ARROW_DOWN);
+      await user.keyboard(USER_EVENT_KEY.ARROW_DOWN);
 
       expect(getSwitcherTrigger(menu)).toHaveFocus();
     });
@@ -330,7 +328,7 @@ describe(`<${TopbarNavMenu.name}/>`, () => {
 
       beforeEach(async () => {
         await user.keyboard(ARROW_DOWN_TO_ACCOUNT);
-        await user.keyboard(ENTER);
+        await user.keyboard(USER_EVENT_KEY.ENTER);
         accountMenu = await screen.findByRole('menu', {
           name: messages.account.menuLabel,
         });
@@ -351,7 +349,7 @@ describe(`<${TopbarNavMenu.name}/>`, () => {
 
       describe('after one Escape', () => {
         beforeEach(async () => {
-          await user.keyboard(ESCAPE);
+          await user.keyboard(USER_EVENT_KEY.ESCAPE);
         });
 
         it('closes only the account menu, returning focus to its trigger', async () => {
@@ -361,7 +359,7 @@ describe(`<${TopbarNavMenu.name}/>`, () => {
         });
 
         it('closes the Menu onto its button on a second Escape', async () => {
-          await user.keyboard(ESCAPE);
+          await user.keyboard(USER_EVENT_KEY.ESCAPE);
 
           await waitFor(() => expect(menu).not.toBeInTheDocument());
           expect(getMenuButton()).toHaveFocus();

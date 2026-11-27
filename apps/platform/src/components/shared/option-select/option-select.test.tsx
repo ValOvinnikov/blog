@@ -1,12 +1,12 @@
 import { faker } from '@faker-js/faker';
 import { ARIA_ATTRIBUTE } from '@platform/constants/aria-attribute';
-import { KEY } from '@platform/constants/keyboard';
 import {
   customRender,
   renderWithIntl,
   screen,
   within,
 } from '@platform/testing/custom-render';
+import { USER_EVENT_KEY } from '@platform/testing/keyboard';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
 import type { Mock } from 'vitest';
 
@@ -239,14 +239,16 @@ describe(`<${OptionSelect.name}/>`, () => {
         expect(trigger).toBeEnabled();
       });
 
-      it.each(['{Enter}', KEY.SPACE, '{ArrowDown}', '{ArrowUp}'])(
-        'does not open or change on %s',
-        async (key) => {
-          await user.keyboard(key);
+      it.each([
+        USER_EVENT_KEY.ENTER,
+        USER_EVENT_KEY.SPACE,
+        USER_EVENT_KEY.ARROW_DOWN,
+        USER_EVENT_KEY.ARROW_UP,
+      ])('does not open or change on %s', async (key) => {
+        await user.keyboard(key);
 
-          expectClosedAndUnchanged();
-        },
-      );
+        expectClosedAndUnchanged();
+      });
     });
   });
 });

@@ -7,6 +7,7 @@ import {
   screen,
   waitFor,
 } from '@platform/testing/custom-render';
+import { USER_EVENT_KEY } from '@platform/testing/keyboard';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
 
 import { SidebarCollapseToggle } from './sidebar-collapse-toggle';
@@ -73,7 +74,7 @@ describe(`<${SidebarCollapseToggle.name}/>`, () => {
       });
 
       it('toggles on Enter and closes the tooltip', async () => {
-        await user.keyboard('{Enter}');
+        await user.keyboard(USER_EVENT_KEY.ENTER);
 
         const expandButton = screen.getByRole('button', { name: expandToggle });
         expect(expandButton).toHaveFocus();
@@ -85,7 +86,7 @@ describe(`<${SidebarCollapseToggle.name}/>`, () => {
       });
 
       it('hides the tooltip on Escape', async () => {
-        await user.keyboard('{Escape}');
+        await user.keyboard(USER_EVENT_KEY.ESCAPE);
 
         await waitFor(() => {
           const tooltip = screen.queryByText(collapseToggle);

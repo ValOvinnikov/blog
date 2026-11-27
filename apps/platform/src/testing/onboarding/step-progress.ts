@@ -7,9 +7,9 @@ import messages from '@platform/i18n/messages/en.json';
 import { screen } from '@platform/testing/custom-render';
 import { makeEnTranslator } from '@platform/testing/en-translator';
 
-const { steps: STEPS, stepsAriaLabel: STEPS_ARIA_LABEL } =
+export const { steps: STEPS, stepsAriaLabel: STEPS_ARIA_LABEL } =
   messages.onboardingForm;
-const t = makeEnTranslator('onboardingForm');
+export const t = makeEnTranslator('onboardingForm');
 const STEP_ORDER = Object.values(ONBOARDING_STEP);
 
 const stepProgress = () =>

@@ -4,6 +4,7 @@ import { LOOK_SAMPLE_TOKENS_TEST_ID } from '@platform/constants/look-sample';
 import messages from '@platform/i18n/messages/en.json';
 import { updateLookAction } from '@platform/server/site-config/update-look-action';
 import { screen } from '@platform/testing/custom-render';
+import { USER_EVENT_KEY } from '@platform/testing/keyboard';
 import {
   CONSOLE,
   EDITORIAL,
@@ -47,7 +48,7 @@ describe(`<${LookForm.name}/>`, () => {
       const consolePreset = screen.getByRole('radio', { name: CONSOLE });
       const editorialPreset = screen.getByRole('radio', { name: EDITORIAL });
       await user.click(consolePreset);
-      await user.keyboard('{ArrowRight}');
+      await user.keyboard(USER_EVENT_KEY.ARROW_RIGHT);
       await openLookRow(user, LOOK_ROW.COLOUR);
 
       const hueReadout = screen.getByText(hueValue(EDITORIAL_ACCENT_HUE));

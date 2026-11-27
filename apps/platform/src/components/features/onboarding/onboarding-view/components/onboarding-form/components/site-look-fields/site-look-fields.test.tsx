@@ -2,6 +2,7 @@ import { ACCENT_SWATCH_TEST_ID } from '@platform/constants/accent-swatch';
 import { ARIA_ATTRIBUTE } from '@platform/constants/aria-attribute';
 import messages from '@platform/i18n/messages/en.json';
 import { customRender, screen } from '@platform/testing/custom-render';
+import { USER_EVENT_KEY } from '@platform/testing/keyboard';
 import { PRESET_ID } from '@shinefold/config';
 import userEvent from '@testing-library/user-event';
 
@@ -64,7 +65,7 @@ describe(`<${SiteLookFields.name}/>`, () => {
 
     const slider = screen.getByRole('slider', { name: ACCENT_LABEL });
     await userEvent.click(slider);
-    await userEvent.keyboard('{ArrowRight}');
+    await userEvent.keyboard(USER_EVENT_KEY.ARROW_RIGHT);
 
     expect(handleAccentHueChange).toHaveBeenCalledWith(MOCK_HUE + 1);
   });

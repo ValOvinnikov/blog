@@ -118,7 +118,7 @@ describe(useViewTabs.name, () => {
       const { panelProps, tabsProps } = result.current;
 
       expect(panelProps('preview').role).toBe('tabpanel');
-      expect(panelProps('preview')['aria-labelledby']).toBe(
+      expect(panelProps('preview')[ARIA_ATTRIBUTE.LABELLEDBY]).toBe(
         tabsProps.ids.preview.tab,
       );
     });

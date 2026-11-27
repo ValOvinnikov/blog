@@ -140,7 +140,6 @@ const { ARROW_DOWN, ARROW_RIGHT, END, ENTER, ESCAPE, HOME, SPACE, TAB } =
   USER_EVENT_KEY;
 const DIALOG_POPUP = 'dialog';
 const TO_LEDGER = `${ARROW_DOWN}${ARROW_RIGHT}`;
-const ACTIVE_OPTION = 'aria-activedescendant';
 const CLOSES_PICKER = 'closes the picker';
 const KEEPS_SELECTED = 'keeps the selected preset';
 
@@ -302,7 +301,10 @@ describe(`<${PresetStrip.name}/>`, () => {
       it('starts on the selected preset', () => {
         const almanac = screen.getByRole('option', { name: ALMANAC });
 
-        expect(listbox).toHaveAttribute(ACTIVE_OPTION, almanac.id);
+        expect(listbox).toHaveAttribute(
+          ARIA_ATTRIBUTE.ACTIVEDESCENDANT,
+          almanac.id,
+        );
       });
 
       it('moves through the grid in both directions with the arrow keys', async () => {
@@ -310,7 +312,10 @@ describe(`<${PresetStrip.name}/>`, () => {
 
         await user.keyboard(TO_LEDGER);
 
-        expect(listbox).toHaveAttribute(ACTIVE_OPTION, ledger.id);
+        expect(listbox).toHaveAttribute(
+          ARIA_ATTRIBUTE.ACTIVEDESCENDANT,
+          ledger.id,
+        );
       });
 
       it.each([
@@ -321,7 +326,10 @@ describe(`<${PresetStrip.name}/>`, () => {
 
         await user.keyboard(key);
 
-        expect(listbox).toHaveAttribute(ACTIVE_OPTION, target.id);
+        expect(listbox).toHaveAttribute(
+          ARIA_ATTRIBUTE.ACTIVEDESCENDANT,
+          target.id,
+        );
       });
 
       it('chooses the focused preset with Space', async () => {
@@ -497,7 +505,7 @@ describe(`<${PresetStrip.name}/>`, () => {
       it('opens a modal Choose a preset sheet', () => {
         const sheet = screen.getByRole('dialog', { name: CHOOSE_PRESET });
 
-        expect(sheet).toHaveAttribute('aria-modal', 'true');
+        expect(sheet).toHaveAttribute(ARIA_ATTRIBUTE.MODAL, 'true');
       });
 
       it('moves one row at a time with the arrow keys', async () => {
@@ -506,7 +514,10 @@ describe(`<${PresetStrip.name}/>`, () => {
 
         await user.keyboard(ARROW_DOWN);
 
-        expect(listbox).toHaveAttribute(ACTIVE_OPTION, gazette.id);
+        expect(listbox).toHaveAttribute(
+          ARIA_ATTRIBUTE.ACTIVEDESCENDANT,
+          gazette.id,
+        );
       });
 
       it('chooses a row on click', async () => {

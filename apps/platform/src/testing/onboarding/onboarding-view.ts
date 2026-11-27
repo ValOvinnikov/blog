@@ -1,7 +1,7 @@
 import messages from '@platform/i18n/messages/en.json';
 import { createSiteAction } from '@platform/server/onboarding/create-site-action';
 import { screen } from '@platform/testing/custom-render';
-import { makeEnTranslator } from '@platform/testing/en-translator';
+import { t } from '@platform/testing/onboarding/step-progress';
 import {
   MOCK_TENANT_NAME,
   MOCK_TENANT_ROOT_DOMAIN,
@@ -40,8 +40,6 @@ export const {
   siteAddressUnverified: ADDRESS_UNVERIFIED,
   accentLabel: ACCENT_LABEL,
   siteTypes: SITE_TYPES,
-  steps: STEPS,
-  stepsAriaLabel: STEPS_ARIA_LABEL,
   fieldErrors: { nameRequired: NAME_REQUIRED, siteAddressTaken: ADDRESS_TAKEN },
   failures: { tryAgainLater: TRY_AGAIN_LATER },
 } = messages.onboardingForm;
@@ -51,7 +49,6 @@ const { acceptTerms: ACCEPT_TERMS } = messages.termsAcceptance;
 export const { termsNotAccepted: TERMS_NOT_ACCEPTED } =
   messages.termsAcceptance;
 const [ACCEPT_TERMS_LEAD] = ACCEPT_TERMS.split('<');
-export const t = makeEnTranslator('onboardingForm');
 
 export const MOCK_NAME_FIELD = { name: NAME_LABEL };
 export const MOCK_ADDRESS_FIELD = { name: SITE_ADDRESS_LABEL };

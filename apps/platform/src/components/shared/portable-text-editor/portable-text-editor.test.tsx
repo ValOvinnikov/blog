@@ -29,9 +29,6 @@ const MOCK_ITEM_TWO = faker.lorem.words(3);
 const MOCK_ITEM_THREE = faker.lorem.words(3);
 const MOCK_ITEM_FOUR = faker.lorem.words(3);
 const MOCK_ITEM_FIVE = faker.lorem.words(3);
-const ARIA_MULTILINE = 'aria-multiline';
-const ARIA_SETSIZE = 'aria-setsize';
-const ARIA_POSINSET = 'aria-posinset';
 
 const mockLinkBody = (href: string): TEmailTemplateBlock[] => {
   const linkKey = faker.string.uuid();
@@ -75,7 +72,7 @@ describe(`<${PortableTextEditor.name}/>`, () => {
       const field = screen.getByRole('textbox', { name: MOCK_LABEL });
 
       expect(field).toBeVisible();
-      expect(field).toHaveAttribute(ARIA_MULTILINE, 'true');
+      expect(field).toHaveAttribute(ARIA_ATTRIBUTE.MULTILINE, 'true');
       expect(field).not.toHaveAttribute(ARIA_ATTRIBUTE.DISABLED);
     });
 
@@ -164,7 +161,7 @@ describe(`<${PortableTextEditor.name}/>`, () => {
       const field = screen.getByRole('textbox', { name: MOCK_LABEL });
 
       expect(field).toHaveAttribute(ARIA_ATTRIBUTE.DISABLED, 'true');
-      expect(field).toHaveAttribute(ARIA_MULTILINE, 'true');
+      expect(field).toHaveAttribute(ARIA_ATTRIBUTE.MULTILINE, 'true');
       expect(field).not.toHaveAttribute('tabindex');
     });
   });
@@ -200,7 +197,7 @@ describe(`<${PortableTextEditor.name}/>`, () => {
 
     const field = screen.getByRole('textbox', { name: MOCK_LABEL });
 
-    expect(field).toHaveAttribute('aria-invalid', 'true');
+    expect(field).toHaveAttribute(ARIA_ATTRIBUTE.INVALID, 'true');
     expect(field).toHaveAttribute(
       ARIA_ATTRIBUTE.DESCRIBEDBY,
       MOCK_DESCRIPTION_ID,
@@ -266,8 +263,8 @@ describe(`<${PortableTextEditor.name}/>`, () => {
 
     const items = await screen.findAllByRole('listitem');
     const positions = items.map((item) => [
-      item.getAttribute(ARIA_POSINSET),
-      item.getAttribute(ARIA_SETSIZE),
+      item.getAttribute(ARIA_ATTRIBUTE.POSINSET),
+      item.getAttribute(ARIA_ATTRIBUTE.SETSIZE),
     ]);
 
     expect(positions).toEqual([
@@ -304,11 +301,11 @@ describe(`<${PortableTextEditor.name}/>`, () => {
     const nestedFirstItem = findItem(MOCK_ITEM_THREE);
     const nestedSecondItem = findItem(MOCK_ITEM_FOUR);
 
-    expect(outerThirdItem).toHaveAttribute(ARIA_POSINSET, '3');
-    expect(outerThirdItem).toHaveAttribute(ARIA_SETSIZE, '3');
-    expect(nestedFirstItem).toHaveAttribute(ARIA_POSINSET, '1');
-    expect(nestedFirstItem).toHaveAttribute(ARIA_SETSIZE, '2');
-    expect(nestedSecondItem).toHaveAttribute(ARIA_POSINSET, '2');
-    expect(nestedSecondItem).toHaveAttribute(ARIA_SETSIZE, '2');
+    expect(outerThirdItem).toHaveAttribute(ARIA_ATTRIBUTE.POSINSET, '3');
+    expect(outerThirdItem).toHaveAttribute(ARIA_ATTRIBUTE.SETSIZE, '3');
+    expect(nestedFirstItem).toHaveAttribute(ARIA_ATTRIBUTE.POSINSET, '1');
+    expect(nestedFirstItem).toHaveAttribute(ARIA_ATTRIBUTE.SETSIZE, '2');
+    expect(nestedSecondItem).toHaveAttribute(ARIA_ATTRIBUTE.POSINSET, '2');
+    expect(nestedSecondItem).toHaveAttribute(ARIA_ATTRIBUTE.SETSIZE, '2');
   });
 });

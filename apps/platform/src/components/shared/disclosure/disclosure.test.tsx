@@ -5,6 +5,7 @@ import {
   renderWithIntl,
   screen,
 } from '@platform/testing/custom-render';
+import { USER_EVENT_KEY } from '@platform/testing/keyboard';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
 import { useState } from 'react';
 
@@ -117,15 +118,18 @@ describe(`<${Disclosure.name}/>`, () => {
       expect(body).not.toBeVisible();
     });
 
-    it.each(['{Enter}', ' '])('toggles with the %s key', async (key) => {
-      await user.tab();
+    it.each([USER_EVENT_KEY.ENTER, USER_EVENT_KEY.SPACE])(
+      'toggles with the %s key',
+      async (key) => {
+        await user.tab();
 
-      expect(trigger).toHaveFocus();
+        expect(trigger).toHaveFocus();
 
-      await user.keyboard(key);
-      expect(trigger).toHaveAttribute(ARIA_ATTRIBUTE.EXPANDED, 'true');
-      expect(body).toBeVisible();
-    });
+        await user.keyboard(key);
+        expect(trigger).toHaveAttribute(ARIA_ATTRIBUTE.EXPANDED, 'true');
+        expect(body).toBeVisible();
+      },
+    );
   });
 
   it('renders the trigger with no content', () => {

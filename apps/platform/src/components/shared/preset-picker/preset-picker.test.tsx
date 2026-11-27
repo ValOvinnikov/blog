@@ -1,6 +1,7 @@
 import { ARIA_ATTRIBUTE } from '@platform/constants/aria-attribute';
 import messages from '@platform/i18n/messages/en.json';
 import { customRender, screen } from '@platform/testing/custom-render';
+import { USER_EVENT_KEY } from '@platform/testing/keyboard';
 import { ARCHIVED_NOTICE_ID } from '@platform/testing/render-in-settings-form';
 import { PRESET_ID } from '@shinefold/config';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
@@ -40,7 +41,7 @@ describe(`<${PresetPicker.name}/>`, () => {
     ])('marks %s checked: %s', (name, checked) => {
       const preset = screen.getByRole('radio', { name });
 
-      expect(preset).toHaveAttribute('aria-checked', checked);
+      expect(preset).toHaveAttribute(ARIA_ATTRIBUTE.CHECKED, checked);
     });
 
     it('describes each preset with its description', () => {
@@ -64,7 +65,7 @@ describe(`<${PresetPicker.name}/>`, () => {
 
     it('reports the preset the user arrows to', async () => {
       await user.tab();
-      await user.keyboard('{ArrowRight}');
+      await user.keyboard(USER_EVENT_KEY.ARROW_RIGHT);
 
       expect(onChange).toHaveBeenCalledWith(PRESET_ID.EDITORIAL);
     });

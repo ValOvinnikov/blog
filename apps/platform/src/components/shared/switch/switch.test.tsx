@@ -5,6 +5,7 @@ import {
   renderWithIntl,
   screen,
 } from '@platform/testing/custom-render';
+import { USER_EVENT_KEY } from '@platform/testing/keyboard';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
 
 import { Switch } from './switch';
@@ -138,7 +139,7 @@ describe(`<${Switch.name}/>`, () => {
       });
 
       it('ignores Space', async () => {
-        await user.keyboard(' ');
+        await user.keyboard(USER_EVENT_KEY.SPACE);
 
         expect(onCheckedChange).not.toHaveBeenCalled();
       });

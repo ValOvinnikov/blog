@@ -1,4 +1,5 @@
 import { faker } from '@faker-js/faker';
+import { ARIA_ATTRIBUTE } from '@platform/constants/aria-attribute';
 import { customRender, screen } from '@platform/testing/custom-render';
 import { makeEnTranslator } from '@platform/testing/en-translator';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
@@ -48,6 +49,6 @@ describe(`<${PortableTextEditorLinkControl.name}/>`, () => {
 
     expect(onApplyMock).not.toHaveBeenCalled();
     expect(urlInput).toHaveFocus();
-    expect(urlInput).toHaveAttribute('aria-invalid', 'true');
+    expect(urlInput).toHaveAttribute(ARIA_ATTRIBUTE.INVALID, 'true');
   });
 });

@@ -6,6 +6,7 @@ import {
   screen,
   within,
 } from '@platform/testing/custom-render';
+import { USER_EVENT_KEY } from '@platform/testing/keyboard';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
 import type { Mock } from 'vitest';
 
@@ -298,7 +299,7 @@ describe(`<${SegmentedControl.name}/>`, () => {
 
       expect(tabbed).toHaveFocus();
 
-      await user.keyboard('{ArrowRight}');
+      await user.keyboard(USER_EVENT_KEY.ARROW_RIGHT);
       const arrowed = screen.getByRole('button', { name: MOCK_SECOND_LABEL });
 
       expect(arrowed).toHaveFocus();
@@ -313,16 +314,19 @@ describe(`<${SegmentedControl.name}/>`, () => {
       expect(onChange).not.toHaveBeenCalled();
     });
 
-    it.each(['{Enter}', ' '])('reports nothing on %s', async (key) => {
-      const firstOption = screen.getByRole('button', {
-        name: MOCK_FIRST_LABEL,
-      });
-      firstOption.focus();
-      await user.keyboard(key);
+    it.each([USER_EVENT_KEY.ENTER, USER_EVENT_KEY.SPACE])(
+      'reports nothing on %s',
+      async (key) => {
+        const firstOption = screen.getByRole('button', {
+          name: MOCK_FIRST_LABEL,
+        });
+        firstOption.focus();
+        await user.keyboard(key);
 
-      expect(onChange).not.toHaveBeenCalled();
-      expect(firstOption).not.toBePressed();
-    });
+        expect(onChange).not.toHaveBeenCalled();
+        expect(firstOption).not.toBePressed();
+      },
+    );
   });
 
   it('hides a glyph inside its option, even one with text, so the label alone names it', () => {

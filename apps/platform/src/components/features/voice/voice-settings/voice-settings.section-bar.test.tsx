@@ -14,6 +14,7 @@ import {
   waitFor,
   within,
 } from '@platform/testing/custom-render';
+import { USER_EVENT_KEY } from '@platform/testing/keyboard';
 import { stubMatchingMediaQuery } from '@platform/testing/match-media';
 import { mockRouterRefresh } from '@platform/testing/mock-router';
 import { MOCK_ARCHIVED_AT } from '@platform/testing/tenants/fixtures';
@@ -231,7 +232,7 @@ describe(`<${VoiceSettings.name}/> section bar`, () => {
 
     it('jumps from a chip with Enter', async () => {
       voiceSectionChip(ERROR_PAGES_SECTION).focus();
-      await user.keyboard('{Enter}');
+      await user.keyboard(USER_EVENT_KEY.ENTER);
 
       expect(voiceSectionHeader(ERROR_PAGES_SECTION)).toHaveFocus();
     });

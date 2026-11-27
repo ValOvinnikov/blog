@@ -200,7 +200,7 @@ describe(`<${SaveBar.name}/>`, () => {
     it('marks the bar busy', () => {
       const region = screen.getByRole('region', { name: UNSAVED_CHANGES });
 
-      expect(region).toHaveAttribute('aria-busy', 'true');
+      expect(region).toHaveAttribute(ARIA_ATTRIBUTE.BUSY, 'true');
     });
   });
 

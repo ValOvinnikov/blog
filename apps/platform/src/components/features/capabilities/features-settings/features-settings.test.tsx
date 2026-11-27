@@ -9,6 +9,7 @@ import {
 import { expectArchivedOffersNoSave } from '@platform/testing/assert-archived-save';
 import { screen, waitFor, within } from '@platform/testing/custom-render';
 import { makeEnTranslator } from '@platform/testing/en-translator';
+import { USER_EVENT_KEY } from '@platform/testing/keyboard';
 import {
   ALL_CHANGES_SAVED,
   ARCHIVED_NOTICE_DESCRIPTION,
@@ -290,7 +291,7 @@ describe(`<${FeaturesSettings.name}/>`, () => {
 
     it('keeps an out-of-plan toggle focusable but unchangeable', async () => {
       await user.click(consentSwitch);
-      await user.keyboard(' ');
+      await user.keyboard(USER_EVENT_KEY.SPACE);
 
       expect(consentSwitch).toHaveFocus();
       expect(consentSwitch).toBeEnabled();

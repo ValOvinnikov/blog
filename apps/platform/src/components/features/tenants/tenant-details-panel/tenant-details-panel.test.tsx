@@ -280,7 +280,7 @@ describe(`<${TenantDetailsPanel.name}/>`, () => {
     const status = screen.getByRole('status');
 
     expect(savingButton).toHaveAttribute(ARIA_ATTRIBUTE.DISABLED, 'true');
-    expect(savingButton).toHaveAttribute('aria-busy', 'true');
+    expect(savingButton).toHaveAttribute(ARIA_ATTRIBUTE.BUSY, 'true');
     expect(status).toHaveTextContent(SAVING_LABEL);
 
     resolveAction({

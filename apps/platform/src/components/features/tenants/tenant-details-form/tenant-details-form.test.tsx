@@ -291,7 +291,7 @@ describe(`<${TenantDetailsForm.name}/>`, () => {
 
     expect(overlay).toBeVisible();
     expect(submitButton).toHaveAttribute(ARIA_ATTRIBUTE.DISABLED, 'true');
-    expect(submitButton).toHaveAttribute('aria-busy', 'true');
+    expect(submitButton).toHaveAttribute(ARIA_ATTRIBUTE.BUSY, 'true');
     expect(inertForm).toHaveAttribute('inert');
 
     resolveWithServerError();

@@ -7,6 +7,7 @@ import {
   waitFor,
   within,
 } from '@platform/testing/custom-render';
+import { USER_EVENT_KEY } from '@platform/testing/keyboard';
 import { MOCK_TENANT_NAME } from '@platform/testing/tenants/fixtures';
 import { adminRoutes } from '@platform/utils/routes/routes';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
@@ -192,7 +193,7 @@ describe(`<${Breadcrumbs.name}/>`, () => {
       });
 
       it('returns focus to the button on Escape', async () => {
-        await user.keyboard('{Escape}');
+        await user.keyboard(USER_EVENT_KEY.ESCAPE);
 
         await waitFor(() => {
           expect(trigger).toHaveFocus();

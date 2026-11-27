@@ -1,3 +1,4 @@
+import { ARIA_ATTRIBUTE } from '@platform/constants/aria-attribute';
 import { TENANTS_PAGE_SIZE } from '@platform/constants/tenant';
 import messages from '@platform/i18n/messages/en.json';
 import { screen } from '@platform/testing/custom-render';
@@ -56,7 +57,6 @@ const MANAGE_OTHER_TENANT = tTable('manageAriaLabel', {
 const FREE_PLAN = tPlan(TENANT_PLAN.FREE);
 const ACTIVE_STATUS = tTable(`status.${TENANT_STATUS.ACTIVE}`);
 const CREATED_ON = 'Apr 2, 2026';
-const ARIA_SORT = 'aria-sort';
 const TENANT_COLUMN = tTable('columnTenant');
 const CREATED_COLUMN = tTable('columnCreated');
 const PLAN_COLUMN = tTable('columnPlan');
@@ -394,10 +394,10 @@ describe(`<${TenantsTable.name}/>`, () => {
         });
 
         expect(createdHeader).toHaveAttribute(
-          ARIA_SORT,
+          ARIA_ATTRIBUTE.SORT,
           SORT_DIRECTION.DESCENDING,
         );
-        expect(tenantHeader).not.toHaveAttribute(ARIA_SORT);
+        expect(tenantHeader).not.toHaveAttribute(ARIA_ATTRIBUTE.SORT);
       });
 
       it('sorts another column ascending when its header is clicked', async () => {

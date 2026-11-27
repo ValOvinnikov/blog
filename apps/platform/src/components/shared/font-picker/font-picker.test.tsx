@@ -2,6 +2,7 @@ import { faker } from '@faker-js/faker';
 import { FONT_OPTIONS } from '@platform/config/fonts';
 import { ARIA_ATTRIBUTE } from '@platform/constants/aria-attribute';
 import { customRender, screen, within } from '@platform/testing/custom-render';
+import { USER_EVENT_KEY } from '@platform/testing/keyboard';
 import { pickNextOptionByKeyboard } from '@platform/testing/pick-next-option-by-keyboard';
 import { ARCHIVED_NOTICE_ID } from '@platform/testing/render-in-settings-form';
 import { FONT_CHOICE } from '@shinefold/config';
@@ -101,7 +102,7 @@ describe(`<${FontPicker.name}/>`, () => {
     });
 
     await user.tab();
-    await user.keyboard('{Enter}');
+    await user.keyboard(USER_EVENT_KEY.ENTER);
     const trigger = screen.getByRole('combobox', { name: MOCK_ARIA_LABEL });
     const triggerFont = within(trigger).getByText(FRAUNCES_LABEL);
     const listbox = screen.queryByRole('listbox');
