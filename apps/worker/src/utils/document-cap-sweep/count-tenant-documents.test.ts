@@ -35,7 +35,7 @@ describe(countTenantDocuments, () => {
     fetch.mockResolvedValue(MOCK_DOCUMENT_COUNT);
   });
 
-  it('counts drafts and versions too by reading the raw perspective with the tenant read token', async () => {
+  it('counts drafts and versions through the raw perspective', async () => {
     await countTenantDocuments(MOCK_CREDENTIALS);
 
     expect(createTenantSanityClient).toHaveBeenCalledWith({

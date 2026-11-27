@@ -28,7 +28,7 @@ describe(runDocumentCapSweep, () => {
     ]);
   });
 
-  it('checks every active tenant and counts the ones nearing the cap, leaving skipped ones out', async () => {
+  it('checks every active tenant and tallies the nearing ones', async () => {
     vi.mocked(checkTenantDocumentCap)
       .mockResolvedValueOnce(DOCUMENT_CAP_CHECK.NEARING)
       .mockResolvedValueOnce(DOCUMENT_CAP_CHECK.CLEAR)

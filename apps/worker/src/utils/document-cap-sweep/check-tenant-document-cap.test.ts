@@ -55,7 +55,7 @@ describe(checkTenantDocumentCap, () => {
     vi.mocked(countTenantDocuments).mockResolvedValue(MOCK_COUNT_AT_THRESHOLD);
   });
 
-  it('opens a warning naming the count and the cap once a free tenant reaches the threshold', async () => {
+  it('opens a warning naming count and cap at the threshold', async () => {
     const outcome = await checkTenantDocumentCap(mockProvisionedTenant());
 
     expect(outcome).toBe(DOCUMENT_CAP_CHECK.NEARING);
