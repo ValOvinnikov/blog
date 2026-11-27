@@ -17,19 +17,17 @@ import {
 } from '@shinefold/utils/portable-text';
 import { defineArrayMember, defineField, defineType } from 'sanity';
 
-const SET_BY_PIPELINE_DESCRIPTION = 'Set by the summary pipeline.';
-
 export const postTakeawaysSchema = defineType({
   name: 'postTakeaways',
   title: 'Summary',
   type: 'object',
   description:
     'A short summary readers open from the post page, generated for you to review.',
-  options: { collapsible: true, collapsed: true },
+  options: { collapsible: true, collapsed: false },
   fields: [
     defineField({
       name: 'summary',
-      title: 'Summary',
+      title: 'Content',
       type: 'array',
       description:
         'Readers see exactly this. Write it as prose, and use a list only where the post lists things.',
@@ -54,15 +52,13 @@ export const postTakeawaysSchema = defineType({
       name: 'generatedAt',
       title: 'Generated At',
       type: 'datetime',
-      description: SET_BY_PIPELINE_DESCRIPTION,
-      readOnly: true,
+      hidden: true,
     }),
     defineField({
       name: 'model',
       title: 'Model',
       type: 'string',
-      description: SET_BY_PIPELINE_DESCRIPTION,
-      readOnly: true,
+      hidden: true,
     }),
   ],
   preview: {

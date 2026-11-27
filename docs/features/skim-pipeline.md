@@ -30,7 +30,7 @@ When a post is first published, the public site asks Claude for a short summary 
 ## Surfaces and routes
 
 - **`POST /api/generate-skim?secret=<SANITY_GENERATE_SECRET>`** on `apps/web`, body `{ "_id": "<post id>" }` (a Sanity webhook payload carries `_id`). Node.js runtime. Returns `{ ok: true, count }` on success, `count` being the number of summary blocks saved.
-- **Studio:** the post's "Summary" object (`postTakeaways`, collapsed by default), between Published At and SEO. Its "Summary" field (`summary`) is editable; `generatedAt` and `model` are read-only. Its preview reads "N words" or "No summary yet".
+- **Studio:** the post's "Summary" object (`postTakeaways`, expanded by default), between Published At and SEO. Its "Content" field (`summary`) is editable; `generatedAt` and `model` are hidden from editors. Its preview reads "N words" or "No summary yet". While the draft holds a summary whose `generatedAt` differs from the published one, the post carries a "Summary to review" badge whose tooltip says publishing approves it (`SummaryReviewBadge`), so the post flipping back to an unpublished draft after a generation is explained.
 - **Platform:** none. No Studio action or platform button triggers generation.
 
 ## Data
@@ -89,6 +89,7 @@ When a post is first published, the public site asks Claude for a short summary 
 - `packages/service/src/features/editorial/skim/adaptor/save-skim-draft/loader.ts`
 - `packages/service/src/sanity/write-client/write-client.ts`
 - `packages/studio/src/schema-types/objects/post-takeaways/post-takeaways.ts`
+- `packages/studio/src/document-badges/summary-review-badge/summary-review-badge.ts`
 - `packages/studio/src/schema-types/validation/validate-max-words/`
 
 ## Tests and stories

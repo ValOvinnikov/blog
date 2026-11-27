@@ -8,12 +8,13 @@ import { formatSendCount } from '@shinefold/studio/schema-types/inputs/send-to-s
 
 export type TSendSwitchView = { isDisabled: boolean; description: string };
 
-export const SENDING_PAUSED = 'Sending is paused for this site.';
+export const SITE_SUSPENDED =
+  "This site is suspended, so posts aren't emailed.";
 
 const OFF_CAUSE_SWITCH_NOTE: Readonly<
   Partial<Record<TNewsletterSendingOffCause, string>>
 > = {
-  [NEWSLETTER_SKIP_REASON.SITE_INACTIVE]: SENDING_PAUSED,
+  [NEWSLETTER_SKIP_REASON.SITE_INACTIVE]: SITE_SUSPENDED,
   [NEWSLETTER_SKIP_REASON.NEWSLETTER_OFF]:
     'The newsletter is off for this site. Turn it on in Features.',
   [NEWSLETTER_SKIP_REASON.SENDING_OFF]:
