@@ -24,9 +24,6 @@ export const CONFIGURATION_KEYS = [
   'email',
   'subscribers',
 ];
-export const OPERATOR_CONFIGURATION_KEYS = CONFIGURATION_KEYS.filter(
-  (key) => key !== 'subscribers',
-);
 export const ALWAYS_AVAILABLE_KEYS = [
   'look',
   'voice',

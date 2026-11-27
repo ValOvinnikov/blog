@@ -109,7 +109,8 @@ URLs carry no locale prefix (next-intl `localePrefix: 'never'`).
   its normal place in the table. An archived one has no tile; its pin is
   kept, so the tile returns if the tenant is restored.
 - **Operator tenant view**: `/tenants/{id}` and its Look, Voice, Features,
-  Languages, Domain, Email, Studio, Provisioning, Danger zone and Help pages.
+  Languages, Domain, Email, Studio, Subscribers, Provisioning, Danger zone and
+  Help pages.
   The sidebar shows the Platform section plus the tenant's own sections, ending
   with Support.
 - **Owner dashboard**: `/dashboard` and its Look, Voice, Features,
@@ -274,7 +275,9 @@ save still settles as the form's generic server error.
   form, Subscribers `NEWSLETTER` and Team more than one seat. There is no
   Comments entry. Leads carries no unread-count pill: the count would go stale
   while the owner moves between pages.
-  The operator's tenant view (`EVERY_PLAN_PAGE`) always shows every page.
+  The operator's tenant view (`EVERY_PLAN_PAGE`) shows every page whatever
+  the plan, except Subscribers: only a super admin sees it, only on a site
+  created from the platform whose plan includes `NEWSLETTER`.
 - UI copy is next-intl, five message files (`en`, `de`, `es`, `fr`, `nl`). It
   is fixed platform copy and never [Voice](./voice.md).
 

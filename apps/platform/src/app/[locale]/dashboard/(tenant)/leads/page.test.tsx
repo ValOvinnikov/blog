@@ -38,6 +38,7 @@ vi.mock('@shinefold/db', async () => ({
     ...noEntitlementGrantQueries(),
     memberships: {
       listMembershipsWithTenantsForUser: listMembershipsWithTenantsForUserMock,
+      getMembership: vi.fn(async () => undefined),
     },
     admins: { getAdminByUserId: getAdminByUserIdMock },
     leads: {

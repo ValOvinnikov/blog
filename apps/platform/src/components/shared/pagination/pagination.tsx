@@ -2,13 +2,14 @@ import { Button } from '@platform/components/shared/button';
 import type { TButtonVariants } from '@platform/components/shared/button/button-variants';
 import { LinkButton } from '@platform/components/shared/link-button';
 import { Text } from '@platform/components/shared/text';
+import type { TPageHref } from '@platform/utils/pagination/pagination';
 import { SIZE } from '@shinefold/config';
 import { useTranslations } from 'next-intl';
 
 import { paginationVariants } from './pagination-variants';
 
 type TPaginationTarget =
-  | { pageHref: (page: number) => string; onPageChange?: never }
+  | { pageHref: TPageHref; onPageChange?: never }
   | { onPageChange: (page: number) => void; pageHref?: never };
 
 export type TPaginationProps = {

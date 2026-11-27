@@ -6,29 +6,30 @@ import { SubscribersList } from '@platform/components/features/subscribers/subsc
 import { SubscribersNotice } from '@platform/components/features/subscribers/subscribers-notice';
 import { PageHeader } from '@platform/components/shared/page-header';
 import type { TPlatformViewer } from '@platform/server/auth/platform-viewer';
-import { loadSubscribersPage } from '@platform/server/subscribers/load-subscribers-page';
+import {
+  loadSubscribersPage,
+  type TSubscribersPageQuery,
+} from '@platform/server/subscribers/load-subscribers-page';
 import type { TPlatformTenant } from '@platform/utils/platform-tenant/platform-tenant';
 import { stripeEnv } from '@platform/utils/stripe-env/stripe-env';
-import type { TMaybeUndefined } from '@shinefold/config';
 import { getTranslations } from 'next-intl/server';
 
 import { subscribersPageContentVariants } from './subscribers-page-content-variants';
 
-export type TSubscribersPageContentProps = {
+export type TSubscribersPageContentProps = TSubscribersPageQuery & {
   tenant: TPlatformTenant;
   viewer: TPlatformViewer;
-  page: number;
-  movedUpCeiling: TMaybeUndefined<number>;
+  studioPagesHref: string;
 };
 
 export const SubscribersPageContent = async ({
   tenant,
   viewer,
-  page,
-  movedUpCeiling,
+  studioPagesHref,
+  ...query
 }: TSubscribersPageContentProps) => {
   const [data, t] = await Promise.all([
-    loadSubscribersPage(tenant, page, movedUpCeiling),
+    loadSubscribersPage(tenant, query),
     getTranslations('subscribersPage'),
   ]);
   const { list, emailNewPosts, offer } = data;
@@ -59,7 +60,7 @@ export const SubscribersPageContent = async ({
       />
       <SubscriberLimitCards data={data} isEmpty={isEmpty} />
       {isEmpty ? (
-        <SubscribersEmptyCard />
+        <SubscribersEmptyCard studioPagesHref={studioPagesHref} />
       ) : (
         <>
           <SendingSettingCard

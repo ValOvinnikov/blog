@@ -1,10 +1,12 @@
 import { redirect } from 'next/navigation';
 
+export type TPageHref = (page: number) => string;
+
 export type TResolveTotalPagesInput = {
   page: number;
   total: number;
   pageSize: number;
-  pageHref: (page: number) => string;
+  pageHref: TPageHref;
 };
 
 export const parsePage = (raw: unknown): number => {

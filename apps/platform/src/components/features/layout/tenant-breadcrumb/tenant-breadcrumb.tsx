@@ -9,6 +9,7 @@ import {
   navLabelForPathname,
   tenantNavSections,
 } from '@platform/utils/nav-sections/nav-sections';
+import { EVERY_PLAN_PAGE } from '@platform/utils/plan-page-access/plan-page-access';
 import { adminRoutes } from '@platform/utils/routes/routes';
 import { useTranslations } from 'next-intl';
 
@@ -28,7 +29,10 @@ export const TenantBreadcrumb = ({
   const isOverview = pathname === adminRoutes.tenantOverview(tenantId);
   const leafLabel = isOverview
     ? undefined
-    : navLabelForPathname(tenantNavSections(t, tenantId, tenantName), pathname);
+    : navLabelForPathname(
+        tenantNavSections(t, tenantId, tenantName, EVERY_PLAN_PAGE),
+        pathname,
+      );
 
   const items: TBreadcrumbItem[] = [
     { label: t('platformLabel') },

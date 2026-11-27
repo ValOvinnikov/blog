@@ -65,10 +65,7 @@ describe(resolveGatedDashboardTenant, () => {
       await expect(resolveGatedDashboardTenant(page)()).resolves.toBe(
         MOCK_CONTEXT,
       );
-      expect(resolveTenantPageAccessMock).toHaveBeenCalledWith(
-        MOCK_CONTEXT.tenant,
-        MOCK_CONTEXT.viewer,
-      );
+      expect(resolveTenantPageAccessMock).toHaveBeenCalledWith(MOCK_CONTEXT);
     },
   );
 });

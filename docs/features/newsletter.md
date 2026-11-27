@@ -32,6 +32,7 @@ code:
   - apps/worker/src/utils/owner-email/owner-newsletter-*/**
   - apps/worker/src/utils/owner-email/owner-newsletter-*.ts
   - apps/platform/src/app/[locale]/dashboard/(tenant)/subscribers/**
+  - apps/platform/src/app/[locale]/tenants/[tenantId]/(detail)/subscribers/**
   - apps/platform/src/components/features/subscribers/**
   - apps/platform/src/server/subscribers/**
   - apps/platform/src/utils/subscriber-limits/**
@@ -63,12 +64,12 @@ An editor places a Newsletter Signup module on a page; a reader enters an email 
 - `/[locale]/newsletter/[result]` — the confirm or unsubscribe outcome (`NEWSLETTER_RESULT`: confirmed, unsubscribed, or an invalid, failed or unavailable link) in the site's layout, theme and the link's language, with a link home; `noindex`.
 - `/[locale]/account` — the Newsletter section (see [reader-account](./reader-account.md)).
 - **Platform** — the Features toggle, the Email page's `NEWSLETTER_CONFIRMATION` template, and the Subscribers page below.
-- **Platform, `/dashboard/subscribers`** — for a site whose plan (with grants) includes Newsletter, opened by its owner or an operator; an editor, and a Free or Starter site, get neither the page nor its sidebar entry. The operator tree (`/tenants/[tenantId]`) has no Subscribers entry: operators reach the page from the dashboard. It shows:
+- **Platform, `/dashboard/subscribers` and `/tenants/[tenantId]/subscribers`** — for a site whose plan (with grants) includes Newsletter. Subscriber lists are sensitive, so one rule (`canManageSubscribers`) decides the dashboard page, its sidebar entry, the Overview's usage link and the page's actions: the site's owner passes, and an operator passes only on a site they really own or, as a super admin, on a live site created from the platform (`createdFromPlatform`, `canOperatorOpenSubscribers`). The operator tenant view, where the entry sits beside Leads, shows it only on that last condition. An admin sees no entry in any tenant view; a self-serve site the super admin does not own, and an archived site, have none for operators; the route is not found for each. An editor, and a Free or Starter site, get neither page nor entry. Each route keeps its links on itself: it pages its own list, and the empty state opens that site's Studio. It shows:
   - the confirmed count and Export CSV (`exportSubscribersAction`: every confirmed subscriber as `email,confirmed_at`, UTC ISO times, newest first, named `subscribers-{first label of the platform address, else the main address}-{UTC day}.csv`; disabled with no subscribers);
   - at most one notice, in this order: the operator pause (`newsletter_paused_at` set, or the reputation at `STOP`), over the band, out of this month's emails, near the band, near the emails (80%), then "After moving up" when the `MOVED_UP` search param names the band the site is now on. A paused notice names the newest post skipped for its reason since the last sent post (`getLatestSkippedNewsletterPost`), or drops that sentence. The move-up button (`MoveUpBand`) shows for the owner only, and only with a catalogue price for the site's stored interval and currency; on the 25,000 band the note reads "You're on the largest band.";
   - the subscriber-band and emails-this-month cards, each a meter with a note that is muted below 80%, warning from 80% and error-toned only while its own paused notice shows ("paused" uses the worker gate's rules: over the band is more subscribers than the ceiling, out of emails is more subscribers than the emails left);
   - the "Email new posts to subscribers" switch (`setEmailNewPostsAction`, saved on change, reverted with an error on failure) and the paged list, 25 a page newest first, each row with a confirm-first remove (`removeSubscriberAction`, `unsubscribeById`). Below `md` the list is a `<ul>` whose footer hides Previous on page 1.
-  - With no subscribers: no switch and no list, but a card linking to the Studio's page list.
+  - With no subscribers: no switch and no list, but a card linking to the site's Studio page list.
 - **Platform, Overview** — the Usage card's emails row links to the Subscribers page and, while the next post would not fit this month, reads "Sending paused".
 - **Platform, operator** — a paused site's tenant overview (`/tenants/[tenantId]`) shows every admin a "Newsletter paused" card with the date it was paused; an unpaused site shows none. Only a super admin gets its "Clear pause" confirm, which calls `clearNewsletterPauseAction` (`apps/platform/src/server/newsletter-pause/`, behind `requireSuperAdmin`). The clear write decides: when it clears nothing the action refuses `NOT_PAUSED` and a toast says the pause was already cleared; otherwise it records `NEWSLETTER_PAUSE_CLEARED` against the tenant with the cleared `pausedAt`. Either way the dialog closes, focus moves to the page heading and the page refreshes.
 
@@ -106,7 +107,7 @@ An editor places a Newsletter Signup module on a page; a reader enters an email 
 ## Configuration
 
 - **Editor (Studio)** — whether a post is sent to subscribers; the module's content, variant, trust cues, alignment and layout, and where it is placed.
-- **Owner or operator (platform)** — the `NEWSLETTER` toggle, `GROWTH` only; the "Email new posts to subscribers" setting, removing subscribers and exporting the list on the Subscribers page (moving up a band is the owner's alone); the confirmation email's subject, body, logo, sender name, reply-to and postal footer on the Email page (see [email](./email.md)).
+- **Owner or operator (platform)** — the `NEWSLETTER` toggle, `GROWTH` only; the "Email new posts to subscribers" setting, removing subscribers and exporting the list on the Subscribers page, for whoever may open that page (moving up a band is the owner's alone); the confirmation email's subject, body, logo, sender name, reply-to and postal footer on the Email page (see [email](./email.md)).
 - **Voice** — the confirm and unsubscribe result-page and confirmation-page copy is fixed (`newsletterConfirm.*`, `newsletterUnsubscribe.*`), as is the form copy, including the rate-limit message (`newsletterForm.errorRateLimited`).
 
 ## Constraints and invariants
@@ -146,8 +147,8 @@ An editor places a Newsletter Signup module on a page; a reader enters an email 
 - `packages/studio/src/schema-types/inputs/send-to-subscribers-field/` (the switch, status and Send emails), `packages/studio/src/document-actions/send-test-action/`, `packages/studio/src/platform-routes/newsletter-post-send/newsletter-post-send.ts`
 - `apps/platform/src/app/api/studio/newsletter-post/{status,test-send,send-now}/route.ts`, `apps/platform/src/server/newsletter-post-send/`
 - `packages/config/src/constants/newsletter-post-send.ts` (the Studio–platform contract), `packages/config/src/newsletter-post/newsletter-post-email.ts` (the post email's fields, shared by the worker and the test send)
-- `apps/platform/src/app/[locale]/dashboard/(tenant)/subscribers/page.tsx`, `apps/platform/src/components/features/subscribers/subscribers-page-content/subscribers-page-content.tsx`, `apps/platform/src/server/subscribers/load-subscribers-page.ts` (notice precedence in `apps/platform/src/utils/subscriber-limits/subscriber-limits.ts`)
-- `apps/platform/src/server/subscribers/{remove-subscriber,export-subscribers,set-email-new-posts}-action.ts`, all behind `requireSubscribersManager`
+- `apps/platform/src/app/[locale]/dashboard/(tenant)/subscribers/page.tsx`, `apps/platform/src/app/[locale]/tenants/[tenantId]/(detail)/subscribers/page.tsx` (behind `requireOperatorSubscribersTenant`), `apps/platform/src/components/features/subscribers/subscribers-page-content/subscribers-page-content.tsx`, `apps/platform/src/server/subscribers/load-subscribers-page.ts` (notice precedence in `apps/platform/src/utils/subscriber-limits/subscriber-limits.ts`)
+- `apps/platform/src/server/subscribers/{remove-subscriber,export-subscribers,set-email-new-posts}-action.ts`, all behind `requireSubscribersManager`, which applies `canManageSubscribers` and answers not found to everyone it refuses
 
 ## Tests and stories
 

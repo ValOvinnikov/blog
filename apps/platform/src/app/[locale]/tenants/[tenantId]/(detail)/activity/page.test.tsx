@@ -1,17 +1,15 @@
 import messages from '@platform/i18n/messages/en.json';
+import { requireTenantById } from '@platform/server/auth/require-tenant-by-id';
 import { customRenderAsync, screen } from '@platform/testing/custom-render';
+import { mockTenantByIdContext } from '@platform/testing/memberships/fixtures';
 import { mockDbConstants } from '@platform/testing/mock-db-constants';
 import { MOCK_TENANT_ID, mockTenant } from '@platform/testing/tenants/fixtures';
 
 import TenantActivityPage from './page';
 
-const { requireTenantByIdMock } = vi.hoisted(() => ({
-  requireTenantByIdMock: vi.fn(),
-}));
+vi.mock('@platform/server/auth/require-tenant-by-id');
 
-vi.mock('@platform/server/auth/require-tenant-by-id', () => ({
-  requireTenantById: requireTenantByIdMock,
-}));
+const requireTenantByIdMock = vi.mocked(requireTenantById);
 
 vi.mock('@shinefold/db', async () => ({
   ...(await mockDbConstants()),
@@ -30,7 +28,9 @@ const setup = customRenderAsync(TenantActivityPage, {
 
 describe(`<${TenantActivityPage.name}/>`, () => {
   it("renders the requested tenant's activity", async () => {
-    requireTenantByIdMock.mockResolvedValueOnce({ tenant: mockTenant() });
+    requireTenantByIdMock.mockResolvedValueOnce(
+      mockTenantByIdContext(mockTenant()),
+    );
 
     await setup();
 

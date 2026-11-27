@@ -2,6 +2,7 @@ import { PlatformShell } from '@platform/components/features/layout/platform-she
 import { TenantBreadcrumb } from '@platform/components/features/layout/tenant-breadcrumb';
 import { requireTenantById } from '@platform/server/auth/require-tenant-by-id';
 import { loadPlatformShellChrome } from '@platform/server/layout/load-platform-shell-chrome';
+import { canOperatorOpenSubscribers } from '@platform/server/subscribers/can-operator-open-subscribers';
 import { helpNavSection } from '@platform/utils/help-nav-section/help-nav-section';
 import {
   operatorNavSections,
@@ -18,7 +19,7 @@ type TProps = {
 export default async function TenantDetailLayout({ children, params }: TProps) {
   const { tenantId } = await params;
   // Deduped against the ancestor layout's gate by `requireTenantById`'s own `cache()`.
-  const { tenant, admin } = await requireTenantById(tenantId);
+  const { tenant, admin, viewer } = await requireTenantById(tenantId);
   const [
     { isSidebarInitiallyCollapsed, tNavSections, userName, userEmail },
     t,
@@ -32,7 +33,9 @@ export default async function TenantDetailLayout({ children, params }: TProps) {
       isSidebarInitiallyCollapsed={isSidebarInitiallyCollapsed}
       sections={[
         ...operatorNavSections(tNavSections, admin.role),
-        ...tenantNavSections(tNavSections, tenant.id, tenant.name),
+        ...tenantNavSections(tNavSections, tenant.id, tenant.name, {
+          subscribers: canOperatorOpenSubscribers(tenant, viewer),
+        }),
         helpNavSection(tNavSections, adminRoutes.tenantHelp(tenant.id)),
       ]}
       crumb={<TenantBreadcrumb tenantId={tenant.id} tenantName={tenant.name} />}

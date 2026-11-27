@@ -3,13 +3,18 @@ import { Heading } from '@platform/components/shared/heading';
 import { Icon } from '@platform/components/shared/icon';
 import { LinkButton } from '@platform/components/shared/link-button';
 import { BUTTON_VARIANT } from '@platform/constants/button';
-import { adminRoutes } from '@platform/utils/routes/routes';
 import { ICONS } from '@shinefold/config';
 import { useTranslations } from 'next-intl';
 
 import { subscribersEmptyCardVariants } from './subscribers-empty-card-variants';
 
-export const SubscribersEmptyCard = () => {
+export type TSubscribersEmptyCardProps = {
+  studioPagesHref: string;
+};
+
+export const SubscribersEmptyCard = ({
+  studioPagesHref,
+}: TSubscribersEmptyCardProps) => {
   const t = useTranslations('subscribersPage.empty');
   const { body, tile, icon, title, description, action } =
     subscribersEmptyCardVariants();
@@ -25,10 +30,7 @@ export const SubscribersEmptyCard = () => {
         </Heading>
         <p className={description()}>{t('description')}</p>
         <span className={action()}>
-          <LinkButton
-            href={adminRoutes.dashboardStudioPages()}
-            variant={BUTTON_VARIANT.PRIMARY}
-          >
+          <LinkButton href={studioPagesHref} variant={BUTTON_VARIANT.PRIMARY}>
             {t('action')}
           </LinkButton>
         </span>
