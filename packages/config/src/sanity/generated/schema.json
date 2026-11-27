@@ -1207,77 +1207,6 @@
         },
         "optional": true
       },
-      "brandVariant": {
-        "type": "objectAttribute",
-        "value": {
-          "type": "union",
-          "of": [
-            {
-              "type": "string",
-              "value": "PRIMARY"
-            },
-            {
-              "type": "string",
-              "value": "SECONDARY"
-            },
-            {
-              "type": "string",
-              "value": "BRAND_PRIMARY"
-            },
-            {
-              "type": "string",
-              "value": "INK"
-            }
-          ]
-        },
-        "optional": true
-      },
-      "bandTone": {
-        "type": "objectAttribute",
-        "value": {
-          "type": "union",
-          "of": [
-            {
-              "type": "string",
-              "value": "PRIMARY"
-            },
-            {
-              "type": "string",
-              "value": "SECONDARY"
-            },
-            {
-              "type": "string",
-              "value": "BRAND_PRIMARY"
-            },
-            {
-              "type": "string",
-              "value": "INK"
-            }
-          ]
-        },
-        "optional": true
-      },
-      "variant": {
-        "type": "objectAttribute",
-        "value": {
-          "type": "union",
-          "of": [
-            {
-              "type": "string",
-              "value": "BANNER"
-            },
-            {
-              "type": "string",
-              "value": "SPLIT"
-            },
-            {
-              "type": "string",
-              "value": "CALLOUT"
-            }
-          ]
-        },
-        "optional": true
-      },
       "headingBlock": {
         "type": "objectAttribute",
         "value": {
@@ -1337,6 +1266,77 @@
         "value": {
           "type": "inline",
           "name": "internationalizedArrayString"
+        },
+        "optional": true
+      },
+      "variant": {
+        "type": "objectAttribute",
+        "value": {
+          "type": "union",
+          "of": [
+            {
+              "type": "string",
+              "value": "BANNER"
+            },
+            {
+              "type": "string",
+              "value": "SPLIT"
+            },
+            {
+              "type": "string",
+              "value": "CALLOUT"
+            }
+          ]
+        },
+        "optional": true
+      },
+      "brandVariant": {
+        "type": "objectAttribute",
+        "value": {
+          "type": "union",
+          "of": [
+            {
+              "type": "string",
+              "value": "PRIMARY"
+            },
+            {
+              "type": "string",
+              "value": "SECONDARY"
+            },
+            {
+              "type": "string",
+              "value": "BRAND_PRIMARY"
+            },
+            {
+              "type": "string",
+              "value": "INK"
+            }
+          ]
+        },
+        "optional": true
+      },
+      "bandTone": {
+        "type": "objectAttribute",
+        "value": {
+          "type": "union",
+          "of": [
+            {
+              "type": "string",
+              "value": "PRIMARY"
+            },
+            {
+              "type": "string",
+              "value": "SECONDARY"
+            },
+            {
+              "type": "string",
+              "value": "BRAND_PRIMARY"
+            },
+            {
+              "type": "string",
+              "value": "INK"
+            }
+          ]
         },
         "optional": true
       },
@@ -1411,6 +1411,81 @@
             {
               "type": "string",
               "value": "FIRST"
+            }
+          ]
+        },
+        "optional": true
+      },
+      "cardStyle": {
+        "type": "objectAttribute",
+        "value": {
+          "type": "union",
+          "of": [
+            {
+              "type": "string",
+              "value": "ACCENT_BAR"
+            },
+            {
+              "type": "string",
+              "value": "OUTLINED"
+            },
+            {
+              "type": "string",
+              "value": "FILLED"
+            },
+            {
+              "type": "string",
+              "value": "RAISED"
+            },
+            {
+              "type": "string",
+              "value": "PLAIN"
+            }
+          ]
+        },
+        "optional": true
+      },
+      "radiusScale": {
+        "type": "objectAttribute",
+        "value": {
+          "type": "union",
+          "of": [
+            {
+              "type": "string",
+              "value": "NONE"
+            },
+            {
+              "type": "string",
+              "value": "SM"
+            },
+            {
+              "type": "string",
+              "value": "MD"
+            },
+            {
+              "type": "string",
+              "value": "LG"
+            },
+            {
+              "type": "string",
+              "value": "XL"
+            }
+          ]
+        },
+        "optional": true
+      },
+      "density": {
+        "type": "objectAttribute",
+        "value": {
+          "type": "union",
+          "of": [
+            {
+              "type": "string",
+              "value": "DEFAULT"
+            },
+            {
+              "type": "string",
+              "value": "COMPACT"
             }
           ]
         },
