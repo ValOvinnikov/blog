@@ -3,6 +3,8 @@ import { mockTenantSanityCredentials } from '@shinefold/db/testing/tenant-sanity
 import {
   DOCUMENT_CAP_UNCOUNTED_TYPE_PREFIX,
   DOCUMENT_CAP_UNCOUNTED_TYPES,
+  DOCUMENT_COUNT_MAX_RETRIES,
+  DOCUMENT_COUNT_TIMEOUT_MS,
 } from '@worker/constants/document-cap';
 import { mockSanityClient } from '@worker/testing/sanity-client/mock-sanity-client';
 import {
@@ -31,7 +33,7 @@ describe(countTenantDocuments, () => {
     fetch.mockResolvedValue(MOCK_DOCUMENT_COUNT);
   });
 
-  it('counts drafts and versions through the raw perspective', async () => {
+  it('counts drafts and versions on a short, once-retried read', async () => {
     await countTenantDocuments(MOCK_CREDENTIALS);
 
     expect(createTenantSanityClient).toHaveBeenCalledWith({
@@ -39,6 +41,8 @@ describe(countTenantDocuments, () => {
       dataset: MOCK_SANITY_DATASET,
       token: MOCK_SANITY_READ_TOKEN,
       perspective: SANITY_PERSPECTIVE.RAW,
+      timeoutMs: DOCUMENT_COUNT_TIMEOUT_MS,
+      maxRetries: DOCUMENT_COUNT_MAX_RETRIES,
     });
   });
 

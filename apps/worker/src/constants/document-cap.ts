@@ -4,6 +4,8 @@ export const PLAN_DOCUMENT_CAP: Partial<Record<TTenantPlan, number>> = {
   [TENANT_PLAN.FREE]: 10_000,
 };
 export const DOCUMENT_CAP_WARNING_RATIO = 0.8;
+export const DOCUMENT_COUNT_TIMEOUT_MS = 10_000;
+export const DOCUMENT_COUNT_MAX_RETRIES = 1;
 export const DOCUMENT_CAP_FINDING_IDENTIFIER = 'document-cap';
 export const DOCUMENT_CAP_UNCOUNTED_TYPES = [
   'sanity.imageAsset',
