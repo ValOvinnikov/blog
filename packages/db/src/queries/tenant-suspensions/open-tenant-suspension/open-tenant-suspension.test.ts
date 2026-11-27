@@ -1,13 +1,7 @@
-import {
-  BLOCKED_IDENTITY_KIND,
-  SUSPENSION_CATEGORY,
-} from '@shinefold/db/constants';
+import { SUSPENSION_CATEGORY } from '@shinefold/db/constants';
 import * as schema from '@shinefold/db/schema';
 import { insertTestAdmin } from '@shinefold/db/testing/admins/fixtures';
-import {
-  MOCK_BLOCK_REASON,
-  MOCK_BLOCKED_DOMAIN,
-} from '@shinefold/db/testing/blocked-signup-identities/fixtures';
+import { insertTestBlockedIdentity } from '@shinefold/db/testing/blocked-signup-identities/fixtures';
 import { insertTestTenant } from '@shinefold/db/testing/fixtures';
 import { useQueryTestDb } from '@shinefold/db/testing/query-test-db';
 import {
@@ -48,19 +42,6 @@ async function openFor(caseTenantId: string, ownerBlockId?: string) {
     suspendedBy,
     ownerBlockId,
   });
-}
-
-async function insertOwnerBlock(): Promise<string> {
-  const [block] = await db()
-    .insert(schema.blockedSignupIdentities)
-    .values({
-      kind: BLOCKED_IDENTITY_KIND.DOMAIN,
-      value: MOCK_BLOCKED_DOMAIN,
-      reason: MOCK_BLOCK_REASON,
-    })
-    .returning({ id: schema.blockedSignupIdentities.id });
-  if (!block) throw new Error('failed to insert an owner block');
-  return block.id;
 }
 
 describe(openTenantSuspension, () => {
@@ -115,13 +96,20 @@ describe(openTenantSuspension, () => {
     let ownerBlockId: string;
 
     beforeEach(async () => {
-      ownerBlockId = await insertOwnerBlock();
+      ({ id: ownerBlockId } = await insertTestBlockedIdentity(db()));
     });
 
     it('records the block the suspension added', async () => {
       const suspension = await openFor(tenantId, ownerBlockId);
 
       expect(suspension.ownerBlockId).toBe(ownerBlockId);
+    });
+
+    it("refuses a block another tenant's suspension already holds", async () => {
+      const other = await insertTestTenant(db());
+      await openFor(other.id, ownerBlockId);
+
+      await expect(openFor(tenantId, ownerBlockId)).rejects.toThrow();
     });
 
     it('forgets the block once it is removed', async () => {

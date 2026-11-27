@@ -50,10 +50,9 @@ export const tenantSuspensions = pgTable(
     liftedBy: uuid('lifted_by').references(() => admins.id, {
       onDelete: 'set null',
     }),
-    ownerBlockId: uuid('owner_block_id').references(
-      () => blockedSignupIdentities.id,
-      { onDelete: 'set null' },
-    ),
+    ownerBlockId: uuid('owner_block_id')
+      .unique()
+      .references(() => blockedSignupIdentities.id, { onDelete: 'set null' }),
   },
   (suspension) => [
     uniqueIndex('tenant_suspensions_open_tenant_idx')

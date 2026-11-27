@@ -1,5 +1,5 @@
 {
-  "id": "3758a370-18d4-4797-a895-eb542c7c2d6e",
+  "id": "d174a4cf-0418-4caf-8ff4-6b07b7d2d1eb",
   "prevId": "eb2d3b49-4ee5-432f-bb74-3153d59c0409",
   "version": "7",
   "dialect": "postgresql",
@@ -3173,6 +3173,11 @@
           "name": "tenant_suspensions_reference_unique",
           "nullsNotDistinct": false,
           "columns": ["reference"]
+        },
+        "tenant_suspensions_owner_block_id_unique": {
+          "name": "tenant_suspensions_owner_block_id_unique",
+          "nullsNotDistinct": false,
+          "columns": ["owner_block_id"]
         }
       },
       "policies": {},
