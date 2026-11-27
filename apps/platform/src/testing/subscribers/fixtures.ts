@@ -1,8 +1,11 @@
 import type { TSubscribersPageData } from '@platform/server/subscribers/load-subscribers-page';
 import { createMockFaker } from '@platform/testing/mock-faker';
+import { mockReadyTenant } from '@platform/testing/tenants/fixtures';
 import { toSubscriberLimits } from '@platform/utils/subscriber-limits/subscriber-limits';
+import { TENANT_PLAN } from '@shinefold/config';
 import type { TNewsletterLimits } from '@shinefold/db/queries/email-usage';
 import type { TConfirmedSubscriber } from '@shinefold/db/queries/subscribers/confirmed-subscribers';
+import type { TTenant } from '@shinefold/db/schema/tenants';
 
 const subscribersFaker = createMockFaker(7164);
 
@@ -65,3 +68,12 @@ export const mockSubscribersPageData = (
     ...overrides,
   };
 };
+
+export const mockPlatformNewsletterTenant = (
+  overrides: Partial<TTenant> = {},
+) =>
+  mockReadyTenant({
+    plan: TENANT_PLAN.GROWTH,
+    createdFromPlatform: true,
+    ...overrides,
+  });

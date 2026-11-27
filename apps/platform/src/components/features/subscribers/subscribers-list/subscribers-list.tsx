@@ -4,7 +4,6 @@ import { DataTableShell } from '@platform/components/shared/data-table-shell';
 import { Pagination } from '@platform/components/shared/pagination';
 import type { TSubscribersPageData } from '@platform/server/subscribers/load-subscribers-page';
 import { DAY_MONTH_YEAR_SHORT_UTC } from '@platform/utils/date-format-options/date-format-options';
-import { adminRoutes } from '@platform/utils/routes/routes';
 import { toSubscribersRange } from '@platform/utils/subscribers-range/subscribers-range';
 import { useFormatter, useTranslations } from 'next-intl';
 import { useId } from 'react';
@@ -14,9 +13,14 @@ import { subscribersListVariants } from './subscribers-list-variants';
 export type TSubscribersListProps = {
   tenantId: string;
   data: Pick<TSubscribersPageData, 'list' | 'page' | 'totalPages'>;
+  pageHref: (page: number) => string;
 };
 
-export const SubscribersList = ({ tenantId, data }: TSubscribersListProps) => {
+export const SubscribersList = ({
+  tenantId,
+  data,
+  pageHref,
+}: TSubscribersListProps) => {
   const t = useTranslations('subscribersPage.list');
   const format = useFormatter();
   const titleId = useId();
@@ -78,14 +82,18 @@ export const SubscribersList = ({ tenantId, data }: TSubscribersListProps) => {
             <Pagination
               page={page}
               totalPages={totalPages}
-              pageHref={adminRoutes.dashboardSubscribers}
+              pageHref={pageHref}
               hasStatus={false}
             />
           </DataTableShell.Footer>
         </DataTableShell>
       </div>
       <div className={narrow()}>
-        <SubscribersPhoneList tenantId={tenantId} data={data} />
+        <SubscribersPhoneList
+          tenantId={tenantId}
+          data={data}
+          pageHref={pageHref}
+        />
       </div>
     </>
   );

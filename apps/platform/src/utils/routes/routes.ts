@@ -27,6 +27,9 @@ const STUDIO_PAGES_PANE = 'pages';
 
 export const SIGN_IN_PATH = '/sign-in';
 
+const pagedPath = (path: string, page: number) =>
+  page > 1 ? `${path}?page=${page}` : path;
+
 export const adminRoutes = {
   home: () => '/',
   signIn: (callbackUrl = '/') =>
@@ -74,12 +77,14 @@ export const adminRoutes = {
   languages: (tenantId: string) => `/tenants/${tenantId}/languages`,
   email: (tenantId: string) => `/tenants/${tenantId}/email`,
   leads: (tenantId: string) => `/tenants/${tenantId}/leads`,
+  tenantSubscribers: (tenantId: string, page = 1) =>
+    pagedPath(`/tenants/${tenantId}/subscribers`, page),
   tenantTeam: (tenantId: string) => `/tenants/${tenantId}/team`,
   tenantActivity: (tenantId: string, page = 1) =>
-    page > 1
-      ? `/tenants/${tenantId}/activity?page=${page}`
-      : `/tenants/${tenantId}/activity`,
+    pagedPath(`/tenants/${tenantId}/activity`, page),
   tenantStudio: (tenantId: string) => `/tenants/${tenantId}/${STUDIO_SEGMENT}`,
+  tenantStudioPages: (tenantId: string) =>
+    `${adminRoutes.tenantStudio(tenantId)}/${STUDIO_STRUCTURE_TOOL}/${STUDIO_PAGES_PANE}`,
   tenantDraftPreviews: (tenantId: string) =>
     `/tenants/${tenantId}/${DRAFT_PREVIEW_SEGMENT}`,
   tenantDraftPreview: (tenantId: string, documentId: string) =>

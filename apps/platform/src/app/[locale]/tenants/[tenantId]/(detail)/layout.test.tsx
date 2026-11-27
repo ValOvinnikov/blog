@@ -4,6 +4,7 @@ import { mockAdmin } from '@platform/testing/admins/fixtures';
 import { customRenderAsync, screen } from '@platform/testing/custom-render';
 import { makeEnTranslator } from '@platform/testing/en-translator';
 import { mockDbConstants } from '@platform/testing/mock-db-constants';
+import { mockPlatformNewsletterTenant } from '@platform/testing/subscribers/fixtures';
 import {
   MOCK_TENANT_DOMAIN,
   MOCK_TENANT_ID,
@@ -11,6 +12,7 @@ import {
   mockReadyTenant,
 } from '@platform/testing/tenants/fixtures';
 import { noEntitlementGrantQueries } from '@platform/testing/tenants/no-entitlement-grant-queries';
+import { ADMIN_ROLE } from '@shinefold/db/constants';
 
 import TenantDetailLayout from './layout';
 
@@ -87,5 +89,47 @@ describe(`<${TenantDetailLayout.name}/>`, () => {
 
       expect(tenantDomain).not.toBeInTheDocument();
     });
+
+    it('shows no Subscribers entry for a site whose plan has no Newsletter', () => {
+      const subscribersLink = screen.queryByRole('link', {
+        name: navSections.subscribers,
+      });
+
+      expect(subscribersLink).not.toBeInTheDocument();
+    });
   });
+
+  it('shows a super admin Subscribers on a platform-created site', async () => {
+    getAdminByUserIdMock.mockResolvedValue(
+      mockAdmin({ role: ADMIN_ROLE.SUPERADMIN }),
+    );
+    getTenantByIdMock.mockResolvedValue(mockPlatformNewsletterTenant());
+    await setup();
+
+    const subscribersLink = screen.getByRole('link', {
+      name: navSections.subscribers,
+    });
+
+    expect(subscribersLink).toBeVisible();
+  });
+
+  it.each([
+    ['an admin on a platform-created site', ADMIN_ROLE.ADMIN, true],
+    ['a super admin on a self-serve site', ADMIN_ROLE.SUPERADMIN, false],
+  ])(
+    'shows %s no Subscribers entry',
+    async (_viewer, role, createdFromPlatform) => {
+      getAdminByUserIdMock.mockResolvedValue(mockAdmin({ role }));
+      getTenantByIdMock.mockResolvedValue(
+        mockPlatformNewsletterTenant({ createdFromPlatform }),
+      );
+      await setup();
+
+      const subscribersLink = screen.queryByRole('link', {
+        name: navSections.subscribers,
+      });
+
+      expect(subscribersLink).not.toBeInTheDocument();
+    },
+  );
 });
