@@ -4,13 +4,18 @@ import {
   SIGNUP_BLOCK_REFUSAL,
 } from '@platform/constants/signup-block';
 import { requireSuperAdmin } from '@platform/server/auth/require-super-admin';
-import { firstRecordedAuditEvent } from '@platform/testing/audit-events/recorded-audit-event';
+import { mockAuditEvent } from '@platform/testing/audit-events/fixtures';
+import {
+  firstRecordedAuditEvent,
+  recordedAuditEvents,
+} from '@platform/testing/audit-events/recorded-audit-event';
 import {
   MOCK_BLOCKED_ADDRESS_ENTRY_ID,
   mockBlockedIdentity,
   mockBlockedAddressIdentity,
 } from '@platform/testing/blocked-signups/fixtures';
 import { mockDbConstants } from '@platform/testing/mock-db-constants';
+import { MOCK_TENANT_ID } from '@platform/testing/tenants/fixtures';
 import { logger } from '@platform/utils/logger/logger';
 import {
   ACTION_OUTCOME,
@@ -26,10 +31,12 @@ import { notFound } from 'next/navigation';
 import { removeBlockedIdentityAction } from './remove-blocked-identity-action';
 
 const {
+  listAuditEventsForTargetMock,
   listBlockedIdentitiesMock,
   removeBlockedIdentityMock,
   recordAuditEventMock,
 } = vi.hoisted(() => ({
+  listAuditEventsForTargetMock: vi.fn(),
   listBlockedIdentitiesMock: vi.fn(),
   removeBlockedIdentityMock: vi.fn(),
   recordAuditEventMock: vi.fn(),
@@ -44,6 +51,7 @@ vi.mock('@platform/server/audit/record-audit-event', () => ({
 vi.mock('@shinefold/db', async () => ({
   ...(await mockDbConstants()),
   queries: {
+    auditEvents: { listAuditEventsForTarget: listAuditEventsForTargetMock },
     blockedSignupIdentities: {
       listBlockedIdentities: listBlockedIdentitiesMock,
       removeBlockedIdentity: removeBlockedIdentityMock,
@@ -65,6 +73,7 @@ describe(removeBlockedIdentityAction, () => {
       );
     removeBlockedIdentityMock.mockReset().mockResolvedValue(okResult());
     recordAuditEventMock.mockReset();
+    listAuditEventsForTargetMock.mockReset().mockResolvedValue([]);
   });
 
   it('rejects a caller who is not a super admin', async () => {
@@ -105,6 +114,55 @@ describe(removeBlockedIdentityAction, () => {
       targetId: MOCK_BLOCKED_ADDRESS_ENTRY_ID,
       details: { kind: BLOCKED_IDENTITY_KIND.ADDRESS },
     });
+  });
+
+  it('also audits the removal on the tenant whose suspension added the block', async () => {
+    listAuditEventsForTargetMock.mockResolvedValue([
+      mockAuditEvent({
+        action: AUDIT_ACTION.SIGNUP_BLOCK_ADDED,
+        targetType: AUDIT_TARGET_TYPE.BLOCKED_SIGNUP_IDENTITY,
+        targetId: MOCK_BLOCKED_ADDRESS_ENTRY_ID,
+        details: {
+          kind: BLOCKED_IDENTITY_KIND.ADDRESS,
+          tenantId: MOCK_TENANT_ID,
+        },
+      }),
+    ]);
+
+    const result = await removeBlockedIdentityAction(
+      MOCK_BLOCKED_ADDRESS_ENTRY_ID,
+    );
+
+    expect(result).toEqual({ outcome: ACTION_OUTCOME.SUCCESS });
+    expect(listAuditEventsForTargetMock).toHaveBeenCalledWith(
+      AUDIT_TARGET_TYPE.BLOCKED_SIGNUP_IDENTITY,
+      MOCK_BLOCKED_ADDRESS_ENTRY_ID,
+    );
+    expect(recordedAuditEvents(recordAuditEventMock)).toContainEqual({
+      action: AUDIT_ACTION.SIGNUP_BLOCK_REMOVED,
+      targetType: AUDIT_TARGET_TYPE.TENANT,
+      targetId: MOCK_TENANT_ID,
+      details: { kind: BLOCKED_IDENTITY_KIND.ADDRESS },
+    });
+  });
+
+  it('audits no tenant removal for a block no tenant added', async () => {
+    await removeBlockedIdentityAction(MOCK_DOMAIN_ENTRY.id);
+
+    expect(recordAuditEventMock).toHaveBeenCalledTimes(1);
+  });
+
+  it('still succeeds and logs when the tenant lookup fails', async () => {
+    listAuditEventsForTargetMock.mockRejectedValue(MOCK_DB_ERROR);
+
+    const result = await removeBlockedIdentityAction(MOCK_DOMAIN_ENTRY.id);
+
+    expect(result).toEqual({ outcome: ACTION_OUTCOME.SUCCESS });
+    expect(recordAuditEventMock).toHaveBeenCalledTimes(1);
+    expect(logger.error).toHaveBeenCalledWith(
+      SIGNUP_BLOCK_LOG.REMOVE_AUDIT_FAILED,
+      { entryId: MOCK_DOMAIN_ENTRY.id, errorName: MOCK_DB_ERROR.name },
+    );
   });
 
   it('refuses an entry that is not on the list and records nothing', async () => {

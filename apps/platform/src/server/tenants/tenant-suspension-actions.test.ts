@@ -78,6 +78,9 @@ vi.mock('@platform/server/tenants/notify-owner-of-suspension', () => ({
 
 vi.mock('@platform/server/signup-block/add-signup-block', () => ({
   saveSignupBlock: saveSignupBlockMock,
+}));
+
+vi.mock('@platform/server/signup-block/signup-block-audit', () => ({
   recordSignupBlockAdded: recordSignupBlockAddedMock,
 }));
 
@@ -442,6 +445,7 @@ describe('tenant suspension actions', () => {
       expect(recordSignupBlockAddedMock).toHaveBeenCalledWith(
         mockBlockedAddressIdentity(),
         MOCK_BLOCK_REASON,
+        ACTIVE_TENANT.id,
       );
       expect(removeBlockedIdentityMock).not.toHaveBeenCalled();
       expect(result).toEqual({ outcome: ACTION_OUTCOME.SUCCESS });
@@ -558,6 +562,7 @@ describe('tenant suspension actions', () => {
         expect(recordSignupBlockAddedMock).toHaveBeenCalledWith(
           mockBlockedAddressIdentity(),
           MOCK_BLOCK_REASON,
+          ACTIVE_TENANT.id,
         );
       });
 

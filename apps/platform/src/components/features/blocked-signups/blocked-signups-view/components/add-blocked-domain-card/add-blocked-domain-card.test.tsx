@@ -72,6 +72,55 @@ describe(`<${AddBlockedDomainCard.name}/>`, () => {
     expect(refresh).not.toHaveBeenCalled();
   });
 
+  it('clears each field error once that field is edited', async () => {
+    vi.mocked(addBlockedDomainAction).mockResolvedValueOnce({
+      outcome: ACTION_OUTCOME.INVALID,
+      fieldErrors: {
+        domain: { reason: SIGNUP_BLOCK_FIELD_ERROR.BLOCK_DOMAIN_INVALID },
+        reason: { reason: SIGNUP_BLOCK_FIELD_ERROR.BLOCK_REASON_REQUIRED },
+      },
+    });
+
+    const submit = screen.getByRole('button', SUBMIT_BUTTON);
+    await user.click(submit);
+    const domainError = await screen.findByText(
+      addBlockedDomainCard.domainFormatInvalid,
+    );
+    const reasonError = screen.getByText(addBlockedDomainCard.reasonRequired);
+    const domainField = screen.getByRole('textbox', DOMAIN_FIELD);
+    const reasonField = screen.getByRole('textbox', REASON_FIELD);
+
+    await user.type(domainField, MOCK_BLOCKED_DOMAIN);
+
+    expect(domainError).not.toBeInTheDocument();
+    expect(reasonError).toBeVisible();
+
+    await user.type(reasonField, MOCK_BLOCK_REASON);
+
+    expect(reasonError).not.toBeInTheDocument();
+  });
+
+  it('tells the operator a domain is already blocked', async () => {
+    vi.mocked(addBlockedDomainAction).mockResolvedValueOnce({
+      outcome: ACTION_OUTCOME.INVALID,
+      fieldErrors: {
+        domain: {
+          reason: SIGNUP_BLOCK_FIELD_ERROR.BLOCK_DOMAIN_ALREADY_BLOCKED,
+        },
+      },
+    });
+
+    const submit = screen.getByRole('button', SUBMIT_BUTTON);
+    await user.click(submit);
+
+    const error = await screen.findByText(
+      addBlockedDomainCard.domainAlreadyBlocked,
+    );
+
+    expect(error).toBeVisible();
+    expect(refresh).not.toHaveBeenCalled();
+  });
+
   it('keeps the input and does not refresh when the action fails', async () => {
     vi.mocked(addBlockedDomainAction).mockResolvedValueOnce({
       outcome: ACTION_OUTCOME.SERVER_ERROR,

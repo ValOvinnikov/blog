@@ -32,6 +32,13 @@ export type TAddBlockedDomainResult = TActionResult<
   TSignupBlockFieldError
 >;
 
+const ALREADY_BLOCKED = {
+  outcome: ACTION_OUTCOME.INVALID,
+  fieldErrors: {
+    domain: { reason: SIGNUP_BLOCK_FIELD_ERROR.BLOCK_DOMAIN_ALREADY_BLOCKED },
+  },
+} as const;
+
 export const addBlockedDomainAction = async (
   input: TAddBlockedDomainInput,
 ): Promise<TAddBlockedDomainResult> => {
@@ -60,7 +67,11 @@ export const addBlockedDomainAction = async (
       admin,
     });
 
-    if (result.ok) return toOutcome(ACTION_OUTCOME.SUCCESS);
+    if (result.ok) {
+      return result.data.created
+        ? toOutcome(ACTION_OUTCOME.SUCCESS)
+        : ALREADY_BLOCKED;
+    }
 
     if (result.error === ERROR_CODE.DB_INVALID_DOMAIN) {
       return {

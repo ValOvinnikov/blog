@@ -1,10 +1,8 @@
 import 'server-only';
 
 import { TENANT_REFUSAL, TENANT_LOG } from '@platform/constants/tenant';
-import {
-  recordSignupBlockAdded,
-  saveSignupBlock,
-} from '@platform/server/signup-block/add-signup-block';
+import { saveSignupBlock } from '@platform/server/signup-block/add-signup-block';
+import { recordSignupBlockAdded } from '@platform/server/signup-block/signup-block-audit';
 import { toLoggableError } from '@platform/utils/loggable-error/loggable-error';
 import { logger } from '@platform/utils/logger/logger';
 import {
@@ -26,6 +24,7 @@ type TBlockTenantOwnerEmailFailure =
 
 export type TSavedOwnerEmailBlock = TAddBlockedIdentityOutcome & {
   reason: string;
+  tenantId: string;
 };
 
 export const blockTenantOwnerEmail = async (
@@ -47,7 +46,7 @@ export const blockTenantOwnerEmail = async (
     reason,
     admin,
   });
-  if (saved.ok) return okResult({ ...saved.data, reason });
+  if (saved.ok) return okResult({ ...saved.data, reason, tenantId });
 
   logger.error(TENANT_LOG.SUSPENSION_BLOCK_FAILED, {
     tenantId,
@@ -59,7 +58,9 @@ export const blockTenantOwnerEmail = async (
 export const confirmOwnerEmailBlock = async (
   block: TMaybeUndefined<TSavedOwnerEmailBlock>,
 ): Promise<void> => {
-  if (block?.created) await recordSignupBlockAdded(block.entry, block.reason);
+  if (block?.created) {
+    await recordSignupBlockAdded(block.entry, block.reason, block.tenantId);
+  }
 };
 
 export const undoOwnerEmailBlock = async (

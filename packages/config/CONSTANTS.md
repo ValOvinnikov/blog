@@ -867,7 +867,7 @@ Every key/value const an agent should reuse before writing a literal. The
 
 ### `@platform/constants/signup-block` — `apps/platform/src/constants/signup-block.ts`
 
-- **SIGNUP_BLOCK_FIELD_ERROR**: `BLOCK_DOMAIN_INVALID`, `BLOCK_REASON_REQUIRED`
+- **SIGNUP_BLOCK_FIELD_ERROR**: `BLOCK_DOMAIN_INVALID`, `BLOCK_DOMAIN_ALREADY_BLOCKED`, `BLOCK_REASON_REQUIRED`
 - **SIGNUP_BLOCK_REFUSAL**: `ENTRY_NOT_FOUND`
 - **SIGNUP_BLOCK_LOG**: `ADD_AUDIT_FAILED`=`"signup_block.add_audit_failed"`, `ADD_DOMAIN_FAILED`=`"signup_block.add_domain_failed"`, `REMOVE_AUDIT_FAILED`=`"signup_block.remove_audit_failed"`, `REMOVE_FAILED`=`"signup_block.remove_failed"`, `REMOVE_LOOKUP_FAILED`=`"signup_block.remove_lookup_failed"`
 

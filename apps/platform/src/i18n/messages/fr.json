@@ -2255,6 +2255,7 @@
     "submitting": "Blocage…",
     "reasonRequired": "Saisissez un motif.",
     "domainFormatInvalid": "Saisissez un domaine valide, par exemple example.com.",
+    "domainAlreadyBlocked": "Ce domaine est déjà bloqué.",
     "domainBlocked": "Domaine bloqué.",
     "domainBlockFailed": "Impossible de bloquer le domaine — réessayez.",
     "blockSubmit": "Bloquer le domaine"

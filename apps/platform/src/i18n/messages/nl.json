@@ -2255,6 +2255,7 @@
     "submitting": "Blokkeren…",
     "reasonRequired": "Voer een reden in.",
     "domainFormatInvalid": "Voer een geldig domein in, zoals example.com.",
+    "domainAlreadyBlocked": "Dit domein is al geblokkeerd.",
     "domainBlocked": "Domein geblokkeerd.",
     "domainBlockFailed": "Het domein kon niet worden geblokkeerd — probeer het opnieuw.",
     "blockSubmit": "Domein blokkeren"

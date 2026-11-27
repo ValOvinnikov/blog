@@ -4,18 +4,13 @@ import {
   SIGNUP_BLOCK_REFUSAL,
   SIGNUP_BLOCK_LOG,
 } from '@platform/constants/signup-block';
-import { recordAuditEvent } from '@platform/server/audit/record-audit-event';
 import { requireSuperAdmin } from '@platform/server/auth/require-super-admin';
+import { recordSignupBlockRemoved } from '@platform/server/signup-block/signup-block-audit';
 import { toLoggableError } from '@platform/utils/loggable-error/loggable-error';
 import { logger } from '@platform/utils/logger/logger';
-import {
-  ACTION_OUTCOME,
-  AUDIT_ACTION,
-  AUDIT_TARGET_TYPE,
-  type TActionResult,
-} from '@shinefold/config';
+import { ACTION_OUTCOME, type TActionResult } from '@shinefold/config';
 import { ERROR_CODE } from '@shinefold/config/constants';
-import { BLOCKED_IDENTITY_KIND, queries } from '@shinefold/db';
+import { queries } from '@shinefold/db';
 import { toOutcome } from '@shinefold/utils/to-outcome';
 import { z } from 'zod';
 
@@ -65,18 +60,7 @@ export const removeBlockedIdentityAction = async (
       return toOutcome(ACTION_OUTCOME.SERVER_ERROR);
     }
 
-    await recordAuditEvent({
-      logEvent: SIGNUP_BLOCK_LOG.REMOVE_AUDIT_FAILED,
-      action: AUDIT_ACTION.SIGNUP_BLOCK_REMOVED,
-      targetType: AUDIT_TARGET_TYPE.BLOCKED_SIGNUP_IDENTITY,
-      targetId: entry.id,
-      details: {
-        kind: entry.kind,
-        ...(entry.kind === BLOCKED_IDENTITY_KIND.DOMAIN && {
-          domain: entry.value,
-        }),
-      },
-    });
+    await recordSignupBlockRemoved(entry);
   } catch (error) {
     logger.error(SIGNUP_BLOCK_LOG.REMOVE_FAILED, toLoggableError(error));
     return toOutcome(ACTION_OUTCOME.SERVER_ERROR);

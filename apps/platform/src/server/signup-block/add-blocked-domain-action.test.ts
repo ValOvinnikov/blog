@@ -99,6 +99,23 @@ describe(addBlockedDomainAction, () => {
     });
   });
 
+  it('reports a domain already on the list as a field error', async () => {
+    addSignupBlockMock.mockResolvedValue(
+      okResult({ entry: mockBlockedIdentity(), created: false }),
+    );
+
+    const result = await addBlockedDomainAction(MOCK_INPUT);
+
+    expect(result).toEqual({
+      outcome: ACTION_OUTCOME.INVALID,
+      fieldErrors: {
+        domain: {
+          reason: SIGNUP_BLOCK_FIELD_ERROR.BLOCK_DOMAIN_ALREADY_BLOCKED,
+        },
+      },
+    });
+  });
+
   it('returns a server error and logs when the write fails', async () => {
     addSignupBlockMock.mockResolvedValue(errorResult(ERROR_CODE.DB_NOT_FOUND));
 
