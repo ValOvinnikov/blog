@@ -32,13 +32,13 @@ Section Pages turns a landing page into a hub for the pages nested under it. Pla
 ## Configuration
 
 - Editors add the module to a landing template and choose its heading under Content, and its background, heading alignment, card overrides, columns and layout under Appearance. Which cards appear follows the landing page tree, not the module.
-- No plan or capability gate; no Voice strings.
-- Look: card style, radius and density restyle the cards ([look](./look.md)); the module's Appearance fields can override them per section. The service returns the per-module overrides and `columns`; the web side does not yet apply them.
+- No Voice strings. The card overrides are plan-gated through `gateSectionStyleOverrides`: without the card-style entitlement the cards follow the site's look whatever is stored.
+- Look: card style, radius and density restyle the cards ([look](./look.md)); the module's Card style, Corners and Density override them for this section only, resolved through `getModuleSection` like the other card modules.
 
 ## Constraints and invariants
 
 - Renders nothing when the page has no children in the request language, when the fetch fails (logged), or when it is placed without landing-page context (logs `section_pages_module.missing_landing_page_context`).
-- Grid columns follow the card count through `toModuleGridColumns`.
+- Grid columns follow the stored Columns through `toCardGridColumns`; on Site default (Auto) they follow the card count through `toModuleGridColumns`. Image `sizes` follow the resolved column count.
 - With a heading, the section is labelled by it and card titles are `h3`; without one, the section has no `aria-labelledby` and card titles are `h2`.
 - A card without an image keeps a minimum height so a title-only card still reads as a card.
 - Card summaries are the child's page heading supporting text, never its SEO description.

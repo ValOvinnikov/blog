@@ -1,10 +1,18 @@
-import { BRAND_VARIANT, CONTENT_ALIGNMENT } from '@shinefold/config';
+import {
+  BRAND_VARIANT,
+  CONTENT_ALIGNMENT,
+  GRID_COLUMNS,
+} from '@shinefold/config';
 import type { Meta, StoryObj } from '@storybook/nextjs-vite';
 import { mockSanityImage } from '@web/testing/modules/hero/fixtures';
 import {
   mockSectionPageCard,
-  mockSectionPagesModule,
+  mockSectionPagesContent,
 } from '@web/testing/modules/section-pages/fixtures';
+import {
+  MOCK_OUTLINED_BRAND_TINT_SECTION,
+  MOCK_PRIMARY_SECTION,
+} from '@web/testing/shared/section-appearance/fixtures';
 
 import { SectionPagesModuleView } from './section-pages-module-view';
 
@@ -33,9 +41,14 @@ const meta = {
       control: 'select',
       options: [CONTENT_ALIGNMENT.LEFT, CONTENT_ALIGNMENT.CENTER],
     },
+    columns: {
+      control: 'select',
+      options: [undefined, ...Object.values(GRID_COLUMNS)],
+    },
   },
   args: {
-    ...mockSectionPagesModule({ pages }),
+    ...mockSectionPagesContent({ pages }),
+    section: MOCK_PRIMARY_SECTION,
     titleId: 'section-pages-title',
     dataTestId: 'section-pages-module-section-pages-1',
   },
@@ -57,7 +70,31 @@ export const WithoutHeading: TStory = {
 };
 
 export const Secondary: TStory = {
-  args: { brandVariant: BRAND_VARIANT.SECONDARY },
+  args: { section: { brandVariant: BRAND_VARIANT.SECONDARY } },
+};
+
+export const OutlinedOnBrandTint: TStory = {
+  args: { section: MOCK_OUTLINED_BRAND_TINT_SECTION },
+};
+
+export const ThreeColumnsOneChild: TStory = {
+  args: { columns: GRID_COLUMNS.THREE, pages: pages.slice(0, 1) },
+};
+
+export const ThreeColumnsTwoChildren: TStory = {
+  args: { columns: GRID_COLUMNS.THREE, pages: pages.slice(0, 2) },
+};
+
+export const ThreeColumnsThreeChildren: TStory = {
+  args: { columns: GRID_COLUMNS.THREE },
+};
+
+export const SiteDefaultColumnsOneChild: TStory = {
+  args: { pages: pages.slice(0, 1) },
+};
+
+export const SiteDefaultColumnsTwoChildren: TStory = {
+  args: { pages: pages.slice(0, 2) },
 };
 
 export const TitleOnly: TStory = {

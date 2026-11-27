@@ -4,37 +4,47 @@ import { MediaCard } from '@shinefold/ui/components/molecules/media-card';
 import { CardGrid } from '@shinefold/ui/components/organisms/card-grid';
 import { ModuleHeading } from '@web/components/shared/module-heading';
 import { SanityImage } from '@web/components/shared/sanity-image';
-import { Section } from '@web/components/shared/section';
+import { Section, type TModuleSection } from '@web/components/shared/section';
 import { SmartLink } from '@web/components/shared/smart-link';
 import {
   SQUARE_IMAGE_SIZE,
   WIDE_IMAGE_HEIGHT,
 } from '@web/utils/media-card-image-size';
 import { GRID_IMAGE_SIZES } from '@web/utils/module-image-sizes';
+import { toCardGridColumns } from '@web/utils/to-card-grid-columns';
 import { toModuleGridColumns } from '@web/utils/to-module-grid-columns';
 
 import { sectionPagesModuleViewVariants } from './section-pages-module-view-variants';
 
-export interface ISectionPagesModuleViewProps extends TSectionPagesModule {
+export type TSectionPagesModuleContent = Pick<
+  TSectionPagesModule,
+  'headingBlock' | 'pages' | 'contentAlignment' | 'columns'
+>;
+
+export interface ISectionPagesModuleViewProps extends TSectionPagesModuleContent {
+  section: TModuleSection;
   titleId: string;
   dataTestId: string;
 }
 
 export const SectionPagesModuleView = ({
-  brandVariant,
+  section,
   headingBlock,
   pages,
   contentAlignment,
-  layout,
+  columns: storedColumns,
   titleId,
   dataTestId,
 }: ISectionPagesModuleViewProps) => {
-  const columns = toModuleGridColumns(pages.length);
+  const { brandVariant, layout, appearance } = section;
+  const columns =
+    toCardGridColumns(storedColumns) ?? toModuleGridColumns(pages.length);
 
   return (
     <Section
       brandVariant={brandVariant}
       layout={layout}
+      appearance={appearance}
       titleId={headingBlock && titleId}
       dataTestId={dataTestId}
     >
@@ -46,7 +56,7 @@ export const SectionPagesModuleView = ({
           align={contentAlignment}
         />
       )}
-      <CardGrid columns={columns}>
+      <CardGrid columns={columns} dataTestId={`${dataTestId}-grid-${columns}`}>
         {pages.map(({ id, title, summary, image, path }) => {
           const { card, image: imageClassName } =
             sectionPagesModuleViewVariants({ hasImage: Boolean(image) });

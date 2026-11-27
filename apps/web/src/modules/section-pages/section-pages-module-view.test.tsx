@@ -1,4 +1,5 @@
 import { faker } from '@faker-js/faker';
+import { GRID_COLUMNS } from '@shinefold/config';
 import { customRender, screen, within } from '@web/testing/custom-render';
 import { mockSanityImage } from '@web/testing/modules/hero/fixtures';
 import {
@@ -7,8 +8,14 @@ import {
   MOCK_SECTION_PAGE_TITLE,
   MOCK_SECTION_PAGES_HEADING,
   mockSectionPageCard,
-  mockSectionPagesModule,
+  mockSectionPagesContent,
 } from '@web/testing/modules/section-pages/fixtures';
+import { mockItemsWithIds } from '@web/testing/shared/items/fixtures';
+import {
+  MOCK_PRIMARY_SECTION,
+  MOCK_RADIUS_SCOPE_CASES,
+  MOCK_SCOPED_RADIUS_TOKEN,
+} from '@web/testing/shared/section-appearance/fixtures';
 
 import { SectionPagesModuleView } from './section-pages-module-view';
 
@@ -20,7 +27,8 @@ const MOCK_TITLE_ID = faker.lorem.slug();
 const MOCK_DATA_TEST_ID = faker.lorem.slug();
 
 const setup = customRender(SectionPagesModuleView, {
-  ...mockSectionPagesModule(),
+  ...mockSectionPagesContent(),
+  section: MOCK_PRIMARY_SECTION,
   titleId: MOCK_TITLE_ID,
   dataTestId: MOCK_DATA_TEST_ID,
 });
@@ -110,5 +118,47 @@ describe(`<${SectionPagesModuleView.name}/>`, () => {
     const renderedImage = screen.getByRole('img', { name: image.alt });
 
     expect(renderedImage).toBeVisible();
+  });
+
+  it.each(MOCK_RADIUS_SCOPE_CASES)(
+    'scopes the radius token to its section $title an override',
+    ({ section, scoped }) => {
+      setup({ section });
+
+      const region = screen.getByRole('region', {
+        name: MOCK_SECTION_PAGES_HEADING,
+      });
+
+      expect(region.style.getPropertyValue(MOCK_SCOPED_RADIUS_TOKEN)).toBe(
+        scoped,
+      );
+    },
+  );
+
+  it.each([
+    {
+      title: 'in the stored column count for one child',
+      columns: GRID_COLUMNS.THREE,
+      pageCount: 1,
+      expected: 3,
+    },
+    {
+      title: 'in the stored column count for two children',
+      columns: GRID_COLUMNS.THREE,
+      pageCount: 2,
+      expected: 3,
+    },
+    {
+      title: 'in columns that fit the child count on Site default',
+      columns: undefined,
+      pageCount: 2,
+      expected: 2,
+    },
+  ])('lays the grid out $title', ({ columns, pageCount, expected }) => {
+    setup({ columns, pages: mockItemsWithIds(pageCount, mockSectionPageCard) });
+
+    const grid = screen.getByTestId(`${MOCK_DATA_TEST_ID}-grid-${expected}`);
+
+    expect(grid).toBeVisible();
   });
 });
