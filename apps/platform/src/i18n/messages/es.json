@@ -380,7 +380,8 @@
     "RECHECK_TENANT_OWNERS": "Revisión de propietarios",
     "DOMAIN_VERIFICATION": "Verificación del dominio",
     "SITE_CONFIG_REVALIDATION": "Revalidación de la configuración del sitio",
-    "CONTRAST_CHECK": "Comprobación de contraste"
+    "CONTRAST_CHECK": "Comprobación de contraste",
+    "DOCUMENT_COUNT_CHECK": "Comprobación del número de documentos"
   },
   "findingKindLabel": {
     "SCHEMA_VALIDATION_ERROR": "Error de validación del esquema",
@@ -390,7 +391,8 @@
     "DOMAIN_NOT_ADDED": "Dominio no añadido",
     "REVALIDATION_FAILED": "Revalidación fallida",
     "CONTRAST_REGRESSION": "Regresión de contraste",
-    "OWNER_ACCESS_CHECK_FAILED": "La comprobación del acceso del propietario falla"
+    "OWNER_ACCESS_CHECK_FAILED": "La comprobación del acceso del propietario falla",
+    "DOCUMENT_CAP_APPROACHING": "Cerca del límite de documentos"
   },
   "ownerHomePage": {
     "description": "Su sitio de un vistazo. Todo lo que aparece aquí está en vivo.",

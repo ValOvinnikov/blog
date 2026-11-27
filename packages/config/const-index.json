@@ -1746,6 +1746,14 @@
         "file": "packages/config/src/constants/finding.ts"
       }
     ],
+    "DOCUMENT_COUNT_CHECK": [
+      {
+        "ref": "FINDING_SOURCE.DOCUMENT_COUNT_CHECK",
+        "scope": "config",
+        "from": "@shinefold/config/constants",
+        "file": "packages/config/src/constants/finding.ts"
+      }
+    ],
     "SCHEMA_VALIDATION_ERROR": [
       {
         "ref": "FINDING_KIND.SCHEMA_VALIDATION_ERROR",
@@ -1805,6 +1813,14 @@
     "OWNER_ACCESS_CHECK_FAILED": [
       {
         "ref": "FINDING_KIND.OWNER_ACCESS_CHECK_FAILED",
+        "scope": "config",
+        "from": "@shinefold/config/constants",
+        "file": "packages/config/src/constants/finding.ts"
+      }
+    ],
+    "DOCUMENT_CAP_APPROACHING": [
+      {
+        "ref": "FINDING_KIND.DOCUMENT_CAP_APPROACHING",
         "scope": "config",
         "from": "@shinefold/config/constants",
         "file": "packages/config/src/constants/finding.ts"

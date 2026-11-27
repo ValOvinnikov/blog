@@ -7,13 +7,12 @@ export const FINDING_SOURCE = {
   DOMAIN_VERIFICATION: 'DOMAIN_VERIFICATION',
   SITE_CONFIG_REVALIDATION: 'SITE_CONFIG_REVALIDATION',
   CONTRAST_CHECK: 'CONTRAST_CHECK',
+  DOCUMENT_COUNT_CHECK: 'DOCUMENT_COUNT_CHECK',
 } as const;
 
 export type TFindingSource = TValueOf<typeof FINDING_SOURCE>;
 
-// One source can report more than one kind (e.g. RECHECK_TENANT_OWNERS
-// reports both OWNER_CHECK_STALLED and OWNER_CHECK_AMBIGUOUS) — kind and
-// source are independent vocabularies, not a 1:1 pair.
+// Kind and source are independent vocabularies: one source can report several kinds.
 export const FINDING_KIND = {
   SCHEMA_VALIDATION_ERROR: 'SCHEMA_VALIDATION_ERROR',
   PROVISIONING_STEP_FAILED: 'PROVISIONING_STEP_FAILED',
@@ -23,6 +22,7 @@ export const FINDING_KIND = {
   REVALIDATION_FAILED: 'REVALIDATION_FAILED',
   CONTRAST_REGRESSION: 'CONTRAST_REGRESSION',
   OWNER_ACCESS_CHECK_FAILED: 'OWNER_ACCESS_CHECK_FAILED',
+  DOCUMENT_CAP_APPROACHING: 'DOCUMENT_CAP_APPROACHING',
 } as const;
 
 export type TFindingKind = TValueOf<typeof FINDING_KIND>;
