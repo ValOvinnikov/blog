@@ -1,5 +1,6 @@
 import { ARIA_ATTRIBUTE } from '@platform/constants/aria-attribute';
 import { TENANT_FIELD_ERROR, TENANT_REFUSAL } from '@platform/constants/tenant';
+import { deprovisionTenantAction } from '@platform/server/provisioning/deprovision-tenant-action';
 import { customRender, screen, within } from '@platform/testing/custom-render';
 import { mockRouterRefresh } from '@platform/testing/mock-router';
 import {
@@ -12,13 +13,9 @@ import userEvent, { type UserEvent } from '@testing-library/user-event';
 
 import { DeprovisionTenantControl } from './deprovision-tenant-control';
 
-const { deprovisionTenantActionMock } = vi.hoisted(() => ({
-  deprovisionTenantActionMock: vi.fn(),
-}));
+vi.mock('@platform/server/provisioning/deprovision-tenant-action');
 
-vi.mock('@platform/server/provisioning/deprovision-tenant-action', () => ({
-  deprovisionTenantAction: deprovisionTenantActionMock,
-}));
+const deprovisionTenantActionMock = vi.mocked(deprovisionTenantAction);
 
 const MOCK_CLIENT_TENANT = mockClientTenant({ deprovisionedAt: null });
 

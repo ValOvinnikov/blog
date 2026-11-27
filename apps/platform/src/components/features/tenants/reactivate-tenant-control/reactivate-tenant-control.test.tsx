@@ -1,4 +1,5 @@
 import { TENANT_REFUSAL } from '@platform/constants/tenant';
+import { reactivateTenantAction } from '@platform/server/provisioning/reactivate-tenant-action';
 import { customRender, screen, waitFor } from '@platform/testing/custom-render';
 import { mockRouterRefresh } from '@platform/testing/mock-router';
 import {
@@ -16,13 +17,9 @@ import { ReactivateTenantControl } from './reactivate-tenant-control';
 const REACTIVATE_DIALOG_TITLE = `Reactivate ${MOCK_TENANT_NAME}`;
 const REACTIVATE_CONFIRM_LABEL = 'Reactivate';
 
-const { reactivateTenantActionMock } = vi.hoisted(() => ({
-  reactivateTenantActionMock: vi.fn(),
-}));
+vi.mock('@platform/server/provisioning/reactivate-tenant-action');
 
-vi.mock('@platform/server/provisioning/reactivate-tenant-action', () => ({
-  reactivateTenantAction: reactivateTenantActionMock,
-}));
+const reactivateTenantActionMock = vi.mocked(reactivateTenantAction);
 
 const MOCK_ARCHIVED_TENANT = mockClientTenant({
   deprovisionedAt: MOCK_ARCHIVED_AT,
