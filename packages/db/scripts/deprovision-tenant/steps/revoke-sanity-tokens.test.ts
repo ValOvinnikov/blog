@@ -82,7 +82,7 @@ describe(revokeTenantSanityTokens, () => {
     expect(revokeToken).not.toHaveBeenCalled();
   });
 
-  it('revokes every robot on the project, using the tenant management token', async () => {
+  it('revokes every robot on the project with the tenant management token', async () => {
     listRobotTokens.mockResolvedValueOnce([
       MOCK_READ_ROBOT,
       MOCK_WRITE_ROBOT,
@@ -101,6 +101,7 @@ describe(revokeTenantSanityTokens, () => {
     });
     expect(revokeToken).toHaveBeenCalledWith({
       token: MOCK_TENANT_MANAGEMENT_TOKEN,
+      organisationToken: MOCK_DEPROVISION_ENV.sanityManagementToken,
       projectId: MOCK_TENANT.sanityProjectId,
       robotId: MOCK_READ_ROBOT.id,
     });

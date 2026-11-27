@@ -5,7 +5,7 @@ import {
   startDeprovisioningRun,
 } from '@shinefold/db/queries/tenants';
 import { errorResult, okResult } from '@shinefold/utils/result';
-import { DEPROVISIONING_RUN_FAILED_EVENT } from '@worker/constants/deprovisioning';
+import { DEPROVISIONING_LOG } from '@worker/constants/deprovisioning';
 import { MOCK_NOW } from '@worker/testing/clock/frozen-clock';
 import { MOCK_DB_DOWN } from '@worker/testing/outage/fixtures';
 import { MOCK_RUN_CONTEXT } from '@worker/testing/run/fixtures';
@@ -88,7 +88,7 @@ describe(finishDeprovisioning, () => {
       errorResult({ message: MOCK_DB_DOWN }),
     );
 
-    expect(logger.error).toHaveBeenCalledWith(DEPROVISIONING_RUN_FAILED_EVENT, {
+    expect(logger.error).toHaveBeenCalledWith(DEPROVISIONING_LOG.RUN_FAILED, {
       tenantId: MOCK_TENANT_ID,
       runId: MOCK_RUN_CONTEXT.runId,
       error: MOCK_DB_DOWN,

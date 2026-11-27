@@ -1,6 +1,6 @@
 import type { TDeprovisioningStep } from '@shinefold/db/constants';
 import { sanitizeLogMessage } from '@shinefold/insight';
-import { DEPROVISIONING_RUN_FAILED_EVENT } from '@worker/constants/deprovisioning';
+import { DEPROVISIONING_LOG } from '@worker/constants/deprovisioning';
 import { PROVISIONING_UNIT_MAX_RETRIES } from '@worker/constants/provisioning';
 import {
   reportDeprovisioningRunFinish,
@@ -40,7 +40,7 @@ export async function finishDeprovisioning(
   if (outcome.ok) {
     await alertOperatorsToDeleteSanityProject(await loadTenant(tenantId));
   } else if (!isStepFailure(outcome.error)) {
-    logger.error(DEPROVISIONING_RUN_FAILED_EVENT, {
+    logger.error(DEPROVISIONING_LOG.RUN_FAILED, {
       tenantId,
       runId: ctx.runId,
       error: sanitizeLogMessage(outcome.error.message),

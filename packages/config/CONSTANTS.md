@@ -1315,6 +1315,10 @@ Every key/value const an agent should reuse before writing a literal. The
 
 - **CUSTOM_DOMAIN_LOG**: `CONNECT_START_FAILED`=`"custom_domain.connect_start_failed"`, `DISCONNECT_START_FAILED`=`"custom_domain.disconnect_start_failed"`, `CONNECT_FAILED`=`"custom_domain.connect_failed"`, `DISCONNECT_FAILED`=`"custom_domain.disconnect_failed"`
 
+### `@worker/constants/deprovisioning` — `apps/worker/src/constants/deprovisioning.ts`
+
+- **DEPROVISIONING_LOG**: `START_FAILED`=`"deprovisioning.start_failed"`, `STEP_FAILED`=`"deprovisioning.step_failed"`, `RUN_FAILED`=`"deprovisioning.run_failed"`, `TOKEN_REVOKE_FAILED`=`"deprovisioning.token_revoke_failed"`, `ALERT_NO_RECIPIENTS`=`"deprovisioning.alert_no_recipients"`, `ALERT_SEND_FAILED`=`"deprovisioning.alert_send_failed"`
+
 ### `@worker/constants/downgrade-grace` — `apps/worker/src/constants/downgrade-grace.ts`
 
 - **DOWNGRADE_GRACE_LOG**: `FAILED`=`"downgrade_grace.failed"`, `STEP_FAILED`=`"downgrade_grace.step_failed"`, `OWNER_MISSING`=`"downgrade_grace.owner_missing"`, `SUBDOMAIN_MISSING`=`"downgrade_grace.subdomain_missing"`, `GRACE_END_FAILED`=`"downgrade_grace.grace_end_failed"`, `EMAIL_SEND_FAILED`=`"downgrade_grace.email_send_failed"`

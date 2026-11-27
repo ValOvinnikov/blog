@@ -2,8 +2,7 @@ import { EMAIL_ACCOUNT } from '@shinefold/config/constants';
 import { listSuperadminEmails } from '@shinefold/db/queries/admins';
 import { sendEmail } from '@shinefold/email';
 import {
-  DEPROVISIONING_ALERT_NO_RECIPIENTS_EVENT,
-  DEPROVISIONING_ALERT_SEND_FAILED_EVENT,
+  DEPROVISIONING_LOG,
   SANITY_MANAGE_PROJECT_URL,
 } from '@worker/constants/deprovisioning';
 import { DEFAULT_OPERATOR_ALERT_FROM_ADDRESS } from '@worker/constants/operator-alert';
@@ -61,7 +60,7 @@ describe(alertOperatorsToDeleteSanityProject, () => {
 
     expect(sendEmail).not.toHaveBeenCalled();
     expect(logger.warn).toHaveBeenCalledWith(
-      DEPROVISIONING_ALERT_NO_RECIPIENTS_EVENT,
+      DEPROVISIONING_LOG.ALERT_NO_RECIPIENTS,
       { tenantId: MOCK_TENANT_ID },
     );
   });
@@ -73,7 +72,7 @@ describe(alertOperatorsToDeleteSanityProject, () => {
 
     expect(sentTo()).toEqual(MOCK_SUPERADMIN_EMAILS);
     expect(logger.error).toHaveBeenCalledWith(
-      DEPROVISIONING_ALERT_SEND_FAILED_EVENT,
+      DEPROVISIONING_LOG.ALERT_SEND_FAILED,
       { tenantId: MOCK_TENANT_ID, error: MOCK_RESEND_DOWN },
     );
   });

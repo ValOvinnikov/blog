@@ -3,10 +3,10 @@ import { getTenantSanityManagementCredentials } from '@shinefold/db/queries/tena
 import type { TTenant } from '@shinefold/db/schema/tenants';
 import {
   missingManagementRobotIdMessage,
+  revokeSanityRobotToken,
   robotsInRevocationOrder,
 } from '@shinefold/db/utils/sanity-management-client/sanity-robot-revocation';
 import {
-  deleteSanityRobotToken,
   listSanityRobotTokens,
   type TSanityRobotTokenSummary,
 } from '@shinefold/db/utils/sanity-management-client/sanity-robot-tokens';
@@ -17,13 +17,13 @@ import type { TDeprovisionEnv } from '../lib/env';
 export type TRevokeSanityTokensDeps = {
   getManagementCredentials: typeof getTenantSanityManagementCredentials;
   listRobotTokens: typeof listSanityRobotTokens;
-  revokeToken: typeof deleteSanityRobotToken;
+  revokeToken: typeof revokeSanityRobotToken;
 };
 
 const defaultDeps: TRevokeSanityTokensDeps = {
   getManagementCredentials: getTenantSanityManagementCredentials,
   listRobotTokens: listSanityRobotTokens,
-  revokeToken: deleteSanityRobotToken,
+  revokeToken: revokeSanityRobotToken,
 };
 
 async function listProjectRobots(
@@ -74,7 +74,12 @@ export async function revokeTenantSanityTokens(
 
   for (const robot of robotsInRevocationOrder(robots, managementRobotId)) {
     try {
-      await deps.revokeToken({ token, projectId, robotId: robot.id });
+      await deps.revokeToken({
+        token,
+        organisationToken: env.sanityManagementToken,
+        projectId,
+        robotId: robot.id,
+      });
     } catch (error) {
       console.error(
         `deprovision-tenant: failed to revoke Sanity robot token "${robot.id}" (label "${robot.label}") for project "${projectId}" (${sanitizeLogMessage(error)}).`,
