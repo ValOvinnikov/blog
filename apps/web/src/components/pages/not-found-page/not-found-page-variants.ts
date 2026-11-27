@@ -1,4 +1,9 @@
-import { tv } from '@shinefold/ui/lib/styling';
+import {
+  FOCUS_RING,
+  LINK_UNDERLINE,
+  TRANSITION_COLORS,
+  tv,
+} from '@shinefold/ui/lib/styling';
 
 export const notFoundPageVariants = tv({
   slots: {
@@ -10,11 +15,10 @@ export const notFoundPageVariants = tv({
     copy: ['max-w-copy mx-auto'],
     link: [
       'inline-flex items-center gap-1.5',
-      'text-brand-primary underline underline-offset-4',
-      'transition-colors duration-base ease-smooth',
-      'hover:text-brand-primary-hover',
-      'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary',
-      'focus-visible:ring-offset-2 focus-visible:ring-offset-ambient',
+      'text-brand-primary hover:text-brand-primary-hover',
+      ...LINK_UNDERLINE,
+      TRANSITION_COLORS,
+      FOCUS_RING,
     ],
     arrow: ['size-4'],
   },
