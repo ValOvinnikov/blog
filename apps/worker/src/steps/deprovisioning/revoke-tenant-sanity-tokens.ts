@@ -5,7 +5,10 @@ import {
   revokeSanityRobotToken,
   robotsInRevocationOrder,
 } from '@shinefold/db/utils/sanity-management-client/sanity-robot-revocation';
-import { listSanityRobotTokens } from '@shinefold/db/utils/sanity-management-client/sanity-robot-tokens';
+import {
+  getSanityTokenUserId,
+  listSanityRobotTokens,
+} from '@shinefold/db/utils/sanity-management-client/sanity-robot-tokens';
 import { sanitizeLogMessage } from '@shinefold/insight';
 import { DEPROVISIONING_LOG } from '@worker/constants/deprovisioning';
 import type { TDeprovisionEnv } from '@worker/utils/deprovision-env/deprovision-env';
@@ -32,26 +35,31 @@ export async function revokeTenantSanityTokens(
   if (!managementRobotId) {
     throw new FatalError(missingManagementRobotIdMessage(tenantId));
   }
+  const { sanityManagementToken: organizationToken } = env;
 
-  let robots;
-  try {
-    robots = await listSanityRobotTokens({ token, projectId });
-  } catch (error) {
-    logger.error(DEPROVISIONING_LOG.TOKEN_REVOKE_FAILED, {
-      tenantId,
-      error: sanitizeLogMessage(error),
-    });
-    return;
-  }
+  const revocationOrder = await Promise.all([
+    listSanityRobotTokens({ token, projectId }),
+    getSanityTokenUserId(organizationToken),
+  ]).then(
+    ([robots, organizationRobotId]) =>
+      robotsInRevocationOrder(robots, {
+        managementRobotId,
+        organizationRobotId,
+      }),
+    (error: unknown) => {
+      logger.error(DEPROVISIONING_LOG.TOKEN_REVOKE_FAILED, {
+        tenantId,
+        error: sanitizeLogMessage(error),
+      });
+      return [];
+    },
+  );
 
-  for (const { id: robotId } of robotsInRevocationOrder(
-    robots,
-    managementRobotId,
-  )) {
+  for (const { id: robotId } of revocationOrder) {
     try {
       await revokeSanityRobotToken({
         token,
-        organisationToken: env.sanityManagementToken,
+        organizationToken,
         projectId,
         robotId,
       });

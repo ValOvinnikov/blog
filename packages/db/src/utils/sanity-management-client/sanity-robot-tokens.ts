@@ -5,7 +5,11 @@ import {
   type TSanityRobotRole,
 } from '@shinefold/config';
 import { SANITY_API_PATH } from '@shinefold/db/utils/sanity-management-client/sanity-api-paths';
-import { sanityAccessRequest } from '@shinefold/db/utils/sanity-management-client/sanity-api-request';
+import {
+  sanityAccessRequest,
+  sanityManagementRequest,
+} from '@shinefold/db/utils/sanity-management-client/sanity-api-request';
+import { isUndefined } from '@shinefold/utils/primitives';
 
 export type TSanityRobotToken = { id: string; token: string };
 
@@ -62,7 +66,7 @@ export async function listSanityRobotTokens(input: {
   const items = Array.isArray(result) ? result : (result.data ?? []);
   return items
     .map((item) => ({ id: item.id ?? item.tokenId, label: item.label }))
-    .filter((item): item is TSanityRobotTokenSummary => item.id !== undefined);
+    .filter((item): item is TSanityRobotTokenSummary => !isUndefined(item.id));
 }
 
 export async function deleteSanityRobotToken(input: {
@@ -75,4 +79,15 @@ export async function deleteSanityRobotToken(input: {
     input.token,
     { method: HTTP_METHOD.DELETE },
   );
+}
+
+export async function getSanityTokenUserId(token: string): Promise<string> {
+  const { id } = await sanityManagementRequest<{ id?: string }>(
+    SANITY_API_PATH.currentUser(),
+    token,
+  );
+  if (!id) {
+    throw new Error('Sanity Management API: /users/me returned no id.');
+  }
+  return id;
 }

@@ -7,6 +7,7 @@ import {
   robotsInRevocationOrder,
 } from '@shinefold/db/utils/sanity-management-client/sanity-robot-revocation';
 import {
+  getSanityTokenUserId,
   listSanityRobotTokens,
   type TSanityRobotTokenSummary,
 } from '@shinefold/db/utils/sanity-management-client/sanity-robot-tokens';
@@ -17,22 +18,33 @@ import type { TDeprovisionEnv } from '../lib/env';
 export type TRevokeSanityTokensDeps = {
   getManagementCredentials: typeof getTenantSanityManagementCredentials;
   listRobotTokens: typeof listSanityRobotTokens;
+  getTokenUserId: typeof getSanityTokenUserId;
   revokeToken: typeof revokeSanityRobotToken;
 };
 
 const defaultDeps: TRevokeSanityTokensDeps = {
   getManagementCredentials: getTenantSanityManagementCredentials,
   listRobotTokens: listSanityRobotTokens,
+  getTokenUserId: getSanityTokenUserId,
   revokeToken: revokeSanityRobotToken,
 };
 
-async function listProjectRobots(
+async function listRevocableRobots(
   token: string,
   projectId: string,
+  env: TDeprovisionEnv,
   deps: TRevokeSanityTokensDeps,
+  managementRobotId: string,
 ): Promise<TMaybeUndefined<TSanityRobotTokenSummary[]>> {
   try {
-    return await deps.listRobotTokens({ token, projectId });
+    const [robots, organizationRobotId] = await Promise.all([
+      deps.listRobotTokens({ token, projectId }),
+      deps.getTokenUserId(env.sanityManagementToken),
+    ]);
+    return robotsInRevocationOrder(robots, {
+      managementRobotId,
+      organizationRobotId,
+    });
   } catch (error) {
     console.error(
       `deprovision-tenant: failed to list Sanity robot tokens for project "${projectId}" (${sanitizeLogMessage(error)}).`,
@@ -69,14 +81,20 @@ export async function revokeTenantSanityTokens(
     throw new Error(missingManagementRobotIdMessage(tenantId));
   }
 
-  const robots = await listProjectRobots(token, projectId, deps);
+  const robots = await listRevocableRobots(
+    token,
+    projectId,
+    env,
+    deps,
+    managementRobotId,
+  );
   if (!robots) return;
 
-  for (const robot of robotsInRevocationOrder(robots, managementRobotId)) {
+  for (const robot of robots) {
     try {
       await deps.revokeToken({
         token,
-        organisationToken: env.sanityManagementToken,
+        organizationToken: env.sanityManagementToken,
         projectId,
         robotId: robot.id,
       });

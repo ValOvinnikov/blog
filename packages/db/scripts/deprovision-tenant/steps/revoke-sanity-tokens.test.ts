@@ -32,6 +32,10 @@ const MOCK_MANAGEMENT_ROBOT = {
   id: MOCK_TENANT_MANAGEMENT_ROBOT_ID,
   label: faker.company.name(),
 };
+const MOCK_ORGANIZATION_ROBOT = {
+  id: faker.string.uuid(),
+  label: faker.company.name(),
+};
 const MOCK_HAND_MADE_ROBOT = {
   id: faker.string.uuid(),
   label: faker.internet.email(),
@@ -45,10 +49,12 @@ const MOCK_CREDENTIALS = {
 const getManagementCredentials =
   vi.fn<TRevokeSanityTokensDeps['getManagementCredentials']>();
 const listRobotTokens = vi.fn<TRevokeSanityTokensDeps['listRobotTokens']>();
+const getTokenUserId = vi.fn<TRevokeSanityTokensDeps['getTokenUserId']>();
 const revokeToken = vi.fn<TRevokeSanityTokensDeps['revokeToken']>();
 const MOCK_DEPS: TRevokeSanityTokensDeps = {
   getManagementCredentials,
   listRobotTokens,
+  getTokenUserId,
   revokeToken,
 };
 
@@ -58,6 +64,7 @@ function revokedRobotIds(): string[] {
 
 beforeEach(() => {
   getManagementCredentials.mockResolvedValue(MOCK_CREDENTIALS);
+  getTokenUserId.mockResolvedValue(MOCK_ORGANIZATION_ROBOT.id);
 });
 
 describe(revokeTenantSanityTokens, () => {
@@ -101,7 +108,7 @@ describe(revokeTenantSanityTokens, () => {
     });
     expect(revokeToken).toHaveBeenCalledWith({
       token: MOCK_TENANT_MANAGEMENT_TOKEN,
-      organisationToken: MOCK_DEPROVISION_ENV.sanityManagementToken,
+      organizationToken: MOCK_DEPROVISION_ENV.sanityManagementToken,
       projectId: MOCK_TENANT.sanityProjectId,
       robotId: MOCK_READ_ROBOT.id,
     });
@@ -132,6 +139,24 @@ describe(revokeTenantSanityTokens, () => {
       MOCK_WRITE_ROBOT.id,
       MOCK_MANAGEMENT_ROBOT.id,
     ]);
+  });
+
+  it("never revokes the organisation token's own robot", async () => {
+    listRobotTokens.mockResolvedValueOnce([
+      MOCK_ORGANIZATION_ROBOT,
+      MOCK_READ_ROBOT,
+    ]);
+
+    await revokeTenantSanityTokens(
+      MOCK_TENANT,
+      MOCK_DEPROVISION_ENV,
+      MOCK_DEPS,
+    );
+
+    expect(getTokenUserId).toHaveBeenCalledWith(
+      MOCK_DEPROVISION_ENV.sanityManagementToken,
+    );
+    expect(revokedRobotIds()).toEqual([MOCK_READ_ROBOT.id]);
   });
 
   it('resolves without calling Sanity when the tenant has no management token', async () => {
@@ -172,6 +197,17 @@ describe(revokeTenantSanityTokens, () => {
 
   it('resolves without revoking when listing the project robots fails', async () => {
     listRobotTokens.mockRejectedValueOnce(new Error(MOCK_STEP_ERROR));
+
+    await expect(
+      revokeTenantSanityTokens(MOCK_TENANT, MOCK_DEPROVISION_ENV, MOCK_DEPS),
+    ).resolves.toBeUndefined();
+
+    expect(revokeToken).not.toHaveBeenCalled();
+  });
+
+  it("revokes nothing when the organisation token's own id cannot be read", async () => {
+    listRobotTokens.mockResolvedValueOnce([MOCK_READ_ROBOT]);
+    getTokenUserId.mockRejectedValueOnce(new Error(MOCK_STEP_ERROR));
 
     await expect(
       revokeTenantSanityTokens(MOCK_TENANT, MOCK_DEPROVISION_ENV, MOCK_DEPS),

@@ -38,6 +38,7 @@ export const MOCK_SANITY_WEBHOOK_ID =
   sanityManagementClientFaker.string.alphanumeric(10);
 
 export const MOCK_SANITY_EXPECTED_URL = {
+  currentUser: 'https://api.sanity.io/v2021-06-07/users/me',
   projects: 'https://api.sanity.io/v2021-06-07/projects',
   project: `https://api.sanity.io/v2021-06-07/projects/${MOCK_SANITY_PROJECT_ID}`,
   datasets: `https://api.sanity.io/v2021-06-07/projects/${MOCK_SANITY_PROJECT_ID}/datasets`,
