@@ -14,7 +14,8 @@ export const sidebarNavListVariants = tv({
       '-ml-px block rounded-r-md border-l-2 border-transparent',
       'py-1 pr-2 pl-3 text-subtle no-underline',
       'transition-colors duration-base ease-smooth',
-      'hover:border-border-strong hover:text-text',
+      'hover:border-border-emphasis hover:text-text',
+      'focus-visible:border-border-emphasis focus-visible:text-text',
       'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary',
       'focus-visible:ring-offset-2 focus-visible:ring-offset-ambient',
     ],
@@ -33,12 +34,13 @@ export const sidebarNavListVariants = tv({
     isRoot: {
       true: { link: ['font-semibold text-text'] },
     },
-    // Last, so its hover classes win: hovering the current item leaves it unchanged.
+    // Last, so its hover and focus classes win: the current item keeps its bar and text.
     isActive: {
       true: {
         link: [
           'border-sidenav-current-bar text-sidenav-current-text',
           'hover:border-sidenav-current-bar hover:text-sidenav-current-text',
+          'focus-visible:border-sidenav-current-bar focus-visible:text-sidenav-current-text',
         ],
       },
     },
