@@ -1,14 +1,19 @@
 import type { TRecordAuditEventInput } from '@platform/server/audit/record-audit-event';
+import { omit } from 'remeda';
 import type { Mock } from 'vitest';
 
 type TRecordedAuditEvent = Omit<TRecordAuditEventInput, 'logEvent'>;
+type TRecordAuditEventMock = Mock<(input: TRecordAuditEventInput) => unknown>;
+
+export const recordedAuditEvents = (
+  recordAuditEventMock: TRecordAuditEventMock,
+): TRecordedAuditEvent[] =>
+  recordAuditEventMock.mock.calls.map(([event]) => omit(event, ['logEvent']));
 
 export const firstRecordedAuditEvent = (
-  recordAuditEventMock: Mock<(input: TRecordAuditEventInput) => unknown>,
+  recordAuditEventMock: TRecordAuditEventMock,
 ): TRecordedAuditEvent => {
-  const [input] = recordAuditEventMock.mock.calls.map(([event]) => event);
+  const [event] = recordedAuditEvents(recordAuditEventMock);
 
-  return Object.fromEntries(
-    Object.entries(input ?? {}).filter(([key]) => key !== 'logEvent'),
-  ) as TRecordedAuditEvent;
+  return event ?? ({} as TRecordedAuditEvent);
 };

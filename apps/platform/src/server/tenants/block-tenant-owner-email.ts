@@ -1,10 +1,8 @@
 import 'server-only';
 
 import { TENANT_REFUSAL, TENANT_LOG } from '@platform/constants/tenant';
-import {
-  recordSignupBlockAdded,
-  saveSignupBlock,
-} from '@platform/server/signup-block/add-signup-block';
+import { saveSignupBlock } from '@platform/server/signup-block/add-signup-block';
+import { recordSignupBlockAdded } from '@platform/server/signup-block/signup-block-audit';
 import { toLoggableError } from '@platform/utils/loggable-error/loggable-error';
 import { logger } from '@platform/utils/logger/logger';
 import {

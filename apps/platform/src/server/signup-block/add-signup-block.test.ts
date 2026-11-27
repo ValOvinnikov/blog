@@ -1,9 +1,7 @@
-import { faker } from '@faker-js/faker';
 import { mockAdmin } from '@platform/testing/admins/fixtures';
 import { firstRecordedAuditEvent } from '@platform/testing/audit-events/recorded-audit-event';
 import {
   MOCK_BLOCK_REASON,
-  MOCK_BLOCKED_ADDRESS_HASH,
   MOCK_BLOCKED_DOMAIN,
   mockBlockedIdentity,
 } from '@platform/testing/blocked-signups/fixtures';
@@ -13,7 +11,7 @@ import { ERROR_CODE } from '@shinefold/config/constants';
 import { BLOCKED_IDENTITY_KIND } from '@shinefold/db/constants';
 import { errorResult, okResult } from '@shinefold/utils';
 
-import { addSignupBlock, recordSignupBlockAdded } from './add-signup-block';
+import { addSignupBlock } from './add-signup-block';
 
 const { addBlockedIdentityMock, recordAuditEventMock } = vi.hoisted(() => ({
   addBlockedIdentityMock: vi.fn(),
@@ -31,10 +29,7 @@ vi.mock('@shinefold/db', async () => ({
   },
 }));
 
-faker.seed(7781);
-
 const MOCK_ADMIN = mockAdmin();
-const MOCK_TENANT_ID = faker.string.uuid();
 const MOCK_DOMAIN_BLOCK = {
   kind: BLOCKED_IDENTITY_KIND.DOMAIN,
   identity: MOCK_BLOCKED_DOMAIN,
@@ -95,55 +90,5 @@ describe(addSignupBlock, () => {
 
     expect(result).toEqual(failure);
     expect(recordAuditEventMock).not.toHaveBeenCalled();
-  });
-});
-
-describe(recordSignupBlockAdded, () => {
-  const entry = mockBlockedIdentity({
-    kind: BLOCKED_IDENTITY_KIND.ADDRESS,
-    value: MOCK_BLOCKED_ADDRESS_HASH,
-  });
-
-  beforeEach(() => {
-    recordAuditEventMock.mockReset();
-  });
-
-  it('audits an address entry without the address or its hash', async () => {
-    await recordSignupBlockAdded(entry, MOCK_BLOCK_REASON);
-
-    expect(firstRecordedAuditEvent(recordAuditEventMock)).toEqual({
-      action: AUDIT_ACTION.SIGNUP_BLOCK_ADDED,
-      targetType: AUDIT_TARGET_TYPE.BLOCKED_SIGNUP_IDENTITY,
-      targetId: entry.id,
-      details: {
-        kind: BLOCKED_IDENTITY_KIND.ADDRESS,
-        reason: MOCK_BLOCK_REASON,
-      },
-    });
-  });
-
-  it('also audits a block added for a tenant against that tenant, without the address', async () => {
-    await recordSignupBlockAdded(entry, MOCK_BLOCK_REASON, MOCK_TENANT_ID);
-
-    expect(recordAuditEventMock.mock.calls.map(([event]) => event)).toEqual([
-      expect.objectContaining({
-        targetType: AUDIT_TARGET_TYPE.BLOCKED_SIGNUP_IDENTITY,
-        targetId: entry.id,
-        details: {
-          kind: BLOCKED_IDENTITY_KIND.ADDRESS,
-          reason: MOCK_BLOCK_REASON,
-          tenantId: MOCK_TENANT_ID,
-        },
-      }),
-      expect.objectContaining({
-        action: AUDIT_ACTION.SIGNUP_BLOCK_ADDED,
-        targetType: AUDIT_TARGET_TYPE.TENANT,
-        targetId: MOCK_TENANT_ID,
-        details: {
-          kind: BLOCKED_IDENTITY_KIND.ADDRESS,
-          reason: MOCK_BLOCK_REASON,
-        },
-      }),
-    ]);
   });
 });

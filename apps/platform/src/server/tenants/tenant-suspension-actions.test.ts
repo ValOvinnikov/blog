@@ -78,6 +78,9 @@ vi.mock('@platform/server/tenants/notify-owner-of-suspension', () => ({
 
 vi.mock('@platform/server/signup-block/add-signup-block', () => ({
   saveSignupBlock: saveSignupBlockMock,
+}));
+
+vi.mock('@platform/server/signup-block/signup-block-audit', () => ({
   recordSignupBlockAdded: recordSignupBlockAddedMock,
 }));
 

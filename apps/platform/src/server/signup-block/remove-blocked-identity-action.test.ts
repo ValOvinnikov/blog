@@ -4,13 +4,18 @@ import {
   SIGNUP_BLOCK_REFUSAL,
 } from '@platform/constants/signup-block';
 import { requireSuperAdmin } from '@platform/server/auth/require-super-admin';
-import { firstRecordedAuditEvent } from '@platform/testing/audit-events/recorded-audit-event';
+import { mockAuditEvent } from '@platform/testing/audit-events/fixtures';
+import {
+  firstRecordedAuditEvent,
+  recordedAuditEvents,
+} from '@platform/testing/audit-events/recorded-audit-event';
 import {
   MOCK_BLOCKED_ADDRESS_ENTRY_ID,
   mockBlockedIdentity,
   mockBlockedAddressIdentity,
 } from '@platform/testing/blocked-signups/fixtures';
 import { mockDbConstants } from '@platform/testing/mock-db-constants';
+import { MOCK_TENANT_ID } from '@platform/testing/tenants/fixtures';
 import { logger } from '@platform/utils/logger/logger';
 import {
   ACTION_OUTCOME,
@@ -58,10 +63,6 @@ faker.seed(6107);
 
 const MOCK_DOMAIN_ENTRY = mockBlockedIdentity();
 const MOCK_DB_ERROR = new Error(faker.lorem.sentence());
-const MOCK_TENANT_ID = faker.string.uuid();
-
-const recordedAuditEvents = () =>
-  recordAuditEventMock.mock.calls.map(([event]) => event);
 
 describe(removeBlockedIdentityAction, () => {
   beforeEach(() => {
@@ -117,13 +118,15 @@ describe(removeBlockedIdentityAction, () => {
 
   it('also audits the removal on the tenant whose suspension added the block', async () => {
     listAuditEventsForTargetMock.mockResolvedValue([
-      {
+      mockAuditEvent({
         action: AUDIT_ACTION.SIGNUP_BLOCK_ADDED,
+        targetType: AUDIT_TARGET_TYPE.BLOCKED_SIGNUP_IDENTITY,
+        targetId: MOCK_BLOCKED_ADDRESS_ENTRY_ID,
         details: {
           kind: BLOCKED_IDENTITY_KIND.ADDRESS,
           tenantId: MOCK_TENANT_ID,
         },
-      },
+      }),
     ]);
 
     const result = await removeBlockedIdentityAction(
@@ -135,14 +138,12 @@ describe(removeBlockedIdentityAction, () => {
       AUDIT_TARGET_TYPE.BLOCKED_SIGNUP_IDENTITY,
       MOCK_BLOCKED_ADDRESS_ENTRY_ID,
     );
-    expect(recordedAuditEvents()).toContainEqual(
-      expect.objectContaining({
-        action: AUDIT_ACTION.SIGNUP_BLOCK_REMOVED,
-        targetType: AUDIT_TARGET_TYPE.TENANT,
-        targetId: MOCK_TENANT_ID,
-        details: { kind: BLOCKED_IDENTITY_KIND.ADDRESS },
-      }),
-    );
+    expect(recordedAuditEvents(recordAuditEventMock)).toContainEqual({
+      action: AUDIT_ACTION.SIGNUP_BLOCK_REMOVED,
+      targetType: AUDIT_TARGET_TYPE.TENANT,
+      targetId: MOCK_TENANT_ID,
+      details: { kind: BLOCKED_IDENTITY_KIND.ADDRESS },
+    });
   });
 
   it('audits no tenant removal for a block no tenant added', async () => {
