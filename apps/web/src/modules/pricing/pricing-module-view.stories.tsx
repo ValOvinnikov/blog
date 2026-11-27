@@ -252,6 +252,10 @@ export const LinkedPlanBothPeriods: TStory = {
   },
 };
 
+export const LinkedPlanWithoutComparison: TStory = {
+  args: { ...LinkedPlanLivePrice.args, hasPlanComparison: false },
+};
+
 export const LinkedPlanComparisonPhone: TStory = {
   ...LinkedPlanLivePrice,
   globals: { viewport: 'mobile' },

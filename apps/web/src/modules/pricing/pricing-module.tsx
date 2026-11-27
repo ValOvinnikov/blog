@@ -53,7 +53,7 @@ export const PricingModule = async ({ id }: IPricingModuleProps) => {
     return null;
   }
 
-  const { tiers } = result.data;
+  const { tiers, showPlanComparison } = result.data;
   const { currency, pricePeriodWording } = settingsResult.data;
   const [{ section, content }, planPrices] = await Promise.all([
     getModuleSection(tenantId, result.data),
@@ -92,7 +92,7 @@ export const PricingModule = async ({ id }: IPricingModuleProps) => {
       ctaButtons={ctaButtons}
       contentAlignment={contentAlignment}
       panels={panels}
-      hasPlanComparison={hasLinkedTier(tiers)}
+      hasPlanComparison={showPlanComparison && hasLinkedTier(tiers)}
       titleId={`pricing-${id}`}
       dataTestId={`pricing-module-${id}`}
     />
