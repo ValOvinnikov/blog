@@ -1,4 +1,4 @@
-import { ICONS, routes } from '@shinefold/config';
+import { ICONS, routes, SIZE } from '@shinefold/config';
 import type { TLandingBreadcrumb } from '@shinefold/service';
 import { Icon } from '@shinefold/ui/components/atoms/icon';
 import { SmartLink } from '@web/components/shared/smart-link';
@@ -18,7 +18,9 @@ export const AdjacentPageLink = ({
   direction,
   isNext,
 }: IAdjacentPageLinkProps) => {
-  const arrow = <Icon name={ICONS.ARROW} className={s.arrow({ isNext })} />;
+  const arrow = (
+    <Icon name={ICONS.ARROW} size={SIZE.SM} className={s.arrow({ isNext })} />
+  );
 
   return (
     <SmartLink

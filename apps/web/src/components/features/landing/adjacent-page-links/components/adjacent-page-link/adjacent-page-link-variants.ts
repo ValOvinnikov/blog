@@ -18,7 +18,7 @@ export const adjacentPageLinkVariants = tv({
     ],
     direction: ['sr-only'],
     title: ['min-w-0 break-words'],
-    arrow: ['mt-[0.25em] size-4 shrink-0'],
+    arrow: ['mt-[0.25em]'],
   },
   variants: {
     isNext: {

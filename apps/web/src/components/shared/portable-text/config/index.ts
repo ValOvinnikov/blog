@@ -49,11 +49,10 @@ const makeArticleTextComponents = (
   },
 });
 
-const makeTypeOverrides = (
+const makeExpandableSectionOverride = (
   aside: PortableTextTypeComponent,
   isSectionFullBleed: boolean,
 ) => ({
-  aside,
   [PORTABLE_TEXT_BLOCK_TYPE.EXPANDABLE_SECTION]:
     makeExpandableSectionTypeComponent(
       mergeComponents(defaultComponents, makeArticleTextComponents(aside)),
@@ -68,11 +67,11 @@ export const baseComponents = mergeComponents(defaultComponents, {
   ...articleTextComponents,
   types: {
     ...articleTextComponents.types,
-    ...makeTypeOverrides(aside, true),
+    ...makeExpandableSectionOverride(aside, true),
   },
 });
 
 // A post's expandable section keeps the text measure; elsewhere it widens like a table.
 export const postBodyOverride: PortableTextComponents = {
-  types: makeTypeOverrides(aside, false),
+  types: makeExpandableSectionOverride(aside, false),
 };
