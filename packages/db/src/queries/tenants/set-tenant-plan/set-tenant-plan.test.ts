@@ -21,6 +21,7 @@ import { MOCK_MISSING_TENANT_ID } from '@shinefold/db/testing/tenants/fixtures';
 import { daysBeforeNow } from '@shinefold/db/testing/tenants/grace';
 import {
   MOCK_SELF_SERVE_OWNER_EMAIL_INDEX,
+  readCreatedFromPlatform,
   readSelfServeIndex,
 } from '@shinefold/db/testing/tenants/self-serve-fixtures';
 import { eq } from 'drizzle-orm';
@@ -296,11 +297,7 @@ describe(setTenantPlan, () => {
 
       await setTenantPlan(id, MOCK_MOVE_TO_GROWTH);
 
-      const [row] = await db()
-        .select({ createdFromPlatform: tenants.createdFromPlatform })
-        .from(tenants)
-        .where(eq(tenants.id, id));
-      expect(row).toEqual({ createdFromPlatform: true });
+      expect(await readCreatedFromPlatform(db(), id)).toBe(true);
     });
 
     it('reports the stored plan as the previous one when a write repeats it', async () => {
