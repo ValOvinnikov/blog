@@ -1,4 +1,5 @@
 import { Card, Flex, Switch, Text } from '@sanity/ui';
+import { toShownToggleValue } from '@shinefold/studio/schema-types/inputs/enabled-state-boolean-input/to-shown-toggle-value';
 import { FormField, type BooleanInputProps } from 'sanity';
 
 export const EnabledStateBooleanInput = (props: BooleanInputProps) => {
@@ -12,8 +13,9 @@ export const EnabledStateBooleanInput = (props: BooleanInputProps) => {
     validation,
     readOnly,
   } = props;
-  const checked = value ?? false;
-  const indeterminate = typeof value !== 'boolean';
+  const shownValue = toShownToggleValue(value, schemaType.initialValue);
+  const checked = shownValue ?? false;
+  const indeterminate = typeof shownValue !== 'boolean';
 
   return (
     <FormField

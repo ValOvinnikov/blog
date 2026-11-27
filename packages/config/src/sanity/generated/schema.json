@@ -694,6 +694,13 @@
         },
         "optional": true
       },
+      "showPlanComparison": {
+        "type": "objectAttribute",
+        "value": {
+          "type": "boolean"
+        },
+        "optional": true
+      },
       "ctaButtons": {
         "type": "objectAttribute",
         "value": {
