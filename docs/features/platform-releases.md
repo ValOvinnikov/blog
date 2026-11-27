@@ -243,7 +243,9 @@ values are stored as plain `text`, so none of them needs a db migration:
   comparison's newest commits, and every `v*` tag ref up to 10 pages (1000
   tags). A comparison's changed files come from its first page only, where
   GitHub returns the whole list up to its 300-file limit, so one comparison
-  makes at most three requests: page 1 and the last two commit pages. Every
+  makes at most three requests: page 1 and the last two commit pages. The
+  total and the last commit page come from `ahead_by`, the exact count, never
+  `total_commits`, which GitHub stops at 10,000. Every
   request keeps its timeout, and a failed page fails the read with a reason
   code. A tag list still full at the page cap is reported as
   `tagListIncomplete`, never as a different latest tag.
