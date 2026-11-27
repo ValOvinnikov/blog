@@ -177,9 +177,6 @@ export type Module_cta = {
   _updatedAt: string;
   _rev: string;
   title?: string;
-  brandVariant?: 'PRIMARY' | 'SECONDARY' | 'BRAND_PRIMARY' | 'INK';
-  bandTone?: 'PRIMARY' | 'SECONDARY' | 'BRAND_PRIMARY' | 'INK';
-  variant?: 'BANNER' | 'SPLIT' | 'CALLOUT';
   headingBlock?: ModuleHeadingBlock;
   eyebrow?: InternationalizedArrayString;
   image?: LocalizedImageWithAlt;
@@ -190,10 +187,16 @@ export type Module_cta = {
     } & CtaButton
   >;
   footnote?: InternationalizedArrayString;
+  variant?: 'BANNER' | 'SPLIT' | 'CALLOUT';
+  brandVariant?: 'PRIMARY' | 'SECONDARY' | 'BRAND_PRIMARY' | 'INK';
+  bandTone?: 'PRIMARY' | 'SECONDARY' | 'BRAND_PRIMARY' | 'INK';
   contentAlignment?: 'LEFT' | 'CENTER' | 'RIGHT';
   contentPositionSplit?: 'LEFT' | 'RIGHT';
   contentPositionBanner?: 'LEFT' | 'CENTER' | 'RIGHT';
   mobileMediaOrder?: 'LAST' | 'FIRST';
+  cardStyle?: 'ACCENT_BAR' | 'OUTLINED' | 'FILLED' | 'RAISED' | 'PLAIN';
+  radiusScale?: 'NONE' | 'SM' | 'MD' | 'LG' | 'XL';
+  density?: 'DEFAULT' | 'COMPACT';
   layout?: CtaLayout;
 };
 
