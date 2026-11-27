@@ -321,6 +321,7 @@ describe('proxy matcher for an operator-suspended site', () => {
     REVALIDATE_API_PATH,
     '/api/revalidate-site-config',
     '/api/client-log',
+    '/api/health',
   ])('bypasses the proxy for %s', (path) => {
     expect(matches(path)).toBe(false);
   });

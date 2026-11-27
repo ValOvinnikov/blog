@@ -3015,9 +3015,12 @@ before its first await.
 
 Grafana alerts the operator by email, with an optional Slack contact point
 beside it: one rule per app on error-level lines, grouped by event so a burst
-sends one message, and synthetic uptime checks on the apex home page and the
-platform host's sign-in page, run from two probes, that alert when both fail
-the same run and resolve on recovery. This is why `error` is reserved for what
+sends one message, and synthetic uptime checks on `apps/web`'s `/api/health`
+and the platform host's sign-in page, run from two probes, that alert when
+both fail the same run and resolve on recovery. `/api/health` answers 200 with
+no Postgres, Sanity or outside call and `Cache-Control: no-store`, and sits
+outside the proxy matcher, so frequent checks never keep Neon's compute awake;
+an hourly check on the apex home page keeps a full render covered. This is why `error` is reserved for what
 a human must act on — every error event alerts the operator. The Grafana stack,
 the alerts, their thresholds and the credentials are console configuration and
 Vercel env vars, never repo content; `docs/DEPLOY.md` § "8d. Alerts & uptime
