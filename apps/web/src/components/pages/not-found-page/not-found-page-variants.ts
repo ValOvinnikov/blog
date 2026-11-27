@@ -1,6 +1,7 @@
 import {
   FOCUS_RING,
-  LINK_UNDERLINE,
+  PROSE_LINK_UNDERLINE,
+  PROSE_LINK_UNDERLINE_HOVER,
   TRANSITION_COLORS,
   tv,
 } from '@shinefold/ui/lib/styling';
@@ -16,7 +17,8 @@ export const notFoundPageVariants = tv({
     link: [
       'inline-flex items-center gap-1.5',
       'text-brand-primary hover:text-brand-primary-hover',
-      ...LINK_UNDERLINE,
+      ...PROSE_LINK_UNDERLINE,
+      PROSE_LINK_UNDERLINE_HOVER,
       TRANSITION_COLORS,
       FOCUS_RING,
     ],
