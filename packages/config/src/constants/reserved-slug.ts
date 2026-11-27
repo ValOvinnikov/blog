@@ -10,6 +10,9 @@ export const RESERVED_SLUGS = [
   'tags',
   'privacy',
   'legal',
+  'account',
+  'bookmarks',
+  'newsletter',
 ] as const;
 
 export type TReservedSlug = (typeof RESERVED_SLUGS)[number];
