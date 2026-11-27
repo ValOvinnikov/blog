@@ -21,13 +21,13 @@ export type TTenantEmailLook = {
 export const toTenantEmailBrand = (
   siteConfig: TMaybeUndefined<TSiteConfigResult>,
 ): TTenantEmailLook => {
-  const { preset, accentHue, logoHue, headingFont, bodyFont } =
+  const { preset, accentHue, logoHue, buttonColor, headingFont, bodyFont } =
     lookFormValuesOrDefaults(siteConfig);
-  const hues = { preset, accentHue, logoHue };
+  const brandInput = { preset, accentHue, logoHue, buttonColor };
 
   return {
-    brand: resolveTenantEmailBrand(hues),
-    darkBrand: resolveTenantEmailDarkBrand(hues),
+    brand: resolveTenantEmailBrand(brandInput),
+    darkBrand: resolveTenantEmailDarkBrand(brandInput),
     headingFont,
     bodyFont,
   };
