@@ -10,6 +10,7 @@ export type TOpenTenantSuspensionInput = {
   category: TSuspensionCategory;
   description: string;
   suspendedBy: string;
+  ownerBlockId?: string;
 };
 
 export async function openTenantSuspension(

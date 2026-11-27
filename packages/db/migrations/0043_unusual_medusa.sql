@@ -1,0 +1,3 @@
+ALTER TABLE "newsletter_post_sends" ADD COLUMN "band_ceiling" integer;--> statement-breakpoint
+ALTER TABLE "tenant_suspensions" ADD COLUMN "owner_block_id" uuid;--> statement-breakpoint
+ALTER TABLE "tenant_suspensions" ADD CONSTRAINT "tenant_suspensions_owner_block_id_blocked_signup_identities_id_fk" FOREIGN KEY ("owner_block_id") REFERENCES "public"."blocked_signup_identities"("id") ON DELETE set null ON UPDATE no action;

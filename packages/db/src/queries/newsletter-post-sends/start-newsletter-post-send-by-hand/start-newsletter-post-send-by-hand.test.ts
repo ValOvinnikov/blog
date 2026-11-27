@@ -48,6 +48,7 @@ describe(startNewsletterPostSendByHand, () => {
         clearedSkipReason: undefined,
         clearedEmailsNeeded: undefined,
         clearedAllowanceLeft: undefined,
+        clearedBandCeiling: undefined,
       },
     );
     expect(await getNewsletterPostSend(tenantId, MOCK_POST_ID)).toEqual(
@@ -74,6 +75,7 @@ describe(startNewsletterPostSendByHand, () => {
         clearedSkipReason: skipReason,
         clearedEmailsNeeded: MOCK_SKIP_DETAILS.emailsNeeded,
         clearedAllowanceLeft: MOCK_SKIP_DETAILS.allowanceLeft,
+        clearedBandCeiling: MOCK_SKIP_DETAILS.bandCeiling,
       });
       expect(await getNewsletterPostSend(tenantId, MOCK_POST_ID)).toEqual(
         mockNewsletterPostSend({

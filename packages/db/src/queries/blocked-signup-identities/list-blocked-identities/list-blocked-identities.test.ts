@@ -8,8 +8,12 @@ import {
   MOCK_BLOCKED_ADDRESS_DOMAIN,
   MOCK_BLOCKED_DOMAIN,
 } from '@shinefold/db/testing/blocked-signup-identities/fixtures';
-import { MOCK_OPERATOR_EMAIL } from '@shinefold/db/testing/fixtures';
+import {
+  insertTestTenant,
+  MOCK_OPERATOR_EMAIL,
+} from '@shinefold/db/testing/fixtures';
 import { useQueryTestDb } from '@shinefold/db/testing/query-test-db';
+import { insertTestTenantSuspension } from '@shinefold/db/testing/tenant-suspensions/fixtures';
 
 import {
   listBlockedIdentities,
@@ -29,6 +33,8 @@ const MOCK_ADMIN_NAME = faker.person.fullName();
 const db = useQueryTestDb();
 
 afterEach(async () => {
+  await db().delete(schema.tenantSuspensions);
+  await db().delete(schema.tenants);
   await db().delete(schema.blockedSignupIdentities);
   await db().delete(schema.admins);
   await db().delete(schema.users);
@@ -36,15 +42,18 @@ afterEach(async () => {
 
 async function insertBlockedDomain(
   overrides: Partial<typeof schema.blockedSignupIdentities.$inferInsert> = {},
-): Promise<void> {
-  await db()
+): Promise<string> {
+  const [entry] = await db()
     .insert(schema.blockedSignupIdentities)
     .values({
       kind: BLOCKED_IDENTITY_KIND.DOMAIN,
       value: MOCK_BLOCKED_DOMAIN,
       reason: MOCK_BLOCK_REASON,
       ...overrides,
-    });
+    })
+    .returning({ id: schema.blockedSignupIdentities.id });
+  if (!entry) throw new Error('failed to insert a blocked domain');
+  return entry.id;
 }
 
 async function listEntries(): Promise<TBlockedIdentityListing[]> {
@@ -105,6 +114,32 @@ describe(listBlockedIdentities, () => {
       const entries = await listEntries();
 
       expect(entries.map(({ addedByEmail }) => addedByEmail)).toEqual([null]);
+    });
+  });
+
+  describe('the suspension that added it', () => {
+    it('names its reference and tenant', async () => {
+      const ownerBlockId = await insertBlockedDomain();
+      const tenant = await insertTestTenant(db());
+      const { reference } = await insertTestTenantSuspension(db(), tenant.id, {
+        ownerBlockId,
+      });
+
+      const [entry] = await listEntries();
+
+      expect(entry?.suspension).toEqual({
+        reference,
+        tenantId: tenant.id,
+        tenantName: tenant.name,
+      });
+    });
+
+    it('is null for an entry no suspension added', async () => {
+      await insertBlockedDomain();
+
+      const entries = await listEntries();
+
+      expect(entries.map(({ suspension }) => suspension)).toEqual([null]);
     });
   });
 });

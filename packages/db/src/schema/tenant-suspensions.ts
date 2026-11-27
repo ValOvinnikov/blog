@@ -14,6 +14,7 @@ import {
 } from 'drizzle-orm/pg-core';
 
 import { admins } from './admins';
+import { blockedSignupIdentities } from './blocked-signup-identities';
 import { tenants } from './tenants';
 
 const REFERENCE_SEQUENCE_NAME = 'tenant_suspension_reference_seq';
@@ -49,6 +50,10 @@ export const tenantSuspensions = pgTable(
     liftedBy: uuid('lifted_by').references(() => admins.id, {
       onDelete: 'set null',
     }),
+    ownerBlockId: uuid('owner_block_id').references(
+      () => blockedSignupIdentities.id,
+      { onDelete: 'set null' },
+    ),
   },
   (suspension) => [
     uniqueIndex('tenant_suspensions_open_tenant_idx')

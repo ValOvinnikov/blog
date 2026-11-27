@@ -1,6 +1,13 @@
-import { SUSPENSION_CATEGORY } from '@shinefold/db/constants';
+import {
+  BLOCKED_IDENTITY_KIND,
+  SUSPENSION_CATEGORY,
+} from '@shinefold/db/constants';
 import * as schema from '@shinefold/db/schema';
 import { insertTestAdmin } from '@shinefold/db/testing/admins/fixtures';
+import {
+  MOCK_BLOCK_REASON,
+  MOCK_BLOCKED_DOMAIN,
+} from '@shinefold/db/testing/blocked-signup-identities/fixtures';
 import { insertTestTenant } from '@shinefold/db/testing/fixtures';
 import { useQueryTestDb } from '@shinefold/db/testing/query-test-db';
 import {
@@ -27,18 +34,33 @@ beforeEach(async () => {
 
 afterEach(async () => {
   await db().delete(schema.tenantSuspensions);
+  await db().delete(schema.blockedSignupIdentities);
   await db().delete(schema.tenants);
   await db().delete(schema.admins);
   await db().delete(schema.users);
 });
 
-async function openFor(caseTenantId: string) {
+async function openFor(caseTenantId: string, ownerBlockId?: string) {
   return openTenantSuspension({
     tenantId: caseTenantId,
     category: SUSPENSION_CATEGORY.TERMS_VIOLATION,
     description: MOCK_SUSPENSION_DESCRIPTION,
     suspendedBy,
+    ownerBlockId,
   });
+}
+
+async function insertOwnerBlock(): Promise<string> {
+  const [block] = await db()
+    .insert(schema.blockedSignupIdentities)
+    .values({
+      kind: BLOCKED_IDENTITY_KIND.DOMAIN,
+      value: MOCK_BLOCKED_DOMAIN,
+      reason: MOCK_BLOCK_REASON,
+    })
+    .returning({ id: schema.blockedSignupIdentities.id });
+  if (!block) throw new Error('failed to insert an owner block');
+  return block.id;
 }
 
 describe(openTenantSuspension, () => {
@@ -51,6 +73,7 @@ describe(openTenantSuspension, () => {
       description: MOCK_SUSPENSION_DESCRIPTION,
       suspendedBy,
       liftedAt: null,
+      ownerBlockId: null,
     });
     expect(suspension.reference).toMatch(MOCK_SUSPENSION_REFERENCE_PATTERN);
   });
@@ -86,5 +109,31 @@ describe(openTenantSuspension, () => {
       .from(schema.tenantSuspensions)
       .where(eq(schema.tenantSuspensions.tenantId, tenantId));
     expect(rows).toHaveLength(1);
+  });
+
+  describe('with an owner sign-up block', () => {
+    let ownerBlockId: string;
+
+    beforeEach(async () => {
+      ownerBlockId = await insertOwnerBlock();
+    });
+
+    it('records the block the suspension added', async () => {
+      const suspension = await openFor(tenantId, ownerBlockId);
+
+      expect(suspension.ownerBlockId).toBe(ownerBlockId);
+    });
+
+    it('forgets the block once it is removed', async () => {
+      const { id } = await openFor(tenantId, ownerBlockId);
+
+      await db().delete(schema.blockedSignupIdentities);
+
+      const [row] = await db()
+        .select()
+        .from(schema.tenantSuspensions)
+        .where(eq(schema.tenantSuspensions.id, id));
+      expect(row?.ownerBlockId).toBeNull();
+    });
   });
 });

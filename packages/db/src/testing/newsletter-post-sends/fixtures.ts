@@ -23,6 +23,7 @@ export const MOCK_POST_SEND_START = {
 export const MOCK_SKIP_DETAILS = {
   emailsNeeded: newsletterPostSendsFaker.number.int({ min: 100, max: 200 }),
   allowanceLeft: newsletterPostSendsFaker.number.int({ min: 1, max: 99 }),
+  bandCeiling: newsletterPostSendsFaker.number.int({ min: 1_000, max: 5_000 }),
   postTitle: MOCK_POST_SEND_START.postTitle,
   postPublishedAt: MOCK_POST_SEND_START.postPublishedAt,
 };
@@ -44,6 +45,7 @@ export function mockNewsletterPostSend(
     sentCount: 0,
     emailsNeeded: undefined,
     allowanceLeft: undefined,
+    bandCeiling: undefined,
     scheduledFor: undefined,
     settledAt: undefined,
     handStartedAt: undefined,

@@ -49,7 +49,7 @@ describe(markNewsletterPostSkipped, () => {
     },
   );
 
-  it("keeps the post's title and date, the emails it needed and the allowance left", async () => {
+  it("keeps the post's title, date, emails needed, allowance left and band", async () => {
     await markNewsletterPostSkipped(
       tenantId,
       MOCK_POST_ID,

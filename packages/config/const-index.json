@@ -5682,6 +5682,56 @@
         "file": "packages/db/src/constants/membership.ts"
       }
     ],
+    "FAILED": [
+      {
+        "ref": "NEWSLETTER_POST_SEND_OUTCOME.FAILED",
+        "scope": "db",
+        "from": "@shinefold/db/constants",
+        "file": "packages/db/src/constants/newsletter.ts"
+      },
+      {
+        "ref": "TENANT_PROVISIONING_STATUS.FAILED",
+        "scope": "db",
+        "from": "@shinefold/db/constants",
+        "file": "packages/db/src/constants/tenant-provisioning.ts"
+      },
+      {
+        "ref": "TENANT_PROVISIONING_STEP_STATUS.FAILED",
+        "scope": "db",
+        "from": "@shinefold/db/constants",
+        "file": "packages/db/src/constants/tenant-provisioning.ts"
+      },
+      {
+        "ref": "COPY_STATUS.FAILED",
+        "scope": "app:platform",
+        "from": "@platform/constants/clipboard",
+        "file": "apps/platform/src/constants/clipboard.ts"
+      },
+      {
+        "ref": "CONTRAST_STATUS.FAILED",
+        "scope": "app:platform",
+        "from": "@platform/constants/release",
+        "file": "apps/platform/src/constants/release.ts"
+      },
+      {
+        "ref": "RELEASE_RUN_STATUS.FAILED",
+        "scope": "app:platform",
+        "from": "@platform/constants/release",
+        "file": "apps/platform/src/constants/release.ts"
+      },
+      {
+        "ref": "STEP_INDICATOR_STATE.FAILED",
+        "scope": "app:platform",
+        "from": "@platform/constants/step-indicator",
+        "file": "apps/platform/src/constants/step-indicator.ts"
+      },
+      {
+        "ref": "PROVISION_CLI_RESULT.FAILED",
+        "scope": "app:worker",
+        "from": "@worker/constants/provisioning",
+        "file": "apps/worker/src/constants/provisioning.ts"
+      }
+    ],
     "SUBSCRIBER_BAND_NEAR": [
       {
         "ref": "NEWSLETTER_LIMIT_NOTICE_KIND.SUBSCRIBER_BAND_NEAR",
@@ -5940,50 +5990,6 @@
         "scope": "db",
         "from": "@shinefold/db/constants",
         "file": "packages/db/src/constants/tenant-provisioning.ts"
-      }
-    ],
-    "FAILED": [
-      {
-        "ref": "TENANT_PROVISIONING_STATUS.FAILED",
-        "scope": "db",
-        "from": "@shinefold/db/constants",
-        "file": "packages/db/src/constants/tenant-provisioning.ts"
-      },
-      {
-        "ref": "TENANT_PROVISIONING_STEP_STATUS.FAILED",
-        "scope": "db",
-        "from": "@shinefold/db/constants",
-        "file": "packages/db/src/constants/tenant-provisioning.ts"
-      },
-      {
-        "ref": "COPY_STATUS.FAILED",
-        "scope": "app:platform",
-        "from": "@platform/constants/clipboard",
-        "file": "apps/platform/src/constants/clipboard.ts"
-      },
-      {
-        "ref": "CONTRAST_STATUS.FAILED",
-        "scope": "app:platform",
-        "from": "@platform/constants/release",
-        "file": "apps/platform/src/constants/release.ts"
-      },
-      {
-        "ref": "RELEASE_RUN_STATUS.FAILED",
-        "scope": "app:platform",
-        "from": "@platform/constants/release",
-        "file": "apps/platform/src/constants/release.ts"
-      },
-      {
-        "ref": "STEP_INDICATOR_STATE.FAILED",
-        "scope": "app:platform",
-        "from": "@platform/constants/step-indicator",
-        "file": "apps/platform/src/constants/step-indicator.ts"
-      },
-      {
-        "ref": "PROVISION_CLI_RESULT.FAILED",
-        "scope": "app:worker",
-        "from": "@worker/constants/provisioning",
-        "file": "apps/worker/src/constants/provisioning.ts"
       }
     ],
     "SANITY_PROJECT": [

@@ -15,6 +15,7 @@ export interface INewsletterPostSend {
   sentCount: number;
   emailsNeeded: TMaybeUndefined<number>;
   allowanceLeft: TMaybeUndefined<number>;
+  bandCeiling: TMaybeUndefined<number>;
   scheduledFor: TMaybeUndefined<Date>;
   settledAt: TMaybeUndefined<Date>;
   handStartedAt: TMaybeUndefined<Date>;
@@ -35,6 +36,7 @@ export async function getNewsletterPostSend(
       sentCount: newsletterPostSends.sentCount,
       emailsNeeded: newsletterPostSends.emailsNeeded,
       allowanceLeft: newsletterPostSends.allowanceLeft,
+      bandCeiling: newsletterPostSends.bandCeiling,
       scheduledFor: newsletterPostSends.scheduledFor,
       settledAt: newsletterPostSends.settledAt,
       handStartedAt: newsletterPostSends.handStartedAt,
@@ -60,6 +62,7 @@ export async function getNewsletterPostSend(
     sentCount,
     emailsNeeded: row.emailsNeeded ?? undefined,
     allowanceLeft: row.allowanceLeft ?? undefined,
+    bandCeiling: row.bandCeiling ?? undefined,
     scheduledFor: row.scheduledFor ?? undefined,
     settledAt: row.settledAt ?? undefined,
     handStartedAt: row.handStartedAt ?? undefined,

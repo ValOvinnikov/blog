@@ -31,6 +31,7 @@ export const mockBlockedIdentityListing = (
 ): TBlockedIdentityListing => ({
   ...mockBlockedIdentity(),
   addedByEmail: MOCK_BLOCK_AUTHOR_EMAIL,
+  suspension: null,
   ...overrides,
 });
 

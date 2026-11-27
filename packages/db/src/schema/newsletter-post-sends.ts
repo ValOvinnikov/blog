@@ -46,6 +46,7 @@ export const newsletterPostSends = pgTable(
     sentCount: integer('sent_count').notNull().default(0),
     emailsNeeded: integer('emails_needed'),
     allowanceLeft: integer('allowance_left'),
+    bandCeiling: integer('band_ceiling'),
     scheduledFor: timestamp('scheduled_for', { mode: 'date' }),
     settledAt: timestamp('settled_at', { mode: 'date' }),
     handStartedAt: timestamp('hand_started_at', { mode: 'date' }),

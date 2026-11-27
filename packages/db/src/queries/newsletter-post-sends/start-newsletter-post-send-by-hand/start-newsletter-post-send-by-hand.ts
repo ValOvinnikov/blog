@@ -13,6 +13,7 @@ export type TNewsletterPostHandStart = {
   clearedSkipReason: TMaybeUndefined<TNewsletterSkipReason>;
   clearedEmailsNeeded: TMaybeUndefined<number>;
   clearedAllowanceLeft: TMaybeUndefined<number>;
+  clearedBandCeiling: TMaybeUndefined<number>;
 };
 
 export async function startNewsletterPostSendByHand(
@@ -27,6 +28,7 @@ export async function startNewsletterPostSendByHand(
         skipReason: newsletterPostSends.skipReason,
         emailsNeeded: newsletterPostSends.emailsNeeded,
         allowanceLeft: newsletterPostSends.allowanceLeft,
+        bandCeiling: newsletterPostSends.bandCeiling,
       })
       .from(newsletterPostSends)
       .where(
@@ -55,6 +57,7 @@ export async function startNewsletterPostSendByHand(
         skipReason: null,
         emailsNeeded: null,
         allowanceLeft: null,
+        bandCeiling: null,
         scheduledFor: null,
         recipientCount: null,
         sentCount: 0,
@@ -79,6 +82,9 @@ export async function startNewsletterPostSendByHand(
       clearedAllowanceLeft: sql<
         TMaybeNull<number>
       >`(select ${prior.allowanceLeft} from ${prior})`,
+      clearedBandCeiling: sql<
+        TMaybeNull<number>
+      >`(select ${prior.bandCeiling} from ${prior})`,
     });
 
   if (!started) return undefined;
@@ -88,5 +94,6 @@ export async function startNewsletterPostSendByHand(
     clearedSkipReason: started.clearedSkipReason ?? undefined,
     clearedEmailsNeeded: started.clearedEmailsNeeded ?? undefined,
     clearedAllowanceLeft: started.clearedAllowanceLeft ?? undefined,
+    clearedBandCeiling: started.clearedBandCeiling ?? undefined,
   };
 }

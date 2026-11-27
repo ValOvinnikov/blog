@@ -8,6 +8,7 @@ import { hasLength } from '@shinefold/utils/primitives';
 export type TNewsletterPostSkipDetails = {
   emailsNeeded?: number;
   allowanceLeft?: number;
+  bandCeiling?: number;
   postTitle?: string;
   postPublishedAt?: Date;
 };
@@ -18,7 +19,13 @@ export async function markNewsletterPostSkipped(
   skipReason: TNewsletterSkipReason,
   details: TNewsletterPostSkipDetails = {},
 ): Promise<boolean> {
-  const { emailsNeeded, allowanceLeft, postTitle, postPublishedAt } = details;
+  const {
+    emailsNeeded,
+    allowanceLeft,
+    bandCeiling,
+    postTitle,
+    postPublishedAt,
+  } = details;
   const marked = await getDb()
     .update(newsletterPostSends)
     .set({
@@ -26,6 +33,7 @@ export async function markNewsletterPostSkipped(
       skipReason,
       emailsNeeded,
       allowanceLeft,
+      bandCeiling,
       postTitle,
       postPublishedAt,
       settledAt: new Date(),
