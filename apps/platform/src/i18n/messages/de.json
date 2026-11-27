@@ -998,7 +998,7 @@
     "headerBackgroundDescription": "Die Farbe der Kopfzeile und der Menüs und Bereiche, die sich daraus öffnen. Jede folgt dem hellen oder dunklen Design der Leser.",
     "headerBackgroundDarkLogoNote": "Tinte stellt die Kopfzeile dunkel dar, daher braucht Ihr Logo eine Version für den dunklen Modus. Fügen Sie sie unter Marke hinzu.",
     "breadcrumbBackgroundLabel": "Hintergrund der Brotkrumen",
-    "breadcrumbBackgroundDescription": "Die Farbe der Brotkrumenleiste unter der Kopfzeile, auf Beiträgen, Schlagwörtern, Themen und Landingpages. Jede folgt dem hellen oder dunklen Design der Leser.",
+    "breadcrumbBackgroundDescription": "Die Farbe der Brotkrumenleiste unter der Kopfzeile, auf Beiträgen, Schlagwörtern, Themen und Landingpages. Sie erscheint nur auf Tablets und breiteren Bildschirmen, nicht auf Telefonen. Jede folgt dem hellen oder dunklen Design der Leser.",
     "headerBarStyleOptionLabel": {
       "FULL_WIDTH": "Volle Breite",
       "FLOATING": "Schwebend"

@@ -998,7 +998,7 @@
     "headerBackgroundDescription": "De kleur van de kop en van de menu’s en panelen die daaruit openen. Elke kleur volgt het lichte of donkere thema van de lezer.",
     "headerBackgroundDarkLogoNote": "Inkt maakt de kop donker, dus uw logo heeft een versie voor de donkere modus nodig. Voeg die toe bij Merk.",
     "breadcrumbBackgroundLabel": "Achtergrond kruimelpad",
-    "breadcrumbBackgroundDescription": "De kleur van het kruimelpad onder de kop, op berichten, tags, onderwerpen en landingspagina’s. Elke kleur volgt het lichte of donkere thema van de lezer.",
+    "breadcrumbBackgroundDescription": "De kleur van het kruimelpad onder de kop, op berichten, tags, onderwerpen en landingspagina’s. Het verschijnt alleen op tablets en bredere schermen, niet op telefoons. Elke kleur volgt het lichte of donkere thema van de lezer.",
     "headerBarStyleOptionLabel": {
       "FULL_WIDTH": "Volledige breedte",
       "FLOATING": "Zwevend"
