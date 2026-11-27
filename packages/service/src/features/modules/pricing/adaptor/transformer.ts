@@ -85,6 +85,7 @@ export function toPricingModule(raw: TRawPricingModule): TPricingModule {
     headingBlock: toModuleHeadingBlock(raw.headingBlock),
     tiers: toPricingTiers(raw.tiers),
     footnote: raw.footnote ?? undefined,
+    showPlanComparison: raw.showPlanComparison ?? true,
     ctaButtons: toCtaButtons(raw.ctaButtons),
     contentAlignment: raw.contentAlignment ?? undefined,
     layout: toLayout(raw.layout),

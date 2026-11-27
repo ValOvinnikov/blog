@@ -67,6 +67,7 @@ export function mockRawPricingModule(
       mockRawPricingTier({ _key: 'tier-2', name: 'Team' }),
     ],
     footnote: null,
+    showPlanComparison: null,
     ctaButtons: null,
     contentAlignment: null,
     layout: null,
