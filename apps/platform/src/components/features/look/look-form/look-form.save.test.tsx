@@ -15,7 +15,7 @@ import {
 import { setupLookForm } from '@platform/testing/look/look-form-setup';
 import {
   ALL_CHANGES_SAVED,
-  SAVE_CHANGES,
+  SAVE,
   UNSAVED_CHANGES,
 } from '@platform/testing/render-in-settings-form';
 import { MOCK_TENANT_ID } from '@platform/testing/tenants/fixtures';
@@ -72,7 +72,7 @@ describe(`<${LookForm.name}/>`, () => {
 
         const hueReadout = screen.getByText(hueValue(DEFAULT_ACCENT_HUE));
         const saveButton = screen.queryByRole('button', {
-          name: SAVE_CHANGES,
+          name: SAVE,
         });
         expect(hueReadout).toBeVisible();
         expect(saveButton).not.toBeInTheDocument();
@@ -101,7 +101,7 @@ describe(`<${LookForm.name}/>`, () => {
         it('hides the save bar once the save resolves', async () => {
           const savedNote = await screen.findByText(ALL_CHANGES_SAVED);
           const saveButton = screen.queryByRole('button', {
-            name: SAVE_CHANGES,
+            name: SAVE,
           });
 
           expect(savedNote).toBeVisible();

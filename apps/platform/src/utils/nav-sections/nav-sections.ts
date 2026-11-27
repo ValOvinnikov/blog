@@ -1,6 +1,6 @@
 import type { TSidebarNavSection } from '@platform/components/features/layout/sidebar';
-import { BADGE_TONE } from '@platform/constants/badge-tone';
 import { isSuperAdmin } from '@platform/server/auth/is-super-admin';
+import { billingNavItem } from '@platform/utils/billing-nav-item/billing-nav-item';
 import {
   configurationNavItems,
   type TTenantNavHrefs,
@@ -14,6 +14,7 @@ import { adminRoutes } from '@platform/utils/routes/routes';
 import { studioNavItem } from '@platform/utils/studio-nav-item/studio-nav-item';
 import { superAdminNavItems } from '@platform/utils/super-admin-nav-items/super-admin-nav-items';
 import { teamNavItem } from '@platform/utils/team-nav-item/team-nav-item';
+import { tenantPlatformNavItems } from '@platform/utils/tenant-platform-nav-items/tenant-platform-nav-items';
 import { ICONS, type TMaybeUndefined } from '@shinefold/config';
 import type { TAdminRole } from '@shinefold/db/constants';
 import { isUndefined } from '@shinefold/utils/primitives';
@@ -46,13 +47,8 @@ export const tenantNavSections = (
   t: TLooseTranslator,
   tenantId: string,
   tenantName: string,
-  { subscribers }: Pick<TPlanPageAccess, 'subscribers'>,
+  { subscribers, billing }: Pick<TPlanPageAccess, 'subscribers' | 'billing'>,
 ): TSidebarNavSection[] => {
-  const platform = {
-    label: t('badgePlatform'),
-    tone: BADGE_TONE.NEUTRAL,
-    hasDot: false,
-  } as const;
   const hrefs: TTenantNavHrefs = {
     look: adminRoutes.look(tenantId),
     voice: adminRoutes.voice(tenantId),
@@ -90,24 +86,16 @@ export const tenantNavSections = (
     },
     {
       label: t('accountSectionLabel'),
-      items: [teamNavItem(t, adminRoutes.tenantTeam(tenantId))],
+      items: [
+        teamNavItem(t, adminRoutes.tenantTeam(tenantId)),
+        ...(billing
+          ? [billingNavItem(t, adminRoutes.tenantBilling(tenantId))]
+          : []),
+      ],
     },
     {
       label: t('platformSectionLabel'),
-      items: [
-        {
-          label: t('provisioning'),
-          icon: ICONS.CHECK_SHEET,
-          href: adminRoutes.tenantProvisioning(tenantId),
-          badge: platform,
-        },
-        {
-          label: t('dangerZone'),
-          icon: ICONS.WARNING,
-          href: adminRoutes.tenantDanger(tenantId),
-          badge: platform,
-        },
-      ],
+      items: tenantPlatformNavItems(t, tenantId),
     },
   ];
 };

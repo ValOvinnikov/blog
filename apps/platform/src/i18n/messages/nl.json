@@ -14,6 +14,7 @@
     "tenantOverview": "Tenantoverzicht",
     "tenantActivity": "Tenantactiviteit",
     "tenantProvisioning": "Inrichting",
+    "tenantBilling": "Facturatie",
     "tenantDanger": "Gevarenzone",
     "tenantDomain": "Domein",
     "signInApps": "Inloggen",
@@ -1964,7 +1965,7 @@
     "languagesNotInPlan": "Uw site gebruikt het abonnement {plan, select, FREE {Free} STARTER {Starter} GROWTH {Growth} other {huidige}}, dat {limit, plural, one {# taal} other {# talen}} toestaat. {count, plural, one {{items} is niet toegevoegd} other {{items} zijn niet toegevoegd}}.",
     "shortcut": "⌘S / Ctrl+S",
     "discard": "Verwerpen",
-    "save": "Wijzigingen opslaan",
+    "save": "Opslaan",
     "saving": "Opslaan…"
   },
   "leavePageDialog": {
@@ -2458,6 +2459,7 @@
   "billingPage": {
     "title": "Facturering",
     "description": "Je abonnement, je volgende betaling en je facturen.",
+    "operatorDescription": "Abonnement, volgende betaling en facturen van een tenant, alleen lezen.",
     "manage": "Facturering beheren",
     "managePending": "Openen…",
     "manageFailed": "Facturering kon niet worden geopend. Probeer het zo opnieuw.",

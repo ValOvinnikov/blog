@@ -1,6 +1,9 @@
 import { tagSchema } from '@shinefold/studio/schema-types/documents/blog/tag/tag';
 import { topicSchema } from '@shinefold/studio/schema-types/documents/blog/topic/topic';
-import { PAGE_POST_TYPE } from '@shinefold/studio/schema-types/documents/pages/post/post-type';
+import {
+  PAGE_POST_TYPE,
+  POST_TAKEAWAYS_FIELD,
+} from '@shinefold/studio/schema-types/documents/pages/post/post-type';
 import { personSchema } from '@shinefold/studio/schema-types/documents/person/person';
 import { articleContentField } from '@shinefold/studio/schema-types/fields/article-content-field/article-content-field';
 import { languageField } from '@shinefold/studio/schema-types/fields/language-field/language-field';
@@ -110,11 +113,11 @@ export const postPageSchema = defineType({
       components: { field: SendToSubscribersField },
     }),
     defineField({
-      name: 'postTakeaways',
+      name: POST_TAKEAWAYS_FIELD,
       title: 'Summary',
       type: postTakeawaysSchema.name,
       description:
-        'The short summary readers open from the post page. Generated when the post is published; edit it here.',
+        'The short summary readers open from the post page. Generated after the first publish for you to review; publishing the post approves it.',
     }),
     seoField(),
   ],

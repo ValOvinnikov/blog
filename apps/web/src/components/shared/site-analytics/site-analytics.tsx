@@ -11,7 +11,10 @@ import Script from 'next/script';
 import { GoogleAnalytics } from './components/google-analytics/google-analytics';
 
 export const SiteAnalytics = async () => {
-  const { tenantId } = await getRequestContext();
+  const { tenantId, isDraftPreview } = await getRequestContext();
+  // A draft render's URL carries its signed preview token, which every analytics tool here reports.
+  if (isDraftPreview) return null;
+
   const analytics = await getSiteAnalytics(
     tenantId ?? UNRESOLVED_TENANT_PLACEHOLDER,
   );

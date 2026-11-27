@@ -29,7 +29,7 @@ import {
 import {
   GO_TO_THE_FIRST_ONE,
   ONE_FIELD_NEEDS_ATTENTION,
-  SAVE_CHANGES,
+  SAVE,
 } from '@platform/testing/render-in-settings-form';
 import { EMAIL_SENDER_ITEM } from '@platform/utils/email-draft/email-draft';
 import {
@@ -105,7 +105,7 @@ describe(`<${EmailSettings.name}/>`, () => {
           name: GO_TO_THE_FIRST_ONE,
         });
         const barWithSave = getSaveBar();
-        await within(barWithSave).findByRole('button', { name: SAVE_CHANGES });
+        await within(barWithSave).findByRole('button', { name: SAVE });
       };
 
       beforeEach(async () => {

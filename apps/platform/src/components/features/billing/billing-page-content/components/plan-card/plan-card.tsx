@@ -26,6 +26,7 @@ export type TPlanCardProps = {
   hasPayments: boolean;
   isSubscribed: boolean;
   renewal: TBillingRenewal;
+  canChangePlan: boolean;
 };
 
 export const PlanCard = ({
@@ -34,6 +35,7 @@ export const PlanCard = ({
   hasPayments,
   isSubscribed,
   renewal,
+  canChangePlan,
 }: TPlanCardProps) => {
   const { nextPayment, amountOwed, endsAt } = renewal;
   const t = useTranslations('billingPage');
@@ -87,7 +89,7 @@ export const PlanCard = ({
         {endsAt && <Text>{t.rich('planEnds', richDate(endsAt, locale))}</Text>}
         {!hasPayments && <Text>{t('noPayments')}</Text>}
       </Card.Body>
-      {!endsAt && (
+      {canChangePlan && !endsAt && (
         <Card.Footer>
           <LinkButton href={adminRoutes.dashboardUpgrade()} size={SIZE.SM}>
             {isSubscribed ? t('changePlan') : t('upgrade')}

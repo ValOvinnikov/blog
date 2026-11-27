@@ -21,7 +21,11 @@ vi.mock('@shinefold/db', () => ({
 }));
 
 const getTenantBillingMock = vi.mocked(queries.tenants.getTenantBilling);
-const MANAGE_BILLING = makeEnTranslator('billingPage')('manage');
+const billingPage = makeEnTranslator('billingPage');
+const MANAGE_BILLING = billingPage('manage');
+const PLAN_CHANGE_LINK = new RegExp(
+  `^(${billingPage('upgrade')}|${billingPage('changePlan')})$`,
+);
 
 const setup = customRenderAsync(BillingPageContent, {
   tenant: mockReadyTenant(),
@@ -36,24 +40,54 @@ describe(`<${BillingPageContent.name}/>`, () => {
     });
   });
 
-  it('offers the owner Manage billing', async () => {
-    await setup();
+  describe('the owner on the dashboard', () => {
+    beforeEach(async () => {
+      await setup();
+    });
 
-    const manageBilling = screen.getByRole('button', { name: MANAGE_BILLING });
+    it('offers Manage billing', () => {
+      const manageBilling = screen.getByRole('button', {
+        name: MANAGE_BILLING,
+      });
 
-    expect(manageBilling).toBeVisible();
+      expect(manageBilling).toBeVisible();
+    });
+
+    it('offers a plan change', () => {
+      const planChange = screen.getByRole('link', { name: PLAN_CHANGE_LINK });
+
+      expect(planChange).toBeVisible();
+    });
+
+    it('describes the page to the owner', () => {
+      const description = screen.getByText(billingPage('description'));
+
+      expect(description).toBeVisible();
+    });
   });
 
-  it('shows a super admin no Manage billing', async () => {
-    await setup({
-      viewer: mockViewer({ admin: mockAdmin({ role: ADMIN_ROLE.SUPERADMIN }) }),
+  describe('a super admin on the dashboard', () => {
+    beforeEach(async () => {
+      await setup({
+        viewer: mockViewer({
+          admin: mockAdmin({ role: ADMIN_ROLE.SUPERADMIN }),
+        }),
+      });
     });
 
-    const manageBilling = screen.queryByRole('button', {
-      name: MANAGE_BILLING,
+    it('shows no Manage billing', () => {
+      const manageBilling = screen.queryByRole('button', {
+        name: MANAGE_BILLING,
+      });
+
+      expect(manageBilling).not.toBeInTheDocument();
     });
 
-    expect(manageBilling).not.toBeInTheDocument();
+    it('shows no plan change', () => {
+      const planChange = screen.queryByRole('link', { name: PLAN_CHANGE_LINK });
+
+      expect(planChange).not.toBeInTheDocument();
+    });
   });
 
   it('shows the owner no Manage billing before the site has a billing account', async () => {
@@ -66,5 +100,35 @@ describe(`<${BillingPageContent.name}/>`, () => {
     });
 
     expect(manageBilling).not.toBeInTheDocument();
+  });
+
+  describe('read-only for the operator', () => {
+    beforeEach(async () => {
+      await setup({ isReadOnly: true });
+    });
+
+    it('shows even the owner no Manage billing', () => {
+      const manageBilling = screen.queryByRole('button', {
+        name: MANAGE_BILLING,
+      });
+
+      expect(manageBilling).not.toBeInTheDocument();
+    });
+
+    it('shows even the owner no plan change', () => {
+      const planChange = screen.queryByRole('link', { name: PLAN_CHANGE_LINK });
+
+      expect(planChange).not.toBeInTheDocument();
+    });
+
+    it('describes the page for the operator', () => {
+      const operatorDescription = screen.getByText(
+        billingPage('operatorDescription'),
+      );
+      const ownerDescription = screen.queryByText(billingPage('description'));
+
+      expect(operatorDescription).toBeVisible();
+      expect(ownerDescription).not.toBeInTheDocument();
+    });
   });
 });

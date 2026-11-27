@@ -35,6 +35,7 @@ export default async function TenantDetailLayout({ children, params }: TProps) {
         ...operatorNavSections(tNavSections, admin.role),
         ...tenantNavSections(tNavSections, tenant.id, tenant.name, {
           subscribers: canOperatorOpenSubscribers(tenant, viewer),
+          billing: viewer.isSuperAdmin,
         }),
         helpNavSection(tNavSections, adminRoutes.tenantHelp(tenant.id)),
       ]}

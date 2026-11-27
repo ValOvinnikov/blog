@@ -2,6 +2,7 @@ import type {
   TSidebarNavItem,
   TSidebarNavSection,
 } from '@platform/components/features/layout/sidebar';
+import { billingNavItem } from '@platform/utils/billing-nav-item/billing-nav-item';
 import {
   configurationNavItems,
   type TTenantNavHrefs,
@@ -36,13 +37,7 @@ export const dashboardNavSections = (
   const accountItems: TSidebarNavItem[] = [
     ...(access.team ? [teamNavItem(t, adminRoutes.dashboardTeam())] : []),
     ...(access.billing
-      ? [
-          {
-            label: t('billing'),
-            icon: ICONS.CHECK_SHEET,
-            href: adminRoutes.dashboardBilling(),
-          },
-        ]
+      ? [billingNavItem(t, adminRoutes.dashboardBilling())]
       : []),
   ];
 

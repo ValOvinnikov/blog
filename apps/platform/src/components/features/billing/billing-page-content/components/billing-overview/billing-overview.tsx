@@ -16,6 +16,7 @@ export type TBillingOverviewProps = {
   plan: TTenantPlan;
   status: TTenantStatus;
   billing: TMaybeUndefined<TTenantBilling>;
+  canChangePlan: boolean;
 };
 
 export const BillingOverview = async ({
@@ -23,6 +24,7 @@ export const BillingOverview = async ({
   plan,
   status,
   billing,
+  canChangePlan,
 }: TBillingOverviewProps) => {
   const [t, overview] = await Promise.all([
     getTranslations('billingPage'),
@@ -52,6 +54,7 @@ export const BillingOverview = async ({
         hasPayments={false}
         isSubscribed={isSubscribed}
         renewal={NO_RENEWAL}
+        canChangePlan={canChangePlan}
       />
     );
   }
@@ -66,6 +69,7 @@ export const BillingOverview = async ({
         hasPayments={true}
         isSubscribed={isSubscribed}
         renewal={renewal}
+        canChangePlan={canChangePlan}
       />
       <InvoicesTable invoices={invoices} />
     </>

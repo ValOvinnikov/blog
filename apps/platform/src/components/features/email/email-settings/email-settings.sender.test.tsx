@@ -25,7 +25,7 @@ import {
   SEND_CONTACT_MESSAGES_TO,
 } from '@platform/testing/email/fixtures';
 import { mockEmailSender } from '@platform/testing/email-draft';
-import { SAVE_CHANGES } from '@platform/testing/render-in-settings-form';
+import { SAVE } from '@platform/testing/render-in-settings-form';
 import { MOCK_TENANT_ID } from '@platform/testing/tenants/fixtures';
 import { EMAIL_SENDER_ITEM } from '@platform/utils/email-draft/email-draft';
 import { ACTION_OUTCOME } from '@shinefold/config';
@@ -72,7 +72,7 @@ describe(`<${EmailSettings.name}/>`, () => {
 
     it('is uploaded on Save', async () => {
       const saveButton = await screen.findByRole('button', {
-        name: SAVE_CHANGES,
+        name: SAVE,
       });
       await user.click(saveButton);
 

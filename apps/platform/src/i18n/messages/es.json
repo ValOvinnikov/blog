@@ -14,6 +14,7 @@
     "tenantOverview": "Resumen del cliente",
     "tenantActivity": "Actividad del cliente",
     "tenantProvisioning": "Aprovisionamiento",
+    "tenantBilling": "Facturación",
     "tenantDanger": "Zona de peligro",
     "tenantDomain": "Dominio",
     "signInApps": "Inicio de sesión",
@@ -1964,7 +1965,7 @@
     "languagesNotInPlan": "Su sitio está en el plan {plan, select, FREE {Free} STARTER {Starter} GROWTH {Growth} other {actual}}, que permite {limit, plural, one {# idioma} other {# idiomas}}, así que {count, plural, one {no se ha añadido {items}} other {no se han añadido {items}}}.",
     "shortcut": "⌘S / Ctrl+S",
     "discard": "Descartar",
-    "save": "Guardar cambios",
+    "save": "Guardar",
     "saving": "Guardando…"
   },
   "leavePageDialog": {
@@ -2458,6 +2459,7 @@
   "billingPage": {
     "title": "Facturación",
     "description": "Tu plan, tu próximo pago y tus facturas.",
+    "operatorDescription": "Plan, próximo pago y facturas de un inquilino, solo lectura.",
     "manage": "Gestionar facturación",
     "managePending": "Abriendo…",
     "manageFailed": "No se pudo abrir la facturación. Inténtalo de nuevo en un momento.",

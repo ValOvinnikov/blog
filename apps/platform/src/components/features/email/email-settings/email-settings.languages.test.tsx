@@ -27,7 +27,7 @@ import {
 import { SEND_TEST_TO_ME } from '@platform/testing/email/fixtures';
 import { MOCK_EMAIL_DRAFT_SUBJECT } from '@platform/testing/email-draft';
 import type { mockRouterRefresh } from '@platform/testing/mock-router';
-import { SAVE_CHANGES } from '@platform/testing/render-in-settings-form';
+import { SAVE } from '@platform/testing/render-in-settings-form';
 import { MOCK_TENANT_ID } from '@platform/testing/tenants/fixtures';
 import {
   ACTION_OUTCOME,
@@ -110,7 +110,7 @@ describe(`<${EmailSettings.name}/>`, () => {
       await user.click(discardButton);
 
       const frenchSubjectInput = screen.getByLabelText(SUBJECT_FRENCH);
-      const saveButton = screen.queryByRole('button', { name: SAVE_CHANGES });
+      const saveButton = screen.queryByRole('button', { name: SAVE });
 
       expect(frenchSubjectInput).toHaveValue('');
       expect(saveButton).not.toBeInTheDocument();

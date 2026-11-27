@@ -9,7 +9,7 @@ import {
   DISCARD,
   GO_TO_THE_FIRST_ONE,
   ONE_FIELD_NEEDS_ATTENTION,
-  SAVE_CHANGES,
+  SAVE,
   UNSAVED_CHANGES,
 } from '@platform/testing/render-in-settings-form';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
@@ -70,7 +70,7 @@ const BarWithHiddenField = () => {
 };
 
 const expectSaveAndDiscardEnabled = () => {
-  const saveButton = screen.getByRole('button', { name: SAVE_CHANGES });
+  const saveButton = screen.getByRole('button', { name: SAVE });
   const discardButton = screen.getByRole('button', { name: DISCARD });
 
   expect(saveButton).toBeEnabled();

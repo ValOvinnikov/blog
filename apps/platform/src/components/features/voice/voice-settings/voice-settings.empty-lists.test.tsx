@@ -6,7 +6,7 @@ import { screen, within } from '@platform/testing/custom-render';
 import { makeEnTranslator } from '@platform/testing/en-translator';
 import { mockRouterRefresh } from '@platform/testing/mock-router';
 import {
-  SAVE_CHANGES,
+  SAVE,
   UNSAVED_CHANGES,
 } from '@platform/testing/render-in-settings-form';
 import {
@@ -122,7 +122,7 @@ describe(`<${VoiceSettings.name}/> empty lists`, () => {
 
       const saveBar = screen.getByRole('region', { name: UNSAVED_CHANGES });
       const saveButton = within(saveBar).getByRole('button', {
-        name: SAVE_CHANGES,
+        name: SAVE,
       });
       await user.click(saveButton);
       await screen.findAllByRole('alert');

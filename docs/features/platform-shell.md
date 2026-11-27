@@ -166,8 +166,8 @@ Every settings page (Voice, Look, Email, Languages, Features) renders through
 changes and never for an archived tenant. From `md` it docks to the viewport
 bottom, from the sidebar's right edge (rail edge when collapsed) to the right
 edge: 64px tall, flat, top border and `shadow-platform-dock`. It shows a dot,
-"N unsaved changes", the "⌘S / Ctrl+S" hint (from `lg` only), Discard and Save
-changes. With invalid fields the left side becomes "N fields need attention",
+"N unsaved changes", the "⌘S / Ctrl+S" hint (from `lg` only), Discard and
+Save. With invalid fields the left side becomes "N fields need attention",
 "Go to the first one" and "Not saved" — one line from `lg`, stacked on two
 lines from `md` to `lg` — and the dot, count and hint go. While saving, Save
 reads "Saving…" through the Button's pending state (focus stays on it),
@@ -203,7 +203,7 @@ narrow for both. What the user entered stays. Saving again withdraws it while
 the request is in flight, so a second failure announces again, and a
 successful save clears it.
 
-A successful save pressed from Save changes in the save bar returns focus,
+A successful save pressed from Save in the save bar returns focus,
 without scrolling, to the control that had it before Save was pressed, so the
 bar unmounting never drops a keyboard user's place. If that control has left
 the page, focus moves to the page's `h1` instead. A save from ⌘S / Ctrl+S never moves focus,

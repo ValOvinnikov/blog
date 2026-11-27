@@ -14,6 +14,7 @@
     "tenantOverview": "Mandantenübersicht",
     "tenantActivity": "Mandantenaktivität",
     "tenantProvisioning": "Bereitstellung",
+    "tenantBilling": "Abrechnung",
     "tenantDanger": "Gefahrenzone",
     "tenantDomain": "Domain",
     "signInApps": "Anmeldung",
@@ -1964,7 +1965,7 @@
     "languagesNotInPlan": "Ihre Website nutzt den Tarif {plan, select, FREE {Free} STARTER {Starter} GROWTH {Growth} other {aktuellen}}, der {limit, plural, one {# Sprache} other {# Sprachen}} erlaubt. {count, plural, one {{items} wurde nicht hinzugefügt} other {{items} wurden nicht hinzugefügt}}.",
     "shortcut": "⌘S / Strg+S",
     "discard": "Verwerfen",
-    "save": "Änderungen speichern",
+    "save": "Speichern",
     "saving": "Wird gespeichert…"
   },
   "leavePageDialog": {
@@ -2458,6 +2459,7 @@
   "billingPage": {
     "title": "Abrechnung",
     "description": "Ihr Tarif, Ihre nächste Zahlung und Ihre Rechnungen.",
+    "operatorDescription": "Tarif, nächste Zahlung und Rechnungen eines Mandanten, nur lesend.",
     "manage": "Abrechnung verwalten",
     "managePending": "Wird geöffnet…",
     "manageFailed": "Die Abrechnung konnte nicht geöffnet werden. Versuchen Sie es gleich noch einmal.",

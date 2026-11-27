@@ -7,7 +7,7 @@ import { USER_EVENT_KEY } from '@platform/testing/keyboard';
 import { EDITORIAL, GROWTH } from '@platform/testing/look/look-form-fixtures';
 import {
   GO_TO_THE_FIRST_ONE,
-  SAVE_CHANGES,
+  SAVE,
   UNSAVED_CHANGES,
 } from '@platform/testing/render-in-settings-form';
 import type { UserEvent } from '@testing-library/user-event';
@@ -56,7 +56,7 @@ export const clickGoToTheFirstOne = async (user: UserEvent) => {
 export const clickSave = async (user: UserEvent) => {
   const saveBar = screen.getByRole('region', { name: UNSAVED_CHANGES });
   const saveChangesButton = within(saveBar).getByRole('button', {
-    name: SAVE_CHANGES,
+    name: SAVE,
   });
   await user.click(saveChangesButton);
 };
