@@ -5,7 +5,7 @@ import {
   pickAndSaveLogo,
   pickLogo,
 } from '@platform/testing/look/brand-image-interactions';
-import { BRAND_IMAGES_HINT } from '@platform/testing/look/look-form-fixtures';
+import { LOGO_HINT } from '@platform/testing/look/look-form-fixtures';
 import { clickGoToTheFirstOne } from '@platform/testing/look/look-form-interactions';
 import {
   prepareBrandImageForm,
@@ -90,9 +90,7 @@ describe(`<${LookForm.name}/>`, () => {
           const attentionLink = screen.queryByRole('link', {
             name: GO_TO_THE_FIRST_ONE,
           });
-          expect(replaceLogoButton).toHaveAccessibleDescription(
-            BRAND_IMAGES_HINT,
-          );
+          expect(replaceLogoButton).toHaveAccessibleDescription(LOGO_HINT);
           expect(attentionLink).not.toBeInTheDocument();
         });
       });

@@ -13,6 +13,8 @@ export const SAMPLE_PART = {
   CTA_BOX: 'cta-box',
   BUTTON: 'button',
   BUSY_BUTTON: 'busy-button',
+  BREADCRUMBS: 'breadcrumbs',
+  COOKIE_BUTTON: 'cookie-button',
 } as const;
 export type TSamplePart = TValueOf<typeof SAMPLE_PART>;
 

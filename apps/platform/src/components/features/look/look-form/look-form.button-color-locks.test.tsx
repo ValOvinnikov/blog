@@ -36,7 +36,7 @@ describe(`<${LookForm.name}/>`, () => {
   ])('on $plan with isOperator $isOperator', ({ plan, isOperator }) => {
     beforeEach(async () => {
       setupLookForm({ ...withLookPlan(plan), isOperator });
-      await openLookRow(user, LOOK_ROW.BUTTONS);
+      await openLookRow(user, LOOK_ROW.COLOUR);
     });
 
     it.each([BUTTON_COLOR_FOLLOWS_ACCENT, BUTTON_COLOR_DARK_FOLLOWS])(

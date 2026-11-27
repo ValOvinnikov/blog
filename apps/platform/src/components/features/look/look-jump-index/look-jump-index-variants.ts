@@ -3,8 +3,6 @@ import { tv } from '@platform/utils/tv/tv';
 // Matches the fades' w-10, so a scrolled-to link clears the fade on its side.
 export const LOOK_INDEX_FADE_WIDTH_PX = 40;
 
-export const LOOK_INDEX_DIVIDER = 'mx-1 h-5 w-px shrink-0 bg-platform-line';
-
 export const lookJumpIndexVariants = tv({
   slots: {
     root: [
@@ -20,7 +18,7 @@ export const lookJumpIndexVariants = tv({
       'm-0 flex min-w-0 flex-1 list-none items-center overflow-x-auto p-0',
       '[scrollbar-width:none] [&::-webkit-scrollbar]:hidden',
     ],
-    divider: [LOOK_INDEX_DIVIDER],
+    divider: ['mx-1 h-5 w-px shrink-0 bg-platform-line'],
     fade: ['pointer-events-none absolute inset-y-0 w-10'],
     fadeStart: ['left-0 bg-linear-to-r'],
     fadeEnd: ['right-0 bg-linear-to-l'],

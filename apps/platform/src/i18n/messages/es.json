@@ -787,8 +787,8 @@
     "close": "Cerrar"
   },
   "logoHueField": {
-    "followAccentHue": "Seguir el tono de acento",
-    "logoHueAriaLabel": "Tono del logotipo",
+    "followAccentHue": "Seguir el color de acento",
+    "logoHueAriaLabel": "Color del logotipo",
     "followsAccent": "sigue el acento",
     "hueValue": "tono {hue}°"
   },
@@ -799,17 +799,15 @@
   "lookForm": {
     "heading": "Aspecto",
     "subtitle": "Personaliza este sitio. La vista previa muestra tus cambios — nada se publica hasta que guardes.",
-    "styleGroupHeading": "Estilo",
-    "sitePartsGroupHeading": "Partes del sitio",
     "viewTabsAriaLabel": "Vista de Look",
     "jumpIndexAriaLabel": "Secciones de Look",
-    "growthAddsColour": "Un tono de logotipo propio y un sitio fijado en claro u oscuro",
+    "growthAddsBrand": "Un color de logotipo propio",
+    "growthAddsColour": "Colores de botones y un sitio fijado en claro u oscuro",
     "growthAddsType": "Fuentes, grosor y mayúsculas de los títulos",
-    "growthAddsShape": "Esquinas, espaciado, proporciones de imagen y separadores",
-    "growthAddsCards": "Estilo de tarjeta",
-    "growthAddsButtons": "Estado de carga e indicador de progreso",
-    "growthAddsHeader": "Diseño, submenús, barra, botones de la cabecera y controles de cuenta",
-    "growthAddsFooter": "Diseño, fondo y superficie",
+    "growthAddsShape": "Esquinas, forma de los botones, espaciado, estilo de tarjeta, proporciones de imagen y separadores",
+    "growthAddsHeader": "Diseño, ancho, submenús, botones de la cabecera, el botón de acción y controles de cuenta",
+    "growthAddsFooter": "Diseño, fondo y ancho",
+    "growthAddsDetails": "Indicador de carga, botón al guardar y fondo de las migas de pan",
     "growthAddsClosing": "Growth también añade más idiomas (con elección del estilo del selector de idioma) y más funciones para el sitio.",
     "jumpIndexUnsaved": ", cambios sin guardar",
     "expandAll": "Desplegar todo",
@@ -820,36 +818,36 @@
     "alertSuccess": "Aspecto guardado.",
     "alertError": "No se pudo guardar la configuración de Aspecto. Vuelva a intentarlo.",
     "presetLabel": "Ajuste predefinido",
-    "presetDescription": "Define el tono de acento, las fuentes de títulos y de texto, el radio y la densidad.",
-    "accentHueLabel": "Tono de acento",
+    "presetDescription": "Un ajuste predefinido fija el valor inicial de la mayoría de las opciones de esta página.",
+    "accentHueLabel": "Color de acento",
     "accentHueDescription": "Colorea los enlaces, los botones y los elementos destacados de todo el sitio.",
     "accentHueInaccessible": "Este tono no mantiene legible el texto sobre sus superficies tintadas, así que el sitio lo sustituiría. Elija otro tono.",
-    "logoHueLabel": "Tono del logotipo",
-    "logoHueDescription": "Tiñe el logotipo de texto. Sigue el tono de acento si no se elige otro.",
-    "colorModeLabel": "Modo de color",
+    "logoHueLabel": "Color del logotipo",
+    "logoHueDescription": "Tiñe el logotipo de texto. Sigue el color de acento si no se elige otro.",
+    "colorModeLabel": "Modo claro y oscuro",
     "colorModeDescription": "Si los lectores cambian entre claro y oscuro, o el sitio muestra siempre uno.",
     "colorModeOptionLabel": {
       "READER": "Elige el lector",
       "LIGHT": "Siempre claro",
       "DARK": "Siempre oscuro"
     },
-    "brandImagesDescription": "Las imágenes se usan tal como se suben: no se redimensionan ni se recortan.",
+    "brandImagesDescription": "Las imágenes se muestran tal como las subes, así que recórtalas y ajusta su tamaño antes.",
     "brandNameLabel": "Nombre de la marca",
-    "brandNameHint": "El nombre de tu sitio. Déjalo en blanco para usar el nombre de la cuenta.",
+    "brandNameHint": "Se muestra en la cabecera, el pie de página y los correos. Si lo dejas vacío, se usa el nombre con el que te registraste.",
     "brandNameTooLong": "Usa {max} caracteres como máximo.",
     "brandNameUnset": "Nombre de la cuenta",
     "logoFieldLabel": "Logotipo",
+    "logoFieldHint": "PNG, JPEG, WebP o SVG. Sin logotipo, tu sitio muestra su inicial y su nombre.",
     "logoDarkFieldLabel": "Logotipo para el modo oscuro",
-    "logoDarkFieldHint": "Se muestra cuando el lector usa el modo oscuro. Sin él, se usa el logotipo principal.",
+    "logoDarkFieldHint": "Se muestra en modo oscuro. Sin él, se usa el logotipo principal.",
     "faviconFieldLabel": "Favicon",
-    "brandFieldsHint": "Logotipo: PNG, JPEG, WebP o SVG. Favicon: una imagen cuadrada.",
-    "optionalTag": "opcional",
+    "faviconFieldHint": "Una imagen cuadrada que se muestra en la pestaña del navegador. Sin ella, la pestaña muestra tu inicial sobre un cuadro del color del logotipo.",
     "fieldUnsavedLabel": "Cambio sin guardar",
     "headingFontLabel": "Fuente de títulos",
     "bodyFontLabel": "Fuente del texto",
-    "radiusScaleLabel": "Escala de radio",
+    "radiusScaleLabel": "Esquinas",
     "radiusScaleDescription": "Redondea cada tarjeta, panel, menú, tabla e imagen.",
-    "densityLabel": "Densidad",
+    "densityLabel": "Espaciado",
     "densityDescription": "Espaciado y tamaño de los controles.",
     "cardStyleLabel": "Estilo de tarjeta",
     "cardStyleDescription": "Enmarca cada tarjeta de contenido: entradas, temas, citas, precios, preguntas frecuentes y cuadros de llamada a la acción.",
@@ -887,7 +885,7 @@
       "CLASSIC": "Clásica",
       "SQUARE": "Cuadrada"
     },
-    "dividerWidthLabel": "Separadores de sección",
+    "dividerWidthLabel": "Grosor de los separadores",
     "dividerWidthDescription": "El grosor de la línea entre secciones que muestran un separador.",
     "dividerWidthOptionLabel": {
       "HAIRLINE": "Fino",
@@ -907,7 +905,7 @@
       "RAISED": "Un contorno fino con una sombra suave",
       "PLAIN": "Sin marco; el espacio separa las tarjetas"
     },
-    "headerControlStyleLabel": "Botones de la cabecera",
+    "headerControlStyleLabel": "Estilo de los botones de la cabecera",
     "headerControlStyleDescription": "Los botones de idioma, tema, menú e Iniciar sesión, en cualquier tamaño de pantalla.",
     "headerControlStyleOptionLabel": {
       "OUTLINED": "Con contorno",
@@ -931,26 +929,25 @@
       "ROUNDED": "Las esquinas siguen el ajuste de Esquinas del sitio",
       "SQUARE": "Esquinas rectas"
     },
-    "headerActionStyleLabel": "Estilo de la acción de la cabecera",
+    "headerActionStyleLabel": "Estilo del botón de acción",
     "headerActionStyleDescription": "Cómo se dibuja el enlace de acción de la cabecera. Relleno y Con contorno toman el color y la forma de los botones.",
     "headerActionStyleOptionLabel": {
       "FILLED": "Relleno",
       "OUTLINED": "Con contorno",
       "PLAIN": "Enlace sencillo"
     },
-    "headerActionPhonePlacementLabel": "En teléfonos",
+    "headerActionPhonePlacementLabel": "Botón de acción en teléfonos",
     "headerActionPhonePlacementDescription": "Dónde va la acción de la cabecera en teléfonos: en la barra junto al botón del menú, o arriba del todo en el menú.",
     "headerActionPhonePlacementOptionLabel": {
       "BAR": "En la barra",
       "MENU": "Arriba en el menú"
     },
-    "languageSwitcherLabel": "Selector de idioma",
-    "languageSwitcherStyleLabel": "Estilo",
+    "languageSwitcherStyleLabel": "Estilo del selector de idioma",
     "languageSwitcherDescription": "Cómo se ve el selector de idioma en escritorio, en el encabezado y el pie de página.",
-    "languageSwitcherSingleLanguage": "Añade otro idioma en Idiomas para elegir un estilo.",
+    "languageSwitcherSingleLanguage": "Añade otro idioma en Idiomas para elegir un estilo de selector de idioma.",
     "languageSwitcherFreeDescription": "Tu plan publica un idioma. Mejora el plan para añadir idiomas y elegir un estilo de selector.",
     "lockLineGrowthFields": "Los campos marcados con Growth mantienen el valor del ajuste predefinido {preset}.",
-    "lockLineTypeFonts": "Con este plan, Tipografía mantiene las fuentes y el estilo de títulos del ajuste predefinido {preset}. Elegir otro ajuste predefinido los cambia.",
+    "lockLineTypeFonts": "Con este plan, Texto mantiene las fuentes y el estilo de títulos del ajuste predefinido {preset}. Elegir otro ajuste predefinido los cambia.",
     "languageSwitcherOptionLabel": {
       "MENU_CODE": "Código",
       "MENU_GLOBE": "Globo",
@@ -961,16 +958,19 @@
       "MENU_GLOBE": "Un icono de globo abre el menú de idiomas",
       "CODES": "Códigos de idioma uno al lado del otro, para pocos idiomas"
     },
-    "colourHeading": "Color",
-    "colourDescription": "Elige el tono de acento y si los lectores eligen entre claro y oscuro. El texto sigue siendo legible en ambos casos.",
-    "typeHeading": "Tipografía",
+    "colourHeading": "Colores",
+    "colourDescription": "Tu color de acento, los colores de los botones y si los lectores eligen entre claro y oscuro. El texto sigue siendo legible en ambos casos.",
+    "typeHeading": "Texto",
     "typeDescription": "Cada fuente se muestra con su propio estilo.",
-    "shapeHeading": "Esquinas y espaciado",
-    "cardsHeading": "Tarjetas",
-    "shapeDescription": "Lo redondeadas que son las esquinas y cuánto espacio rodea a los elementos en todo el sitio.",
-    "cardsDescription": "Cómo se enmarcan las tarjetas de contenido en todo el sitio.",
+    "shapeHeading": "Formas y espaciado",
+    "shapeDescription": "Lo redondeadas que son las esquinas, la forma de botones y tarjetas, y cuánto espacio rodea a los elementos en todo el sitio.",
     "headerHeading": "Cabecera",
     "headerDescription": "Cómo se organiza la barra superior de su sitio y cómo se abren sus submenús.",
+    "headerLayoutHeading": "Diseño",
+    "headerLinksHeading": "Enlaces",
+    "headerButtonsHeading": "Botones",
+    "headerActionHeading": "Botón de acción",
+    "headerAccountHeading": "Cuenta",
     "headerLayoutLabel": "Diseño",
     "headerLayoutDescription": "Dónde van el logotipo, los enlaces y los botones en pantallas anchas. En el móvil siempre hay una barra con botón de menú.",
     "headerPreviewDeviceNote": {
@@ -986,24 +986,24 @@
       "CENTRED_BRAND": "Marca centrada",
       "MENU_BUTTON": "Botón de menú"
     },
-    "headerSubmenuStyleLabel": "Submenús",
+    "headerSubmenuStyleLabel": "Estilo de los submenús",
     "headerSubmenuStyleDescription": "Cómo se abre un enlace con subelementos en pantallas anchas.",
     "headerSubmenuStyleOptionLabel": {
       "DROPDOWN": "Desplegable",
       "WIDE_PANEL": "Panel ancho"
     },
-    "headerBarStyleLabel": "Barra",
+    "headerBarStyleLabel": "Ancho",
     "headerBarStyleDescription": "Si la barra ocupa todo el ancho de la página o flota sobre ella como una tarjeta.",
     "headerBackgroundLabel": "Fondo",
     "headerBackgroundDescription": "El color de la cabecera y de los menús y paneles que se abren desde ella. Cada uno sigue el tema claro u oscuro del lector.",
     "headerBackgroundDarkLogoNote": "Tinta muestra la cabecera oscura, así que su logotipo necesita una versión para el modo oscuro. Añádala en Marca.",
     "breadcrumbBackgroundLabel": "Fondo de la ruta de navegación",
-    "breadcrumbBackgroundDescription": "El color de la fila de ruta de navegación bajo la cabecera, en entradas, etiquetas, temas y páginas de destino. Cada uno sigue el tema claro u oscuro del lector.",
+    "breadcrumbBackgroundDescription": "El color de la fila de ruta de navegación bajo la cabecera, en entradas, etiquetas, temas y páginas de destino. Solo se muestra en tabletas y pantallas más anchas, no en teléfonos. Cada uno sigue el tema claro u oscuro del lector.",
     "headerBarStyleOptionLabel": {
       "FULL_WIDTH": "Ancho completo",
       "FLOATING": "Flotante"
     },
-    "navLinkStyleLabel": "Enlaces de navegación",
+    "navLinkStyleLabel": "Resaltado del enlace actual",
     "navLinkStyleDescription": "Cómo marca el menú la página en la que estás y el enlace bajo el puntero. Los enlaces del pie de página no cambian.",
     "navLinkStyleGlyphWord": "Enlace",
     "navLinkStyleOptionLabel": {
@@ -1018,8 +1018,8 @@
       "SOFT": "Un fondo tintado al pasar el cursor y en la página actual",
       "PILL": "Un contorno redondeado al pasar el cursor y en la página actual"
     },
-    "accountButtonStyleLabel": "Botón de la cuenta",
-    "accountButtonStyleDescription": "El botón con el que los lectores inician sesión y abren su cuenta, en pantallas anchas. Los teléfonos siguen el ajuste «En teléfonos, la cuenta va» más abajo.",
+    "accountButtonStyleLabel": "Estilo del botón de la cuenta",
+    "accountButtonStyleDescription": "El botón con el que los lectores inician sesión y abren su cuenta, en pantallas anchas. Los teléfonos siguen el ajuste «Cuenta en teléfonos» más abajo.",
     "accountButtonStyleOptionLabel": {
       "PILL": "Píldora con etiqueta",
       "CIRCLE": "Círculo"
@@ -1031,16 +1031,13 @@
       "PROFILE": "Perfil",
       "HUB": "Centro"
     },
-    "accountPhonePlacementLabel": "En teléfonos, la cuenta va",
+    "accountPhonePlacementLabel": "Cuenta en teléfonos",
     "accountPhonePlacementDescription": "En la barra como un círculo, o como la última fila del menú.",
     "accountPhonePlacementOptionLabel": {
       "BAR": "En la barra",
       "MENU": "En el menú"
     },
-    "buttonsHeading": "Botones",
-    "buttonsDescription": "Qué forma y color tienen los botones, cómo se ven mientras trabajan y el indicador de carga que muestran.",
-    "buttonsWhileWorkingHeading": "Mientras trabaja",
-    "buttonShapeLabel": "Forma",
+    "buttonShapeLabel": "Forma de los botones",
     "buttonShapeDescription": "Esquinas de los botones y las etiquetas.",
     "buttonShapeOptionLabel": {
       "SQUARE": "Cuadrada",
@@ -1057,7 +1054,7 @@
     "buttonColorInvalid": "Introduce un color hexadecimal, como #1a73e8.",
     "buttonColorFaint": "Los botones se ven tenues en {grounds}, así que los lectores pueden pasarlos por alto.",
     "buttonColorFaintGround": "{skin} en {scheme, select, DARK {modo oscuro} other {modo claro}}",
-    "busyButtonStyleLabel": "Mientras trabaja",
+    "busyButtonStyleLabel": "Botón al guardar",
     "busyButtonStyleDescription": "Qué muestra un botón mientras guarda o envía. Conserva su sitio y su color completo.",
     "busyButtonStyleOptionLabel": {
       "LABEL": "Texto de espera",
@@ -1074,8 +1071,10 @@
       "PULSE": "Pulso"
     },
     "footerHeading": "Pie de página",
-    "footerDescription": "Cómo se organiza la parte inferior de tu sitio, su fondo y cómo vuelven los lectores a la configuración de cookies.",
-    "footerLayoutLabel": "Diseño del pie de página",
+    "detailsHeading": "Pequeños detalles",
+    "footerDescription": "Cómo se organiza la parte inferior de tu sitio, su fondo y su ancho.",
+    "detailsDescription": "Cómo muestra tu sitio que está trabajando, la fila de migas de pan y cómo vuelven los lectores a la configuración de cookies.",
+    "footerLayoutLabel": "Diseño",
     "footerLayoutDescription": "Dónde se colocan la marca, los grupos de enlaces y la letra pequeña. Compacto no muestra grupos, texto de presentación ni dirección.",
     "footerLayoutOptionLabel": {
       "COLUMNS": "Columnas",
@@ -1091,13 +1090,13 @@
       "BRAND_PRIMARY": "Tono de marca",
       "INK": "Tinta"
     },
-    "footerSurfaceLabel": "Superficie",
+    "footerSurfaceLabel": "Ancho",
     "footerSurfaceDescription": "Si el pie de página ocupa todo el ancho o aparece como una tarjeta.",
     "footerSurfaceOptionLabel": {
       "FULL_WIDTH": "Ancho completo",
       "CARD": "Tarjeta"
     },
-    "cookieSettingsButtonLabel": "Configuración de cookies",
+    "cookieSettingsButtonLabel": "Botón de configuración de cookies",
     "cookieSettingsButtonDescription": "Cómo vuelven a abrir los lectores la configuración de cookies después de responder al banner de cookies: un enlace en el pie de página, un botón redondo en la esquina inferior izquierda o ambos.",
     "cookieSettingsButtonOptionLabel": {
       "HIDDEN": "Enlace en el pie",
@@ -1127,8 +1126,7 @@
       "FILLED": "Acción rellena",
       "OUTLINED": "Acción con contorno",
       "PLAIN": "Acción como enlace"
-    },
-    "summaryOneLanguage": "Un idioma"
+    }
   },
   "previewModeControl": {
     "modeLight": "Claro",
@@ -1235,9 +1233,9 @@
     "topOfPage": "Principio de la página",
     "styleCard": "<strong>{card}</strong> cambia toda la página, así que el marco se queda donde está.",
     "styleOutlined": "Resaltado: lo que cambia <strong>{card}</strong>.",
-    "idle": "Abre una tarjeta de Partes del sitio y el marco se desplazará hasta ella.",
+    "idle": "Abre la tarjeta Cabecera o Pie de página y el marco se desplazará hasta esa parte.",
     "off": "El seguimiento está desactivado. El marco se queda donde lo dejes.",
-    "allOpen": "Todas las tarjetas están abiertas. Enfoca una tarjeta de Partes del sitio y el marco se desplazará hasta ella.",
+    "allOpen": "Todas las tarjetas están abiertas. Enfoca la tarjeta Cabecera o Pie de página y el marco se desplazará hasta esa parte.",
     "freeSample": "La muestra usa los valores del ajuste predefinido {preset}, los que publica este plan."
   },
   "lookFullscreen": {

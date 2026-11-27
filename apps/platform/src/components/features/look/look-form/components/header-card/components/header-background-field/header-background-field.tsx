@@ -6,7 +6,7 @@ import { ICONS } from '@shinefold/config';
 import { isUndefined } from '@shinefold/utils/primitives';
 import { useTranslations } from 'next-intl';
 
-export const BackgroundFields = () => {
+export const HeaderBackgroundField = () => {
   const {
     values: { accentHue, logoDark },
   } = useLookForm();
@@ -17,26 +17,17 @@ export const BackgroundFields = () => {
   );
 
   return (
-    <>
-      <LookChoiceField
-        field="headerBackground"
-        label={t('headerBackgroundLabel')}
-        hint={t('headerBackgroundDescription')}
-        options={skinOptions}
-      >
-        {isUndefined(logoDark.url) && (
-          <LockedReason icon={ICONS.INFO}>
-            {t('headerBackgroundDarkLogoNote')}
-          </LockedReason>
-        )}
-      </LookChoiceField>
-
-      <LookChoiceField
-        field="breadcrumbBackground"
-        label={t('breadcrumbBackgroundLabel')}
-        hint={t('breadcrumbBackgroundDescription')}
-        options={skinOptions}
-      />
-    </>
+    <LookChoiceField
+      field="headerBackground"
+      label={t('headerBackgroundLabel')}
+      hint={t('headerBackgroundDescription')}
+      options={skinOptions}
+    >
+      {isUndefined(logoDark.url) && (
+        <LockedReason icon={ICONS.INFO}>
+          {t('headerBackgroundDarkLogoNote')}
+        </LockedReason>
+      )}
+    </LookChoiceField>
   );
 };

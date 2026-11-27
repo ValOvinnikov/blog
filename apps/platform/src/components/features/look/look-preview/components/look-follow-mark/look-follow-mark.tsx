@@ -15,11 +15,13 @@ import { usePartBoxes } from './use-part-boxes';
 export type TLookFollowMarkProps = {
   outline: TLookFollowOutline;
   scale: number;
+  isTagShown?: boolean;
 };
 
 export const LookFollowMark = ({
   outline: { row, parts },
   scale,
+  isTagShown = true,
 }: TLookFollowMarkProps) => {
   const t = useTranslations('lookForm');
   const rootRef = useRef<HTMLDivElement>(null);
@@ -56,7 +58,7 @@ export const LookFollowMark = ({
               outlineOffset: isInset ? -edgeWidth : 0,
             }}
           />
-          {index === 0 && (
+          {isTagShown && index === 0 && (
             <span
               className={tag()}
               style={{

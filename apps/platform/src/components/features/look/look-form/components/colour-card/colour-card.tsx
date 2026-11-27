@@ -1,11 +1,9 @@
-import { LogoHueField } from '@platform/components/features/look/logo-hue-field';
 import { logoHueFieldVariants } from '@platform/components/features/look/logo-hue-field/logo-hue-field-variants';
 import { LookCard } from '@platform/components/features/look/look-form/components/look-card';
 import { LookChoiceField } from '@platform/components/features/look/look-form/components/look-choice-field';
 import { LookField } from '@platform/components/features/look/look-form/components/look-field';
-import { toLookLabelOptions } from '@platform/components/features/look/look-form/components/look-option-glyph';
+import { toLookGlyphOptions } from '@platform/components/features/look/look-form/components/look-option-glyph';
 import { PresetValueButton } from '@platform/components/features/look/look-form/components/preset-value-button';
-import { useLookFieldLock } from '@platform/components/features/look/look-form/use-look-field-lock';
 import { useLookRowLock } from '@platform/components/features/look/look-form/use-look-row-lock';
 import { useLookForm } from '@platform/components/features/look/look-form-provider';
 import { AccentSwatch } from '@platform/components/shared/accent-swatch';
@@ -17,6 +15,8 @@ import { COLOR_MODE, SIZE } from '@shinefold/config';
 import { LOOK_FIELD } from '@shinefold/db/constants';
 import { useTranslations } from 'next-intl';
 
+import { ButtonColorFields } from './components/button-color-fields/button-color-fields';
+
 export type TColourCardProps = {
   summary: string;
 };
@@ -24,19 +24,20 @@ export type TColourCardProps = {
 export const ColourCard = ({ summary }: TColourCardProps) => {
   const { isArchived, archivedDescribedBy } = useSettingsFormState();
   const {
-    values: { accentHue, logoHue },
+    values: { accentHue },
     updateField,
     accentHueFieldId,
     isAccentHueRejected,
   } = useLookForm();
   const t = useTranslations('lookForm');
   const tHue = useTranslations('logoHueField');
-  const logoHueLock = useLookFieldLock('logoHue');
-  const { lockLine } = useLookRowLock(CARD_FIELDS[LOOK_ROW.COLOUR]);
+  const { lockLine, hasGrowthBadge } = useLookRowLock(
+    CARD_FIELDS[LOOK_ROW.COLOUR],
+  );
   const { hueField, hueValue } = logoHueFieldVariants();
 
   const accentHueLabel = t('accentHueLabel');
-  const colorModeOptions = toLookLabelOptions(COLOR_MODE, (mode) =>
+  const colorModeOptions = toLookGlyphOptions('colorMode', COLOR_MODE, (mode) =>
     t(`colorModeOptionLabel.${mode}`),
   );
 
@@ -47,6 +48,7 @@ export const ColourCard = ({ summary }: TColourCardProps) => {
       card={LOOK_ROW.COLOUR}
       description={t('colourDescription')}
       lockLine={lockLine}
+      hasGrowthBadge={hasGrowthBadge}
     >
       <LookField
         field="accentHue"
@@ -71,22 +73,7 @@ export const ColourCard = ({ summary }: TColourCardProps) => {
         <PresetValueButton field="accentHue" fieldLabel={accentHueLabel} />
       </LookField>
 
-      <LookField
-        field="logoHue"
-        label={t('logoHueLabel')}
-        hint={t('logoHueDescription')}
-        isGroup={true}
-        lock={logoHueLock}
-      >
-        <LogoHueField
-          accentHue={accentHue}
-          logoHue={logoHue}
-          onChange={(hue) => updateField('logoHue', hue)}
-          isLocked={logoHueLock.isLocked}
-          growthBadgeId={logoHueLock.growthBadgeId}
-          aria-describedby={logoHueLock.aria.describedBy}
-        />
-      </LookField>
+      <ButtonColorFields />
 
       <LookChoiceField
         field={LOOK_FIELD.COLOR_MODE}

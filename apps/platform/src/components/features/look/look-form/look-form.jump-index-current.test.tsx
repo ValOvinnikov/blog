@@ -85,9 +85,9 @@ describe(`<${LookForm.name}/>`, () => {
       });
 
       it('keeps the open row current while a folded row takes focus', async () => {
-        const languageSwitcher = lookRowTrigger(LOOK_ROW.LANGUAGE_SWITCHER);
+        const details = lookRowTrigger(LOOK_ROW.DETAILS);
 
-        act(() => languageSwitcher.focus());
+        act(() => details.focus());
 
         expect(rowLink(LOOK_ROW.FOOTER)).toHaveAttribute(
           ARIA_ATTRIBUTE.CURRENT,

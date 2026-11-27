@@ -82,18 +82,14 @@ describe(`<${LookForm.name}/> Growth badges on Free`, () => {
       setupLookForm(withLookPlan(TENANT_PLAN.FREE));
     });
 
-    it.each([
-      LOOK_ROW.TYPE,
-      LOOK_ROW.SHAPE,
-      LOOK_ROW.CARDS,
-      LOOK_ROW.BUTTONS,
-      LOOK_ROW.HEADER,
-      LOOK_ROW.LANGUAGE_SWITCHER,
-    ])('badges the folded %s row, every field of which is Growth', (row) => {
-      expect(growthRowBadge(row)).toBeVisible();
-    });
+    it.each([LOOK_ROW.TYPE, LOOK_ROW.SHAPE, LOOK_ROW.HEADER, LOOK_ROW.FOOTER])(
+      'badges the folded %s row, every field of which is Growth',
+      (row) => {
+        expect(growthRowBadge(row)).toBeVisible();
+      },
+    );
 
-    it.each([LOOK_ROW.COLOUR, LOOK_ROW.BRAND, LOOK_ROW.FOOTER])(
+    it.each([LOOK_ROW.BRAND, LOOK_ROW.COLOUR, LOOK_ROW.DETAILS])(
       'leaves the folded %s row unbadged, as it keeps a live field',
       (row) => {
         expect(growthRowBadge(row)).not.toBeInTheDocument();

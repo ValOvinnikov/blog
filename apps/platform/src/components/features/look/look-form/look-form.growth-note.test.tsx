@@ -65,13 +65,13 @@ describe(`<${LookForm.name}/> Growth note`, () => {
         const closing = screen.getByText(LOOK_FORM.growthAddsClosing);
 
         expect(links.map((link) => link.textContent)).toEqual([
+          `${LOOK_FORM.brandHeading}${LOOK_FORM.growthAddsBrand}`,
           `${LOOK_FORM.colourHeading}${LOOK_FORM.growthAddsColour}`,
           `${LOOK_FORM.typeHeading}${LOOK_FORM.growthAddsType}`,
           `${LOOK_FORM.shapeHeading}${LOOK_FORM.growthAddsShape}`,
-          `${LOOK_FORM.cardsHeading}${LOOK_FORM.growthAddsCards}`,
-          `${LOOK_FORM.buttonsHeading}${LOOK_FORM.growthAddsButtons}`,
           `${LOOK_FORM.headerHeading}${LOOK_FORM.growthAddsHeader}`,
           `${LOOK_FORM.footerHeading}${LOOK_FORM.growthAddsFooter}`,
+          `${LOOK_FORM.detailsHeading}${LOOK_FORM.growthAddsDetails}`,
         ]);
         expect(closing).toBeVisible();
       });

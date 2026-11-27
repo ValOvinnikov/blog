@@ -46,54 +46,65 @@ describe(`<${LookForm.name}/>`, () => {
       setupLookForm(withLookPlan(TENANT_PLAN.FREE));
     });
 
-    it('keeps a locked option focusable at its value and ignores a click', async () => {
-      await openLookRow(user, LOOK_ROW.SHAPE);
-      const radiusGroup = screen.getByRole('group', {
-        name: `${LOOK_FORM.radiusScaleLabel} ${GROWTH_BADGE_TEXT}`,
-      });
-      const extraLargeButton = within(radiusGroup).getByRole('button', {
-        name: EXTRA_LARGE,
+    describe('with Shapes and spacing open', () => {
+      beforeEach(async () => {
+        await openLookRow(user, LOOK_ROW.SHAPE);
       });
 
-      await user.click(extraLargeButton);
+      it('keeps a locked option focusable at its value and ignores a click', async () => {
+        const radiusGroup = screen.getByRole('group', {
+          name: `${LOOK_FORM.radiusScaleLabel} ${GROWTH_BADGE_TEXT}`,
+        });
+        const extraLargeButton = within(radiusGroup).getByRole('button', {
+          name: EXTRA_LARGE,
+        });
 
-      expect(radiusGroup).toHaveAccessibleDescription(GROWTH_BADGE_TEXT);
-      expect(extraLargeButton).toBeEnabled();
-      expect(extraLargeButton).toHaveAttribute(ARIA_ATTRIBUTE.DISABLED, 'true');
-      expect(extraLargeButton).toHaveAttribute(ARIA_ATTRIBUTE.PRESSED, 'false');
+        await user.click(extraLargeButton);
+
+        expect(radiusGroup).toHaveAccessibleDescription(GROWTH_BADGE_TEXT);
+        expect(extraLargeButton).toBeEnabled();
+        expect(extraLargeButton).toHaveAttribute(
+          ARIA_ATTRIBUTE.DISABLED,
+          'true',
+        );
+        expect(extraLargeButton).toHaveAttribute(
+          ARIA_ATTRIBUTE.PRESSED,
+          'false',
+        );
+      });
+
+      it('keeps the locked Card style tiles at the preset value while arrows move focus', async () => {
+        const tiles = screen.getByRole('radiogroup', {
+          name: `${LOOK_FORM.cardStyleLabel} ${GROWTH_BADGE_TEXT}`,
+        });
+        const accentBarTile = within(tiles).getByRole('radio', {
+          name: LOOK_FORM.cardStyleOptionLabel.ACCENT_BAR,
+        });
+        const outlinedTile = within(tiles).getByRole('radio', {
+          name: OUTLINED,
+        });
+
+        const filledTile = within(tiles).getByRole('radio', {
+          name: LOOK_FORM.cardStyleOptionLabel.FILLED,
+        });
+
+        await user.click(outlinedTile);
+        await user.keyboard(USER_EVENT_KEY.ARROW_RIGHT);
+
+        expect(filledTile).toHaveFocus();
+        expect(accentBarTile).toBeChecked();
+        expect(outlinedTile).toHaveAttribute(ARIA_ATTRIBUTE.DISABLED, 'true');
+        expect(tiles).toHaveAccessibleDescription(
+          `${GROWTH_BADGE_TEXT} ${LOOK_FORM.cardStyleOptionDescription.ACCENT_BAR} ${LOOK_FORM.cardStyleDescription}`,
+        );
+      });
     });
 
-    it('keeps the locked Card style tiles at the preset value while arrows move focus', async () => {
-      await openLookRow(user, LOOK_ROW.CARDS);
-      const tiles = screen.getByRole('radiogroup', {
-        name: `${LOOK_FORM.cardStyleLabel} ${GROWTH_BADGE_TEXT}`,
-      });
-      const accentBarTile = within(tiles).getByRole('radio', {
-        name: LOOK_FORM.cardStyleOptionLabel.ACCENT_BAR,
-      });
-      const outlinedTile = within(tiles).getByRole('radio', { name: OUTLINED });
-
-      const filledTile = within(tiles).getByRole('radio', {
-        name: LOOK_FORM.cardStyleOptionLabel.FILLED,
-      });
-
-      await user.click(outlinedTile);
-      await user.keyboard(USER_EVENT_KEY.ARROW_RIGHT);
-
-      expect(filledTile).toHaveFocus();
-      expect(accentBarTile).toBeChecked();
-      expect(outlinedTile).toHaveAttribute(ARIA_ATTRIBUTE.DISABLED, 'true');
-      expect(tiles).toHaveAccessibleDescription(
-        `${GROWTH_BADGE_TEXT} ${LOOK_FORM.cardStyleOptionDescription.ACCENT_BAR} ${LOOK_FORM.cardStyleDescription}`,
-      );
-    });
-
-    it('keeps the logo hue following the accent behind a locked switch', async () => {
-      await openLookRow(user, LOOK_ROW.COLOUR);
+    it('keeps the logo mark colour following the accent behind a locked switch', async () => {
+      await openLookRow(user, LOOK_ROW.BRAND);
       const followSwitch = screen.getByRole('switch', {
         name: `${FOLLOW_ACCENT_HUE} ${GROWTH_BADGE_TEXT}`,
       });
-      const accentSlider = screen.getByRole('slider', { name: ACCENT_HUE });
 
       await user.click(followSwitch);
 
@@ -108,11 +119,15 @@ describe(`<${LookForm.name}/>`, () => {
       );
       expect(readout).toBeVisible();
       expect(logoSlider).not.toBeInTheDocument();
+
+      await openLookRow(user, LOOK_ROW.COLOUR);
+      const accentSlider = screen.getByRole('slider', { name: ACCENT_HUE });
+
       expect(accentSlider).toBeEnabled();
     });
 
-    it('saves the cookie settings button, the one footer field Free keeps', async () => {
-      await openLookRow(user, LOOK_ROW.FOOTER);
+    it('saves the cookie settings button, the one Small details field Free keeps', async () => {
+      await openLookRow(user, LOOK_ROW.DETAILS);
       const cookieButtonGroup = screen.getByRole('group', {
         name: LOOK_FORM.cookieSettingsButtonLabel,
       });

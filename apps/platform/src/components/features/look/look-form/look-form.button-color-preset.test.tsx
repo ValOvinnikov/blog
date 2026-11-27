@@ -56,7 +56,7 @@ describe(`<${LookForm.name}/>`, () => {
 
   it('follows and previews the preset colour under Shinefold when none is saved', async () => {
     setupShinefold();
-    await openLookRow(user, LOOK_ROW.BUTTONS);
+    await openLookRow(user, LOOK_ROW.COLOUR);
 
     const presetSwitch = followSwitch(BUTTON_COLOR_FOLLOWS_PRESET);
     expect(presetSwitch).toBeChecked();
@@ -68,7 +68,7 @@ describe(`<${LookForm.name}/>`, () => {
   describe('under Shinefold with a saved colour', () => {
     beforeEach(async () => {
       setupShinefold(MOCK_PINK_HEX);
-      await openLookRow(user, LOOK_ROW.BUTTONS);
+      await openLookRow(user, LOOK_ROW.COLOUR);
     });
 
     it('saves no colour once it follows the preset again', async () => {

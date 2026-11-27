@@ -1,15 +1,13 @@
 import type { TValueOf } from '@shinefold/config/utils';
 
 export const LOOK_ROW = {
-  COLOUR: 'COLOUR',
   BRAND: 'BRAND',
+  COLOUR: 'COLOUR',
   TYPE: 'TYPE',
   SHAPE: 'SHAPE',
-  CARDS: 'CARDS',
-  BUTTONS: 'BUTTONS',
   HEADER: 'HEADER',
   FOOTER: 'FOOTER',
-  LANGUAGE_SWITCHER: 'LANGUAGE_SWITCHER',
+  DETAILS: 'DETAILS',
 } as const;
 
 export type TLookRow = TValueOf<typeof LOOK_ROW>;

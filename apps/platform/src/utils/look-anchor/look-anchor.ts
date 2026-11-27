@@ -1,15 +1,11 @@
 import { LOOK_CARD, type TLookCard } from '@platform/constants/look-card';
-import type { TLookGroup } from '@platform/constants/look-group';
 import { LOOK_LAYOUT_LIMIT } from '@platform/constants/look-layout';
 import { LOOK_CARDS } from '@platform/utils/look-open-rows/look-open-rows';
 import type { TMaybeUndefined } from '@shinefold/config';
 
-export type TLookAnchor = TLookCard | TLookGroup;
-
 export const LOOK_ANCHOR_CLASSES = 'scroll-mt-platform-form-gap';
 
-export const toLookAnchorId = (anchor: TLookAnchor) =>
-  `look-${anchor.toLowerCase()}`;
+export const toLookAnchorId = (card: TLookCard) => `look-${card.toLowerCase()}`;
 
 export const findLookCardContaining = (
   target: Node,
@@ -23,10 +19,10 @@ export const findTopmostLookCard = (belowY: number): TLookCard =>
     (card) =>
       (document.getElementById(toLookAnchorId(card))?.getBoundingClientRect()
         .bottom ?? -Infinity) >= belowY,
-  ) ?? LOOK_CARD.LANGUAGE_SWITCHER;
+  ) ?? LOOK_CARD.DETAILS;
 
-export const scrollToLookAnchor = (anchor: TLookAnchor) => {
-  const element = document.getElementById(toLookAnchorId(anchor));
+export const scrollToLookAnchor = (card: TLookCard) => {
+  const element = document.getElementById(toLookAnchorId(card));
   if (!element) return;
   const start = performance.now();
   const pin = () => {

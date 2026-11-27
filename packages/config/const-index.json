@@ -8892,12 +8892,6 @@
         "scope": "app:platform",
         "from": "@platform/constants/look-follow",
         "file": "apps/platform/src/constants/look-follow.ts"
-      },
-      {
-        "ref": "LOOK_GROUP.STYLE",
-        "scope": "app:platform",
-        "from": "@platform/constants/look-group",
-        "file": "apps/platform/src/constants/look-group.ts"
       }
     ],
     "PART": [
@@ -8964,22 +8958,6 @@
         "file": "apps/platform/src/constants/look-follow.ts"
       }
     ],
-    "SITE_PARTS": [
-      {
-        "ref": "LOOK_GROUP.SITE_PARTS",
-        "scope": "app:platform",
-        "from": "@platform/constants/look-group",
-        "file": "apps/platform/src/constants/look-group.ts"
-      }
-    ],
-    "COLOUR": [
-      {
-        "ref": "LOOK_ROW.COLOUR",
-        "scope": "app:platform",
-        "from": "@platform/constants/look-row",
-        "file": "apps/platform/src/constants/look-row.ts"
-      }
-    ],
     "BRAND": [
       {
         "ref": "LOOK_ROW.BRAND",
@@ -9000,6 +8978,14 @@
         "file": "apps/platform/src/constants/spinner.ts"
       }
     ],
+    "COLOUR": [
+      {
+        "ref": "LOOK_ROW.COLOUR",
+        "scope": "app:platform",
+        "from": "@platform/constants/look-row",
+        "file": "apps/platform/src/constants/look-row.ts"
+      }
+    ],
     "TYPE": [
       {
         "ref": "LOOK_ROW.TYPE",
@@ -9011,22 +8997,6 @@
     "SHAPE": [
       {
         "ref": "LOOK_ROW.SHAPE",
-        "scope": "app:platform",
-        "from": "@platform/constants/look-row",
-        "file": "apps/platform/src/constants/look-row.ts"
-      }
-    ],
-    "CARDS": [
-      {
-        "ref": "LOOK_ROW.CARDS",
-        "scope": "app:platform",
-        "from": "@platform/constants/look-row",
-        "file": "apps/platform/src/constants/look-row.ts"
-      }
-    ],
-    "BUTTONS": [
-      {
-        "ref": "LOOK_ROW.BUTTONS",
         "scope": "app:platform",
         "from": "@platform/constants/look-row",
         "file": "apps/platform/src/constants/look-row.ts"
@@ -9048,9 +9018,9 @@
         "file": "apps/platform/src/constants/look-row.ts"
       }
     ],
-    "LANGUAGE_SWITCHER": [
+    "DETAILS": [
       {
-        "ref": "LOOK_ROW.LANGUAGE_SWITCHER",
+        "ref": "LOOK_ROW.DETAILS",
         "scope": "app:platform",
         "from": "@platform/constants/look-row",
         "file": "apps/platform/src/constants/look-row.ts"
@@ -10061,6 +10031,22 @@
     "busy-button": [
       {
         "ref": "SAMPLE_PART.BUSY_BUTTON",
+        "scope": "app:platform",
+        "from": "@platform/constants/sample-part",
+        "file": "apps/platform/src/constants/sample-part.ts"
+      }
+    ],
+    "breadcrumbs": [
+      {
+        "ref": "SAMPLE_PART.BREADCRUMBS",
+        "scope": "app:platform",
+        "from": "@platform/constants/sample-part",
+        "file": "apps/platform/src/constants/sample-part.ts"
+      }
+    ],
+    "cookie-button": [
+      {
+        "ref": "SAMPLE_PART.COOKIE_BUTTON",
         "scope": "app:platform",
         "from": "@platform/constants/sample-part",
         "file": "apps/platform/src/constants/sample-part.ts"

@@ -13,8 +13,8 @@ type TCheckedValues = Pick<TLookFormValues, TCheckedField>;
 
 const CHECKED_ROWS = {
   accentHue: LOOK_ROW.COLOUR,
-  buttonColor: LOOK_ROW.BUTTONS,
-  buttonColorDark: LOOK_ROW.BUTTONS,
+  buttonColor: LOOK_ROW.COLOUR,
+  buttonColorDark: LOOK_ROW.COLOUR,
   brandName: LOOK_ROW.BRAND,
 } as const satisfies Record<TCheckedField, TLookRow>;
 

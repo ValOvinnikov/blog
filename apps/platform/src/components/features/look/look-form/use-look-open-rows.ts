@@ -13,7 +13,7 @@ import { useRef, useState, type RefCallback } from 'react';
 
 type TLookRowActions = TAccordionActions<TLookRow>;
 
-export type TLookRowsGroup = {
+export type TLookRowsAccordion = {
   openValues: readonly TLookRow[];
   onOpenValuesChange: (values: TLookRow[]) => void;
   actionsRef: RefCallback<TLookRowActions>;
@@ -23,25 +23,19 @@ export const useLookOpenRows = () => {
   const [openRows, setOpenRows] = useState<readonly TLookRow[]>([]);
   const [editedRow, setEditedRow] =
     useState<TMaybeUndefined<TLookRow>>(undefined);
-  const rowActions = useRef(new Map<TLookRow, TLookRowActions>());
+  const rowActions = useRef<TMaybeNull<TLookRowActions>>(null);
 
-  const groupProps = (groupRows: readonly TLookRow[]): TLookRowsGroup => ({
-    openValues: openRows.filter((row) => groupRows.includes(row)),
+  const rows: TLookRowsAccordion = {
+    openValues: openRows,
     onOpenValuesChange: (next) => {
       const opened = next.find((row) => !openRows.includes(row));
       if (opened) setEditedRow(opened);
-      setOpenRows((prev) => nextOpenRows(prev, groupRows, next));
+      setOpenRows((prev) => nextOpenRows(prev, next));
     },
     actionsRef: (actions: TMaybeNull<TLookRowActions>) => {
-      for (const row of groupRows) {
-        if (actions) {
-          rowActions.current.set(row, actions);
-        } else {
-          rowActions.current.delete(row);
-        }
-      }
+      rowActions.current = actions;
     },
-  });
+  };
 
   const revealRow = (row: TLookRow) =>
     setOpenRows((prev) => revealOpenRow(prev, row));
@@ -52,7 +46,7 @@ export const useLookOpenRows = () => {
       return;
     }
     setEditedRow(card);
-    rowActions.current.get(card)?.openRow(card, { focus: true });
+    rowActions.current?.openRow(card, { focus: true });
   };
 
   const engageCardAt = (target: Node) => {
@@ -76,5 +70,5 @@ export const useLookOpenRows = () => {
     onToggleAll: toggleAll,
   };
 
-  return { groupProps, revealRow, revealCard, engageCardAt, jumpIndex };
+  return { rows, revealRow, revealCard, engageCardAt, jumpIndex };
 };

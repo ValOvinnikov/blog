@@ -69,7 +69,7 @@ describe(`<${LookForm.name}/>`, () => {
     );
 
     it('saves the chosen Card style tile', async () => {
-      await openLookRow(user, LOOK_ROW.CARDS);
+      await openLookRow(user, LOOK_ROW.SHAPE);
       const outlinedTile = screen.getByRole('radio', { name: OUTLINED });
       await user.click(outlinedTile);
 

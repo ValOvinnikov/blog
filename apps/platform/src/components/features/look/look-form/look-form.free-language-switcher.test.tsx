@@ -2,13 +2,9 @@ import { ARIA_ATTRIBUTE } from '@platform/constants/aria-attribute';
 import { LOOK_ROW } from '@platform/constants/look-row';
 import messages from '@platform/i18n/messages/en.json';
 import { screen, within } from '@platform/testing/custom-render';
-import {
-  GROWTH,
-  GROWTH_BADGE_TEXT,
-} from '@platform/testing/look/look-form-fixtures';
+import { GROWTH_BADGE_TEXT } from '@platform/testing/look/look-form-fixtures';
 import {
   growthBadgesOutsideNote,
-  lookRowTrigger,
   openLookRow,
 } from '@platform/testing/look/look-form-interactions';
 import {
@@ -52,18 +48,8 @@ describe(`<${LookForm.name}/>`, () => {
       });
     });
 
-    it('folds to the published style and One language, with a Growth badge', () => {
-      const trigger = lookRowTrigger(LOOK_ROW.LANGUAGE_SWITCHER);
-      const badge = within(trigger).getByText(GROWTH, { exact: true });
-
-      expect(trigger).toHaveTextContent(
-        `${SWITCHER_OPTION.MENU_CODE} · ${LOOK_FORM.summaryOneLanguage}`,
-      );
-      expect(badge).toBeVisible();
-    });
-
-    it('says why the card is quiet and shows the style locked at Code, described below', async () => {
-      await openLookRow(user, LOOK_ROW.LANGUAGE_SWITCHER);
+    it('says why the style is quiet and shows it locked at Code, described below', async () => {
+      await openLookRow(user, LOOK_ROW.HEADER);
 
       const freeLine = screen.getByText(
         LOOK_FORM.languageSwitcherFreeDescription,
@@ -98,7 +84,7 @@ describe(`<${LookForm.name}/>`, () => {
       ...withLookPlan(TENANT_PLAN.FREE),
       liveLocales: [LOCALE_ISO_CODES.EN],
     });
-    await openLookRow(user, LOOK_ROW.LANGUAGE_SWITCHER);
+    await openLookRow(user, LOOK_ROW.HEADER);
 
     const freeLine = screen.getByText(
       LOOK_FORM.languageSwitcherFreeDescription,

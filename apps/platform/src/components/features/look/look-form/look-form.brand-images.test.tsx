@@ -72,19 +72,19 @@ describe(`<${LookForm.name}/>`, () => {
         expect(uploadBrandAssetAction).not.toHaveBeenCalled();
       });
 
-      it('marks only the logo field as unsaved, beside its optional tag', () => {
+      it('marks only the logo field as unsaved, with no optional tag', () => {
         const logoGroup = screen.getByRole('group', {
-          name: `${LOOK_FORM.logoFieldLabel} ${LOOK_FORM.optionalTag} ${LOOK_FORM.fieldUnsavedLabel}`,
+          name: `${LOOK_FORM.logoFieldLabel} ${LOOK_FORM.fieldUnsavedLabel}`,
         });
         const faviconGroup = screen.getByRole('group', {
-          name: `${LOOK_FORM.faviconFieldLabel} ${LOOK_FORM.optionalTag}`,
+          name: LOOK_FORM.faviconFieldLabel,
         });
 
         expect(logoGroup).toBeVisible();
         expect(faviconGroup).toBeVisible();
       });
 
-      it('keeps the optional tag and unsaved marker out of the label focus returns to', () => {
+      it('keeps the unsaved marker out of the label focus returns to', () => {
         const focusTargetTexts = screen
           .getAllByTestId(LOOK_FIELD_LABEL_TEST_ID)
           .map(({ textContent }) => textContent);
@@ -120,11 +120,35 @@ describe(`<${LookForm.name}/>`, () => {
         setupLookForm();
       });
 
-      it('offers an optional dark-mode logo with its hint', async () => {
+      it.each([
+        {
+          upload: messages.assetUploadField.logo.upload,
+          hint: LOOK_FORM.logoFieldHint,
+        },
+        {
+          upload: messages.assetUploadField.logoDark.upload,
+          hint: LOOK_FORM.logoDarkFieldHint,
+        },
+        {
+          upload: messages.assetUploadField.favicon.upload,
+          hint: LOOK_FORM.faviconFieldHint,
+        },
+      ])(
+        'describes the $upload button by its own hint',
+        async ({ upload, hint }) => {
+          await openLookRow(user, LOOK_ROW.BRAND);
+
+          const uploadButton = screen.getByRole('button', { name: upload });
+
+          expect(uploadButton).toHaveAccessibleDescription(hint);
+        },
+      );
+
+      it('offers a dark-mode logo with its hint', async () => {
         await openLookRow(user, LOOK_ROW.BRAND);
 
         const logoDarkGroup = screen.getByRole('group', {
-          name: `${LOOK_FORM.logoDarkFieldLabel} ${LOOK_FORM.optionalTag}`,
+          name: LOOK_FORM.logoDarkFieldLabel,
           description: LOOK_FORM.logoDarkFieldHint,
         });
         const uploadButton = within(logoDarkGroup).getByRole('button', {

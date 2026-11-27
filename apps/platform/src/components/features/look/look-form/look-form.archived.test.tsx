@@ -55,10 +55,10 @@ describe(`<${LookForm.name}/>`, () => {
         const editorialPreset = screen.getByRole('radio', { name: EDITORIAL });
         await openLookRow(user, LOOK_ROW.COLOUR);
         const hueSlider = screen.getByRole('slider', { name: ACCENT_HUE });
+        await openLookRow(user, LOOK_ROW.BRAND);
         const followSwitch = screen.getByRole('switch', {
           name: FOLLOW_ACCENT_HUE,
         });
-        await openLookRow(user, LOOK_ROW.BRAND);
         const uploadLogoButton = screen.getByRole('button', {
           name: UPLOAD_LOGO,
         });
@@ -133,7 +133,6 @@ describe(`<${LookForm.name}/>`, () => {
           name: EXTRA_LARGE,
         });
         const compactButton = screen.getByRole('button', { name: COMPACT });
-        await openLookRow(user, LOOK_ROW.CARDS);
         const cardStyleGroup = screen.getByRole('group', {
           name: LOOK_FORM.cardStyleLabel,
         });

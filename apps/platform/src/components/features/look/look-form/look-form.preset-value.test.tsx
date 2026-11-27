@@ -39,7 +39,7 @@ describe(`<${LookForm.name}/> Use preset value`, () => {
 
   it.each([
     {
-      row: LOOK_ROW.BUTTONS,
+      row: LOOK_ROW.SHAPE,
       label: LOOK_FORM.buttonShapeLabel,
       chosen: LOOK_FORM.buttonShapeOptionLabel.SQUARE,
       preset: LOOK_FORM.buttonShapeOptionLabel.ROUNDED,

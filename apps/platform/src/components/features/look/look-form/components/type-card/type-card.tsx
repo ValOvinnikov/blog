@@ -1,6 +1,6 @@
 import { LookCard } from '@platform/components/features/look/look-form/components/look-card';
 import { LookField } from '@platform/components/features/look/look-form/components/look-field';
-import { toLookLabelOptions } from '@platform/components/features/look/look-form/components/look-option-glyph';
+import { toLookGlyphOptions } from '@platform/components/features/look/look-form/components/look-option-glyph';
 import { LookPresetChoiceField } from '@platform/components/features/look/look-form/components/look-preset-choice-field';
 import { PresetValueButton } from '@platform/components/features/look/look-form/components/preset-value-button';
 import { useLookFieldLock } from '@platform/components/features/look/look-form/use-look-field-lock';
@@ -31,11 +31,15 @@ export const TypeCard = ({ summary }: TTypeCardProps) => {
 
   const headingFontLabel = t('headingFontLabel');
   const bodyFontLabel = t('bodyFontLabel');
-  const headingWeightOptions = toLookLabelOptions(HEADING_WEIGHT, (weight) =>
-    t(`headingWeightOptionLabel.${weight}`),
+  const headingWeightOptions = toLookGlyphOptions(
+    'headingWeight',
+    HEADING_WEIGHT,
+    (weight) => t(`headingWeightOptionLabel.${weight}`),
   );
-  const headingCaseOptions = toLookLabelOptions(HEADING_CASE, (headingCase) =>
-    t(`headingCaseOptionLabel.${headingCase}`),
+  const headingCaseOptions = toLookGlyphOptions(
+    'headingCase',
+    HEADING_CASE,
+    (headingCase) => t(`headingCaseOptionLabel.${headingCase}`),
   );
 
   return (

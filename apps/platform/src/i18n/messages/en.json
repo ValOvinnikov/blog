@@ -787,8 +787,8 @@
     "close": "Close"
   },
   "logoHueField": {
-    "followAccentHue": "Follow accent hue",
-    "logoHueAriaLabel": "Logo hue",
+    "followAccentHue": "Follow accent colour",
+    "logoHueAriaLabel": "Logo mark colour",
     "followsAccent": "follows accent",
     "hueValue": "hue {hue}°"
   },
@@ -799,17 +799,15 @@
   "lookForm": {
     "heading": "Look",
     "subtitle": "Theme this site. The preview shows your changes — nothing is live until you save.",
-    "styleGroupHeading": "Style",
-    "sitePartsGroupHeading": "Site parts",
     "viewTabsAriaLabel": "Look view",
     "jumpIndexAriaLabel": "Look sections",
-    "growthAddsColour": "A logo hue of its own, and a site locked to light or dark",
+    "growthAddsBrand": "A logo mark colour of its own",
+    "growthAddsColour": "Button colours, and a site locked to light or dark",
     "growthAddsType": "Fonts, heading weight and case",
-    "growthAddsShape": "Corners, spacing, image proportions and dividers",
-    "growthAddsCards": "Card style",
-    "growthAddsButtons": "Busy state and spinner",
-    "growthAddsHeader": "Layout, sub-menus, bar, header buttons and account controls",
-    "growthAddsFooter": "Layout, background and surface",
+    "growthAddsShape": "Corners, button shape, spacing, card style, image proportions and dividers",
+    "growthAddsHeader": "Layout, width, sub-menus, header buttons, the action button and account controls",
+    "growthAddsFooter": "Layout, background and width",
+    "growthAddsDetails": "Loading spinner, button while saving and breadcrumb background",
     "growthAddsClosing": "Growth also adds more languages (with a choice of language switcher style) and more site features.",
     "jumpIndexUnsaved": ", unsaved changes",
     "expandAll": "Expand all",
@@ -820,36 +818,36 @@
     "alertSuccess": "Look saved.",
     "alertError": "Couldn't save Look settings — try again.",
     "presetLabel": "Preset",
-    "presetDescription": "Sets accent hue, heading and body fonts, radius, and density.",
-    "accentHueLabel": "Accent hue",
+    "presetDescription": "A preset sets the starting value of most options on this page.",
+    "accentHueLabel": "Accent colour",
     "accentHueDescription": "Colours links, buttons and highlights across your site.",
     "accentHueInaccessible": "This hue doesn't keep body text readable on its tinted surfaces, so the site would replace it. Choose another hue.",
-    "logoHueLabel": "Logo hue",
-    "logoHueDescription": "Tints your wordmark. Follows the accent hue unless you choose another.",
-    "colorModeLabel": "Colour mode",
+    "logoHueLabel": "Logo mark colour",
+    "logoHueDescription": "Tints your wordmark. Follows the accent colour unless you choose another.",
+    "colorModeLabel": "Light and dark mode",
     "colorModeDescription": "Whether readers switch between light and dark, or the site always shows one.",
     "colorModeOptionLabel": {
       "READER": "Reader chooses",
       "LIGHT": "Always light",
       "DARK": "Always dark"
     },
-    "brandImagesDescription": "Images are used exactly as uploaded — nothing is resized or cropped.",
+    "brandImagesDescription": "Images are shown as you upload them, so crop and size them first.",
     "brandNameLabel": "Brand name",
-    "brandNameHint": "Your site's name. Leave it blank to use your account name.",
+    "brandNameHint": "Shown in your header, footer and emails. Empty uses the name you signed up with.",
     "brandNameTooLong": "Use {max} characters or fewer.",
     "brandNameUnset": "Account name",
     "logoFieldLabel": "Logo",
+    "logoFieldHint": "PNG, JPEG, WebP or SVG. Without one, your site shows its initial and name.",
     "logoDarkFieldLabel": "Logo for dark mode",
-    "logoDarkFieldHint": "Shown when a reader uses dark mode. Without it, the main logo is used.",
+    "logoDarkFieldHint": "Shown in dark mode. Without it, the main logo is used.",
     "faviconFieldLabel": "Favicon",
-    "brandFieldsHint": "Logo: PNG, JPEG, WebP or SVG. Favicon: a square image.",
-    "optionalTag": "optional",
+    "faviconFieldHint": "A square image, shown in the browser tab. Without one, the tab shows your initial on a tile in your logo mark colour.",
     "fieldUnsavedLabel": "Unsaved change",
     "headingFontLabel": "Heading font",
     "bodyFontLabel": "Body font",
-    "radiusScaleLabel": "Radius scale",
+    "radiusScaleLabel": "Corners",
     "radiusScaleDescription": "Rounds every card, panel, menu, table and image.",
-    "densityLabel": "Density",
+    "densityLabel": "Spacing",
     "densityDescription": "Spacing and control size.",
     "cardStyleLabel": "Card style",
     "cardStyleDescription": "Frames every content card: posts, topics, quotes, pricing, FAQ items and call-to-action boxes.",
@@ -887,7 +885,7 @@
       "CLASSIC": "Classic",
       "SQUARE": "Square"
     },
-    "dividerWidthLabel": "Section dividers",
+    "dividerWidthLabel": "Divider thickness",
     "dividerWidthDescription": "How thick the line is between sections that show a divider.",
     "dividerWidthOptionLabel": {
       "HAIRLINE": "Hairline",
@@ -907,7 +905,7 @@
       "RAISED": "A thin outline with a soft shadow",
       "PLAIN": "No frame; spacing separates the cards"
     },
-    "headerControlStyleLabel": "Header buttons",
+    "headerControlStyleLabel": "Header button style",
     "headerControlStyleDescription": "The language, theme, menu and Sign in buttons, at every screen size.",
     "headerControlStyleOptionLabel": {
       "OUTLINED": "Outlined",
@@ -919,7 +917,7 @@
       "SOFT": "A grey fill, no outline",
       "PLAIN": "No outline until hovered"
     },
-    "headerControlShapeLabel": "Header buttons shape",
+    "headerControlShapeLabel": "Header button shape",
     "headerControlShapeDescription": "The outline shape of the language, theme, menu and account buttons, and of the header action.",
     "headerControlShapeOptionLabel": {
       "ROUND": "Round",
@@ -931,26 +929,25 @@
       "ROUNDED": "Corners follow the site's Corners setting",
       "SQUARE": "Square corners"
     },
-    "headerActionStyleLabel": "Header action style",
+    "headerActionStyleLabel": "Action button style",
     "headerActionStyleDescription": "How the header's action link is drawn. Filled and Outlined take the button colour and shape.",
     "headerActionStyleOptionLabel": {
       "FILLED": "Filled",
       "OUTLINED": "Outlined",
       "PLAIN": "Plain link"
     },
-    "headerActionPhonePlacementLabel": "On phones",
+    "headerActionPhonePlacementLabel": "Action button on phones",
     "headerActionPhonePlacementDescription": "Where the header action sits on phones: in the bar beside the menu button, or at the top of the menu.",
     "headerActionPhonePlacementOptionLabel": {
       "BAR": "In the bar",
       "MENU": "At the top of the menu"
     },
-    "languageSwitcherLabel": "Language switcher",
-    "languageSwitcherStyleLabel": "Style",
+    "languageSwitcherStyleLabel": "Language switcher style",
     "languageSwitcherDescription": "How the language switcher looks on desktop, in the header and footer.",
-    "languageSwitcherSingleLanguage": "Add another language in Languages settings to choose a style.",
+    "languageSwitcherSingleLanguage": "Add another language in Languages settings to choose a language switcher style.",
     "languageSwitcherFreeDescription": "Your plan publishes one language. Upgrade to add languages and choose a switcher style.",
     "lockLineGrowthFields": "Fields marked Growth keep the {preset} preset's value.",
-    "lockLineTypeFonts": "On this plan, Type keeps the {preset} preset's fonts and heading style. Picking another preset changes them.",
+    "lockLineTypeFonts": "On this plan, Text keeps the {preset} preset's fonts and heading style. Picking another preset changes them.",
     "languageSwitcherOptionLabel": {
       "MENU_CODE": "Code",
       "MENU_GLOBE": "Globe",
@@ -961,16 +958,19 @@
       "MENU_GLOBE": "A globe icon opens the language menu",
       "CODES": "Language codes side by side, for a few languages"
     },
-    "colourHeading": "Colour",
-    "colourDescription": "Pick the accent hue and whether readers choose light or dark. Text stays readable either way.",
-    "typeHeading": "Type",
+    "colourHeading": "Colours",
+    "colourDescription": "Your accent colour, button colours, and whether readers choose light or dark. Text stays readable either way.",
+    "typeHeading": "Text",
     "typeDescription": "Each font is shown in its own face.",
-    "shapeHeading": "Corners & spacing",
-    "cardsHeading": "Cards",
-    "shapeDescription": "How round corners are and how much space surrounds things, across the site.",
-    "cardsDescription": "How content cards are framed across the site.",
+    "shapeHeading": "Shapes and spacing",
+    "shapeDescription": "How round corners are, how buttons and cards are shaped, and how much space surrounds things, across the site.",
     "headerHeading": "Header",
     "headerDescription": "How the top bar of your site is arranged and how its sub-menus open.",
+    "headerLayoutHeading": "Layout",
+    "headerLinksHeading": "Links",
+    "headerButtonsHeading": "Buttons",
+    "headerActionHeading": "Action button",
+    "headerAccountHeading": "Account",
     "headerLayoutLabel": "Layout",
     "headerLayoutDescription": "Where the logo, links and buttons sit on wide screens. Phones always get the bar with a menu button.",
     "headerPreviewDeviceNote": {
@@ -986,24 +986,24 @@
       "CENTRED_BRAND": "Centred brand",
       "MENU_BUTTON": "Menu button"
     },
-    "headerSubmenuStyleLabel": "Sub-menus",
+    "headerSubmenuStyleLabel": "Sub-menu style",
     "headerSubmenuStyleDescription": "How a link with sub-items opens on wide screens.",
     "headerSubmenuStyleOptionLabel": {
       "DROPDOWN": "Dropdown",
       "WIDE_PANEL": "Wide panel"
     },
-    "headerBarStyleLabel": "Bar",
+    "headerBarStyleLabel": "Width",
     "headerBarStyleDescription": "Whether the bar spans the page or floats above it as a card.",
     "headerBackgroundLabel": "Background",
     "headerBackgroundDescription": "The header's colour, and the colour of the menus and panels that open from it. Each follows the reader's light or dark theme.",
     "headerBackgroundDarkLogoNote": "Ink draws the header dark, so your logo needs a dark-mode version. Add one in Brand.",
     "breadcrumbBackgroundLabel": "Breadcrumb background",
-    "breadcrumbBackgroundDescription": "The colour of the breadcrumb row under the header, on posts, tags, topics and landing pages. Each follows the reader's light or dark theme.",
+    "breadcrumbBackgroundDescription": "The colour of the breadcrumb row under the header, on posts, tags, topics and landing pages. It shows on tablets and wider screens only, not on phones. Each follows the reader's light or dark theme.",
     "headerBarStyleOptionLabel": {
       "FULL_WIDTH": "Full width",
       "FLOATING": "Floating"
     },
-    "navLinkStyleLabel": "Navigation links",
+    "navLinkStyleLabel": "Current-link highlight",
     "navLinkStyleDescription": "How the menu marks the page you're on and the link under the pointer. Footer links are not affected.",
     "navLinkStyleGlyphWord": "Link",
     "navLinkStyleOptionLabel": {
@@ -1018,8 +1018,8 @@
       "SOFT": "A tinted background on hover and on the current page",
       "PILL": "A rounded outline on hover and on the current page"
     },
-    "accountButtonStyleLabel": "Account button",
-    "accountButtonStyleDescription": "The control readers sign in with and open their account from, on wide screens. Phones follow the “On phones, the account sits” setting below.",
+    "accountButtonStyleLabel": "Account button style",
+    "accountButtonStyleDescription": "The control readers sign in with and open their account from, on wide screens. Phones follow the “Account on phones” setting below.",
     "accountButtonStyleOptionLabel": {
       "PILL": "Pill with label",
       "CIRCLE": "Circle"
@@ -1031,16 +1031,13 @@
       "PROFILE": "Profile",
       "HUB": "Hub"
     },
-    "accountPhonePlacementLabel": "On phones, the account sits",
+    "accountPhonePlacementLabel": "Account on phones",
     "accountPhonePlacementDescription": "In the bar as a circle, or as the menu's last row.",
     "accountPhonePlacementOptionLabel": {
       "BAR": "In the bar",
       "MENU": "In the menu"
     },
-    "buttonsHeading": "Buttons",
-    "buttonsDescription": "How buttons are shaped and coloured, how they look while they work, and the spinner they show.",
-    "buttonsWhileWorkingHeading": "While working",
-    "buttonShapeLabel": "Shape",
+    "buttonShapeLabel": "Button shape",
     "buttonShapeDescription": "Corners of buttons and tags.",
     "buttonShapeOptionLabel": {
       "SQUARE": "Square",
@@ -1057,14 +1054,14 @@
     "buttonColorInvalid": "Enter a hex colour, like #1a73e8.",
     "buttonColorFaint": "Buttons are faint on {grounds}, so readers may miss them there.",
     "buttonColorFaintGround": "{skin} in {scheme, select, DARK {dark mode} other {light mode}}",
-    "busyButtonStyleLabel": "While busy",
+    "busyButtonStyleLabel": "Button while saving",
     "busyButtonStyleDescription": "What a button shows while it saves or sends. It keeps its place and stays full colour.",
     "busyButtonStyleOptionLabel": {
       "LABEL": "Busy label",
       "KEPT": "Label kept",
       "EDGE": "Progress edge"
     },
-    "spinnerStyleLabel": "Spinner",
+    "spinnerStyleLabel": "Loading spinner",
     "spinnerStyleDescription": "The spinner on your site's buttons and loading states.",
     "spinnerEdgeNote": "Busy buttons draw no spinner in this style. Toasts and loading states still use it.",
     "spinnerStyleOptionLabel": {
@@ -1074,8 +1071,10 @@
       "PULSE": "Pulse"
     },
     "footerHeading": "Footer",
-    "footerDescription": "How the bottom of your site is laid out, its background, and how readers reopen cookie settings.",
-    "footerLayoutLabel": "Footer layout",
+    "detailsHeading": "Small details",
+    "footerDescription": "How the bottom of your site is laid out, its background and its width.",
+    "detailsDescription": "How your site shows that it is busy, the breadcrumb row, and how readers reopen cookie settings.",
+    "footerLayoutLabel": "Layout",
     "footerLayoutDescription": "Where the brand, link groups and fine print sit. Compact shows no groups, about text or address.",
     "footerLayoutOptionLabel": {
       "COLUMNS": "Columns",
@@ -1091,13 +1090,13 @@
       "BRAND_PRIMARY": "Brand tint",
       "INK": "Ink"
     },
-    "footerSurfaceLabel": "Surface",
+    "footerSurfaceLabel": "Width",
     "footerSurfaceDescription": "Whether the footer spans the page or sits as a card.",
     "footerSurfaceOptionLabel": {
       "FULL_WIDTH": "Full width",
       "CARD": "Card"
     },
-    "cookieSettingsButtonLabel": "Cookie settings",
+    "cookieSettingsButtonLabel": "Cookie settings button",
     "cookieSettingsButtonDescription": "How readers reopen cookie settings after answering the cookie banner: a link in the footer, a round button in the bottom-left corner, or both.",
     "cookieSettingsButtonOptionLabel": {
       "HIDDEN": "Footer link",
@@ -1111,7 +1110,7 @@
     "brandImageUnchanged": "No new image",
     "summaryHue": "Hue {hue}",
     "summaryLogoFollowsAccent": "logo follows accent",
-    "summaryLogoHue": "Logo hue {hue}",
+    "summaryLogoHue": "Logo mark hue {hue}",
     "summaryLogoUploaded": "Logo uploaded",
     "summaryNoLogo": "No logo",
     "summaryLogoDarkUploaded": "Dark-mode logo uploaded",
@@ -1127,8 +1126,7 @@
       "FILLED": "Filled action",
       "OUTLINED": "Outlined action",
       "PLAIN": "Action as link"
-    },
-    "summaryOneLanguage": "One language"
+    }
   },
   "previewModeControl": {
     "modeLight": "Light",
@@ -1235,9 +1233,9 @@
     "topOfPage": "Top of page",
     "styleCard": "<strong>{card}</strong> changes the whole page, so the frame stays where it is.",
     "styleOutlined": "Outlined: what <strong>{card}</strong> changes.",
-    "idle": "Open a Site parts card and the frame scrolls to it.",
+    "idle": "Open the Header or Footer card and the frame scrolls to it.",
     "off": "Following is off. The frame stays where you leave it.",
-    "allOpen": "Every card is open. Focus a Site parts card and the frame scrolls to it.",
+    "allOpen": "Every card is open. Focus the Header or Footer card and the frame scrolls to it.",
     "freeSample": "The sample uses the {preset} preset's values, the ones this plan publishes."
   },
   "lookFullscreen": {

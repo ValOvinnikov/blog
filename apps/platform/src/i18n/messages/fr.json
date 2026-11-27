@@ -787,8 +787,8 @@
     "close": "Fermer"
   },
   "logoHueField": {
-    "followAccentHue": "Suivre la teinte d'accent",
-    "logoHueAriaLabel": "Teinte du logo",
+    "followAccentHue": "Suivre la couleur d’accent",
+    "logoHueAriaLabel": "Couleur du logo",
     "followsAccent": "suit l'accent",
     "hueValue": "teinte {hue}°"
   },
@@ -799,17 +799,15 @@
   "lookForm": {
     "heading": "Apparence",
     "subtitle": "Personnalisez ce site. L'aperçu montre vos modifications — rien n'est en ligne avant d'enregistrer.",
-    "styleGroupHeading": "Style",
-    "sitePartsGroupHeading": "Parties du site",
     "viewTabsAriaLabel": "Vue Look",
     "jumpIndexAriaLabel": "Sections de Look",
-    "growthAddsColour": "Une teinte de logo à part, et un site figé en clair ou en sombre",
+    "growthAddsBrand": "Une couleur de logo à part",
+    "growthAddsColour": "Des couleurs de boutons, et un site figé en clair ou en sombre",
     "growthAddsType": "Polices, graisse et casse des titres",
-    "growthAddsShape": "Coins, espacement, proportions des images et séparateurs",
-    "growthAddsCards": "Style de carte",
-    "growthAddsButtons": "État de chargement et indicateur de progression",
-    "growthAddsHeader": "Mise en page, sous-menus, barre, boutons d'en-tête et commandes du compte",
-    "growthAddsFooter": "Mise en page, arrière-plan et surface",
+    "growthAddsShape": "Coins, forme des boutons, espacement, style des cartes, proportions des images et séparateurs",
+    "growthAddsHeader": "Disposition, largeur, sous-menus, boutons d’en-tête, bouton d’action et commandes du compte",
+    "growthAddsFooter": "Disposition, arrière-plan et largeur",
+    "growthAddsDetails": "Indicateur de chargement, bouton pendant l’enregistrement et arrière-plan du fil d’Ariane",
     "growthAddsClosing": "Growth ajoute aussi d'autres langues (avec le choix du style du sélecteur de langue) et d'autres fonctionnalités du site.",
     "jumpIndexUnsaved": ", modifications non enregistrées",
     "expandAll": "Tout déplier",
@@ -820,36 +818,36 @@
     "alertSuccess": "Apparence enregistrée.",
     "alertError": "Impossible d'enregistrer les paramètres d'apparence — veuillez réessayer.",
     "presetLabel": "Préréglage",
-    "presetDescription": "Définit la teinte d'accent, les polices des titres et du texte, l'arrondi et la densité.",
-    "accentHueLabel": "Teinte d'accent",
+    "presetDescription": "Un préréglage fixe la valeur de départ de la plupart des options de cette page.",
+    "accentHueLabel": "Couleur d’accent",
     "accentHueDescription": "Colore les liens, les boutons et les mises en avant de tout le site.",
     "accentHueInaccessible": "Cette teinte ne garde pas le texte lisible sur ses surfaces teintées ; le site la remplacerait. Choisissez une autre teinte.",
-    "logoHueLabel": "Teinte du logo",
-    "logoHueDescription": "Colore le logotype. Suit la teinte d'accent si aucune autre n'est choisie.",
-    "colorModeLabel": "Mode de couleur",
+    "logoHueLabel": "Couleur du logo",
+    "logoHueDescription": "Colore le logotype. Suit la couleur d’accent si aucune autre n’est choisie.",
+    "colorModeLabel": "Mode clair et sombre",
     "colorModeDescription": "Les lecteurs choisissent entre clair et sombre, ou le site en affiche toujours un seul.",
     "colorModeOptionLabel": {
       "READER": "Au choix du lecteur",
       "LIGHT": "Toujours clair",
       "DARK": "Toujours sombre"
     },
-    "brandImagesDescription": "Les images sont utilisées telles quelles — rien n'est redimensionné ni recadré.",
+    "brandImagesDescription": "Les images sont affichées telles que vous les importez : recadrez-les et dimensionnez-les d’abord.",
     "brandNameLabel": "Nom de la marque",
-    "brandNameHint": "Le nom de votre site. Laissez vide pour utiliser le nom du compte.",
+    "brandNameHint": "Affiché dans l’en-tête, le pied de page et les e-mails. Vide, c’est le nom utilisé à l’inscription.",
     "brandNameTooLong": "Utilisez {max} caractères au maximum.",
     "brandNameUnset": "Nom du compte",
     "logoFieldLabel": "Logo",
+    "logoFieldHint": "PNG, JPEG, WebP ou SVG. Sans logo, votre site affiche son initiale et son nom.",
     "logoDarkFieldLabel": "Logo pour le mode sombre",
-    "logoDarkFieldHint": "Affiché quand le lecteur utilise le mode sombre. Sans lui, le logo principal est utilisé.",
+    "logoDarkFieldHint": "Affiché en mode sombre. Sans lui, le logo principal est utilisé.",
     "faviconFieldLabel": "Favicon",
-    "brandFieldsHint": "Logo : PNG, JPEG, WebP ou SVG. Favicon : une image carrée.",
-    "optionalTag": "facultatif",
+    "faviconFieldHint": "Une image carrée, affichée dans l’onglet du navigateur. Sans elle, l’onglet affiche votre initiale sur une tuile de la couleur du logo.",
     "fieldUnsavedLabel": "Modification non enregistrée",
     "headingFontLabel": "Police des titres",
     "bodyFontLabel": "Police du texte",
-    "radiusScaleLabel": "Échelle d'arrondi",
+    "radiusScaleLabel": "Coins",
     "radiusScaleDescription": "Arrondit chaque carte, panneau, menu, tableau et image.",
-    "densityLabel": "Densité",
+    "densityLabel": "Espacement",
     "densityDescription": "Espacement et taille des contrôles.",
     "cardStyleLabel": "Style de carte",
     "cardStyleDescription": "Encadre chaque carte de contenu : articles, thèmes, citations, tarifs, questions fréquentes et encadrés d'appel à l'action.",
@@ -887,7 +885,7 @@
       "CLASSIC": "Classique",
       "SQUARE": "Carré"
     },
-    "dividerWidthLabel": "Séparateurs de section",
+    "dividerWidthLabel": "Épaisseur des séparateurs",
     "dividerWidthDescription": "L'épaisseur du trait entre les sections qui affichent un séparateur.",
     "dividerWidthOptionLabel": {
       "HAIRLINE": "Fin",
@@ -907,7 +905,7 @@
       "RAISED": "Un contour fin avec une ombre douce",
       "PLAIN": "Sans cadre ; l’espacement sépare les cartes"
     },
-    "headerControlStyleLabel": "Boutons d'en-tête",
+    "headerControlStyleLabel": "Style des boutons d’en-tête",
     "headerControlStyleDescription": "Les boutons de langue, de thème, de menu et Se connecter, sur toutes les tailles d'écran.",
     "headerControlStyleOptionLabel": {
       "OUTLINED": "À contour",
@@ -919,7 +917,7 @@
       "SOFT": "Un fond gris, sans contour",
       "PLAIN": "Aucun contour avant le survol"
     },
-    "headerControlShapeLabel": "Forme des boutons d'en-tête",
+    "headerControlShapeLabel": "Forme des boutons d’en-tête",
     "headerControlShapeDescription": "La forme du contour des boutons de langue, de thème, de menu et de compte, ainsi que de l'action d'en-tête.",
     "headerControlShapeOptionLabel": {
       "ROUND": "Ronde",
@@ -931,26 +929,25 @@
       "ROUNDED": "Les coins suivent le réglage Coins du site",
       "SQUARE": "Coins carrés"
     },
-    "headerActionStyleLabel": "Style de l'action d'en-tête",
+    "headerActionStyleLabel": "Style du bouton d’action",
     "headerActionStyleDescription": "La façon dont le lien d'action de l'en-tête est dessiné. Plein et À contour reprennent la couleur et la forme des boutons.",
     "headerActionStyleOptionLabel": {
       "FILLED": "Plein",
       "OUTLINED": "À contour",
       "PLAIN": "Lien simple"
     },
-    "headerActionPhonePlacementLabel": "Sur téléphone",
+    "headerActionPhonePlacementLabel": "Bouton d’action sur téléphone",
     "headerActionPhonePlacementDescription": "Où se trouve l'action d'en-tête sur téléphone : dans la barre à côté du bouton de menu, ou tout en haut du menu.",
     "headerActionPhonePlacementOptionLabel": {
       "BAR": "Dans la barre",
       "MENU": "En haut du menu"
     },
-    "languageSwitcherLabel": "Sélecteur de langue",
-    "languageSwitcherStyleLabel": "Style",
+    "languageSwitcherStyleLabel": "Style du sélecteur de langue",
     "languageSwitcherDescription": "L'apparence du sélecteur de langue sur ordinateur, dans l'en-tête et le pied de page.",
-    "languageSwitcherSingleLanguage": "Ajoutez une autre langue dans Langues pour choisir un style.",
+    "languageSwitcherSingleLanguage": "Ajoutez une autre langue dans Langues pour choisir un style de sélecteur de langue.",
     "languageSwitcherFreeDescription": "Votre formule publie une seule langue. Passez à une formule supérieure pour ajouter des langues et choisir un style de sélecteur.",
     "lockLineGrowthFields": "Les champs marqués Growth gardent la valeur du préréglage {preset}.",
-    "lockLineTypeFonts": "Avec cette formule, Typographie garde les polices et le style des titres du préréglage {preset}. Choisir un autre préréglage les change.",
+    "lockLineTypeFonts": "Avec cette formule, Texte garde les polices et le style des titres du préréglage {preset}. Choisir un autre préréglage les change.",
     "languageSwitcherOptionLabel": {
       "MENU_CODE": "Code",
       "MENU_GLOBE": "Globe",
@@ -961,16 +958,19 @@
       "MENU_GLOBE": "Une icône de globe ouvre le menu des langues",
       "CODES": "Codes de langue côte à côte, pour quelques langues"
     },
-    "colourHeading": "Couleur",
-    "colourDescription": "Choisissez la teinte d'accent et si les lecteurs choisissent entre clair et sombre. Le texte reste lisible dans les deux cas.",
-    "typeHeading": "Typographie",
+    "colourHeading": "Couleurs",
+    "colourDescription": "Votre couleur d’accent, les couleurs des boutons et le choix laissé ou non aux lecteurs entre clair et sombre. Le texte reste lisible dans les deux cas.",
+    "typeHeading": "Texte",
     "typeDescription": "Chaque police s'affiche dans son propre style.",
-    "shapeHeading": "Coins et espacement",
-    "cardsHeading": "Cartes",
-    "shapeDescription": "L'arrondi des coins et l'espace autour des éléments, sur tout le site.",
-    "cardsDescription": "Comment les cartes de contenu sont encadrées sur tout le site.",
+    "shapeHeading": "Formes et espacement",
+    "shapeDescription": "L’arrondi des coins, la forme des boutons et des cartes, et l’espace autour des éléments, sur tout le site.",
     "headerHeading": "En-tête",
     "headerDescription": "Comment la barre du haut de votre site est organisée et comment ses sous-menus s’ouvrent.",
+    "headerLayoutHeading": "Disposition",
+    "headerLinksHeading": "Liens",
+    "headerButtonsHeading": "Boutons",
+    "headerActionHeading": "Bouton d’action",
+    "headerAccountHeading": "Compte",
     "headerLayoutLabel": "Disposition",
     "headerLayoutDescription": "Où se placent le logo, les liens et les boutons sur grand écran. Sur mobile, vous avez toujours la barre avec un bouton de menu.",
     "headerPreviewDeviceNote": {
@@ -986,24 +986,24 @@
       "CENTRED_BRAND": "Marque centrée",
       "MENU_BUTTON": "Bouton de menu"
     },
-    "headerSubmenuStyleLabel": "Sous-menus",
+    "headerSubmenuStyleLabel": "Style des sous-menus",
     "headerSubmenuStyleDescription": "Comment un lien avec des sous-éléments s’ouvre sur grand écran.",
     "headerSubmenuStyleOptionLabel": {
       "DROPDOWN": "Menu déroulant",
       "WIDE_PANEL": "Panneau large"
     },
-    "headerBarStyleLabel": "Barre",
+    "headerBarStyleLabel": "Largeur",
     "headerBarStyleDescription": "Si la barre occupe toute la largeur de la page ou flotte au-dessus comme une carte.",
     "headerBackgroundLabel": "Arrière-plan",
     "headerBackgroundDescription": "La couleur de l’en-tête et des menus et panneaux qui s’ouvrent depuis celui-ci. Chacune suit le thème clair ou sombre du lecteur.",
     "headerBackgroundDarkLogoNote": "Encre affiche l’en-tête en sombre : votre logo a donc besoin d’une version pour le mode sombre. Ajoutez-la dans Marque.",
     "breadcrumbBackgroundLabel": "Arrière-plan du fil d’Ariane",
-    "breadcrumbBackgroundDescription": "La couleur du fil d’Ariane sous l’en-tête, sur les articles, les étiquettes, les thèmes et les pages d’accueil. Chacune suit le thème clair ou sombre du lecteur.",
+    "breadcrumbBackgroundDescription": "La couleur du fil d’Ariane sous l’en-tête, sur les articles, les étiquettes, les thèmes et les pages d’accueil. Il ne s’affiche que sur tablette et sur les écrans plus larges, pas sur téléphone. Chacune suit le thème clair ou sombre du lecteur.",
     "headerBarStyleOptionLabel": {
       "FULL_WIDTH": "Pleine largeur",
       "FLOATING": "Flottante"
     },
-    "navLinkStyleLabel": "Liens de navigation",
+    "navLinkStyleLabel": "Mise en avant du lien actuel",
     "navLinkStyleDescription": "Comment le menu signale la page où vous êtes et le lien sous le pointeur. Les liens du pied de page ne changent pas.",
     "navLinkStyleGlyphWord": "Lien",
     "navLinkStyleOptionLabel": {
@@ -1018,8 +1018,8 @@
       "SOFT": "Un fond teinté au survol et sur la page actuelle",
       "PILL": "Un contour arrondi au survol et sur la page actuelle"
     },
-    "accountButtonStyleLabel": "Bouton du compte",
-    "accountButtonStyleDescription": "Le bouton avec lequel les lecteurs se connectent et ouvrent leur compte, sur grand écran. Les téléphones suivent le réglage « Sur téléphone, le compte se trouve » plus bas.",
+    "accountButtonStyleLabel": "Style du bouton du compte",
+    "accountButtonStyleDescription": "Le bouton avec lequel les lecteurs se connectent et ouvrent leur compte, sur grand écran. Les téléphones suivent le réglage « Compte sur téléphone » plus bas.",
     "accountButtonStyleOptionLabel": {
       "PILL": "Pastille avec libellé",
       "CIRCLE": "Cercle"
@@ -1031,16 +1031,13 @@
       "PROFILE": "Profil",
       "HUB": "Hub"
     },
-    "accountPhonePlacementLabel": "Sur téléphone, le compte se trouve",
+    "accountPhonePlacementLabel": "Compte sur téléphone",
     "accountPhonePlacementDescription": "Dans la barre sous forme de cercle, ou en dernière ligne du menu.",
     "accountPhonePlacementOptionLabel": {
       "BAR": "Dans la barre",
       "MENU": "Dans le menu"
     },
-    "buttonsHeading": "Boutons",
-    "buttonsDescription": "La forme et la couleur des boutons, leur aspect pendant qu'ils travaillent, et l'indicateur de chargement qu'ils affichent.",
-    "buttonsWhileWorkingHeading": "Pendant le travail",
-    "buttonShapeLabel": "Forme",
+    "buttonShapeLabel": "Forme des boutons",
     "buttonShapeDescription": "Coins des boutons et des étiquettes.",
     "buttonShapeOptionLabel": {
       "SQUARE": "Carrée",
@@ -1057,7 +1054,7 @@
     "buttonColorInvalid": "Saisissez une couleur hexadécimale, comme #1a73e8.",
     "buttonColorFaint": "Les boutons sont pâles sur {grounds}, les lecteurs risquent de ne pas les voir.",
     "buttonColorFaintGround": "{skin} en {scheme, select, DARK {mode sombre} other {mode clair}}",
-    "busyButtonStyleLabel": "Pendant le traitement",
+    "busyButtonStyleLabel": "Bouton pendant l’enregistrement",
     "busyButtonStyleDescription": "Ce qu'un bouton affiche pendant un enregistrement ou un envoi. Il garde sa place et ses couleurs pleines.",
     "busyButtonStyleOptionLabel": {
       "LABEL": "Libellé d'attente",
@@ -1074,8 +1071,10 @@
       "PULSE": "Pulsation"
     },
     "footerHeading": "Pied de page",
-    "footerDescription": "La disposition du bas de votre site, son arrière-plan et la façon dont les lecteurs rouvrent les paramètres des cookies.",
-    "footerLayoutLabel": "Disposition du pied de page",
+    "detailsHeading": "Petits détails",
+    "footerDescription": "La disposition du bas de votre site, son arrière-plan et sa largeur.",
+    "detailsDescription": "La façon dont votre site montre qu’il travaille, la ligne du fil d’Ariane et la façon dont les lecteurs rouvrent les paramètres des cookies.",
+    "footerLayoutLabel": "Disposition",
     "footerLayoutDescription": "L’emplacement de la marque, des groupes de liens et des mentions. Compact n’affiche ni groupes, ni texte de présentation, ni adresse.",
     "footerLayoutOptionLabel": {
       "COLUMNS": "Colonnes",
@@ -1091,13 +1090,13 @@
       "BRAND_PRIMARY": "Teinte de marque",
       "INK": "Encre"
     },
-    "footerSurfaceLabel": "Surface",
+    "footerSurfaceLabel": "Largeur",
     "footerSurfaceDescription": "Si le pied de page occupe toute la largeur ou s’affiche comme une carte.",
     "footerSurfaceOptionLabel": {
       "FULL_WIDTH": "Pleine largeur",
       "CARD": "Carte"
     },
-    "cookieSettingsButtonLabel": "Paramètres des cookies",
+    "cookieSettingsButtonLabel": "Bouton des paramètres des cookies",
     "cookieSettingsButtonDescription": "Comment les lecteurs rouvrent les paramètres des cookies après avoir répondu à la bannière des cookies : un lien dans le pied de page, un bouton rond dans le coin inférieur gauche, ou les deux.",
     "cookieSettingsButtonOptionLabel": {
       "HIDDEN": "Lien en pied de page",
@@ -1127,8 +1126,7 @@
       "FILLED": "Action pleine",
       "OUTLINED": "Action à contour",
       "PLAIN": "Action en lien"
-    },
-    "summaryOneLanguage": "Une seule langue"
+    }
   },
   "previewModeControl": {
     "modeLight": "Clair",
@@ -1235,9 +1233,9 @@
     "topOfPage": "Haut de page",
     "styleCard": "<strong>{card}</strong> modifie toute la page, le cadre reste donc où il est.",
     "styleOutlined": "Encadré : ce que modifie <strong>{card}</strong>.",
-    "idle": "Ouvrez une carte des Parties du site et le cadre défile jusqu’à elle.",
+    "idle": "Ouvrez la carte En-tête ou Pied de page et le cadre défile jusqu’à cette partie.",
     "off": "Le suivi est désactivé. Le cadre reste où vous le laissez.",
-    "allOpen": "Toutes les cartes sont ouvertes. Placez le focus sur une carte des Parties du site et le cadre défile jusqu’à elle.",
+    "allOpen": "Toutes les cartes sont ouvertes. Placez le focus sur la carte En-tête ou Pied de page et le cadre défile jusqu’à cette partie.",
     "freeSample": "L'aperçu utilise les valeurs du préréglage {preset}, celles que cette formule publie."
   },
   "lookFullscreen": {

@@ -3,18 +3,16 @@ import type { TLookCard } from '@platform/constants/look-card';
 import { LOOK_FOLLOW_TARGET } from '@platform/constants/look-follow';
 import { LOOK_ROW, type TLookRow } from '@platform/constants/look-row';
 import { SAMPLE_PART, type TSamplePart } from '@platform/constants/sample-part';
-import {
-  SITE_PARTS_ROWS,
-  type STYLE_ROWS,
-} from '@platform/utils/look-open-rows/look-open-rows';
 import type { TMaybeUndefined } from '@shinefold/config';
 import {
   hasArrayGotItems,
   hasArrayGotMultipleItems,
 } from '@shinefold/utils/primitives';
 
+const SITE_PARTS_ROWS = [LOOK_ROW.HEADER, LOOK_ROW.FOOTER] as const;
+
 type TSitePartsRow = (typeof SITE_PARTS_ROWS)[number];
-type TStyleRow = (typeof STYLE_ROWS)[number];
+type TStyleRow = Exclude<TLookRow, TSitePartsRow>;
 
 export type TLookFollowTarget =
   | { kind: typeof LOOK_FOLLOW_TARGET.IDLE }
@@ -35,13 +33,11 @@ export type TLookFollowOutline = {
 const LOOK_FOLLOW_PART = {
   [LOOK_ROW.HEADER]: SAMPLE_PART.HEADER,
   [LOOK_ROW.FOOTER]: SAMPLE_PART.FOOTER,
-  [LOOK_ROW.LANGUAGE_SWITCHER]: SAMPLE_PART.HEADER,
 } as const satisfies Record<TSitePartsRow, TSamplePart>;
 
 export const LOOK_FOLLOW_SCROLL = {
   [LOOK_ROW.HEADER]: DEVICE_FRAME_SCROLL_TARGET.TOP,
   [LOOK_ROW.FOOTER]: DEVICE_FRAME_SCROLL_TARGET.END,
-  [LOOK_ROW.LANGUAGE_SWITCHER]: DEVICE_FRAME_SCROLL_TARGET.TOP,
 } as const satisfies Record<TSitePartsRow, string>;
 
 const CARD_SURFACE_PARTS = [
@@ -52,15 +48,19 @@ const CARD_SURFACE_PARTS = [
 ] as const;
 
 const LOOK_STYLE_REACH = {
-  [LOOK_ROW.COLOUR]: [],
   [LOOK_ROW.BRAND]: [SAMPLE_PART.BRAND],
+  [LOOK_ROW.COLOUR]: [],
   [LOOK_ROW.TYPE]: [],
-  [LOOK_ROW.SHAPE]: [...CARD_SURFACE_PARTS, SAMPLE_PART.POST_IMAGE],
-  [LOOK_ROW.CARDS]: CARD_SURFACE_PARTS,
-  [LOOK_ROW.BUTTONS]: [
+  [LOOK_ROW.SHAPE]: [
+    ...CARD_SURFACE_PARTS,
+    SAMPLE_PART.POST_IMAGE,
     SAMPLE_PART.BUTTON,
-    SAMPLE_PART.BUSY_BUTTON,
     SAMPLE_PART.FORM_FIELD,
+  ],
+  [LOOK_ROW.DETAILS]: [
+    SAMPLE_PART.BUSY_BUTTON,
+    SAMPLE_PART.BREADCRUMBS,
+    SAMPLE_PART.COOKIE_BUTTON,
   ],
 } as const satisfies Record<TStyleRow, readonly TSamplePart[]>;
 
@@ -100,4 +100,7 @@ export const toLookFollowOutline = (
 };
 
 export const toLookFollowKey = (target: TLookFollowTarget) =>
-  'row' in target ? `${target.kind}:${target.row}` : target.kind;
+  target.kind === LOOK_FOLLOW_TARGET.PART ||
+  target.kind === LOOK_FOLLOW_TARGET.STYLE
+    ? `${target.kind}:${target.row}`
+    : target.kind;

@@ -13,10 +13,6 @@ import { VIEW_TABS_VARIANT } from '@platform/constants/view-tabs';
 import type { TLookFormValues } from '@platform/utils/default-look-values/default-look-values';
 import { toLookFollowTarget } from '@platform/utils/look-follow-target/look-follow-target';
 import { buildLookRowSummaries } from '@platform/utils/look-form-values/look-row-summaries';
-import {
-  SITE_PARTS_ROWS,
-  STYLE_ROWS,
-} from '@platform/utils/look-open-rows/look-open-rows';
 import { useElementSize } from '@platform/utils/use-element-size/use-element-size';
 import type { TLocaleIsoCode } from '@shinefold/config';
 import { LOOK_FIELD } from '@shinefold/db/constants';
@@ -68,7 +64,7 @@ export const LookForm = ({
   });
   const t = useTranslations('lookForm');
   const hasMultipleLanguages = hasArrayGotMultipleItems(liveLocales);
-  const { groupProps, revealRow, revealCard, engageCardAt, jumpIndex } =
+  const { rows, revealRow, revealCard, engageCardAt, jumpIndex } =
     useLookOpenRows();
   const { lookForm, isPending, form, errorTitle } = useLookFormState({
     tenant,
@@ -113,8 +109,7 @@ export const LookForm = ({
               className={editPanel({ isActive: view === 'edit' })}
             >
               <LookEditCards
-                styleGroup={groupProps(STYLE_ROWS)}
-                sitePartsGroup={groupProps(SITE_PARTS_ROWS)}
+                rows={rows}
                 hasCookieBanner={hasCookieBanner}
                 hasMultipleLanguages={hasMultipleLanguages}
                 hasGrowthNote={lookForm.hasLockedFields && !isOperator}

@@ -11,20 +11,20 @@ import { CARD_FIELDS } from '@platform/utils/look-form-values/look-form-values';
 import { FOOTER_LAYOUT, FOOTER_SURFACE } from '@shinefold/config';
 import { useTranslations } from 'next-intl';
 
-import { CookieSettingsButtonField } from './components/cookie-settings-button-field/cookie-settings-button-field';
 import { FooterPoweredByNote } from './components/footer-powered-by-note';
 
 export type TFooterCardProps = {
-  hasCookieBanner: boolean;
   summary: string;
 };
 
-export const FooterCard = ({ hasCookieBanner, summary }: TFooterCardProps) => {
+export const FooterCard = ({ summary }: TFooterCardProps) => {
   const {
     values: { accentHue },
   } = useLookForm();
   const t = useTranslations('lookForm');
-  const { lockLine } = useLookRowLock(CARD_FIELDS[LOOK_ROW.FOOTER]);
+  const { lockLine, hasGrowthBadge } = useLookRowLock(
+    CARD_FIELDS[LOOK_ROW.FOOTER],
+  );
 
   const layoutOptions = toLookGlyphOptions(
     'footerLayout',
@@ -46,6 +46,7 @@ export const FooterCard = ({ hasCookieBanner, summary }: TFooterCardProps) => {
       card={LOOK_ROW.FOOTER}
       description={t('footerDescription')}
       lockLine={lockLine}
+      hasGrowthBadge={hasGrowthBadge}
     >
       <LookChoiceField
         field="footerLayout"
@@ -68,7 +69,6 @@ export const FooterCard = ({ hasCookieBanner, summary }: TFooterCardProps) => {
         options={surfaceOptions}
       />
 
-      <CookieSettingsButtonField hasCookieBanner={hasCookieBanner} />
       <FooterPoweredByNote />
     </LookCard>
   );

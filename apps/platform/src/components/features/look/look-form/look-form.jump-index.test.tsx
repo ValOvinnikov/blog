@@ -45,22 +45,18 @@ describe(`<${LookForm.name}/>`, () => {
       setupLookForm();
     });
 
-    it('lists Preset, both groups and every card in page order', () => {
+    it('lists Preset and every card in page order', () => {
       const links = within(jumpIndex()).getAllByRole('link');
 
       expect(links.map((link) => link.textContent)).toEqual([
         LOOK_FORM.presetLabel,
-        LOOK_FORM.styleGroupHeading,
-        LOOK_FORM.colourHeading,
         LOOK_FORM.brandHeading,
+        LOOK_FORM.colourHeading,
         LOOK_FORM.typeHeading,
         LOOK_FORM.shapeHeading,
-        LOOK_FORM.cardsHeading,
-        LOOK_FORM.buttonsHeading,
-        LOOK_FORM.sitePartsGroupHeading,
         LOOK_FORM.headerHeading,
         LOOK_FORM.footerHeading,
-        LOOK_FORM.languageSwitcherLabel,
+        LOOK_FORM.detailsHeading,
       ]);
     });
 
@@ -102,20 +98,6 @@ describe(`<${LookForm.name}/>`, () => {
       expect(colour).toHaveAttribute(ARIA_ATTRIBUTE.EXPANDED, 'false');
     });
 
-    it('scrolls to a group from its link', async () => {
-      const scrollIntoView = vi.spyOn(Element.prototype, 'scrollIntoView');
-      const styleLink = cardLink(LOOK_FORM.styleGroupHeading);
-
-      await user.click(styleLink);
-
-      const styleGroup = screen.getByRole('region', {
-        name: LOOK_FORM.styleGroupHeading,
-      });
-      await waitFor(() =>
-        expect(scrollIntoView.mock.contexts).toContain(styleGroup),
-      );
-    });
-
     it('names a card with unsaved changes', async () => {
       await nudgeAccentHue(user);
 
@@ -131,16 +113,12 @@ describe(`<${LookForm.name}/>`, () => {
       setupLookForm();
     });
 
-    it('shows the groups as labels, not links, and offers no Expand all', () => {
+    it('offers no Expand all', () => {
       const index = jumpIndex();
-      const groupLink = within(index).queryByRole('link', {
-        name: LOOK_FORM.styleGroupHeading,
-      });
       const expandAll = within(index).queryByRole('button', {
         name: LOOK_FORM.expandAll,
       });
 
-      expect(groupLink).not.toBeInTheDocument();
       expect(expandAll).not.toBeInTheDocument();
     });
 

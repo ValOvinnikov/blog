@@ -707,17 +707,13 @@ Every key/value const an agent should reuse before writing a literal. The
 
 - **LOOK_FULLSCREEN**: `SCROLL_STEP`=`40`
 
-### `@platform/constants/look-group` — `apps/platform/src/constants/look-group.ts`
-
-- **LOOK_GROUP**: `STYLE`, `SITE_PARTS`
-
 ### `@platform/constants/look-layout` — `apps/platform/src/constants/look-layout.ts`
 
 - **LOOK_LAYOUT_LIMIT**: `TWO_COLUMN_MIN_WIDTH`=`900`, `DOCKED_SAVE_BAR_HEIGHT`=`64`, `DOCKED_SAVE_BAR_CLEARANCE`=`16`, `ANCHOR_SETTLE_MS`=`400`
 
 ### `@platform/constants/look-row` — `apps/platform/src/constants/look-row.ts`
 
-- **LOOK_ROW**: `COLOUR`, `BRAND`, `TYPE`, `SHAPE`, `CARDS`, `BUTTONS`, `HEADER`, `FOOTER`, `LANGUAGE_SWITCHER`
+- **LOOK_ROW**: `BRAND`, `COLOUR`, `TYPE`, `SHAPE`, `HEADER`, `FOOTER`, `DETAILS`
 
 ### `@platform/constants/look-sample` — `apps/platform/src/constants/look-sample.ts`
 
@@ -817,7 +813,7 @@ Every key/value const an agent should reuse before writing a literal. The
 
 ### `@platform/constants/sample-part` — `apps/platform/src/constants/sample-part.ts`
 
-- **SAMPLE_PART**: `HEADER`=`"header"`, `FOOTER`=`"footer"`, `BRAND`=`"brand"`, `POST_CARD`=`"post-card"`, `POST_IMAGE`=`"post-image"`, `FAQ_ITEM`=`"faq-item"`, `FORM_FIELD`=`"form-field"`, `QUOTE_CARD`=`"quote-card"`, `CTA_BOX`=`"cta-box"`, `BUTTON`=`"button"`, `BUSY_BUTTON`=`"busy-button"`
+- **SAMPLE_PART**: `HEADER`=`"header"`, `FOOTER`=`"footer"`, `BRAND`=`"brand"`, `POST_CARD`=`"post-card"`, `POST_IMAGE`=`"post-image"`, `FAQ_ITEM`=`"faq-item"`, `FORM_FIELD`=`"form-field"`, `QUOTE_CARD`=`"quote-card"`, `CTA_BOX`=`"cta-box"`, `BUTTON`=`"button"`, `BUSY_BUTTON`=`"busy-button"`, `BREADCRUMBS`=`"breadcrumbs"`, `COOKIE_BUTTON`=`"cookie-button"`
 
 ### `@platform/constants/segmented-control` — `apps/platform/src/constants/segmented-control.ts`
 

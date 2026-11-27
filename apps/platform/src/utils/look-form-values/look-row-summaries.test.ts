@@ -60,25 +60,27 @@ const seedValues = () => ({
   accountButtonStyle: ACCOUNT_BUTTON_STYLE.PILL,
   footerLayout: FOOTER_LAYOUT.COLUMNS,
   footerBackground: BRAND_VARIANT.BRAND_PRIMARY,
+  breadcrumbBackground: BRAND_VARIANT.PRIMARY,
   footerSurface: FOOTER_SURFACE.FULL_WIDTH,
   cookieSettingsButton: COOKIE_SETTINGS_BUTTON.SHOWN,
   languageSwitcherStyle: LANGUAGE_SWITCHER_STYLE.MENU_GLOBE,
 });
 
+const HEADER_LEAD = 'Classic · Full width · Dropdown';
+const HEADER_TAIL = 'Filled action · Pill with label';
+
 describe(buildLookRowSummaries, () => {
   it('summarises every row of the seeded look in its drawn order', () => {
     expect(buildLookRowSummaries(seedValues(), t, MULTIPLE_LANGUAGES)).toEqual({
-      [LOOK_ROW.COLOUR]: 'Hue 192 · logo follows accent · Reader chooses',
-      [LOOK_ROW.BRAND]: 'Logo uploaded · No dark-mode logo · No favicon',
+      [LOOK_ROW.BRAND]:
+        'Logo uploaded · No dark-mode logo · logo follows accent · No favicon',
+      [LOOK_ROW.COLOUR]: 'Hue 192 · Reader chooses',
       [LOOK_ROW.TYPE]: 'Fraunces · Inter',
-      [LOOK_ROW.SHAPE]: 'Medium · Comfortable',
-      [LOOK_ROW.CARDS]: 'Accent bar',
-      [LOOK_ROW.BUTTONS]: 'Rounded · Busy label · Braille',
-      [LOOK_ROW.HEADER]:
-        'Classic · Full width · Dropdown · Plain · Outlined · Filled action · Pill with label',
-      [LOOK_ROW.FOOTER]:
-        'Columns · Brand tint · Full width · Cookie link and button',
-      [LOOK_ROW.LANGUAGE_SWITCHER]: 'Globe',
+      [LOOK_ROW.SHAPE]: 'Medium · Rounded · Comfortable · Accent bar',
+      [LOOK_ROW.HEADER]: `${HEADER_LEAD} · Plain · Outlined · Globe · ${HEADER_TAIL}`,
+      [LOOK_ROW.FOOTER]: 'Columns · Brand tint · Full width',
+      [LOOK_ROW.DETAILS]:
+        'Braille · Busy label · Plain · Cookie link and button',
     });
   });
 
@@ -87,8 +89,8 @@ describe(buildLookRowSummaries, () => {
 
     const summaries = buildLookRowSummaries(values, t, MULTIPLE_LANGUAGES);
 
-    expect(summaries[LOOK_ROW.COLOUR]).toBe(
-      'Hue 192 · Logo hue 40 · Reader chooses',
+    expect(summaries[LOOK_ROW.BRAND]).toBe(
+      'Logo uploaded · No dark-mode logo · Logo mark hue 40 · No favicon',
     );
   });
 
@@ -99,12 +101,14 @@ describe(buildLookRowSummaries, () => {
         logo: { url: undefined },
         favicon: { url: MOCK_FAVICON_URL },
       },
-      summary: 'No logo · No dark-mode logo · Favicon uploaded',
+      summary:
+        'No logo · No dark-mode logo · logo follows accent · Favicon uploaded',
     },
     {
       images: 'an uploaded dark-mode logo',
       overrides: { logoDark: { url: MOCK_LOGO_DARK_URL } },
-      summary: 'Logo uploaded · Dark-mode logo uploaded · No favicon',
+      summary:
+        'Logo uploaded · Dark-mode logo uploaded · logo follows accent · No favicon',
     },
   ])('reads $images', ({ overrides, summary }) => {
     const values = { ...seedValues(), ...overrides };
@@ -122,29 +126,31 @@ describe(buildLookRowSummaries, () => {
 
     const summaries = buildLookRowSummaries(values, t, MULTIPLE_LANGUAGES);
 
-    expect(summaries[LOOK_ROW.BUTTONS]).toBe(
-      'Rounded · Progress edge · Braille',
+    expect(summaries[LOOK_ROW.DETAILS]).toBe(
+      'Braille · Progress edge · Plain · Cookie link and button',
     );
   });
 
   it.each([
     [BUTTON_SHAPE.SQUARE, 'Square'],
     [BUTTON_SHAPE.PILL, 'Pill'],
-  ])('leads the Buttons row with the %s shape', (buttonShape, reads) => {
+  ])('names the %s button shape after the corners', (buttonShape, reads) => {
     const values = { ...seedValues(), buttonShape };
 
     const summaries = buildLookRowSummaries(values, t, MULTIPLE_LANGUAGES);
 
-    expect(summaries[LOOK_ROW.BUTTONS]).toBe(`${reads} · Busy label · Braille`);
+    expect(summaries[LOOK_ROW.SHAPE]).toBe(
+      `Medium · ${reads} · Comfortable · Accent bar`,
+    );
   });
 
-  it('puts the navigation link style after the sub-menu style', () => {
+  it('puts the current-link highlight after the sub-menu style', () => {
     const values = { ...seedValues(), navLinkStyle: NAV_LINK_STYLE.UNDERLINE };
 
     const summaries = buildLookRowSummaries(values, t, MULTIPLE_LANGUAGES);
 
     expect(summaries[LOOK_ROW.HEADER]).toBe(
-      'Classic · Full width · Dropdown · Underline · Outlined · Filled action · Pill with label',
+      `${HEADER_LEAD} · Underline · Outlined · Globe · ${HEADER_TAIL}`,
     );
   });
 
@@ -157,7 +163,7 @@ describe(buildLookRowSummaries, () => {
     const summaries = buildLookRowSummaries(values, t, MULTIPLE_LANGUAGES);
 
     expect(summaries[LOOK_ROW.HEADER]).toBe(
-      `Classic · Full width · Dropdown · Plain · Outlined · ${reads} · Pill with label`,
+      `${HEADER_LEAD} · Plain · Outlined · Globe · ${reads} · Pill with label`,
     );
   });
 
@@ -169,16 +175,18 @@ describe(buildLookRowSummaries, () => {
 
     const summaries = buildLookRowSummaries(values, t, MULTIPLE_LANGUAGES);
 
-    expect(summaries[LOOK_ROW.FOOTER]).toBe(
-      `Columns · Brand tint · Full width · ${reads}`,
+    expect(summaries[LOOK_ROW.DETAILS]).toBe(
+      `Braille · Busy label · Plain · ${reads}`,
     );
   });
 
-  it('adds One language to the language switcher on a one-language site', () => {
+  it('leaves the language switcher out of the header on a one-language site', () => {
     const summaries = buildLookRowSummaries(seedValues(), t, {
       hasMultipleLanguages: false,
     });
 
-    expect(summaries[LOOK_ROW.LANGUAGE_SWITCHER]).toBe('Globe · One language');
+    expect(summaries[LOOK_ROW.HEADER]).toBe(
+      `${HEADER_LEAD} · Plain · Outlined · ${HEADER_TAIL}`,
+    );
   });
 });

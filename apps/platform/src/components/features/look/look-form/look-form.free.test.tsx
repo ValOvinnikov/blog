@@ -48,12 +48,12 @@ describe(`<${LookForm.name}/>`, () => {
     });
 
     it.each([
+      LOOK_ROW.BRAND,
       LOOK_ROW.COLOUR,
       LOOK_ROW.SHAPE,
-      LOOK_ROW.CARDS,
-      LOOK_ROW.BUTTONS,
       LOOK_ROW.HEADER,
       LOOK_ROW.FOOTER,
+      LOOK_ROW.DETAILS,
     ])('says what the Growth fields of an open %s row keep', async (row) => {
       await openLookRow(user, row);
 
@@ -65,7 +65,7 @@ describe(`<${LookForm.name}/>`, () => {
       expect(lockLine).toBeVisible();
     });
 
-    it('says Type keeps the preset fonts and shows them locked', async () => {
+    it('says Text keeps the preset fonts and shows them locked', async () => {
       await openLookRow(user, LOOK_ROW.TYPE);
 
       const typeCard = screen.getByRole('group', {

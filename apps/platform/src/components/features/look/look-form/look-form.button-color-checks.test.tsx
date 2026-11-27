@@ -42,7 +42,7 @@ describe(`<${LookForm.name}/>`, () => {
   beforeEach(async () => {
     user = userEvent.setup();
     setupLookForm();
-    await openLookRow(user, LOOK_ROW.BUTTONS);
+    await openLookRow(user, LOOK_ROW.COLOUR);
   });
 
   describe('with a colour that is not a hex colour', () => {

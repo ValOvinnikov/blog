@@ -57,7 +57,7 @@ export const useLookDraftFields = () => {
     ...footerDraftFields,
     {
       id: 'languageSwitcherStyle',
-      label: t('languageSwitcherLabel'),
+      label: t('languageSwitcherStyleLabel'),
       display: ({ languageSwitcherStyle }: TLookFormValues) =>
         t(`languageSwitcherOptionLabel.${languageSwitcherStyle}`),
     },

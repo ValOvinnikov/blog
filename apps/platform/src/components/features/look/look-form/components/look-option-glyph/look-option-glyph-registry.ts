@@ -11,11 +11,16 @@ import BusyButtonStyleLabel from '@platform/assets/look-glyphs/busy-button-style
 import ButtonShapePill from '@platform/assets/look-glyphs/button-shape-pill.svg';
 import ButtonShapeRounded from '@platform/assets/look-glyphs/button-shape-rounded.svg';
 import ButtonShapeSquare from '@platform/assets/look-glyphs/button-shape-square.svg';
+import ColorModeDark from '@platform/assets/look-glyphs/color-mode-dark.svg';
+import ColorModeLight from '@platform/assets/look-glyphs/color-mode-light.svg';
+import ColorModeReader from '@platform/assets/look-glyphs/color-mode-reader.svg';
 import CookieSettingsButtonHidden from '@platform/assets/look-glyphs/cookie-settings-button-hidden.svg';
 import CookieSettingsButtonOnly from '@platform/assets/look-glyphs/cookie-settings-button-only.svg';
 import CookieSettingsButtonShown from '@platform/assets/look-glyphs/cookie-settings-button-shown.svg';
 import DensityCompact from '@platform/assets/look-glyphs/density-compact.svg';
 import DensityDefault from '@platform/assets/look-glyphs/density-default.svg';
+import DividerWidthBold from '@platform/assets/look-glyphs/divider-width-bold.svg';
+import DividerWidthHairline from '@platform/assets/look-glyphs/divider-width-hairline.svg';
 import FooterLayoutBigWordmark from '@platform/assets/look-glyphs/footer-layout-big-wordmark.svg';
 import FooterLayoutCentred from '@platform/assets/look-glyphs/footer-layout-centred.svg';
 import FooterLayoutColumns from '@platform/assets/look-glyphs/footer-layout-columns.svg';
@@ -43,6 +48,16 @@ import HeaderLayoutMenuButton from '@platform/assets/look-glyphs/header-layout-m
 import HeaderLayoutTwoRows from '@platform/assets/look-glyphs/header-layout-two-rows.svg';
 import HeaderSubmenuStyleDropdown from '@platform/assets/look-glyphs/header-submenu-style-dropdown.svg';
 import HeaderSubmenuStyleWidePanel from '@platform/assets/look-glyphs/header-submenu-style-wide-panel.svg';
+import HeadingCaseAsWritten from '@platform/assets/look-glyphs/heading-case-as-written.svg';
+import HeadingCaseUppercase from '@platform/assets/look-glyphs/heading-case-uppercase.svg';
+import HeadingWeightBold from '@platform/assets/look-glyphs/heading-weight-bold.svg';
+import HeadingWeightMedium from '@platform/assets/look-glyphs/heading-weight-medium.svg';
+import HeadingWeightRegular from '@platform/assets/look-glyphs/heading-weight-regular.svg';
+import HeadingWeightSemibold from '@platform/assets/look-glyphs/heading-weight-semibold.svg';
+import ImageProportionAsDesigned from '@platform/assets/look-glyphs/image-proportion-as-designed.svg';
+import ImageProportionClassic from '@platform/assets/look-glyphs/image-proportion-classic.svg';
+import ImageProportionSquare from '@platform/assets/look-glyphs/image-proportion-square.svg';
+import ImageProportionWide from '@platform/assets/look-glyphs/image-proportion-wide.svg';
 import LanguageSwitcherStyleCodes from '@platform/assets/look-glyphs/language-switcher-style-codes.svg';
 import LanguageSwitcherStyleMenuCode from '@platform/assets/look-glyphs/language-switcher-style-menu-code.svg';
 import LanguageSwitcherStyleMenuGlobe from '@platform/assets/look-glyphs/language-switcher-style-menu-globe.svg';
@@ -58,8 +73,10 @@ import {
   ACCOUNT_PHONE_PLACEMENT,
   BUSY_BUTTON_STYLE,
   BUTTON_SHAPE,
+  COLOR_MODE,
   COOKIE_SETTINGS_BUTTON,
   DENSITY,
+  DIVIDER_WIDTH,
   FOOTER_LAYOUT,
   FOOTER_SURFACE,
   HEADER_ACTION_PHONE_PLACEMENT,
@@ -69,6 +86,9 @@ import {
   HEADER_CONTROL_STYLE,
   HEADER_LAYOUT,
   HEADER_SUBMENU_STYLE,
+  HEADING_CASE,
+  HEADING_WEIGHT,
+  IMAGE_PROPORTION,
   LANGUAGE_SWITCHER_STYLE,
   RADIUS_SCALE,
   type TAccountButtonStyle,
@@ -76,8 +96,10 @@ import {
   type TAccountPhonePlacement,
   type TBusyButtonStyle,
   type TButtonShape,
+  type TColorMode,
   type TCookieSettingsButton,
   type TDensity,
+  type TDividerWidth,
   type TFooterLayout,
   type TFooterSurface,
   type THeaderActionPhonePlacement,
@@ -87,13 +109,21 @@ import {
   type THeaderControlStyle,
   type THeaderLayout,
   type THeaderSubmenuStyle,
+  type THeadingCase,
+  type THeadingWeight,
+  type TImageProportion,
   type TLanguageSwitcherStyle,
   type TRadiusScale,
 } from '@shinefold/config';
 
 type TLookOptionGlyphValues = {
+  colorMode: TColorMode;
+  headingWeight: THeadingWeight;
+  headingCase: THeadingCase;
   radiusScale: TRadiusScale;
   density: TDensity;
+  imageProportion: TImageProportion;
+  dividerWidth: TDividerWidth;
   headerLayout: THeaderLayout;
   headerSubmenuStyle: THeaderSubmenuStyle;
   headerBarStyle: THeaderBarStyle;
@@ -120,6 +150,21 @@ type TLookOptionGlyphRegistry = {
 };
 
 export const LOOK_OPTION_GLYPH_REGISTRY: TLookOptionGlyphRegistry = {
+  colorMode: {
+    [COLOR_MODE.READER]: ColorModeReader,
+    [COLOR_MODE.LIGHT]: ColorModeLight,
+    [COLOR_MODE.DARK]: ColorModeDark,
+  },
+  headingWeight: {
+    [HEADING_WEIGHT.REGULAR]: HeadingWeightRegular,
+    [HEADING_WEIGHT.MEDIUM]: HeadingWeightMedium,
+    [HEADING_WEIGHT.SEMIBOLD]: HeadingWeightSemibold,
+    [HEADING_WEIGHT.BOLD]: HeadingWeightBold,
+  },
+  headingCase: {
+    [HEADING_CASE.AS_WRITTEN]: HeadingCaseAsWritten,
+    [HEADING_CASE.UPPERCASE]: HeadingCaseUppercase,
+  },
   radiusScale: {
     [RADIUS_SCALE.NONE]: RadiusScaleNone,
     [RADIUS_SCALE.SM]: RadiusScaleSm,
@@ -130,6 +175,16 @@ export const LOOK_OPTION_GLYPH_REGISTRY: TLookOptionGlyphRegistry = {
   density: {
     [DENSITY.DEFAULT]: DensityDefault,
     [DENSITY.COMPACT]: DensityCompact,
+  },
+  imageProportion: {
+    [IMAGE_PROPORTION.AS_DESIGNED]: ImageProportionAsDesigned,
+    [IMAGE_PROPORTION.WIDE]: ImageProportionWide,
+    [IMAGE_PROPORTION.CLASSIC]: ImageProportionClassic,
+    [IMAGE_PROPORTION.SQUARE]: ImageProportionSquare,
+  },
+  dividerWidth: {
+    [DIVIDER_WIDTH.HAIRLINE]: DividerWidthHairline,
+    [DIVIDER_WIDTH.BOLD]: DividerWidthBold,
   },
   headerLayout: {
     [HEADER_LAYOUT.CLASSIC]: HeaderLayoutClassic,

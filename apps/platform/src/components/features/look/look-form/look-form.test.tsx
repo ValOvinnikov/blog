@@ -29,15 +29,13 @@ const { lookForm: LOOK_FORM } = messages;
 const COOKIE_BANNER_OFF_NOTE = LOOK_FORM.cookieSettingsButtonBannerOff;
 
 const ROW_TITLES_IN_ORDER = [
-  LOOK_FORM.colourHeading,
   LOOK_FORM.brandHeading,
+  LOOK_FORM.colourHeading,
   LOOK_FORM.typeHeading,
   LOOK_FORM.shapeHeading,
-  LOOK_FORM.cardsHeading,
-  LOOK_FORM.buttonsHeading,
   LOOK_FORM.headerHeading,
   LOOK_FORM.footerHeading,
-  LOOK_FORM.languageSwitcherLabel,
+  LOOK_FORM.detailsHeading,
 ];
 
 describe(`<${LookForm.name}/>`, () => {
@@ -52,7 +50,7 @@ describe(`<${LookForm.name}/>`, () => {
       setupLookForm();
     });
 
-    it('lists the Preset card, then the Style and Site parts rows in order', () => {
+    it('lists the Preset card, then the seven rows in order, under no group heading', () => {
       const editPanel = screen.getByTestId(LOOK_EDIT_PANEL_TEST_ID);
       const presetHeading = within(editPanel).getAllByRole('heading', {
         level: 2,
@@ -71,26 +69,32 @@ describe(`<${LookForm.name}/>`, () => {
       expect(rowTitles).toEqual(ROW_TITLES_IN_ORDER);
     });
 
-    describe('with the Colour row open', () => {
+    it("describes the accent colour slider with its field's hint", async () => {
+      await openLookRow(user, LOOK_ROW.COLOUR);
+
+      const hueSlider = screen.getByRole('slider', { name: ACCENT_HUE });
+
+      expect(hueSlider).toHaveAccessibleDescription(
+        LOOK_FORM.accentHueDescription,
+      );
+    });
+
+    describe('with the Brand row open', () => {
       beforeEach(async () => {
-        await openLookRow(user, LOOK_ROW.COLOUR);
+        await openLookRow(user, LOOK_ROW.BRAND);
       });
 
-      it("describes each Colour control with its field's hint", () => {
-        const hueSlider = screen.getByRole('slider', { name: ACCENT_HUE });
+      it("describes the logo mark colour switch with its field's hint", () => {
         const followSwitch = screen.getByRole('switch', {
           name: FOLLOW_ACCENT_HUE,
         });
 
-        expect(hueSlider).toHaveAccessibleDescription(
-          LOOK_FORM.accentHueDescription,
-        );
         expect(followSwitch).toHaveAccessibleDescription(
           LOOK_FORM.logoHueDescription,
         );
       });
 
-      it('names the logo hue group by its label alone', () => {
+      it('names the logo mark colour group by its label alone', () => {
         const logoHueGroup = screen.getByRole('group', {
           name: LOOK_FORM.logoHueLabel,
         });
@@ -99,7 +103,7 @@ describe(`<${LookForm.name}/>`, () => {
       });
     });
 
-    describe('with the Corners & spacing row open', () => {
+    describe('with the Shapes and spacing row open', () => {
       beforeEach(async () => {
         await openLookRow(user, LOOK_ROW.SHAPE);
       });
@@ -119,7 +123,7 @@ describe(`<${LookForm.name}/>`, () => {
   describe('the cookie settings choice', () => {
     const cookieChoice = async (hasCookieBanner: boolean) => {
       setupLookForm(withLookFeatures({ hasCookieBanner }));
-      await openLookRow(user, LOOK_ROW.FOOTER);
+      await openLookRow(user, LOOK_ROW.DETAILS);
       const cookieButtonGroup = screen.getByRole('group', {
         name: LOOK_FORM.cookieSettingsButtonLabel,
       });
