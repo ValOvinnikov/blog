@@ -1,7 +1,7 @@
+import { ARIA_ATTRIBUTE } from '@platform/constants/aria-attribute';
 import { LOOK_ROW } from '@platform/constants/look-row';
 import messages from '@platform/i18n/messages/en.json';
 import { updateLookAction } from '@platform/server/site-config/update-look-action';
-import { ARIA_PRESSED } from '@platform/testing/aria';
 import { screen, within } from '@platform/testing/custom-render';
 import {
   COMPACT,
@@ -107,6 +107,6 @@ describe(`<${LookForm.name}/>`, () => {
     const outlinedButton = within(headerButtons).getByRole('button', {
       name: LOOK_FORM.headerControlStyleOptionLabel.OUTLINED,
     });
-    expect(outlinedButton).toHaveAttribute(ARIA_PRESSED, 'true');
+    expect(outlinedButton).toHaveAttribute(ARIA_ATTRIBUTE.PRESSED, 'true');
   });
 });

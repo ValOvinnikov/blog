@@ -1,13 +1,9 @@
 import { faker } from '@faker-js/faker';
 import { SidebarCollapseProvider } from '@platform/components/features/layout/sidebar-collapse-provider';
+import { ARIA_ATTRIBUTE } from '@platform/constants/aria-attribute';
 import { DATA_THEME, THEME_PREFERENCE } from '@platform/constants/theme';
 import messages from '@platform/i18n/messages/en.json';
 import { signOutAction } from '@platform/server/auth/sign-out-action';
-import {
-  ARIA_DISABLED,
-  ARIA_EXPANDED,
-  ARIA_HASPOPUP,
-} from '@platform/testing/aria';
 import {
   renderWithIntl,
   screen,
@@ -85,8 +81,8 @@ describe(`<${AccountMenu.name}/>`, () => {
       expect(initials).toBeVisible();
       expect(name).toHaveAttribute('title', MOCK_NAME);
       expect(email).not.toHaveAttribute('title');
-      expect(trigger).toHaveAttribute(ARIA_HASPOPUP, 'menu');
-      expect(trigger).toHaveAttribute(ARIA_EXPANDED, 'false');
+      expect(trigger).toHaveAttribute(ARIA_ATTRIBUTE.HASPOPUP, 'menu');
+      expect(trigger).toHaveAttribute(ARIA_ATTRIBUTE.EXPANDED, 'false');
     });
 
     describe('once opened', () => {
@@ -110,7 +106,7 @@ describe(`<${AccountMenu.name}/>`, () => {
         expect(email).toBeVisible();
         expect(roleLine).toBeVisible();
         expect(items).toEqual([signOutItem]);
-        expect(trigger).toHaveAttribute(ARIA_EXPANDED, 'true');
+        expect(trigger).toHaveAttribute(ARIA_ATTRIBUTE.EXPANDED, 'true');
       });
 
       it('moves focus to Sign out', async () => {
@@ -141,7 +137,7 @@ describe(`<${AccountMenu.name}/>`, () => {
         const pendingItem = await within(menu).findByRole('menuitem', {
           name: messages.account.signingOut,
         });
-        expect(pendingItem).toHaveAttribute(ARIA_DISABLED, 'true');
+        expect(pendingItem).toHaveAttribute(ARIA_ATTRIBUTE.DISABLED, 'true');
       });
     });
   });

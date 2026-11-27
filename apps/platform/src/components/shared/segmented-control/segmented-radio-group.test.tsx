@@ -1,7 +1,7 @@
 import { faker } from '@faker-js/faker';
+import { ARIA_ATTRIBUTE } from '@platform/constants/aria-attribute';
 import { ICON_TEST_ID } from '@platform/constants/icon';
 import { SEGMENTED_RADIO_LAYOUT } from '@platform/constants/segmented-control';
-import { ARIA_DISABLED } from '@platform/testing/aria';
 import {
   customRender,
   isInaccessible,
@@ -282,7 +282,7 @@ describe(`<${SegmentedRadioGroup.name}/>`, () => {
           });
 
           radios.forEach((radio) =>
-            expect(radio).toHaveAttribute(ARIA_DISABLED, 'true'),
+            expect(radio).toHaveAttribute(ARIA_ATTRIBUTE.DISABLED, 'true'),
           );
           expect(firstRadio).toBeChecked();
         });

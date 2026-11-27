@@ -1,3 +1,4 @@
+import { ARIA_ATTRIBUTE } from '@platform/constants/aria-attribute';
 import { customRender, screen } from '@platform/testing/custom-render';
 
 import { Skeleton } from './skeleton';
@@ -10,6 +11,6 @@ describe(`<${Skeleton.name}/>`, () => {
 
     const skeleton = screen.getByTestId('skeleton');
 
-    expect(skeleton).toHaveAttribute('aria-hidden', 'true');
+    expect(skeleton).toHaveAttribute(ARIA_ATTRIBUTE.HIDDEN, 'true');
   });
 });

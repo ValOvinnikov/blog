@@ -1,3 +1,4 @@
+import { ARIA_ATTRIBUTE } from '@platform/constants/aria-attribute';
 import { LOOK_FULLSCREEN as LOOK_FULLSCREEN_LIMIT } from '@platform/constants/look-fullscreen';
 import { MEDIA_QUERY } from '@platform/constants/media-query';
 import {
@@ -6,7 +7,6 @@ import {
   PREVIEW_FRAME_STATUS_TEST_ID,
 } from '@platform/constants/preview';
 import messages from '@platform/i18n/messages/en.json';
-import { ARIA_PRESSED } from '@platform/testing/aria';
 import { act, screen, within } from '@platform/testing/custom-render';
 import { USER_EVENT_KEY } from '@platform/testing/keyboard';
 import {
@@ -104,7 +104,7 @@ describe(`<${LookPreview.name}/> full screen`, () => {
       );
 
       expect(toolbarButtons.at(-1)).toBe(openButton());
-      expect(openButton()).not.toHaveAttribute(ARIA_PRESSED);
+      expect(openButton()).not.toHaveAttribute(ARIA_ATTRIBUTE.PRESSED);
     });
 
     it('shows the pressed device tooltip at once when opened from the keyboard', async () => {

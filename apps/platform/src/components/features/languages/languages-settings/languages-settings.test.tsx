@@ -1,7 +1,7 @@
+import { ARIA_ATTRIBUTE } from '@platform/constants/aria-attribute';
 import messages from '@platform/i18n/messages/en.json';
 import { grantEntitlementAction } from '@platform/server/entitlement-grants/grant-entitlement-action';
 import { updateTenantLanguagesAction } from '@platform/server/tenants/update-tenant-languages-action';
-import { ARIA_DISABLED } from '@platform/testing/aria';
 import {
   customRender,
   screen,
@@ -103,8 +103,8 @@ describe(`<${LanguagesSettings.name}/>`, () => {
         name: languageNames[DE],
       });
 
-      expect(germanSwitch).toHaveAttribute(ARIA_DISABLED, 'true');
-      expect(dutchSwitch).not.toHaveAttribute(ARIA_DISABLED);
+      expect(germanSwitch).toHaveAttribute(ARIA_ATTRIBUTE.DISABLED, 'true');
+      expect(dutchSwitch).not.toHaveAttribute(ARIA_ATTRIBUTE.DISABLED);
     });
 
     it('saves the chosen additional languages', async () => {
@@ -181,7 +181,7 @@ describe(`<${LanguagesSettings.name}/>`, () => {
     const germanSwitch = screen.getByRole(SWITCH, { name: languageNames[DE] });
     const reasons = screen.getAllByText(languagesSettings.atLimitLockedReason);
 
-    expect(germanSwitch).toHaveAttribute(ARIA_DISABLED, 'true');
+    expect(germanSwitch).toHaveAttribute(ARIA_ATTRIBUTE.DISABLED, 'true');
     expect(reasons).toHaveLength(2);
   });
 
@@ -197,7 +197,7 @@ describe(`<${LanguagesSettings.name}/>`, () => {
       await user.click(germanSwitch);
 
       expect(germanSwitch).toHaveFocus();
-      expect(germanSwitch).toHaveAttribute(ARIA_DISABLED, 'true');
+      expect(germanSwitch).toHaveAttribute(ARIA_ATTRIBUTE.DISABLED, 'true');
       expect(germanSwitch).toHaveAccessibleDescription(
         ARCHIVED_NOTICE_DESCRIPTION,
       );
@@ -229,7 +229,7 @@ describe(`<${LanguagesSettings.name}/>`, () => {
 
     expect(upgradeNotice).toBeVisible();
     for (const toggle of toggles) {
-      expect(toggle).toHaveAttribute(ARIA_DISABLED, 'true');
+      expect(toggle).toHaveAttribute(ARIA_ATTRIBUTE.DISABLED, 'true');
     }
   });
 
@@ -496,8 +496,8 @@ describe(`<${LanguagesSettings.name}/>`, () => {
         languagesSettings.overLimitLockedReason,
       );
 
-      expect(dutchSwitch).toHaveAttribute(ARIA_DISABLED, 'true');
-      expect(frenchSwitch).toHaveAttribute(ARIA_DISABLED, 'true');
+      expect(dutchSwitch).toHaveAttribute(ARIA_ATTRIBUTE.DISABLED, 'true');
+      expect(frenchSwitch).toHaveAttribute(ARIA_ATTRIBUTE.DISABLED, 'true');
       expect(reasons).toHaveLength(4);
     });
 
@@ -506,7 +506,7 @@ describe(`<${LanguagesSettings.name}/>`, () => {
         name: languageNames[ES],
       });
 
-      expect(spanishSwitch).toHaveAttribute(ARIA_DISABLED, 'true');
+      expect(spanishSwitch).toHaveAttribute(ARIA_ATTRIBUTE.DISABLED, 'true');
     });
   });
 

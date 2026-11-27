@@ -1,6 +1,6 @@
+import { ARIA_ATTRIBUTE } from '@platform/constants/aria-attribute';
 import { LOOK_ROW } from '@platform/constants/look-row';
 import { updateLookAction } from '@platform/server/site-config/update-look-action';
-import { ARIA_SELECTED } from '@platform/testing/aria';
 import { screen, waitFor } from '@platform/testing/custom-render';
 import { makeEnTranslator } from '@platform/testing/en-translator';
 import { USER_EVENT_KEY } from '@platform/testing/keyboard';
@@ -93,7 +93,7 @@ describe(`<${LookForm.name}/>`, () => {
         await waitFor(() => {
           expect(replaceLogoButton).toHaveFocus();
         });
-        expect(editTab).toHaveAttribute(ARIA_SELECTED, 'true');
+        expect(editTab).toHaveAttribute(ARIA_ATTRIBUTE.SELECTED, 'true');
       });
     });
   });

@@ -1,5 +1,5 @@
 import { faker } from '@faker-js/faker';
-import { ARIA_HIDDEN } from '@platform/testing/aria';
+import { ARIA_ATTRIBUTE } from '@platform/constants/aria-attribute';
 import { render, screen, waitFor } from '@platform/testing/custom-render';
 import { TOOLTIP_HOVER_TIMEOUT } from '@platform/testing/tooltip';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
@@ -54,7 +54,7 @@ describe(`<${Tooltip.name}/>`, () => {
     it('leaves the trigger its own name as the only announcement', () => {
       const tooltip = screen.getByText(MOCK_LABEL);
 
-      expect(tooltip).toHaveAttribute(ARIA_HIDDEN, 'true');
+      expect(tooltip).toHaveAttribute(ARIA_ATTRIBUTE.HIDDEN, 'true');
       expect(trigger).not.toHaveAccessibleDescription();
     });
 

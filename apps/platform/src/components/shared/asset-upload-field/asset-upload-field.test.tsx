@@ -1,10 +1,10 @@
 import { faker } from '@faker-js/faker';
+import { ARIA_ATTRIBUTE } from '@platform/constants/aria-attribute';
 import {
   ASSET_UPLOAD_LAYOUT,
   ASSET_UPLOAD_THUMB_TEST_ID,
 } from '@platform/constants/asset-upload';
 import messages from '@platform/i18n/messages/en.json';
-import { ARIA_DESCRIBEDBY, ARIA_HIDDEN } from '@platform/testing/aria';
 import { customRender, screen } from '@platform/testing/custom-render';
 import { ARCHIVED_NOTICE_ID } from '@platform/testing/render-in-settings-form';
 import { selectFile } from '@platform/testing/select-file';
@@ -137,7 +137,7 @@ describe(`<${AssetUploadField.name}/>`, () => {
 
     expect(uploadButton).toBeDisabled();
     expect(uploadButton).toHaveAttribute(
-      ARIA_DESCRIBEDBY,
+      ARIA_ATTRIBUTE.DESCRIBEDBY,
       `${hint.id} ${ARCHIVED_NOTICE_ID}`,
     );
     expect(removeButton).toBeDisabled();
@@ -216,7 +216,7 @@ describe(`<${AssetUploadField.name}/>`, () => {
       const uploadButton = screen.getByRole('button', { name: UPLOAD_LOGO });
       const removeButton = screen.queryByRole('button', { name: REMOVE });
 
-      expect(thumb).toHaveAttribute(ARIA_HIDDEN, 'true');
+      expect(thumb).toHaveAttribute(ARIA_ATTRIBUTE.HIDDEN, 'true');
       expect(uploadButton).toBeVisible();
       expect(removeButton).not.toBeInTheDocument();
     });
@@ -286,7 +286,7 @@ describe(`<${AssetUploadField.name}/>`, () => {
 
       expect(uploadButton).toBeDisabled();
       expect(uploadButton).toHaveAttribute(
-        ARIA_DESCRIBEDBY,
+        ARIA_ATTRIBUTE.DESCRIBEDBY,
         ARCHIVED_NOTICE_ID,
       );
       expect(removeButton).toBeDisabled();

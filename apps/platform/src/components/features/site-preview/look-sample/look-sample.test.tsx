@@ -1,5 +1,6 @@
 import { faker } from '@faker-js/faker';
 import type { TSampleReader } from '@platform/components/features/site-preview/sample-site-header';
+import { ARIA_ATTRIBUTE } from '@platform/constants/aria-attribute';
 import {
   LOOK_SAMPLE_BAND_LABEL_TEST_ID,
   LOOK_SAMPLE_BAND_TEST_ID,
@@ -32,7 +33,6 @@ import {
 import { SKIN_ATTRIBUTE } from '@platform/constants/site-theme-frame';
 import { PoweredByMarkProvider } from '@platform/context/powered-by-mark-provider';
 import messages from '@platform/i18n/messages/en.json';
-import { ARIA_CURRENT, ARIA_EXPANDED } from '@platform/testing/aria';
 import {
   customRender,
   renderWithIntl,
@@ -284,8 +284,8 @@ describe(`<${LookSample.name}/>`, () => {
       });
       const firstAnswer = questions.getByText(FIRST_ANSWER);
 
-      expect(firstQuestion).toHaveAttribute(ARIA_EXPANDED, 'true');
-      expect(secondQuestion).toHaveAttribute(ARIA_EXPANDED, 'false');
+      expect(firstQuestion).toHaveAttribute(ARIA_ATTRIBUTE.EXPANDED, 'true');
+      expect(secondQuestion).toHaveAttribute(ARIA_ATTRIBUTE.EXPANDED, 'false');
       expect(firstAnswer).toBeVisible();
     });
 
@@ -396,7 +396,7 @@ describe(`<${LookSample.name}/>`, () => {
         name: LANGUAGE_ENGLISH,
       });
 
-      expect(current).toHaveAttribute(ARIA_CURRENT, 'page');
+      expect(current).toHaveAttribute(ARIA_ATTRIBUTE.CURRENT, 'page');
       expect(current).toHaveTextContent(ENGLISH);
       expect(englishLink).not.toBeInTheDocument();
       expect(frenchLink).toHaveTextContent(FRENCH_CODE);
@@ -523,7 +523,7 @@ describe(`<${LookSample.name}/>`, () => {
         name: ACCOUNT_MENU,
       });
 
-      expect(accountButton).toHaveAttribute(ARIA_EXPANDED, 'true');
+      expect(accountButton).toHaveAttribute(ARIA_ATTRIBUTE.EXPANDED, 'true');
       expect(accountMenu).toBeVisible();
       expect(accountMenu).toHaveTextContent(SIGN_OUT);
     });

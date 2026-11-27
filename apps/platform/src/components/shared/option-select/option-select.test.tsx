@@ -1,6 +1,6 @@
 import { faker } from '@faker-js/faker';
+import { ARIA_ATTRIBUTE } from '@platform/constants/aria-attribute';
 import { KEY } from '@platform/constants/keyboard';
-import { ARIA_DISABLED } from '@platform/testing/aria';
 import {
   customRender,
   renderWithIntl,
@@ -169,7 +169,7 @@ describe(`<${OptionSelect.name}/>`, () => {
       });
       await user.click(disabledOption);
 
-      expect(disabledOption).toHaveAttribute(ARIA_DISABLED, 'true');
+      expect(disabledOption).toHaveAttribute(ARIA_ATTRIBUTE.DISABLED, 'true');
       expect(onChange).not.toHaveBeenCalled();
     });
   });
@@ -235,7 +235,7 @@ describe(`<${OptionSelect.name}/>`, () => {
         const trigger = screen.getByRole('combobox');
 
         expect(trigger).toHaveFocus();
-        expect(trigger).toHaveAttribute(ARIA_DISABLED, 'true');
+        expect(trigger).toHaveAttribute(ARIA_ATTRIBUTE.DISABLED, 'true');
         expect(trigger).toBeEnabled();
       });
 

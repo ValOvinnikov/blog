@@ -1,5 +1,5 @@
+import { ARIA_ATTRIBUTE } from '@platform/constants/aria-attribute';
 import messages from '@platform/i18n/messages/en.json';
-import { ARIA_DISABLED } from '@platform/testing/aria';
 import { customRender, screen, waitFor } from '@platform/testing/custom-render';
 import {
   BUTTON_COLOR_FOLLOWS_ACCENT,
@@ -90,9 +90,9 @@ describe(`<${ButtonColorField.name}/>`, () => {
       await user.type(hexInput!, MOCK_YELLOW_HEX);
 
       expect(picker).toBeEnabled();
-      expect(picker).toHaveAttribute(ARIA_DISABLED, 'true');
+      expect(picker).toHaveAttribute(ARIA_ATTRIBUTE.DISABLED, 'true');
       expect(hexInput).toBeEnabled();
-      expect(hexInput).toHaveAttribute(ARIA_DISABLED, 'true');
+      expect(hexInput).toHaveAttribute(ARIA_ATTRIBUTE.DISABLED, 'true');
       expect(onChange).not.toHaveBeenCalled();
     });
   });

@@ -1,5 +1,5 @@
+import { ARIA_ATTRIBUTE } from '@platform/constants/aria-attribute';
 import messages from '@platform/i18n/messages/en.json';
-import { ARIA_DISABLED } from '@platform/testing/aria';
 import { expectArchivedOffersNoSave } from '@platform/testing/assert-archived-save';
 import { customRenderAsync, screen } from '@platform/testing/custom-render';
 import { makeEnTranslator } from '@platform/testing/en-translator';
@@ -106,8 +106,11 @@ describe(`<${FeaturesPageContent.name}/>`, () => {
         name: toggleLabel[CAPABILITY.CONSENT_BANNER],
       });
 
-      expect(readerAccountsSwitch).toHaveAttribute(ARIA_DISABLED, 'true');
-      expect(bookmarksSwitch).toHaveAttribute(ARIA_DISABLED, 'true');
+      expect(readerAccountsSwitch).toHaveAttribute(
+        ARIA_ATTRIBUTE.DISABLED,
+        'true',
+      );
+      expect(bookmarksSwitch).toHaveAttribute(ARIA_ATTRIBUTE.DISABLED, 'true');
       expect(consentSwitch).toBeEnabled();
     });
 
@@ -124,7 +127,7 @@ describe(`<${FeaturesPageContent.name}/>`, () => {
       });
 
       expect(bookmarksSwitch).not.toBeChecked();
-      expect(bookmarksSwitch).toHaveAttribute(ARIA_DISABLED, 'true');
+      expect(bookmarksSwitch).toHaveAttribute(ARIA_ATTRIBUTE.DISABLED, 'true');
     });
 
     describe('with a Google Analytics id kept from a paid plan', () => {
@@ -168,7 +171,7 @@ describe(`<${FeaturesPageContent.name}/>`, () => {
     });
 
     expect(consentSwitch).toBeChecked();
-    expect(consentSwitch).toHaveAttribute(ARIA_DISABLED, 'true');
+    expect(consentSwitch).toHaveAttribute(ARIA_ATTRIBUTE.DISABLED, 'true');
   });
 
   it('lets a Starter owner edit the analytics id', async () => {

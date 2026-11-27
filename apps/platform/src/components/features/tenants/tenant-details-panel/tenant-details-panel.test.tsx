@@ -1,5 +1,6 @@
 import { faker } from '@faker-js/faker';
 import { GuardedLink } from '@platform/components/shared/guarded-link';
+import { ARIA_ATTRIBUTE } from '@platform/constants/aria-attribute';
 import {
   TENANT_FIELD_ERROR,
   TENANT_FIELD_LOCK_KIND,
@@ -7,7 +8,6 @@ import {
 import { useRouter as useGuardRouter } from '@platform/i18n/base-navigation';
 import messages from '@platform/i18n/messages/en.json';
 import type { TClientTenant } from '@platform/server/tenants/to-client-tenant';
-import { ARIA_DISABLED, ARIA_DESCRIBEDBY } from '@platform/testing/aria';
 import {
   customRender,
   renderWithIntl,
@@ -279,7 +279,7 @@ describe(`<${TenantDetailsPanel.name}/>`, () => {
     });
     const status = screen.getByRole('status');
 
-    expect(savingButton).toHaveAttribute('aria-disabled', 'true');
+    expect(savingButton).toHaveAttribute(ARIA_ATTRIBUTE.DISABLED, 'true');
     expect(savingButton).toHaveAttribute('aria-busy', 'true');
     expect(status).toHaveTextContent(SAVING_LABEL);
 
@@ -301,7 +301,7 @@ describe(`<${TenantDetailsPanel.name}/>`, () => {
     const fieldsGroup = screen.getByRole('group', { name: FIELDS_GROUP_LABEL });
 
     expect(domainInput).toHaveValue(MOCK_TENANT_DOMAIN);
-    expect(domainInput).toHaveAttribute(ARIA_DISABLED, 'true');
+    expect(domainInput).toHaveAttribute(ARIA_ATTRIBUTE.DISABLED, 'true');
     expect(liveRegion).toHaveTextContent(tenantDetailsPanel.lockedAnnouncement);
     expect(fieldsGroup).toHaveFocus();
   });
@@ -373,9 +373,9 @@ describe(`<${TenantDetailsPanel.name}/>`, () => {
         await user.click(saveButton);
 
         controls.forEach((control) =>
-          expect(control).toHaveAttribute(ARIA_DISABLED, 'true'),
+          expect(control).toHaveAttribute(ARIA_ATTRIBUTE.DISABLED, 'true'),
         );
-        expect(saveButton).toHaveAttribute(ARIA_DISABLED, 'true');
+        expect(saveButton).toHaveAttribute(ARIA_ATTRIBUTE.DISABLED, 'true');
         expect(updateTenantDetailsActionMock).not.toHaveBeenCalled();
       });
 
@@ -394,7 +394,7 @@ describe(`<${TenantDetailsPanel.name}/>`, () => {
       it('leaves Save undescribed without an archived notice', () => {
         const saveButton = getSaveButton();
 
-        expect(saveButton).not.toHaveAttribute(ARIA_DESCRIBEDBY);
+        expect(saveButton).not.toHaveAttribute(ARIA_ATTRIBUTE.DESCRIBEDBY);
       });
     });
 

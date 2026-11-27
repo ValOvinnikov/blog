@@ -1,5 +1,5 @@
 import { faker } from '@faker-js/faker';
-import { ARIA_PRESSED } from '@platform/testing/aria';
+import { ARIA_ATTRIBUTE } from '@platform/constants/aria-attribute';
 import { customRender, screen } from '@platform/testing/custom-render';
 import { ICONS } from '@shinefold/config';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
@@ -33,23 +33,27 @@ describe(`<${IconSoloButton.name}/>`, () => {
     it('has no pressed state', () => {
       const button = screen.getByRole('button', { name: MOCK_LABEL });
 
-      expect(button).not.toHaveAttribute(ARIA_PRESSED);
+      expect(button).not.toHaveAttribute(ARIA_ATTRIBUTE.PRESSED);
     });
 
-    it('is its own Tab stop outside a toolbar', async () => {
-      await user.tab();
-      const button = screen.getByRole('button', { name: MOCK_LABEL });
+    describe('on keyboard focus', () => {
+      beforeEach(async () => {
+        await user.tab();
+      });
 
-      expect(button).toHaveFocus();
-    });
+      it('is its own Tab stop outside a toolbar', () => {
+        const button = screen.getByRole('button', { name: MOCK_LABEL });
 
-    it('opens its tooltip at once on keyboard focus, keeping the name', async () => {
-      await user.tab();
-      const tooltip = await screen.findByText(MOCK_TOOLTIP);
-      const button = screen.getByRole('button', { name: MOCK_LABEL });
+        expect(button).toHaveFocus();
+      });
 
-      expect(tooltip).toBeVisible();
-      expect(button).toHaveAccessibleName(MOCK_LABEL);
+      it('opens its tooltip at once, keeping the name', async () => {
+        const tooltip = await screen.findByText(MOCK_TOOLTIP);
+        const button = screen.getByRole('button', { name: MOCK_LABEL });
+
+        expect(tooltip).toBeVisible();
+        expect(button).toHaveAccessibleName(MOCK_LABEL);
+      });
     });
   });
 

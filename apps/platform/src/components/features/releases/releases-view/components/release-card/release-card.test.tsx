@@ -1,8 +1,8 @@
 import { faker } from '@faker-js/faker';
+import { ARIA_ATTRIBUTE } from '@platform/constants/aria-attribute';
 import { GITHUB_FAILURE } from '@platform/constants/github';
 import type * as releaseConstants from '@platform/constants/release';
 import { RELEASE_RUN_STATUS } from '@platform/constants/release';
-import { ARIA_DISABLED } from '@platform/testing/aria';
 import { act, customRender, screen } from '@platform/testing/custom-render';
 import { mockRouterRefresh } from '@platform/testing/mock-router';
 import {
@@ -117,7 +117,7 @@ describe(`<${ReleaseCard.name}/>`, () => {
 
       expect(dispatchedStatus).toBeVisible();
       expect(startedToast).toBeVisible();
-      expect(releaseButton).toHaveAttribute(ARIA_DISABLED, 'true');
+      expect(releaseButton).toHaveAttribute(ARIA_ATTRIBUTE.DISABLED, 'true');
     });
   });
 
@@ -154,7 +154,7 @@ describe(`<${ReleaseCard.name}/>`, () => {
     const refusal = screen.getByText('A release is running.');
 
     expect(status).toBeVisible();
-    expect(releaseButton).toHaveAttribute(ARIA_DISABLED, 'true');
+    expect(releaseButton).toHaveAttribute(ARIA_ATTRIBUTE.DISABLED, 'true');
     expect(refusal).toBeVisible();
   });
 
@@ -165,7 +165,7 @@ describe(`<${ReleaseCard.name}/>`, () => {
     const releaseButton = screen.getByRole('button', { name: 'Release' });
     const pausedNotice = screen.getByText('Production releases are paused.');
 
-    expect(releaseButton).toHaveAttribute(ARIA_DISABLED, 'true');
+    expect(releaseButton).toHaveAttribute(ARIA_ATTRIBUTE.DISABLED, 'true');
     expect(pausedNotice).toBeVisible();
   });
 

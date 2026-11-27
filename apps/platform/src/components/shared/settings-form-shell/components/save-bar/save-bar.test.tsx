@@ -1,4 +1,5 @@
 import { faker } from '@faker-js/faker';
+import { ARIA_ATTRIBUTE } from '@platform/constants/aria-attribute';
 import {
   customRender,
   renderWithIntl,
@@ -192,7 +193,7 @@ describe(`<${SaveBar.name}/>`, () => {
       const savingButton = screen.getByRole('button', { name: 'Saving…' });
       const discardButton = screen.getByRole('button', { name: DISCARD });
 
-      expect(savingButton).toHaveAttribute('aria-disabled', 'true');
+      expect(savingButton).toHaveAttribute(ARIA_ATTRIBUTE.DISABLED, 'true');
       expect(discardButton).toBeDisabled();
     });
 

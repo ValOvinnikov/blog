@@ -1,5 +1,6 @@
 import { faker } from '@faker-js/faker';
 import { Accordion } from '@platform/components/shared/accordion';
+import { ARIA_ATTRIBUTE } from '@platform/constants/aria-attribute';
 import {
   renderWithIntl,
   screen,
@@ -16,7 +17,6 @@ faker.seed(5994);
 
 const MOCK_VALUE = faker.lorem.sentence();
 const MOCK_ERROR = faker.lorem.sentence();
-const ARIA_EXPANDED = 'aria-expanded';
 
 const tagEmpty = VOICE_FIELDS.find(({ id }) => id === 'tagEmpty')!;
 
@@ -40,23 +40,25 @@ const setup = (overrides: Partial<ComponentProps<typeof VoiceListRow>> = {}) =>
   );
 
 describe(`<${VoiceListRow.name}/>`, () => {
-  it('summarises a closed list with its route, default text and status', () => {
-    setup();
+  describe('at its default', () => {
+    beforeEach(() => {
+      setup();
+    });
 
-    const row = screen.getByRole('button', { name: TAG_ROW });
+    it('summarises a closed list with its route, default text and status', () => {
+      const row = screen.getByRole('button', { name: TAG_ROW });
 
-    expect(row).toHaveAttribute(ARIA_EXPANDED, 'false');
-    expect(row).toHaveTextContent('Shown at /tags/…');
-    expect(row).toHaveTextContent('Default');
-  });
+      expect(row).toHaveAttribute(ARIA_ATTRIBUTE.EXPANDED, 'false');
+      expect(row).toHaveTextContent('Shown at /tags/…');
+      expect(row).toHaveTextContent('Default');
+    });
 
-  it('names the list with a button inside an h4', () => {
-    setup();
+    it('names the list with a button inside an h4', () => {
+      const heading = screen.getByRole('heading', { level: 4, name: TAG_ROW });
+      const row = screen.getByRole('button', { name: TAG_ROW });
 
-    const heading = screen.getByRole('heading', { level: 4, name: TAG_ROW });
-    const row = screen.getByRole('button', { name: TAG_ROW });
-
-    expect(heading).toContainElement(row);
+      expect(heading).toContainElement(row);
+    });
   });
 
   it('summarises a customised value and announces that it is unsaved', () => {
@@ -98,7 +100,7 @@ describe(`<${VoiceListRow.name}/>`, () => {
     const editor = screen.getByText('Editor');
     const unsavedMark = within(row).getByRole('img', { name: UNSAVED_MARK });
 
-    expect(row).toHaveAttribute(ARIA_EXPANDED, 'true');
+    expect(row).toHaveAttribute(ARIA_ATTRIBUTE.EXPANDED, 'true');
     expect(row).toHaveTextContent(MOCK_VALUE);
     expect(row).toHaveTextContent('Customised');
     expect(unsavedMark).toBeVisible();

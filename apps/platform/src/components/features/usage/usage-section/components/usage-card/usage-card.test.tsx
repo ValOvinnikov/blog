@@ -1,7 +1,7 @@
+import { ARIA_ATTRIBUTE } from '@platform/constants/aria-attribute';
 import { USAGE_LEVEL, USAGE_METER } from '@platform/constants/usage';
 import messages from '@platform/i18n/messages/en.json';
 import { loadUsageMeters } from '@platform/server/usage/load-usage-meters';
-import { ARIA_VALUEMAX, ARIA_VALUENOW } from '@platform/testing/aria';
 import { customRenderAsync, screen } from '@platform/testing/custom-render';
 import { makeEnTranslator } from '@platform/testing/en-translator';
 import { mockedEnv } from '@platform/testing/env/mocked-env';
@@ -75,9 +75,12 @@ describe(`<${UsageCard.name}/>`, () => {
       const note = screen.getByText(RESETS_ON_NOTE);
 
       expect(title).toBeVisible();
-      expect(meter).toHaveAttribute(ARIA_VALUENOW, String(MOCK_USAGE_USED));
       expect(meter).toHaveAttribute(
-        ARIA_VALUEMAX,
+        ARIA_ATTRIBUTE.VALUENOW,
+        String(MOCK_USAGE_USED),
+      );
+      expect(meter).toHaveAttribute(
+        ARIA_ATTRIBUTE.VALUEMAX,
         String(MOCK_USAGE_ALLOWANCE),
       );
       expect(usedCount).toBeVisible();
@@ -138,7 +141,10 @@ describe(`<${UsageCard.name}/>`, () => {
       }),
     );
 
-    expect(meter).toHaveAttribute(ARIA_VALUENOW, String(MOCK_USAGE_ALLOWANCE));
+    expect(meter).toHaveAttribute(
+      ARIA_ATTRIBUTE.VALUENOW,
+      String(MOCK_USAGE_ALLOWANCE),
+    );
     expect(note).toBeVisible();
   });
 

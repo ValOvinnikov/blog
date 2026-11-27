@@ -1,8 +1,8 @@
+import { ARIA_ATTRIBUTE } from '@platform/constants/aria-attribute';
 import { LOOK_ROW } from '@platform/constants/look-row';
 import { LOOK_SAMPLE_TOKENS_TEST_ID } from '@platform/constants/look-sample';
 import messages from '@platform/i18n/messages/en.json';
 import { updateLookAction } from '@platform/server/site-config/update-look-action';
-import { ARIA_PRESSED } from '@platform/testing/aria';
 import { screen } from '@platform/testing/custom-render';
 import {
   CONSOLE,
@@ -97,7 +97,7 @@ describe(`<${LookForm.name}/>`, () => {
         name: LOOK_FORM.radiusScaleOptionLabel.SM,
       });
       const sampleTokens = screen.getByTestId(LOOK_SAMPLE_TOKENS_TEST_ID);
-      expect(smallButton).toHaveAttribute(ARIA_PRESSED, 'true');
+      expect(smallButton).toHaveAttribute(ARIA_ATTRIBUTE.PRESSED, 'true');
       expect(sampleTokens).toHaveStyle({ '--radius-md': '4px' });
     });
   });

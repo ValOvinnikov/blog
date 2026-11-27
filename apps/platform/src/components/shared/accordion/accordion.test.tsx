@@ -1,5 +1,6 @@
 import { faker } from '@faker-js/faker';
 import { ACCORDION_VARIANT } from '@platform/constants/accordion';
+import { ARIA_ATTRIBUTE } from '@platform/constants/aria-attribute';
 import { KEY } from '@platform/constants/keyboard';
 import {
   customRender,
@@ -15,7 +16,6 @@ import type { TAccordionActions } from './use-accordion-actions';
 
 faker.seed(5995);
 
-const ARIA_EXPANDED = 'aria-expanded';
 const FIRST = 'first';
 const SECOND = 'second';
 const MOCK_FIRST_ROW = faker.lorem.words(2);
@@ -122,8 +122,8 @@ describe(`<${Accordion.name}/>`, () => {
     it('reports the open row through aria-expanded', () => {
       const firstBody = screen.getByText(MOCK_FIRST_BODY);
 
-      expect(firstTrigger).toHaveAttribute(ARIA_EXPANDED, 'true');
-      expect(secondTrigger).toHaveAttribute(ARIA_EXPANDED, 'false');
+      expect(firstTrigger).toHaveAttribute(ARIA_ATTRIBUTE.EXPANDED, 'true');
+      expect(secondTrigger).toHaveAttribute(ARIA_ATTRIBUTE.EXPANDED, 'false');
       expect(firstBody).toBeVisible();
     });
 
@@ -132,15 +132,15 @@ describe(`<${Accordion.name}/>`, () => {
 
       const secondBody = screen.getByText(MOCK_SECOND_BODY);
 
-      expect(firstTrigger).toHaveAttribute(ARIA_EXPANDED, 'false');
-      expect(secondTrigger).toHaveAttribute(ARIA_EXPANDED, 'true');
+      expect(firstTrigger).toHaveAttribute(ARIA_ATTRIBUTE.EXPANDED, 'false');
+      expect(secondTrigger).toHaveAttribute(ARIA_ATTRIBUTE.EXPANDED, 'true');
       expect(secondBody).toBeVisible();
     });
 
     it('closes the open row from its own header', async () => {
       await user.click(firstTrigger);
 
-      expect(firstTrigger).toHaveAttribute(ARIA_EXPANDED, 'false');
+      expect(firstTrigger).toHaveAttribute(ARIA_ATTRIBUTE.EXPANDED, 'false');
     });
   });
 
@@ -160,13 +160,13 @@ describe(`<${Accordion.name}/>`, () => {
       it('opens a row with the keyboard', async () => {
         await user.keyboard('{Enter}');
 
-        expect(firstTrigger).toHaveAttribute(ARIA_EXPANDED, 'true');
+        expect(firstTrigger).toHaveAttribute(ARIA_ATTRIBUTE.EXPANDED, 'true');
       });
 
       it('opens a row with the Space key', async () => {
         await user.keyboard(KEY.SPACE);
 
-        expect(firstTrigger).toHaveAttribute(ARIA_EXPANDED, 'true');
+        expect(firstTrigger).toHaveAttribute(ARIA_ATTRIBUTE.EXPANDED, 'true');
       });
     });
 
@@ -261,15 +261,15 @@ describe(`<${Accordion.name}/>`, () => {
       });
 
       it('opens every row the caller opens', () => {
-        expect(firstTrigger).toHaveAttribute(ARIA_EXPANDED, 'true');
-        expect(secondTrigger).toHaveAttribute(ARIA_EXPANDED, 'true');
+        expect(firstTrigger).toHaveAttribute(ARIA_ATTRIBUTE.EXPANDED, 'true');
+        expect(secondTrigger).toHaveAttribute(ARIA_ATTRIBUTE.EXPANDED, 'true');
       });
 
       it('folds only the row folded by hand', async () => {
         await user.click(firstTrigger);
 
-        expect(firstTrigger).toHaveAttribute(ARIA_EXPANDED, 'false');
-        expect(secondTrigger).toHaveAttribute(ARIA_EXPANDED, 'true');
+        expect(firstTrigger).toHaveAttribute(ARIA_ATTRIBUTE.EXPANDED, 'false');
+        expect(secondTrigger).toHaveAttribute(ARIA_ATTRIBUTE.EXPANDED, 'true');
       });
     });
 
@@ -281,8 +281,8 @@ describe(`<${Accordion.name}/>`, () => {
       it('keeps an open row open when another one opens', async () => {
         await user.click(secondTrigger);
 
-        expect(firstTrigger).toHaveAttribute(ARIA_EXPANDED, 'true');
-        expect(secondTrigger).toHaveAttribute(ARIA_EXPANDED, 'true');
+        expect(firstTrigger).toHaveAttribute(ARIA_ATTRIBUTE.EXPANDED, 'true');
+        expect(secondTrigger).toHaveAttribute(ARIA_ATTRIBUTE.EXPANDED, 'true');
       });
 
       it('names the body a row button controls', () => {
@@ -293,7 +293,7 @@ describe(`<${Accordion.name}/>`, () => {
         const body = screen.getByText(MOCK_FIRST_BODY);
 
         expect(heading).toContainElement(firstTrigger);
-        expect(firstTrigger.getAttribute('aria-controls')).toBeTruthy();
+        expect(firstTrigger.getAttribute(ARIA_ATTRIBUTE.CONTROLS)).toBeTruthy();
         expect(body).toBeVisible();
       });
 
@@ -325,7 +325,7 @@ describe(`<${Accordion.name}/>`, () => {
       const jump = screen.getByRole('button', { name: JUMP_TO_SECOND });
       await user.click(jump);
 
-      expect(secondTrigger).toHaveAttribute(ARIA_EXPANDED, 'true');
+      expect(secondTrigger).toHaveAttribute(ARIA_ATTRIBUTE.EXPANDED, 'true');
       expect(secondTrigger).toHaveFocus();
     });
   });

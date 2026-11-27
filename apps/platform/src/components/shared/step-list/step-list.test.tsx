@@ -1,4 +1,5 @@
 import { faker } from '@faker-js/faker';
+import { ARIA_ATTRIBUTE } from '@platform/constants/aria-attribute';
 import { customRender, screen } from '@platform/testing/custom-render';
 import { MOCK_RUN_PLUS_1_MIN_AT } from '@platform/testing/tenants/fixtures';
 import { TENANT_PROVISIONING_STEP_STATUS } from '@shinefold/db/constants';
@@ -31,21 +32,22 @@ const setup = customRender(StepList, { steps: MOCK_STEPS });
 
 describe(`<${StepList.name}/>`, () => {
   describe('with the full step set', () => {
+    let glyphs: HTMLElement[];
+
     beforeEach(() => {
       setup();
+      glyphs = screen.getAllByTestId(STEP_INDICATOR_GLYPH_TEST_ID);
     });
 
     it('marks done and failed steps with a glyph and the rest with their number', () => {
-      const glyphs = screen.getAllByTestId(STEP_INDICATOR_GLYPH_TEST_ID);
       const glyphTexts = glyphs.map((glyph) => glyph.textContent);
 
       expect(glyphTexts).toEqual(['✓', '2', '!', '4']);
     });
 
     it('hides every glyph from assistive tech', () => {
-      const glyphs = screen.getAllByTestId(STEP_INDICATOR_GLYPH_TEST_ID);
       const hiddenGlyphs = glyphs.filter(
-        (glyph) => glyph.getAttribute('aria-hidden') === 'true',
+        (glyph) => glyph.getAttribute(ARIA_ATTRIBUTE.HIDDEN) === 'true',
       );
 
       expect(hiddenGlyphs).toHaveLength(MOCK_STEPS.length);

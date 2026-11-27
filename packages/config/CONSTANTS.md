@@ -505,7 +505,7 @@ Every key/value const an agent should reuse before writing a literal. The
 
 ### `@platform/constants/aria-attribute` — `apps/platform/src/constants/aria-attribute.ts`
 
-- **ARIA_ATTRIBUTE**: `DISABLED`=`"aria-disabled"`
+- **ARIA_ATTRIBUTE**: `CONTROLS`=`"aria-controls"`, `CURRENT`=`"aria-current"`, `DESCRIBEDBY`=`"aria-describedby"`, `DISABLED`=`"aria-disabled"`, `EXPANDED`=`"aria-expanded"`, `HASPOPUP`=`"aria-haspopup"`, `HIDDEN`=`"aria-hidden"`, `PRESSED`=`"aria-pressed"`, `READONLY`=`"aria-readonly"`, `SELECTED`=`"aria-selected"`, `VALUEMAX`=`"aria-valuemax"`, `VALUENOW`=`"aria-valuenow"`, `VALUETEXT`=`"aria-valuetext"`
 
 ### `@platform/constants/aria-role` — `apps/platform/src/constants/aria-role.ts`
 

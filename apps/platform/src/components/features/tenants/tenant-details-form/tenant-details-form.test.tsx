@@ -1,8 +1,8 @@
 import { faker } from '@faker-js/faker';
+import { ARIA_ATTRIBUTE } from '@platform/constants/aria-attribute';
 import { TENANT_FIELD_ERROR, TENANT_REFUSAL } from '@platform/constants/tenant';
 import en from '@platform/i18n/messages/en.json';
 import type { TCreateTenantInput } from '@platform/server/tenants/create-tenant-input';
-import { ARIA_DISABLED } from '@platform/testing/aria';
 import { customRender, screen, waitFor } from '@platform/testing/custom-render';
 import { makeEnTranslator } from '@platform/testing/en-translator';
 import {
@@ -157,7 +157,7 @@ describe(`<${TenantDetailsForm.name}/>`, () => {
       name: planNames[TENANT_PLAN.FREE],
     });
 
-    expect(freeButton).toHaveAttribute('aria-pressed', 'true');
+    expect(freeButton).toHaveAttribute(ARIA_ATTRIBUTE.PRESSED, 'true');
   });
 
   it('submits the entered values with the chosen plan', async () => {
@@ -290,7 +290,7 @@ describe(`<${TenantDetailsForm.name}/>`, () => {
     const inertForm = screen.getByTestId('tenant-details-form-inert');
 
     expect(overlay).toBeVisible();
-    expect(submitButton).toHaveAttribute(ARIA_DISABLED, 'true');
+    expect(submitButton).toHaveAttribute(ARIA_ATTRIBUTE.DISABLED, 'true');
     expect(submitButton).toHaveAttribute('aria-busy', 'true');
     expect(inertForm).toHaveAttribute('inert');
 
@@ -345,7 +345,7 @@ describe(`<${TenantDetailsForm.name}/>`, () => {
       });
 
       expect(overlay).toBeVisible();
-      expect(submitButton).toHaveAttribute(ARIA_DISABLED, 'true');
+      expect(submitButton).toHaveAttribute(ARIA_ATTRIBUTE.DISABLED, 'true');
 
       resolveWithServerError();
       await waitFor(() => {

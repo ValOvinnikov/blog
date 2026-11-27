@@ -1,6 +1,6 @@
 import { faker } from '@faker-js/faker';
+import { ARIA_ATTRIBUTE } from '@platform/constants/aria-attribute';
 import { CONTROL_MODE } from '@platform/constants/control-mode';
-import { ARIA_DISABLED, ARIA_PRESSED } from '@platform/testing/aria';
 import { customRender, screen, within } from '@platform/testing/custom-render';
 import { makeEnTranslator } from '@platform/testing/en-translator';
 import { USER_EVENT_KEY } from '@platform/testing/keyboard';
@@ -76,7 +76,7 @@ describe(`<${PortableTextEditor.name}/>`, () => {
 
       expect(field).toBeVisible();
       expect(field).toHaveAttribute(ARIA_MULTILINE, 'true');
-      expect(field).not.toHaveAttribute(ARIA_DISABLED);
+      expect(field).not.toHaveAttribute(ARIA_ATTRIBUTE.DISABLED);
     });
 
     it.each([t('bold'), t('heading'), t('bulletList')])(
@@ -120,7 +120,7 @@ describe(`<${PortableTextEditor.name}/>`, () => {
       (name) => {
         const toggle = screen.getByRole('button', { name });
 
-        expect(toggle).toHaveAttribute(ARIA_PRESSED, 'false');
+        expect(toggle).toHaveAttribute(ARIA_ATTRIBUTE.PRESSED, 'false');
       },
     );
   });
@@ -163,7 +163,7 @@ describe(`<${PortableTextEditor.name}/>`, () => {
     it('conveys its disabled state to assistive technology', () => {
       const field = screen.getByRole('textbox', { name: MOCK_LABEL });
 
-      expect(field).toHaveAttribute(ARIA_DISABLED, 'true');
+      expect(field).toHaveAttribute(ARIA_ATTRIBUTE.DISABLED, 'true');
       expect(field).toHaveAttribute(ARIA_MULTILINE, 'true');
       expect(field).not.toHaveAttribute('tabindex');
     });
@@ -175,8 +175,8 @@ describe(`<${PortableTextEditor.name}/>`, () => {
     const field = screen.getByRole('textbox', { name: MOCK_LABEL });
     const toolbarButton = screen.queryByRole('button');
 
-    expect(field).toHaveAttribute('aria-readonly', 'true');
-    expect(field).not.toHaveAttribute(ARIA_DISABLED);
+    expect(field).toHaveAttribute(ARIA_ATTRIBUTE.READONLY, 'true');
+    expect(field).not.toHaveAttribute(ARIA_ATTRIBUTE.DISABLED);
     expect(field).toHaveAttribute('tabindex', '0');
     expect(toolbarButton).not.toBeInTheDocument();
   });
@@ -201,7 +201,10 @@ describe(`<${PortableTextEditor.name}/>`, () => {
     const field = screen.getByRole('textbox', { name: MOCK_LABEL });
 
     expect(field).toHaveAttribute('aria-invalid', 'true');
-    expect(field).toHaveAttribute('aria-describedby', MOCK_DESCRIPTION_ID);
+    expect(field).toHaveAttribute(
+      ARIA_ATTRIBUTE.DESCRIBEDBY,
+      MOCK_DESCRIPTION_ID,
+    );
   });
 
   it('renders an authored link with a safe href as a working anchor', async () => {

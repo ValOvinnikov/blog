@@ -1,9 +1,9 @@
 import { faker } from '@faker-js/faker';
+import { ARIA_ATTRIBUTE } from '@platform/constants/aria-attribute';
 import {
   RELEASE_FIELD_ERROR,
   RELEASE_REFUSAL,
 } from '@platform/constants/release';
-import { ARIA_DISABLED } from '@platform/testing/aria';
 import { customRender, screen, waitFor } from '@platform/testing/custom-render';
 import {
   MOCK_HEAD_SHA,
@@ -206,7 +206,7 @@ describe(`<${StartReleaseDialog.name}/>`, () => {
     const releaseButton = screen.getByRole('button', { name: 'Release' });
     const reason = screen.getByText(RELEASE_RUNNING_REASON);
 
-    expect(releaseButton).toHaveAttribute(ARIA_DISABLED, 'true');
+    expect(releaseButton).toHaveAttribute(ARIA_ATTRIBUTE.DISABLED, 'true');
     expect(reason).toBeVisible();
   });
 });

@@ -1,5 +1,5 @@
+import { ARIA_ATTRIBUTE } from '@platform/constants/aria-attribute';
 import messages from '@platform/i18n/messages/en.json';
-import { ARIA_DISABLED } from '@platform/testing/aria';
 import { screen } from '@platform/testing/custom-render';
 import { USER_EVENT_KEY } from '@platform/testing/keyboard';
 import {
@@ -74,7 +74,7 @@ describe(`<${OnboardingView.name}/> with a refused accent hue`, () => {
       const continueButton = screen.getByRole('button', MOCK_CONTINUE);
       const heading = stepHeading(STEPS.LOOK);
 
-      expect(continueButton).toHaveAttribute(ARIA_DISABLED, 'true');
+      expect(continueButton).toHaveAttribute(ARIA_ATTRIBUTE.DISABLED, 'true');
       expect(heading).toBeVisible();
     });
   });

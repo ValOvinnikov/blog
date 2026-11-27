@@ -1,7 +1,7 @@
 import { faker } from '@faker-js/faker';
+import { ARIA_ATTRIBUTE } from '@platform/constants/aria-attribute';
 import { LOOK_ROW } from '@platform/constants/look-row';
 import { uploadBrandAssetAction } from '@platform/server/site-config/upload-brand-asset-action';
-import { ARIA_EXPANDED } from '@platform/testing/aria';
 import { screen, waitFor } from '@platform/testing/custom-render';
 import { pickLogo } from '@platform/testing/look/brand-image-interactions';
 import {
@@ -74,8 +74,8 @@ describe(useLookOpenRows, () => {
       const colourTrigger = lookRowTrigger(LOOK_ROW.COLOUR);
       const footerTrigger = lookRowTrigger(LOOK_ROW.FOOTER);
       const slider = screen.getByRole('slider', { name: ACCENT_HUE });
-      expect(colourTrigger).toHaveAttribute(ARIA_EXPANDED, 'true');
-      expect(footerTrigger).toHaveAttribute(ARIA_EXPANDED, 'true');
+      expect(colourTrigger).toHaveAttribute(ARIA_ATTRIBUTE.EXPANDED, 'true');
+      expect(footerTrigger).toHaveAttribute(ARIA_ATTRIBUTE.EXPANDED, 'true');
       expect(slider).toHaveFocus();
     });
   });
@@ -102,8 +102,8 @@ describe(useLookOpenRows, () => {
       await waitFor(() => {
         expect(replaceLogoButton).toHaveFocus();
       });
-      expect(brandTrigger).toHaveAttribute(ARIA_EXPANDED, 'true');
-      expect(colourTrigger).toHaveAttribute(ARIA_EXPANDED, 'true');
+      expect(brandTrigger).toHaveAttribute(ARIA_ATTRIBUTE.EXPANDED, 'true');
+      expect(colourTrigger).toHaveAttribute(ARIA_ATTRIBUTE.EXPANDED, 'true');
     });
   });
 });

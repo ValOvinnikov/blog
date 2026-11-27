@@ -1,8 +1,8 @@
 import { LOOK_ROW_TITLE_KEY } from '@platform/components/features/look/look-form/look-row-title-key';
 import { FONT_OPTIONS } from '@platform/config/fonts';
+import { ARIA_ATTRIBUTE } from '@platform/constants/aria-attribute';
 import { LOOK_ROW } from '@platform/constants/look-row';
 import messages from '@platform/i18n/messages/en.json';
-import { ARIA_DISABLED } from '@platform/testing/aria';
 import { screen, within } from '@platform/testing/custom-render';
 import { makeEnTranslator } from '@platform/testing/en-translator';
 import {
@@ -79,7 +79,7 @@ describe(`<${LookForm.name}/>`, () => {
       });
 
       expect(lockLine).toBeVisible();
-      expect(headingFont).toHaveAttribute(ARIA_DISABLED, 'true');
+      expect(headingFont).toHaveAttribute(ARIA_ATTRIBUTE.DISABLED, 'true');
       expect(headingFont).toHaveAccessibleDescription(GROWTH_BADGE_TEXT);
     });
   });
@@ -100,7 +100,7 @@ describe(`<${LookForm.name}/>`, () => {
         name: LOOK_FORM.headingFontLabel,
       });
 
-      expect(headingFont).not.toHaveAttribute(ARIA_DISABLED, 'true');
+      expect(headingFont).not.toHaveAttribute(ARIA_ATTRIBUTE.DISABLED, 'true');
       expect(headingFont).not.toHaveAccessibleDescription(GROWTH_BADGE_TEXT);
     });
   });

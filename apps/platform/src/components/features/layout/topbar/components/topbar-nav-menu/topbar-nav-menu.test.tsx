@@ -2,13 +2,9 @@ import { faker } from '@faker-js/faker';
 import { AccountMenu } from '@platform/components/features/layout/account-menu';
 import { SidebarCollapseProvider } from '@platform/components/features/layout/sidebar-collapse-provider';
 import { TenantSwitcher } from '@platform/components/features/layout/tenant-switcher';
+import { ARIA_ATTRIBUTE } from '@platform/constants/aria-attribute';
 import messages from '@platform/i18n/messages/en.json';
 import { usePathname } from '@platform/i18n/navigation';
-import {
-  ARIA_CURRENT,
-  ARIA_DISABLED,
-  ARIA_HIDDEN,
-} from '@platform/testing/aria';
 import {
   customRender,
   renderWithIntl,
@@ -161,8 +157,8 @@ describe(`<${TopbarNavMenu.name}/>`, () => {
       name: MOCK_VOICE_ITEM.label,
     });
 
-    expect(activeItem).toHaveAttribute(ARIA_CURRENT, 'page');
-    expect(inactiveItem).not.toHaveAttribute(ARIA_CURRENT);
+    expect(activeItem).toHaveAttribute(ARIA_ATTRIBUTE.CURRENT, 'page');
+    expect(inactiveItem).not.toHaveAttribute(ARIA_ATTRIBUTE.CURRENT);
   });
 
   it('marks the Studio row current on a path inside the Studio', async () => {
@@ -174,7 +170,7 @@ describe(`<${TopbarNavMenu.name}/>`, () => {
       name: MOCK_STUDIO_ITEM.label,
     });
 
-    expect(studioItem).toHaveAttribute(ARIA_CURRENT, 'page');
+    expect(studioItem).toHaveAttribute(ARIA_ATTRIBUTE.CURRENT, 'page');
   });
 
   it('renders an item with no href as a disabled menu row with its badge', async () => {
@@ -187,7 +183,7 @@ describe(`<${TopbarNavMenu.name}/>`, () => {
     });
     const badge = within(inertRow).getByText(MOCK_BADGE.label);
 
-    expect(inertRow).toHaveAttribute(ARIA_DISABLED, 'true');
+    expect(inertRow).toHaveAttribute(ARIA_ATTRIBUTE.DISABLED, 'true');
     expect(inertRow).not.toHaveAttribute('href');
     expect(badge).toBeVisible();
   });
@@ -247,7 +243,7 @@ describe(`<${TopbarNavMenu.name}/>`, () => {
         const tooltip = screen.getByText(messages.topbarNavMenu.triggerLabel);
 
         expect(getMenuButton()).toHaveFocus();
-        expect(tooltip).toHaveAttribute(ARIA_HIDDEN, 'true');
+        expect(tooltip).toHaveAttribute(ARIA_ATTRIBUTE.HIDDEN, 'true');
       });
 
       it('hides the tooltip on Escape', async () => {
@@ -265,16 +261,17 @@ describe(`<${TopbarNavMenu.name}/>`, () => {
 
     describe('once opened', () => {
       let menu: HTMLElement;
+      let lookLink: HTMLElement;
 
       beforeEach(async () => {
         menu = await openMenu();
+        lookLink = within(menu).getByRole('menuitem', {
+          name: MOCK_LOOK_ITEM.label,
+        });
       });
 
       it('closes the popup after clicking a link item', async () => {
-        const link = within(menu).getByRole('menuitem', {
-          name: MOCK_LOOK_ITEM.label,
-        });
-        await user.click(link);
+        await user.click(lookLink);
 
         expect(menu).not.toBeInTheDocument();
       });
@@ -292,11 +289,7 @@ describe(`<${TopbarNavMenu.name}/>`, () => {
       });
 
       it('titles a row by its label', () => {
-        const link = within(menu).getByRole('menuitem', {
-          name: MOCK_LOOK_ITEM.label,
-        });
-
-        expect(link).toHaveAttribute('title', MOCK_LOOK_ITEM.label);
+        expect(lookLink).toHaveAttribute('title', MOCK_LOOK_ITEM.label);
       });
     });
   });

@@ -1,7 +1,7 @@
 import { faker } from '@faker-js/faker';
+import { ARIA_ATTRIBUTE } from '@platform/constants/aria-attribute';
 import { ONBOARDING_STEP } from '@platform/constants/onboarding';
 import messages from '@platform/i18n/messages/en.json';
-import { ARIA_CURRENT } from '@platform/testing/aria';
 import { customRender, screen, within } from '@platform/testing/custom-render';
 
 import { OnboardingRail } from './onboarding-rail';
@@ -56,10 +56,12 @@ describe(`<${OnboardingRail.name}/>`, () => {
 
     it('marks only the current step as the current one', () => {
       const rows = getRows();
-      const currentRows = rows.filter((row) => row.hasAttribute(ARIA_CURRENT));
+      const currentRows = rows.filter((row) =>
+        row.hasAttribute(ARIA_ATTRIBUTE.CURRENT),
+      );
 
       expect(currentRows).toEqual([rows[1]]);
-      expect(rows[1]).toHaveAttribute(ARIA_CURRENT, 'step');
+      expect(rows[1]).toHaveAttribute(ARIA_ATTRIBUTE.CURRENT, 'step');
     });
   });
 

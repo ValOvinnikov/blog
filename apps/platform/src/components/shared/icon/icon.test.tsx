@@ -1,6 +1,6 @@
 import { faker } from '@faker-js/faker';
+import { ARIA_ATTRIBUTE } from '@platform/constants/aria-attribute';
 import { ICON_TEST_ID } from '@platform/constants/icon';
-import { ARIA_HIDDEN } from '@platform/testing/aria';
 import { customRender, screen } from '@platform/testing/custom-render';
 import { ICONS } from '@shinefold/config';
 
@@ -16,12 +16,21 @@ const MOCK_STROKE_WIDTH = 2.2;
 const setup = customRender(Icon, { name: ICONS.GRID });
 
 describe(`<${Icon.name}/>`, () => {
-  it('is decorative by default', () => {
-    setup();
+  describe('with the default props', () => {
+    let icon: HTMLElement;
 
-    const icon = screen.getByTestId(ICON_TEST_ID);
+    beforeEach(() => {
+      setup();
+      icon = screen.getByTestId(ICON_TEST_ID);
+    });
 
-    expect(icon).toHaveAttribute(ARIA_HIDDEN, 'true');
+    it('is decorative', () => {
+      expect(icon).toHaveAttribute(ARIA_ATTRIBUTE.HIDDEN, 'true');
+    });
+
+    it('keeps the glyph stroke width', () => {
+      expect(icon).toHaveAttribute(STROKE_WIDTH, DEFAULT_STROKE_WIDTH);
+    });
   });
 
   it('exposes an accessible name when one is given', () => {
@@ -30,15 +39,7 @@ describe(`<${Icon.name}/>`, () => {
     const icon = screen.getByTestId(ICON_TEST_ID);
 
     expect(icon).toHaveAccessibleName(MOCK_ARIA_LABEL);
-    expect(icon).not.toHaveAttribute(ARIA_HIDDEN);
-  });
-
-  it('keeps the glyph stroke width when no override is given', () => {
-    setup();
-
-    const icon = screen.getByTestId(ICON_TEST_ID);
-
-    expect(icon).toHaveAttribute(STROKE_WIDTH, DEFAULT_STROKE_WIDTH);
+    expect(icon).not.toHaveAttribute(ARIA_ATTRIBUTE.HIDDEN);
   });
 
   it('draws the glyph at the given stroke width', () => {

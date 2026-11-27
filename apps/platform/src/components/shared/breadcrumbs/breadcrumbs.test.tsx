@@ -1,10 +1,6 @@
 import { faker } from '@faker-js/faker';
+import { ARIA_ATTRIBUTE } from '@platform/constants/aria-attribute';
 import messages from '@platform/i18n/messages/en.json';
-import {
-  ARIA_CURRENT,
-  ARIA_EXPANDED,
-  ARIA_HASPOPUP,
-} from '@platform/testing/aria';
 import {
   customRender,
   screen,
@@ -79,7 +75,7 @@ describe(`<${Breadcrumbs.name}/>`, () => {
 
     expect(yourSiteLink).toHaveAttribute('href', adminRoutes.dashboard());
     expect(lookLink).not.toBeInTheDocument();
-    expect(current).toHaveAttribute(ARIA_CURRENT, 'page');
+    expect(current).toHaveAttribute(ARIA_ATTRIBUTE.CURRENT, 'page');
   });
 
   it('renders an ancestor with no href as a non-clickable label, not a link', () => {
@@ -89,7 +85,7 @@ describe(`<${Breadcrumbs.name}/>`, () => {
     const platformText = screen.getByText(MOCK_PLATFORM);
 
     expect(platformLink).not.toBeInTheDocument();
-    expect(platformText).not.toHaveAttribute(ARIA_CURRENT);
+    expect(platformText).not.toHaveAttribute(ARIA_ATTRIBUTE.CURRENT);
   });
 
   it('titles a shrinkable link with its full label', () => {
@@ -161,8 +157,8 @@ describe(`<${Breadcrumbs.name}/>`, () => {
     });
 
     it('offers a collapsed menu button for the full path', () => {
-      expect(trigger).toHaveAttribute(ARIA_HASPOPUP, 'menu');
-      expect(trigger).toHaveAttribute(ARIA_EXPANDED, 'false');
+      expect(trigger).toHaveAttribute(ARIA_ATTRIBUTE.HASPOPUP, 'menu');
+      expect(trigger).toHaveAttribute(ARIA_ATTRIBUTE.EXPANDED, 'false');
     });
 
     describe('once opened', () => {

@@ -1,5 +1,5 @@
 import { faker } from '@faker-js/faker';
-import { ARIA_CONTROLS, ARIA_EXPANDED } from '@platform/testing/aria';
+import { ARIA_ATTRIBUTE } from '@platform/constants/aria-attribute';
 import {
   customRender,
   renderWithIntl,
@@ -60,16 +60,6 @@ describe(`<${Disclosure.name}/>`, () => {
     user = userEvent.setup();
   });
 
-  it('renders the summary as a collapsed button and hides the content', () => {
-    setup();
-
-    const trigger = screen.getByRole('button', { name: MOCK_SUMMARY });
-    const body = screen.getByText(MOCK_BODY);
-
-    expect(trigger).toHaveAttribute(ARIA_EXPANDED, 'false');
-    expect(body).not.toBeVisible();
-  });
-
   it('renders the trigger inside a heading of the given level', () => {
     setup({ heading: { level: 2 } });
 
@@ -89,57 +79,53 @@ describe(`<${Disclosure.name}/>`, () => {
 
     const body = screen.getByText(MOCK_BODY);
 
-    expect(trigger).toHaveAttribute(ARIA_EXPANDED, 'true');
+    expect(trigger).toHaveAttribute(ARIA_ATTRIBUTE.EXPANDED, 'true');
     expect(body).toBeVisible();
   });
 
-  it('points the open trigger at its panel', async () => {
-    setup();
+  describe('with the default props', () => {
+    let trigger: HTMLElement;
+    let body: HTMLElement;
 
-    const trigger = screen.getByRole('button', { name: MOCK_SUMMARY });
-    await user.click(trigger);
+    beforeEach(() => {
+      setup();
+      trigger = screen.getByRole('button', { name: MOCK_SUMMARY });
+      body = screen.getByText(MOCK_BODY);
+    });
 
-    expect(trigger).toHaveAttribute(ARIA_CONTROLS);
-  });
+    it('renders the summary as a collapsed button and hides the content', () => {
+      expect(trigger).toHaveAttribute(ARIA_ATTRIBUTE.EXPANDED, 'false');
+      expect(body).not.toBeVisible();
+    });
 
-  it('renders no heading without a heading level', () => {
-    setup();
+    it('renders no heading without a heading level', () => {
+      const heading = screen.queryByRole('heading');
 
-    const heading = screen.queryByRole('heading');
+      expect(heading).not.toBeInTheDocument();
+    });
 
-    expect(heading).not.toBeInTheDocument();
-  });
+    it('toggles open, pointing at its panel, and closed on click', async () => {
+      await user.click(trigger);
 
-  it('toggles open and closed on click', async () => {
-    setup();
+      expect(trigger).toHaveAttribute(ARIA_ATTRIBUTE.EXPANDED, 'true');
+      expect(trigger).toHaveAttribute(ARIA_ATTRIBUTE.CONTROLS);
+      expect(body).toBeVisible();
 
-    const trigger = screen.getByRole('button', { name: MOCK_SUMMARY });
-    const body = screen.getByText(MOCK_BODY);
+      await user.click(trigger);
 
-    await user.click(trigger);
+      expect(trigger).toHaveAttribute(ARIA_ATTRIBUTE.EXPANDED, 'false');
+      expect(body).not.toBeVisible();
+    });
 
-    expect(trigger).toHaveAttribute(ARIA_EXPANDED, 'true');
-    expect(body).toBeVisible();
+    it.each(['{Enter}', ' '])('toggles with the %s key', async (key) => {
+      await user.tab();
 
-    await user.click(trigger);
+      expect(trigger).toHaveFocus();
 
-    expect(trigger).toHaveAttribute(ARIA_EXPANDED, 'false');
-    expect(body).not.toBeVisible();
-  });
-
-  it.each(['{Enter}', ' '])('toggles with the %s key', async (key) => {
-    setup();
-
-    await user.tab();
-    const trigger = screen.getByRole('button', { name: MOCK_SUMMARY });
-
-    expect(trigger).toHaveFocus();
-
-    await user.keyboard(key);
-    const body = screen.getByText(MOCK_BODY);
-
-    expect(trigger).toHaveAttribute(ARIA_EXPANDED, 'true');
-    expect(body).toBeVisible();
+      await user.keyboard(key);
+      expect(trigger).toHaveAttribute(ARIA_ATTRIBUTE.EXPANDED, 'true');
+      expect(body).toBeVisible();
+    });
   });
 
   it('renders the trigger with no content', () => {
@@ -173,7 +159,7 @@ describe(`<${Disclosure.name}/>`, () => {
 
       const trigger = screen.getByRole('button', { name: MOCK_SUMMARY });
 
-      expect(trigger).toHaveAttribute(ARIA_EXPANDED, expanded);
+      expect(trigger).toHaveAttribute(ARIA_ATTRIBUTE.EXPANDED, expanded);
     });
 
     it('reports the next open state without opening on its own', async () => {
@@ -195,7 +181,7 @@ describe(`<${Disclosure.name}/>`, () => {
       const trigger = screen.getByRole('button', { name: MOCK_SUMMARY });
       await user.click(trigger);
 
-      expect(trigger).toHaveAttribute(ARIA_EXPANDED, 'true');
+      expect(trigger).toHaveAttribute(ARIA_ATTRIBUTE.EXPANDED, 'true');
     });
   });
 
@@ -223,15 +209,15 @@ describe(`<${Disclosure.name}/>`, () => {
       expect(collapsed).not.toBeInTheDocument();
     });
 
-    it.each([
-      ['closed', false],
-      ['open', true],
-    ])('points the trigger at the one body while %s', async (_, isOpen) => {
-      const trigger = screen.getByRole('button', { name: MOCK_SUMMARY });
-      if (isOpen) await user.click(trigger);
+    it.each([false, true])(
+      'points the trigger at the one body while open is %s',
+      async (isOpen) => {
+        const trigger = screen.getByRole('button', { name: MOCK_SUMMARY });
+        if (isOpen) await user.click(trigger);
 
-      expect(trigger).toHaveAttribute(ARIA_CONTROLS, MOCK_BODY_ID);
-    });
+        expect(trigger).toHaveAttribute(ARIA_ATTRIBUTE.CONTROLS, MOCK_BODY_ID);
+      },
+    );
 
     it('gives the heading its id', () => {
       const heading = screen.getByRole('heading', {

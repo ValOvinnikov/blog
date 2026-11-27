@@ -1,4 +1,5 @@
 import { faker } from '@faker-js/faker';
+import { ARIA_ATTRIBUTE } from '@platform/constants/aria-attribute';
 import { customRender, screen } from '@platform/testing/custom-render';
 import { pickNextOptionByKeyboard } from '@platform/testing/pick-next-option-by-keyboard';
 import { EMAIL_SENDER_ITEM } from '@platform/utils/email-draft/email-draft';
@@ -10,7 +11,6 @@ import { ItemSelect } from './item-select';
 faker.seed(5993);
 
 const MOCK_LABEL = faker.lorem.word();
-const ARIA_SELECTED = 'aria-selected';
 
 const MOCK_SENDER_OPTION = {
   value: EMAIL_SENDER_ITEM,
@@ -81,45 +81,50 @@ describe(`<${ItemSelect.name}/>`, () => {
       trigger = screen.getByRole('combobox', { name: MOCK_LABEL });
     });
 
-    it('lists every item with its description and status, marking the selected', async () => {
-      await user.click(trigger);
-
-      const senderOption = await screen.findByRole('option', {
-        name: optionName(MOCK_SENDER_OPTION),
-      });
-      const templateOption = screen.getByRole('option', {
-        name: optionName(MOCK_TEMPLATE_OPTION),
-      });
-
-      expect(senderOption).toHaveAttribute(ARIA_SELECTED, 'true');
-      expect(templateOption).toHaveAttribute(ARIA_SELECTED, 'false');
-    });
-
-    it('selects an item by pointer', async () => {
-      await user.click(trigger);
-      const templateOption = await screen.findByRole('option', {
-        name: optionName(MOCK_TEMPLATE_OPTION),
-      });
-      await user.click(templateOption);
-
-      expect(onSelect).toHaveBeenCalledWith(MOCK_TEMPLATE_OPTION.value);
-    });
-
     it('selects an item with the arrow keys and Enter', async () => {
       await pickNextOptionByKeyboard(user, optionName(MOCK_TEMPLATE_OPTION));
 
       expect(onSelect).toHaveBeenCalledWith(MOCK_TEMPLATE_OPTION.value);
     });
 
-    it('closes on Escape without changing the selection', async () => {
-      await user.click(trigger);
-      await screen.findByRole('listbox');
-      await user.keyboard('{Escape}');
+    describe('once opened', () => {
+      beforeEach(async () => {
+        await user.click(trigger);
+      });
 
-      const listbox = screen.queryByRole('listbox');
+      it('lists every item with its description and status, marking the selected', async () => {
+        const senderOption = await screen.findByRole('option', {
+          name: optionName(MOCK_SENDER_OPTION),
+        });
+        const templateOption = screen.getByRole('option', {
+          name: optionName(MOCK_TEMPLATE_OPTION),
+        });
 
-      expect(listbox).not.toBeInTheDocument();
-      expect(onSelect).not.toHaveBeenCalled();
+        expect(senderOption).toHaveAttribute(ARIA_ATTRIBUTE.SELECTED, 'true');
+        expect(templateOption).toHaveAttribute(
+          ARIA_ATTRIBUTE.SELECTED,
+          'false',
+        );
+      });
+
+      it('selects an item by pointer', async () => {
+        const templateOption = await screen.findByRole('option', {
+          name: optionName(MOCK_TEMPLATE_OPTION),
+        });
+        await user.click(templateOption);
+
+        expect(onSelect).toHaveBeenCalledWith(MOCK_TEMPLATE_OPTION.value);
+      });
+
+      it('closes on Escape without changing the selection', async () => {
+        await screen.findByRole('listbox');
+        await user.keyboard('{Escape}');
+
+        const listbox = screen.queryByRole('listbox');
+
+        expect(listbox).not.toBeInTheDocument();
+        expect(onSelect).not.toHaveBeenCalled();
+      });
     });
   });
 });

@@ -1,6 +1,6 @@
+import { ARIA_ATTRIBUTE } from '@platform/constants/aria-attribute';
 import { LOOK_ROW } from '@platform/constants/look-row';
 import messages from '@platform/i18n/messages/en.json';
-import { ARIA_DISABLED, ARIA_PRESSED } from '@platform/testing/aria';
 import { screen, within } from '@platform/testing/custom-render';
 import { USER_EVENT_KEY } from '@platform/testing/keyboard';
 import {
@@ -59,8 +59,8 @@ describe(`<${LookForm.name}/>`, () => {
 
       expect(radiusGroup).toHaveAccessibleDescription(GROWTH_BADGE_TEXT);
       expect(extraLargeButton).toBeEnabled();
-      expect(extraLargeButton).toHaveAttribute(ARIA_DISABLED, 'true');
-      expect(extraLargeButton).toHaveAttribute(ARIA_PRESSED, 'false');
+      expect(extraLargeButton).toHaveAttribute(ARIA_ATTRIBUTE.DISABLED, 'true');
+      expect(extraLargeButton).toHaveAttribute(ARIA_ATTRIBUTE.PRESSED, 'false');
     });
 
     it('keeps the locked Card style tiles at the preset value while arrows move focus', async () => {
@@ -82,7 +82,7 @@ describe(`<${LookForm.name}/>`, () => {
 
       expect(filledTile).toHaveFocus();
       expect(accentBarTile).toBeChecked();
-      expect(outlinedTile).toHaveAttribute(ARIA_DISABLED, 'true');
+      expect(outlinedTile).toHaveAttribute(ARIA_ATTRIBUTE.DISABLED, 'true');
       expect(tiles).toHaveAccessibleDescription(
         `${GROWTH_BADGE_TEXT} ${LOOK_FORM.cardStyleOptionDescription.ACCENT_BAR} ${LOOK_FORM.cardStyleDescription}`,
       );
@@ -102,7 +102,7 @@ describe(`<${LookForm.name}/>`, () => {
         name: messages.logoHueField.logoHueAriaLabel,
       });
       expect(followSwitch).toBeChecked();
-      expect(followSwitch).toHaveAttribute(ARIA_DISABLED, 'true');
+      expect(followSwitch).toHaveAttribute(ARIA_ATTRIBUTE.DISABLED, 'true');
       expect(followSwitch).toHaveAccessibleDescription(
         `${GROWTH_BADGE_TEXT} ${LOOK_FORM.logoHueDescription}`,
       );
@@ -138,7 +138,10 @@ describe(`<${LookForm.name}/>`, () => {
         name: UPLOAD_LOGO,
       });
 
-      expect(editorialPreset).not.toHaveAttribute(ARIA_DISABLED, 'true');
+      expect(editorialPreset).not.toHaveAttribute(
+        ARIA_ATTRIBUTE.DISABLED,
+        'true',
+      );
       expect(hueSlider).toBeEnabled();
       expect(brandNameInput).toBeEnabled();
       expect(uploadLogoButton).toBeEnabled();

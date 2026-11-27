@@ -1,3 +1,4 @@
+import { ARIA_ATTRIBUTE } from '@platform/constants/aria-attribute';
 import messages from '@platform/i18n/messages/en.json';
 import { grantEntitlementAction } from '@platform/server/entitlement-grants/grant-entitlement-action';
 import { updateAnalyticsAction } from '@platform/server/settings-features/update-analytics-action';
@@ -5,7 +6,6 @@ import {
   updateFeaturesAction,
   type TUpdateFeaturesResult,
 } from '@platform/server/settings-features/update-features-action';
-import { ARIA_DISABLED } from '@platform/testing/aria';
 import { expectArchivedOffersNoSave } from '@platform/testing/assert-archived-save';
 import { screen, waitFor, within } from '@platform/testing/custom-render';
 import { makeEnTranslator } from '@platform/testing/en-translator';
@@ -280,9 +280,12 @@ describe(`<${FeaturesSettings.name}/>`, () => {
     });
 
     it('shows an out-of-plan toggle locked, never hidden', () => {
-      expect(consentSwitch).toHaveAttribute(ARIA_DISABLED, 'true');
-      expect(contactFormSwitch).toHaveAttribute(ARIA_DISABLED, 'true');
-      expect(bookmarksSwitch).not.toHaveAttribute(ARIA_DISABLED);
+      expect(consentSwitch).toHaveAttribute(ARIA_ATTRIBUTE.DISABLED, 'true');
+      expect(contactFormSwitch).toHaveAttribute(
+        ARIA_ATTRIBUTE.DISABLED,
+        'true',
+      );
+      expect(bookmarksSwitch).not.toHaveAttribute(ARIA_ATTRIBUTE.DISABLED);
     });
 
     it('keeps an out-of-plan toggle focusable but unchangeable', async () => {
@@ -325,7 +328,7 @@ describe(`<${FeaturesSettings.name}/>`, () => {
       name: saveBar.saving,
     });
 
-    expect(savingButton).toHaveAttribute(ARIA_DISABLED, 'true');
+    expect(savingButton).toHaveAttribute(ARIA_ATTRIBUTE.DISABLED, 'true');
 
     resolveAction({ outcome: ACTION_OUTCOME.SUCCESS });
 
@@ -414,7 +417,7 @@ describe(`<${FeaturesSettings.name}/>`, () => {
       await user.click(bookmarksSwitch);
 
       expect(bookmarksSwitch).toHaveFocus();
-      expect(bookmarksSwitch).toHaveAttribute(ARIA_DISABLED, 'true');
+      expect(bookmarksSwitch).toHaveAttribute(ARIA_ATTRIBUTE.DISABLED, 'true');
       expect(bookmarksSwitch).toHaveAccessibleDescription(
         `${toggleDescription[CAPABILITY.BOOKMARKS]} ${PARENT_OFF_REASON}`,
       );
@@ -464,8 +467,11 @@ describe(`<${FeaturesSettings.name}/>`, () => {
       name: BOOKMARKS_LABEL,
     });
 
-    expect(readerAccountsSwitch).toHaveAttribute(ARIA_DISABLED, 'true');
-    expect(bookmarksSwitch).toHaveAttribute(ARIA_DISABLED, 'true');
+    expect(readerAccountsSwitch).toHaveAttribute(
+      ARIA_ATTRIBUTE.DISABLED,
+      'true',
+    );
+    expect(bookmarksSwitch).toHaveAttribute(ARIA_ATTRIBUTE.DISABLED, 'true');
   });
 
   describe('grants', () => {
@@ -563,7 +569,9 @@ describe(`<${FeaturesSettings.name}/>`, () => {
         expect(readerAccountsSwitch).toHaveAccessibleDescription(
           `${toggleDescription[CAPABILITY.READER_ACCOUNTS]} ${grantedBadge.label}`,
         );
-        expect(readerAccountsSwitch).not.toHaveAttribute(ARIA_DISABLED);
+        expect(readerAccountsSwitch).not.toHaveAttribute(
+          ARIA_ATTRIBUTE.DISABLED,
+        );
       });
 
       it('keeps the plan lock on a capability that is not granted', () => {
@@ -612,7 +620,7 @@ describe(`<${FeaturesSettings.name}/>`, () => {
       });
 
       expect(bookmarksSwitch).toBeEnabled();
-      expect(bookmarksSwitch).toHaveAttribute(ARIA_DISABLED, 'true');
+      expect(bookmarksSwitch).toHaveAttribute(ARIA_ATTRIBUTE.DISABLED, 'true');
       expect(bookmarksSwitch).toHaveAccessibleDescription(
         `${ARCHIVED_NOTICE_DESCRIPTION} ${toggleDescription[CAPABILITY.BOOKMARKS]}`,
       );

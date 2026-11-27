@@ -1,9 +1,9 @@
+import { ARIA_ATTRIBUTE } from '@platform/constants/aria-attribute';
 import {
   PREVIEW_DEVICE,
   PREVIEW_DEVICE_WIDTH,
   type TPreviewDevice,
 } from '@platform/constants/preview';
-import { ARIA_PRESSED } from '@platform/testing/aria';
 import { screen, within } from '@platform/testing/custom-render';
 import { makeEnTranslator } from '@platform/testing/en-translator';
 import { reachReview } from '@platform/testing/onboarding/address-step';
@@ -52,7 +52,7 @@ const deviceButton = (device: TPreviewDevice) =>
   within(previewToolbar()).getByRole('button', { name: DEVICE_NAME[device] });
 
 const expectPressed = (button: HTMLElement, isPressed: boolean) => {
-  expect(button).toHaveAttribute(ARIA_PRESSED, String(isPressed));
+  expect(button).toHaveAttribute(ARIA_ATTRIBUTE.PRESSED, String(isPressed));
 };
 
 const sampleFrame = (device: TPreviewDevice) =>

@@ -1,7 +1,7 @@
 import { faker } from '@faker-js/faker';
+import { ARIA_ATTRIBUTE } from '@platform/constants/aria-attribute';
 import en from '@platform/i18n/messages/en.json';
 import { saveVoiceOverridesAction } from '@platform/server/site-config/save-voice-overrides-action';
-import { ARIA_EXPANDED } from '@platform/testing/aria';
 import { screen, within } from '@platform/testing/custom-render';
 import { makeEnTranslator } from '@platform/testing/en-translator';
 import { mockRouterRefresh } from '@platform/testing/mock-router';
@@ -136,6 +136,9 @@ describe(`<${VoiceSettings.name}/> empty lists`, () => {
   });
 
   describe('a list default holding the name placeholder', () => {
+    let section: HTMLElement;
+    let editor: HTMLElement;
+
     beforeEach(async () => {
       saveVoiceOverridesActionMock.mockResolvedValueOnce({
         outcome: ACTION_OUTCOME.SUCCESS,
@@ -145,13 +148,13 @@ describe(`<${VoiceSettings.name}/> empty lists`, () => {
         name: TOPIC_ROW,
       });
       await user.click(topicRow);
-    });
-
-    it('shows the raw placeholder as text, keeps its note and stays untouched', async () => {
-      const section = voiceCard(EMPTY_LISTS);
-      const editor = await within(section).findByRole('textbox', {
+      section = voiceCard(EMPTY_LISTS);
+      editor = await within(section).findByRole('textbox', {
         name: TOPIC_FIELD,
       });
+    });
+
+    it('shows the raw placeholder as text, keeps its note and stays untouched', () => {
       const unsavedMark = within(section).queryByRole('img', {
         name: UNSAVED_MARK,
       });
@@ -173,9 +176,6 @@ describe(`<${VoiceSettings.name}/> empty lists`, () => {
     });
 
     it('sends no override for it when another field is saved', async () => {
-      const section = voiceCard(EMPTY_LISTS);
-      await within(section).findByRole('textbox', { name: TOPIC_FIELD });
-
       await editVoiceHeadingAndSave(user, MOCK_TYPED_TEXT);
 
       expect(saveVoiceOverridesActionMock).toHaveBeenCalledWith(
@@ -203,7 +203,7 @@ describe(`<${VoiceSettings.name}/> empty lists`, () => {
 
       const remountedToggle = showPreviewButton();
 
-      expect(remountedToggle).toHaveAttribute(ARIA_EXPANDED, 'false');
+      expect(remountedToggle).toHaveAttribute(ARIA_ATTRIBUTE.EXPANDED, 'false');
     });
 
     it('hides the preview again after a language switch', async () => {
@@ -216,7 +216,7 @@ describe(`<${VoiceSettings.name}/> empty lists`, () => {
 
       const remountedToggle = showPreviewButton();
 
-      expect(remountedToggle).toHaveAttribute(ARIA_EXPANDED, 'false');
+      expect(remountedToggle).toHaveAttribute(ARIA_ATTRIBUTE.EXPANDED, 'false');
     });
 
     it('still reveals the preview on an archived tenant', async () => {
@@ -226,7 +226,7 @@ describe(`<${VoiceSettings.name}/> empty lists`, () => {
       const toggle = showPreviewButton();
       await user.click(toggle);
 
-      expect(toggle).toHaveAttribute(ARIA_EXPANDED, 'true');
+      expect(toggle).toHaveAttribute(ARIA_ATTRIBUTE.EXPANDED, 'true');
     });
   });
 

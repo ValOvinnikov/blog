@@ -1,6 +1,6 @@
 import { faker } from '@faker-js/faker';
+import { ARIA_ATTRIBUTE } from '@platform/constants/aria-attribute';
 import en from '@platform/i18n/messages/en.json';
-import { ARIA_DISABLED } from '@platform/testing/aria';
 import { screen } from '@platform/testing/custom-render';
 import { mockEmailBody } from '@platform/testing/email-draft';
 import {
@@ -162,7 +162,7 @@ describe(`<${EmailTemplateEditor.name}/>`, () => {
     it('locks the subject read-only and describes it with the notice', () => {
       const subjectInput = screen.getByLabelText(SUBJECT_LABEL);
 
-      expect(subjectInput).toHaveAttribute(ARIA_DISABLED, 'true');
+      expect(subjectInput).toHaveAttribute(ARIA_ATTRIBUTE.DISABLED, 'true');
       expect(subjectInput).toHaveAttribute('readonly');
       expect(subjectInput).toHaveAccessibleDescription(
         `${ARCHIVED_NOTICE_TEXT} ${subjectHint}`,
@@ -174,7 +174,7 @@ describe(`<${EmailTemplateEditor.name}/>`, () => {
         name: MESSAGE_LABEL,
       });
 
-      expect(messageEditor).toHaveAttribute('aria-readonly', 'true');
+      expect(messageEditor).toHaveAttribute(ARIA_ATTRIBUTE.READONLY, 'true');
       expect(messageEditor).toHaveAccessibleDescription(
         `${bodyHint} ${ARCHIVED_NOTICE_TEXT}`,
       );
@@ -185,7 +185,7 @@ describe(`<${EmailTemplateEditor.name}/>`, () => {
         name: UPLOAD_TEMPLATE_LOGO,
       });
 
-      expect(uploadButton).toHaveAttribute(ARIA_DISABLED, 'true');
+      expect(uploadButton).toHaveAttribute(ARIA_ATTRIBUTE.DISABLED, 'true');
       expect(uploadButton).toHaveAccessibleDescription(
         `${logoHint} ${ARCHIVED_NOTICE_TEXT}`,
       );

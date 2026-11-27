@@ -1,5 +1,5 @@
+import { ARIA_ATTRIBUTE } from '@platform/constants/aria-attribute';
 import en from '@platform/i18n/messages/en.json';
-import { ARIA_DISABLED, ARIA_SELECTED } from '@platform/testing/aria';
 import { expectArchivedOffersNoSave } from '@platform/testing/assert-archived-save';
 import { screen, waitFor, within } from '@platform/testing/custom-render';
 import {
@@ -109,7 +109,7 @@ describe(`<${EmailSettings.name}/>`, () => {
       const editPanel = screen.getByRole('tabpanel', { name: EDIT });
       const senderNameInput = screen.getByLabelText(SENDER_NAME);
 
-      expect(editTab).toHaveAttribute(ARIA_SELECTED, 'true');
+      expect(editTab).toHaveAttribute(ARIA_ATTRIBUTE.SELECTED, 'true');
       expect(editPanel).toContainElement(senderNameInput);
 
       await user.click(previewTab);
@@ -119,7 +119,7 @@ describe(`<${EmailSettings.name}/>`, () => {
         name: en.emailPreview.heading,
       });
 
-      expect(previewTab).toHaveAttribute(ARIA_SELECTED, 'true');
+      expect(previewTab).toHaveAttribute(ARIA_ATTRIBUTE.SELECTED, 'true');
       expect(previewPanel).toContainElement(previewRegion);
     });
 
@@ -176,6 +176,6 @@ describe(`<${EmailSettings.name}/>`, () => {
     expectArchivedOffersNoSave();
     const senderNameInput = screen.getByLabelText(SENDER_NAME);
 
-    expect(senderNameInput).toHaveAttribute(ARIA_DISABLED, 'true');
+    expect(senderNameInput).toHaveAttribute(ARIA_ATTRIBUTE.DISABLED, 'true');
   });
 });

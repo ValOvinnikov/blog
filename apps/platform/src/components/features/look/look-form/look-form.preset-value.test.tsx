@@ -1,6 +1,6 @@
+import { ARIA_ATTRIBUTE } from '@platform/constants/aria-attribute';
 import { LOOK_ROW } from '@platform/constants/look-row';
 import messages from '@platform/i18n/messages/en.json';
-import { ARIA_PRESSED } from '@platform/testing/aria';
 import { screen, within } from '@platform/testing/custom-render';
 import { makeEnTranslator } from '@platform/testing/en-translator';
 import {
@@ -82,7 +82,7 @@ describe(`<${LookForm.name}/> Use preset value`, () => {
 
       const group = screen.getByRole('group', { name: label });
       const presetButton = within(group).getByRole('button', { name: preset });
-      expect(presetButton).toHaveAttribute(ARIA_PRESSED, 'true');
+      expect(presetButton).toHaveAttribute(ARIA_ATTRIBUTE.PRESSED, 'true');
     },
   );
 
@@ -104,8 +104,8 @@ describe(`<${LookForm.name}/> Use preset value`, () => {
       });
       const compactButton = screen.getByRole('button', { name: COMPACT });
 
-      expect(extraLargeButton).toHaveAttribute(ARIA_PRESSED, 'true');
-      expect(compactButton).toHaveAttribute(ARIA_PRESSED, 'true');
+      expect(extraLargeButton).toHaveAttribute(ARIA_ATTRIBUTE.PRESSED, 'true');
+      expect(compactButton).toHaveAttribute(ARIA_ATTRIBUTE.PRESSED, 'true');
     });
 
     it("puts the radius alone back to the new preset's value", async () => {
@@ -120,7 +120,7 @@ describe(`<${LookForm.name}/> Use preset value`, () => {
       const usePresetRadiusButton = screen.queryByRole('button', {
         name: usePresetValueName(LOOK_FORM.radiusScaleLabel),
       });
-      expect(smallButton).toHaveAttribute(ARIA_PRESSED, 'true');
+      expect(smallButton).toHaveAttribute(ARIA_ATTRIBUTE.PRESSED, 'true');
       expect(usePresetRadiusButton).not.toBeInTheDocument();
     });
   });

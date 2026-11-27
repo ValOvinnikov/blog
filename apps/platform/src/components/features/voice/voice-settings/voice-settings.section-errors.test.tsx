@@ -1,7 +1,7 @@
 import { faker } from '@faker-js/faker';
+import { ARIA_ATTRIBUTE } from '@platform/constants/aria-attribute';
 import en from '@platform/i18n/messages/en.json';
 import { saveVoiceOverridesAction } from '@platform/server/site-config/save-voice-overrides-action';
-import { ARIA_EXPANDED } from '@platform/testing/aria';
 import { screen, waitFor, within } from '@platform/testing/custom-render';
 import { mockRouterRefresh } from '@platform/testing/mock-router';
 import {
@@ -129,7 +129,7 @@ describe(`<${VoiceSettings.name}/> section errors`, () => {
       });
 
     await waitFor(() => expect(topicField()).toHaveFocus());
-    expect(emptyStatesHeader).toHaveAttribute(ARIA_EXPANDED, 'true');
+    expect(emptyStatesHeader).toHaveAttribute(ARIA_ATTRIBUTE.EXPANDED, 'true');
   });
 
   it('counts every rejected field of a section and opens only the first row', async () => {
@@ -158,7 +158,7 @@ describe(`<${VoiceSettings.name}/> section errors`, () => {
     expect(topicField).toHaveAccessibleDescription(
       `${en.voiceFieldHints.topicEmpty} ${MISSING_NAME_MESSAGE}`,
     );
-    expect(tagRow).toHaveAttribute(ARIA_EXPANDED, 'false');
+    expect(tagRow).toHaveAttribute(ARIA_ATTRIBUTE.EXPANDED, 'false');
     expect(tagRow).toHaveAccessibleDescription(MISSING_NAME_MESSAGE);
   });
 

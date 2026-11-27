@@ -1,5 +1,5 @@
+import { ARIA_ATTRIBUTE } from '@platform/constants/aria-attribute';
 import { LOOK_ROW } from '@platform/constants/look-row';
-import { ARIA_DISABLED } from '@platform/testing/aria';
 import {
   BUTTON_COLOR_DARK_FOLLOWS,
   BUTTON_COLOR_FOLLOWS_ACCENT,
@@ -47,7 +47,7 @@ describe(`<${LookForm.name}/>`, () => {
         await user.click(lockedSwitch);
 
         expect(lockedSwitch).toBeChecked();
-        expect(lockedSwitch).toHaveAttribute(ARIA_DISABLED, 'true');
+        expect(lockedSwitch).toHaveAttribute(ARIA_ATTRIBUTE.DISABLED, 'true');
       },
     );
   });

@@ -1,3 +1,4 @@
+import { ARIA_ATTRIBUTE } from '@platform/constants/aria-attribute';
 import messages from '@platform/i18n/messages/en.json';
 import { customRender, screen } from '@platform/testing/custom-render';
 import { makeEnTranslator } from '@platform/testing/en-translator';
@@ -102,7 +103,7 @@ describe(`<${Pagination.name}/>`, () => {
       const previous = screen.getByRole('button', { name: PREVIOUS });
       await user.click(previous);
 
-      expect(previous).toHaveAttribute('aria-disabled', 'true');
+      expect(previous).toHaveAttribute(ARIA_ATTRIBUTE.DISABLED, 'true');
       expect(onPageChange).not.toHaveBeenCalled();
     });
 

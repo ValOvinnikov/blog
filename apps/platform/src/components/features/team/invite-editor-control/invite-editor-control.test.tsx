@@ -1,8 +1,8 @@
+import { ARIA_ATTRIBUTE } from '@platform/constants/aria-attribute';
 import {
   TEAM_INVITE_FIELD_ERROR,
   type TTeamInviteFieldError,
 } from '@platform/constants/team-access';
-import { ARIA_DISABLED } from '@platform/testing/aria';
 import { customRender, screen } from '@platform/testing/custom-render';
 import { USER_EVENT_KEY } from '@platform/testing/keyboard';
 import { mockRouterRefresh } from '@platform/testing/mock-router';
@@ -58,7 +58,7 @@ describe(`<${InviteEditorControl.name}/>`, () => {
     await user.click(invite);
     const dialog = screen.queryByRole('dialog');
 
-    expect(invite).toHaveAttribute(ARIA_DISABLED, 'true');
+    expect(invite).toHaveAttribute(ARIA_ATTRIBUTE.DISABLED, 'true');
     expect(dialog).not.toBeInTheDocument();
   });
 

@@ -1,6 +1,6 @@
+import { ARIA_ATTRIBUTE } from '@platform/constants/aria-attribute';
 import { LOOK_ROW } from '@platform/constants/look-row';
 import messages from '@platform/i18n/messages/en.json';
-import { ARIA_DISABLED, ARIA_PRESSED } from '@platform/testing/aria';
 import { screen, within } from '@platform/testing/custom-render';
 import { GROWTH_BADGE_TEXT } from '@platform/testing/look/look-form-fixtures';
 import {
@@ -60,7 +60,10 @@ describe(`<${LookForm.name}/>`, () => {
       async ({ option, shown, removed }) => {
         await chooseSegment(user, LOOK_FORM.colorModeLabel, option);
 
-        expect(previewModeButton(shown)).toHaveAttribute(ARIA_PRESSED, 'true');
+        expect(previewModeButton(shown)).toHaveAttribute(
+          ARIA_ATTRIBUTE.PRESSED,
+          'true',
+        );
         expect(previewModeButton(removed)).not.toBeInTheDocument();
       },
     );
@@ -114,8 +117,8 @@ describe(`<${LookForm.name}/>`, () => {
 
       await user.click(darkButton);
 
-      expect(readerButton).toHaveAttribute(ARIA_PRESSED, 'true');
-      expect(darkButton).toHaveAttribute(ARIA_DISABLED, 'true');
+      expect(readerButton).toHaveAttribute(ARIA_ATTRIBUTE.PRESSED, 'true');
+      expect(darkButton).toHaveAttribute(ARIA_ATTRIBUTE.DISABLED, 'true');
     });
   });
 });

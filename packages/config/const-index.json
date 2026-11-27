@@ -6506,9 +6506,105 @@
         "file": "apps/platform/src/constants/activity.ts"
       }
     ],
+    "aria-controls": [
+      {
+        "ref": "ARIA_ATTRIBUTE.CONTROLS",
+        "scope": "app:platform",
+        "from": "@platform/constants/aria-attribute",
+        "file": "apps/platform/src/constants/aria-attribute.ts"
+      }
+    ],
+    "aria-current": [
+      {
+        "ref": "ARIA_ATTRIBUTE.CURRENT",
+        "scope": "app:platform",
+        "from": "@platform/constants/aria-attribute",
+        "file": "apps/platform/src/constants/aria-attribute.ts"
+      }
+    ],
+    "aria-describedby": [
+      {
+        "ref": "ARIA_ATTRIBUTE.DESCRIBEDBY",
+        "scope": "app:platform",
+        "from": "@platform/constants/aria-attribute",
+        "file": "apps/platform/src/constants/aria-attribute.ts"
+      }
+    ],
     "aria-disabled": [
       {
         "ref": "ARIA_ATTRIBUTE.DISABLED",
+        "scope": "app:platform",
+        "from": "@platform/constants/aria-attribute",
+        "file": "apps/platform/src/constants/aria-attribute.ts"
+      }
+    ],
+    "aria-expanded": [
+      {
+        "ref": "ARIA_ATTRIBUTE.EXPANDED",
+        "scope": "app:platform",
+        "from": "@platform/constants/aria-attribute",
+        "file": "apps/platform/src/constants/aria-attribute.ts"
+      }
+    ],
+    "aria-haspopup": [
+      {
+        "ref": "ARIA_ATTRIBUTE.HASPOPUP",
+        "scope": "app:platform",
+        "from": "@platform/constants/aria-attribute",
+        "file": "apps/platform/src/constants/aria-attribute.ts"
+      }
+    ],
+    "aria-hidden": [
+      {
+        "ref": "ARIA_ATTRIBUTE.HIDDEN",
+        "scope": "app:platform",
+        "from": "@platform/constants/aria-attribute",
+        "file": "apps/platform/src/constants/aria-attribute.ts"
+      }
+    ],
+    "aria-pressed": [
+      {
+        "ref": "ARIA_ATTRIBUTE.PRESSED",
+        "scope": "app:platform",
+        "from": "@platform/constants/aria-attribute",
+        "file": "apps/platform/src/constants/aria-attribute.ts"
+      }
+    ],
+    "aria-readonly": [
+      {
+        "ref": "ARIA_ATTRIBUTE.READONLY",
+        "scope": "app:platform",
+        "from": "@platform/constants/aria-attribute",
+        "file": "apps/platform/src/constants/aria-attribute.ts"
+      }
+    ],
+    "aria-selected": [
+      {
+        "ref": "ARIA_ATTRIBUTE.SELECTED",
+        "scope": "app:platform",
+        "from": "@platform/constants/aria-attribute",
+        "file": "apps/platform/src/constants/aria-attribute.ts"
+      }
+    ],
+    "aria-valuemax": [
+      {
+        "ref": "ARIA_ATTRIBUTE.VALUEMAX",
+        "scope": "app:platform",
+        "from": "@platform/constants/aria-attribute",
+        "file": "apps/platform/src/constants/aria-attribute.ts"
+      }
+    ],
+    "aria-valuenow": [
+      {
+        "ref": "ARIA_ATTRIBUTE.VALUENOW",
+        "scope": "app:platform",
+        "from": "@platform/constants/aria-attribute",
+        "file": "apps/platform/src/constants/aria-attribute.ts"
+      }
+    ],
+    "aria-valuetext": [
+      {
+        "ref": "ARIA_ATTRIBUTE.VALUETEXT",
         "scope": "app:platform",
         "from": "@platform/constants/aria-attribute",
         "file": "apps/platform/src/constants/aria-attribute.ts"

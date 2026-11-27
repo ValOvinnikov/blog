@@ -1,3 +1,4 @@
+import { ARIA_ATTRIBUTE } from '@platform/constants/aria-attribute';
 import { TENANT_FIELD_ERROR, TENANT_REFUSAL } from '@platform/constants/tenant';
 import { customRender, screen, within } from '@platform/testing/custom-render';
 import { mockRouterRefresh } from '@platform/testing/mock-router';
@@ -161,7 +162,7 @@ describe(`<${DeprovisionTenantControl.name}/>`, () => {
 
       const trigger = screen.getByRole('button', { name: DEPROVISION });
 
-      expect(trigger).toHaveAttribute('aria-disabled', 'true');
+      expect(trigger).toHaveAttribute(ARIA_ATTRIBUTE.DISABLED, 'true');
       expect(trigger).not.toBeDisabled();
       expect(trigger).toHaveAccessibleDescription(RUN_IN_PROGRESS_HINT);
     });

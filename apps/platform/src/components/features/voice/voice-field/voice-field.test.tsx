@@ -1,4 +1,5 @@
 import { faker } from '@faker-js/faker';
+import { ARIA_ATTRIBUTE } from '@platform/constants/aria-attribute';
 import messages from '@platform/i18n/messages/en.json';
 import { screen } from '@platform/testing/custom-render';
 import {
@@ -21,7 +22,7 @@ import {
   VOICE_FIELD_KIND,
   VOICE_SURFACE,
 } from '@shinefold/config';
-import userEvent from '@testing-library/user-event';
+import userEvent, { type UserEvent } from '@testing-library/user-event';
 
 import { VoiceField } from './voice-field';
 
@@ -45,22 +46,10 @@ const setup = customRenderInSettingsForm(VoiceFieldInEditor, {
 });
 
 describe(`<${VoiceField.name}/>`, () => {
-  it('resets a customised field to its default', async () => {
-    const user = userEvent.setup();
-    setup({ value: MOCK_HEADING });
+  let user: UserEvent;
 
-    const resetButton = screen.getByRole('button', { name: RESET });
-    await user.click(resetButton);
-
-    expect(setFieldValue).toHaveBeenCalledWith('notFoundHeading', '');
-  });
-
-  it('offers no reset for a default field', () => {
-    setup();
-
-    const resetButton = screen.queryByRole('button', { name: RESET });
-
-    expect(resetButton).not.toBeInTheDocument();
+  beforeEach(() => {
+    user = userEvent.setup();
   });
 
   it('offers no reset for a customised field while archived', () => {
@@ -69,15 +58,6 @@ describe(`<${VoiceField.name}/>`, () => {
     const resetButton = screen.queryByRole('button', { name: RESET });
 
     expect(resetButton).not.toBeInTheDocument();
-  });
-
-  it('labels a text field and describes it with its hint', () => {
-    setup();
-
-    const input = screen.getByRole('textbox', { name: HEADING });
-
-    expect(input).toHaveValue(SITE_MESSAGES_BY_LOCALE.EN.notFound.heading);
-    expect(input).toHaveAccessibleDescription('Also the browser tab title');
   });
 
   it('names a list field without a visible label for screen readers', () => {
@@ -101,18 +81,6 @@ describe(`<${VoiceField.name}/>`, () => {
 
     expect(editor).toBeVisible();
     expect(visibleLabel).not.toBeInTheDocument();
-  });
-
-  it('edits a rich field with only bold, italic and link controls', async () => {
-    setup({ field: fieldById('notFoundSupportingText'), value: null });
-
-    const editor = await screen.findByRole('textbox', {
-      name: SUPPORTING_TEXT_FIELD,
-    });
-    const controls = screen.getAllByRole('button');
-
-    expect(editor).toBeVisible();
-    expect(controls).toHaveLength(3);
   });
 
   it('edits a multiline field in a plain text area', () => {
@@ -165,8 +133,8 @@ describe(`<${VoiceField.name}/>`, () => {
     const editingControl = screen.queryByRole('button');
 
     expect(editingControl).not.toBeInTheDocument();
-    expect(editor).toHaveAttribute('aria-readonly', 'true');
-    expect(editor).not.toHaveAttribute('aria-disabled');
+    expect(editor).toHaveAttribute(ARIA_ATTRIBUTE.READONLY, 'true');
+    expect(editor).not.toHaveAttribute(ARIA_ATTRIBUTE.DISABLED);
   });
 
   it.each([
@@ -203,34 +171,12 @@ describe(`<${VoiceField.name}/>`, () => {
     expect(editor).toHaveAttribute(ARIA_INVALID, 'true');
   });
 
-  it('labels a field with its status and offers no unsaved mark while the draft matches the saved value', () => {
-    setup({ value: MOCK_HEADING });
-
-    const customisedPill = screen.getByText('Customised');
-    const unsavedMark = screen.queryByRole('img', { name: UNSAVED_MARK });
-
-    expect(customisedPill).toBeVisible();
-    expect(unsavedMark).not.toBeInTheDocument();
-  });
-
   it('marks a draft that differs from the saved value as unsaved', () => {
     setup({ value: MOCK_HEADING, savedValue: '' });
 
     const unsavedMark = screen.getByRole('img', { name: UNSAVED_MARK });
 
     expect(unsavedMark).toBeVisible();
-  });
-
-  it('reads Default with no unsaved mark or Reset for a field at its default', () => {
-    setup();
-
-    const defaultPill = screen.getByText('Default');
-    const unsavedMark = screen.queryByRole('img', { name: UNSAVED_MARK });
-    const resetButton = screen.queryByRole('button', { name: RESET });
-
-    expect(defaultPill).toBeVisible();
-    expect(unsavedMark).not.toBeInTheDocument();
-    expect(resetButton).not.toBeInTheDocument();
   });
 
   it('keeps Reset for an unsaved customised edit', () => {
@@ -250,57 +196,6 @@ describe(`<${VoiceField.name}/>`, () => {
     expect(input).not.toHaveAttribute('placeholder');
   });
 
-  it('shows the default copy as the content of a rich field at its default', async () => {
-    setup({ field: fieldById('notFoundSupportingText'), value: null });
-
-    const editor = await screen.findByRole('textbox', {
-      name: SUPPORTING_TEXT_FIELD,
-    });
-
-    expect(editor).toHaveTextContent(
-      SITE_MESSAGES_BY_LOCALE.EN.notFound.supportingText,
-    );
-  });
-
-  it('stores the typed text when it differs from the default', async () => {
-    const user = userEvent.setup();
-    setup();
-
-    const input = screen.getByRole('textbox', { name: HEADING });
-    await user.type(input, MOCK_SUFFIX);
-
-    expect(setFieldValue).toHaveBeenLastCalledWith(
-      'notFoundHeading',
-      `${SITE_MESSAGES_BY_LOCALE.EN.notFound.heading}${MOCK_SUFFIX}`,
-    );
-  });
-
-  it('stores the empty value when the text is typed back to the default', async () => {
-    const user = userEvent.setup();
-    setup({ value: MOCK_HEADING });
-
-    const input = screen.getByRole('textbox', { name: HEADING });
-    await user.clear(input);
-    await user.type(input, SITE_MESSAGES_BY_LOCALE.EN.notFound.heading);
-
-    expect(setFieldValue).toHaveBeenLastCalledWith('notFoundHeading', '');
-  });
-
-  it('keeps an emptied text field empty while it has focus and shows the default again on blur', async () => {
-    const user = userEvent.setup();
-    setup();
-
-    const input = screen.getByRole('textbox', { name: HEADING });
-    await user.clear(input);
-
-    expect(input).toHaveValue('');
-    expect(setFieldValue).toHaveBeenLastCalledWith('notFoundHeading', '');
-
-    await user.tab();
-
-    expect(input).toHaveValue(SITE_MESSAGES_BY_LOCALE.EN.notFound.heading);
-  });
-
   it('keeps the hint and the placeholder note on an archived field', async () => {
     setup(
       { field: fieldById('topicEmpty'), value: null },
@@ -316,16 +211,118 @@ describe(`<${VoiceField.name}/>`, () => {
     );
   });
 
-  it('shows the default again and stores the empty value when Reset follows typing', async () => {
-    const user = userEvent.setup();
-    setup();
+  describe('customised', () => {
+    beforeEach(() => {
+      setup({ value: MOCK_HEADING });
+    });
 
-    const input = screen.getByRole('textbox', { name: HEADING });
-    await user.type(input, MOCK_SUFFIX);
-    const resetButton = screen.getByRole('button', { name: RESET });
-    await user.click(resetButton);
+    it('resets a customised field to its default', async () => {
+      const resetButton = screen.getByRole('button', { name: RESET });
+      await user.click(resetButton);
 
-    expect(setFieldValue).toHaveBeenLastCalledWith('notFoundHeading', '');
-    expect(input).toHaveValue(SITE_MESSAGES_BY_LOCALE.EN.notFound.heading);
+      expect(setFieldValue).toHaveBeenCalledWith('notFoundHeading', '');
+    });
+
+    it('labels its status with no unsaved mark while matching the saved value', () => {
+      const customisedPill = screen.getByText('Customised');
+      const unsavedMark = screen.queryByRole('img', { name: UNSAVED_MARK });
+
+      expect(customisedPill).toBeVisible();
+      expect(unsavedMark).not.toBeInTheDocument();
+    });
+
+    it('stores the empty value when the text is typed back to the default', async () => {
+      const input = screen.getByRole('textbox', { name: HEADING });
+      await user.clear(input);
+      await user.type(input, SITE_MESSAGES_BY_LOCALE.EN.notFound.heading);
+
+      expect(setFieldValue).toHaveBeenLastCalledWith('notFoundHeading', '');
+    });
+  });
+
+  describe('at its default', () => {
+    let input: HTMLElement;
+
+    beforeEach(() => {
+      setup();
+      input = screen.getByRole('textbox', { name: HEADING });
+    });
+
+    it('offers no reset for a default field', () => {
+      const resetButton = screen.queryByRole('button', { name: RESET });
+
+      expect(resetButton).not.toBeInTheDocument();
+    });
+
+    it('labels a text field and describes it with its hint', () => {
+      expect(input).toHaveValue(SITE_MESSAGES_BY_LOCALE.EN.notFound.heading);
+      expect(input).toHaveAccessibleDescription('Also the browser tab title');
+    });
+
+    it('reads Default with no unsaved mark or Reset for a field at its default', () => {
+      const defaultPill = screen.getByText('Default');
+      const unsavedMark = screen.queryByRole('img', { name: UNSAVED_MARK });
+      const resetButton = screen.queryByRole('button', { name: RESET });
+
+      expect(defaultPill).toBeVisible();
+      expect(unsavedMark).not.toBeInTheDocument();
+      expect(resetButton).not.toBeInTheDocument();
+    });
+
+    it('keeps an emptied field empty while focused, the default back on blur', async () => {
+      await user.clear(input);
+
+      expect(input).toHaveValue('');
+      expect(setFieldValue).toHaveBeenLastCalledWith('notFoundHeading', '');
+
+      await user.tab();
+
+      expect(input).toHaveValue(SITE_MESSAGES_BY_LOCALE.EN.notFound.heading);
+    });
+
+    describe('after typing', () => {
+      beforeEach(async () => {
+        await user.type(input, MOCK_SUFFIX);
+      });
+
+      it('stores the typed text when it differs from the default', () => {
+        expect(setFieldValue).toHaveBeenLastCalledWith(
+          'notFoundHeading',
+          `${SITE_MESSAGES_BY_LOCALE.EN.notFound.heading}${MOCK_SUFFIX}`,
+        );
+      });
+
+      it('shows the default again and stores the empty value when Reset follows typing', async () => {
+        const resetButton = screen.getByRole('button', { name: RESET });
+        await user.click(resetButton);
+
+        expect(setFieldValue).toHaveBeenLastCalledWith('notFoundHeading', '');
+        expect(input).toHaveValue(SITE_MESSAGES_BY_LOCALE.EN.notFound.heading);
+      });
+    });
+  });
+
+  describe('a rich field at its default', () => {
+    let editor: HTMLElement;
+
+    beforeEach(async () => {
+      setup({ field: fieldById('notFoundSupportingText'), value: null });
+      editor = await screen.findByRole('textbox', {
+        name: SUPPORTING_TEXT_FIELD,
+      });
+    });
+
+    it('edits a rich field with only bold, italic and link controls', () => {
+      const controls = screen.getAllByRole('button');
+
+      expect(editor).toBeVisible();
+      expect(controls).toHaveLength(3);
+    });
+
+    it('shows the default copy as the content of a rich field at its default', () => {
+      expect(editor).toHaveTextContent(
+        SITE_MESSAGES_BY_LOCALE.EN.notFound.supportingText,
+      );
+    });
   });
 });

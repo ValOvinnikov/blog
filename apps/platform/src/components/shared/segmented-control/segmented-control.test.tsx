@@ -1,4 +1,5 @@
 import { faker } from '@faker-js/faker';
+import { ARIA_ATTRIBUTE } from '@platform/constants/aria-attribute';
 import {
   customRender,
   renderWithIntl,
@@ -187,37 +188,30 @@ describe(`<${SegmentedControl.name}/>`, () => {
     expect(firstOption).not.toBePressed();
   });
 
-  it('reports the clicked option value', async () => {
-    const onChange = vi.fn();
-    setup({ onChange });
+  describe('when an option is clicked', () => {
+    let onChange: Mock<(value: string) => void>;
+    let firstOption: HTMLElement;
+    let secondOption: HTMLElement;
 
-    const secondOption = screen.getByRole('button', {
-      name: MOCK_SECOND_LABEL,
+    beforeEach(() => {
+      onChange = vi.fn();
+      setup({ onChange });
+      firstOption = screen.getByRole('button', { name: MOCK_FIRST_LABEL });
+      secondOption = screen.getByRole('button', { name: MOCK_SECOND_LABEL });
     });
-    await user.click(secondOption);
 
-    expect(onChange).toHaveBeenCalledExactlyOnceWith(MOCK_SECOND_VALUE);
-  });
+    it('reports the clicked value, unpressed until the caller updates it', async () => {
+      await user.click(secondOption);
 
-  it('keeps the clicked option unpressed until the caller updates the value', async () => {
-    setup();
-
-    const secondOption = screen.getByRole('button', {
-      name: MOCK_SECOND_LABEL,
+      expect(onChange).toHaveBeenCalledExactlyOnceWith(MOCK_SECOND_VALUE);
+      expect(secondOption).not.toBePressed();
     });
-    await user.click(secondOption);
 
-    expect(secondOption).not.toBePressed();
-  });
+    it('reports nothing when the selected option is clicked again', async () => {
+      await user.click(firstOption);
 
-  it('reports nothing when the selected option is clicked again', async () => {
-    const onChange = vi.fn();
-    setup({ onChange });
-
-    const firstOption = screen.getByRole('button', { name: MOCK_FIRST_LABEL });
-    await user.click(firstOption);
-
-    expect(onChange).not.toHaveBeenCalled();
+      expect(onChange).not.toHaveBeenCalled();
+    });
   });
 
   describe('disabled', () => {
@@ -282,6 +276,7 @@ describe(`<${SegmentedControl.name}/>`, () => {
     });
 
     it('announces every option disabled while keeping the pressed one pressed', () => {
+      const options = screen.getAllByRole('button');
       const firstOption = screen.getByRole('button', {
         name: MOCK_FIRST_LABEL,
       });
@@ -289,11 +284,9 @@ describe(`<${SegmentedControl.name}/>`, () => {
         name: MOCK_SECOND_LABEL,
       });
 
-      const options = screen.getAllByRole('button');
-
       expect(options).toHaveLength(2);
       options.forEach((option) =>
-        expect(option).toHaveAttribute('aria-disabled', 'true'),
+        expect(option).toHaveAttribute(ARIA_ATTRIBUTE.DISABLED, 'true'),
       );
       expect(firstOption).toBeEnabled();
       expect(secondOption).toBePressed();

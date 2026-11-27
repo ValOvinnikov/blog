@@ -1,3 +1,4 @@
+import { ARIA_ATTRIBUTE } from '@platform/constants/aria-attribute';
 import { LOOK_ROW } from '@platform/constants/look-row';
 import { LOOK_SAMPLE_TOKENS_TEST_ID } from '@platform/constants/look-sample';
 import {
@@ -6,7 +7,6 @@ import {
   SAMPLE_SPINNER_VARIANT_ATTRIBUTE,
 } from '@platform/constants/sample-busy';
 import messages from '@platform/i18n/messages/en.json';
-import { ARIA_SELECTED } from '@platform/testing/aria';
 import { screen, within } from '@platform/testing/custom-render';
 import {
   COMPACT,
@@ -52,14 +52,14 @@ describe(`<${LookForm.name}/>`, () => {
       });
       const editTab = within(tabList).getByRole('tab', { name: EDIT_TAB });
       const previewTab = screen.getByRole('tab', { name: PREVIEW_TAB });
-      expect(editTab).toHaveAttribute(ARIA_SELECTED, 'true');
+      expect(editTab).toHaveAttribute(ARIA_ATTRIBUTE.SELECTED, 'true');
 
       await user.click(previewTab);
 
       const previewPanel = screen.getByRole('tabpanel', { name: PREVIEW_TAB });
       const sampleTokens = screen.getByTestId(LOOK_SAMPLE_TOKENS_TEST_ID);
-      expect(previewTab).toHaveAttribute(ARIA_SELECTED, 'true');
-      expect(editTab).toHaveAttribute(ARIA_SELECTED, 'false');
+      expect(previewTab).toHaveAttribute(ARIA_ATTRIBUTE.SELECTED, 'true');
+      expect(editTab).toHaveAttribute(ARIA_ATTRIBUTE.SELECTED, 'false');
       expect(previewPanel).toContainElement(sampleTokens);
     });
 

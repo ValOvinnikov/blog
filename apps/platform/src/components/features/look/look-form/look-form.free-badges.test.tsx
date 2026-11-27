@@ -1,6 +1,6 @@
+import { ARIA_ATTRIBUTE } from '@platform/constants/aria-attribute';
 import { LOOK_ROW, type TLookRow } from '@platform/constants/look-row';
 import messages from '@platform/i18n/messages/en.json';
-import { ARIA_DISABLED } from '@platform/testing/aria';
 import { screen, within } from '@platform/testing/custom-render';
 import { makeEnTranslator } from '@platform/testing/en-translator';
 import {
@@ -57,7 +57,10 @@ describe(`<${LookForm.name}/> Growth badges on Free`, () => {
     });
     const editorialPreset = screen.getByRole('radio', { name: EDITORIAL });
     expect(resetButton).not.toBeInTheDocument();
-    expect(editorialPreset).not.toHaveAttribute(ARIA_DISABLED, 'true');
+    expect(editorialPreset).not.toHaveAttribute(
+      ARIA_ATTRIBUTE.DISABLED,
+      'true',
+    );
   });
 
   it.each([

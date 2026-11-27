@@ -1,3 +1,4 @@
+import { ARIA_ATTRIBUTE } from '@platform/constants/aria-attribute';
 import {
   ANALYTICS_FIELD_ERROR,
   FEATURES_FIELD_ERROR,
@@ -5,8 +6,8 @@ import {
 import messages from '@platform/i18n/messages/en.json';
 import { updateAnalyticsAction } from '@platform/server/settings-features/update-analytics-action';
 import { updateFeaturesAction } from '@platform/server/settings-features/update-features-action';
-import { ARIA_DISABLED, ARIA_PRESSED } from '@platform/testing/aria';
 import { screen, waitFor } from '@platform/testing/custom-render';
+import { ARCHIVED_NOTICE_DESCRIPTION } from '@platform/testing/render-in-settings-form';
 import {
   CONSENT_BANNER_LABEL,
   CONTACT_FORM_LABEL,
@@ -17,7 +18,10 @@ import {
   setupFeaturesSettings as setup,
 } from '@platform/testing/settings-features/features-settings-setup';
 import { mockFeaturesFormValues } from '@platform/testing/settings-features/fixtures';
-import { MOCK_TENANT_ID } from '@platform/testing/tenants/fixtures';
+import {
+  MOCK_ARCHIVED_AT,
+  MOCK_TENANT_ID,
+} from '@platform/testing/tenants/fixtures';
 import { ACTION_OUTCOME } from '@shinefold/config';
 import { ANALYTICS_PROVIDER, TENANT_PLAN } from '@shinefold/config/constants';
 import {
@@ -40,6 +44,7 @@ vi.mock('@platform/server/settings-features/update-analytics-action', () => ({
 
 const {
   alertSuccess,
+  analyticsProviderLabel,
   analyticsProviderOption,
   analyticsIdLabel,
   analyticsIdInvalid,
@@ -217,7 +222,7 @@ describe(`<${FeaturesSettings.name}/> Analytics row`, () => {
       const note = screen.getByText(consentBannerRequiredNote);
 
       expect(consentSwitch).toBeChecked();
-      expect(consentSwitch).toHaveAttribute(ARIA_DISABLED, 'true');
+      expect(consentSwitch).toHaveAttribute(ARIA_ATTRIBUTE.DISABLED, 'true');
       expect(note).toBeVisible();
     });
 
@@ -229,7 +234,7 @@ describe(`<${FeaturesSettings.name}/> Analytics row`, () => {
       await user.click(plausibleOption);
       const note = screen.queryByText(consentBannerRequiredNote);
 
-      expect(consentSwitch).not.toHaveAttribute(ARIA_DISABLED);
+      expect(consentSwitch).not.toHaveAttribute(ARIA_ATTRIBUTE.DISABLED);
       expect(note).not.toBeInTheDocument();
     });
 
@@ -288,6 +293,51 @@ describe(`<${FeaturesSettings.name}/> Analytics row`, () => {
     expect(message).toBeVisible();
   });
 
+  describe('for an archived tenant', () => {
+    let providerGroup: HTMLElement;
+    let plausibleOption: HTMLElement;
+    let idField: HTMLElement;
+
+    beforeEach(() => {
+      setup({
+        archivedAt: MOCK_ARCHIVED_AT,
+        initialValues: MOCK_SAVED_ANALYTICS_VALUES,
+      });
+      providerGroup = screen.getByRole('group', {
+        name: analyticsProviderLabel,
+      });
+      plausibleOption = screen.getByRole('button', { name: PLAUSIBLE_OPTION });
+      idField = screen.getByRole('textbox', { name: MEASUREMENT_ID_LABEL });
+    });
+
+    it('keeps the provider choice and the id field focusable but locked', () => {
+      expect(plausibleOption).toBeEnabled();
+      expect(plausibleOption).toHaveAttribute(ARIA_ATTRIBUTE.DISABLED, 'true');
+      expect(idField).toBeEnabled();
+      expect(idField).toHaveAttribute(ARIA_ATTRIBUTE.DISABLED, 'true');
+    });
+
+    it('describes both by the archived notice', () => {
+      expect(providerGroup).toHaveAccessibleDescription(
+        expect.stringContaining(ARCHIVED_NOTICE_DESCRIPTION),
+      );
+      expect(idField).toHaveAccessibleDescription(
+        expect.stringContaining(ARCHIVED_NOTICE_DESCRIPTION),
+      );
+    });
+
+    it('ignores a provider click and typing in the id field', async () => {
+      await user.click(plausibleOption);
+      await user.type(idField, MOCK_PLAUSIBLE_ANALYTICS.analyticsId);
+      const googleOption = screen.getByRole('button', {
+        name: GOOGLE_ANALYTICS_OPTION,
+      });
+
+      expect(googleOption).toBePressed();
+      expect(idField).toHaveValue(MOCK_GOOGLE_ANALYTICS.analyticsId);
+    });
+  });
+
   describe('on a plan without its own analytics', () => {
     let plausibleOption: HTMLElement;
 
@@ -307,7 +357,7 @@ describe(`<${FeaturesSettings.name}/> Analytics row`, () => {
       });
       const note = screen.queryByText(consentBannerRequiredNote);
 
-      expect(consentSwitch).not.toHaveAttribute(ARIA_DISABLED);
+      expect(consentSwitch).not.toHaveAttribute(ARIA_ATTRIBUTE.DISABLED);
       expect(note).not.toBeInTheDocument();
     });
 
@@ -323,7 +373,7 @@ describe(`<${FeaturesSettings.name}/> Analytics row`, () => {
     it('locks the provider choice and badges the cheapest plan with it', () => {
       const badge = screen.getByText(planLockedBadge(TENANT_PLAN.STARTER));
 
-      expect(plausibleOption).toHaveAttribute(ARIA_DISABLED, 'true');
+      expect(plausibleOption).toHaveAttribute(ARIA_ATTRIBUTE.DISABLED, 'true');
       expect(badge).toBeVisible();
     });
 
@@ -334,7 +384,7 @@ describe(`<${FeaturesSettings.name}/> Analytics row`, () => {
         name: GOOGLE_ANALYTICS_OPTION,
       });
 
-      expect(googleOption).toHaveAttribute(ARIA_PRESSED, 'true');
+      expect(googleOption).toHaveAttribute(ARIA_ATTRIBUTE.PRESSED, 'true');
     });
   });
 });

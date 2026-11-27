@@ -1,4 +1,5 @@
 import { ACCENT_SWATCH_TEST_ID } from '@platform/constants/accent-swatch';
+import { ARIA_ATTRIBUTE } from '@platform/constants/aria-attribute';
 import messages from '@platform/i18n/messages/en.json';
 import { customRender, screen } from '@platform/testing/custom-render';
 import { PRESET_ID } from '@shinefold/config';
@@ -44,7 +45,10 @@ describe(`<${SiteLookFields.name}/>`, () => {
     it('names the hue slider from the visible accent label', () => {
       const slider = screen.getByRole('slider', { name: ACCENT_LABEL });
 
-      expect(slider).toHaveAttribute('aria-valuetext', `hue ${MOCK_HUE}°`);
+      expect(slider).toHaveAttribute(
+        ARIA_ATTRIBUTE.VALUETEXT,
+        `hue ${MOCK_HUE}°`,
+      );
     });
 
     it('shows no value text beside the slider', () => {

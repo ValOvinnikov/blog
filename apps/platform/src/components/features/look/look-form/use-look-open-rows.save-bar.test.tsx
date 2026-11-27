@@ -1,6 +1,6 @@
+import { ARIA_ATTRIBUTE } from '@platform/constants/aria-attribute';
 import { LOOK_ROW } from '@platform/constants/look-row';
 import messages from '@platform/i18n/messages/en.json';
-import { ARIA_EXPANDED } from '@platform/testing/aria';
 import { screen, within } from '@platform/testing/custom-render';
 import {
   lookRowTrigger,
@@ -46,8 +46,8 @@ describe(useLookOpenRows, () => {
     it('opens the changed row and folds the open one', () => {
       const footerTrigger = lookRowTrigger(LOOK_ROW.FOOTER);
 
-      expect(colourTrigger).toHaveAttribute(ARIA_EXPANDED, 'true');
-      expect(footerTrigger).toHaveAttribute(ARIA_EXPANDED, 'false');
+      expect(colourTrigger).toHaveAttribute(ARIA_ATTRIBUTE.EXPANDED, 'true');
+      expect(footerTrigger).toHaveAttribute(ARIA_ATTRIBUTE.EXPANDED, 'false');
     });
 
     it('moves focus to the changed row button', () => {

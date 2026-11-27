@@ -1,5 +1,5 @@
+import { ARIA_ATTRIBUTE } from '@platform/constants/aria-attribute';
 import messages from '@platform/i18n/messages/en.json';
-import { ARIA_DISABLED } from '@platform/testing/aria';
 import {
   customRender,
   screen,
@@ -139,7 +139,6 @@ const setup = (
 const { ARROW_DOWN, ARROW_RIGHT, END, ENTER, ESCAPE, HOME, SPACE, TAB } =
   USER_EVENT_KEY;
 const DIALOG_POPUP = 'dialog';
-const HAS_POPUP = 'aria-haspopup';
 const TO_LEDGER = `${ARROW_DOWN}${ARROW_RIGHT}`;
 const ACTIVE_OPTION = 'aria-activedescendant';
 const CLOSES_PICKER = 'closes the picker';
@@ -251,7 +250,10 @@ describe(`<${PresetStrip.name}/>`, () => {
           name: morePresetsName(3),
         });
 
-        expect(morePresets).toHaveAttribute(HAS_POPUP, DIALOG_POPUP);
+        expect(morePresets).toHaveAttribute(
+          ARIA_ATTRIBUTE.HASPOPUP,
+          DIALOG_POPUP,
+        );
       });
     });
 
@@ -276,7 +278,7 @@ describe(`<${PresetStrip.name}/>`, () => {
       });
 
       it('marks More presets expanded', () => {
-        expect(morePresets).toHaveAttribute('aria-expanded', 'true');
+        expect(morePresets).toHaveAttribute(ARIA_ATTRIBUTE.EXPANDED, 'true');
       });
 
       it('counts every preset in the dialog header', () => {
@@ -390,7 +392,7 @@ describe(`<${PresetStrip.name}/>`, () => {
       const consoleChip = screen.getByRole('radio', { name: CONSOLE });
       await user.click(consoleChip);
 
-      expect(consoleChip).toHaveAttribute(ARIA_DISABLED, 'true');
+      expect(consoleChip).toHaveAttribute(ARIA_ATTRIBUTE.DISABLED, 'true');
       expect(consoleChip).not.toBeChecked();
       expect(onChange).not.toHaveBeenCalled();
     });
@@ -406,7 +408,7 @@ describe(`<${PresetStrip.name}/>`, () => {
 
       expect(dialog).not.toBeInTheDocument();
 
-      expect(morePresets).toHaveAttribute(ARIA_DISABLED, 'true');
+      expect(morePresets).toHaveAttribute(ARIA_ATTRIBUTE.DISABLED, 'true');
       expect(morePresets).toHaveAccessibleDescription(MOCK_ARCHIVED_NOTICE);
     });
   });
@@ -467,7 +469,10 @@ describe(`<${PresetStrip.name}/>`, () => {
       });
 
       it('announces the Preset button as a dialog trigger', () => {
-        expect(presetButton).toHaveAttribute(HAS_POPUP, DIALOG_POPUP);
+        expect(presetButton).toHaveAttribute(
+          ARIA_ATTRIBUTE.HASPOPUP,
+          DIALOG_POPUP,
+        );
       });
     });
 
@@ -549,7 +554,7 @@ describe(`<${PresetStrip.name}/>`, () => {
 
       expect(sheet).not.toBeInTheDocument();
 
-      expect(presetButton).toHaveAttribute(ARIA_DISABLED, 'true');
+      expect(presetButton).toHaveAttribute(ARIA_ATTRIBUTE.DISABLED, 'true');
       expect(presetButton).toHaveAccessibleDescription(MOCK_ARCHIVED_NOTICE);
     });
   });

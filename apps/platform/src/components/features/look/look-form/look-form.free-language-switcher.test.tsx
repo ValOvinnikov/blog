@@ -1,6 +1,6 @@
+import { ARIA_ATTRIBUTE } from '@platform/constants/aria-attribute';
 import { LOOK_ROW } from '@platform/constants/look-row';
 import messages from '@platform/i18n/messages/en.json';
-import { ARIA_DISABLED, ARIA_PRESSED } from '@platform/testing/aria';
 import { screen, within } from '@platform/testing/custom-render';
 import {
   GROWTH,
@@ -83,8 +83,8 @@ describe(`<${LookForm.name}/>`, () => {
 
       expect(freeLine).toBeVisible();
       expect(singleLanguageNote).not.toBeInTheDocument();
-      expect(menuCodeButton).toHaveAttribute(ARIA_PRESSED, 'true');
-      expect(codesButton).toHaveAttribute(ARIA_DISABLED, 'true');
+      expect(menuCodeButton).toHaveAttribute(ARIA_ATTRIBUTE.PRESSED, 'true');
+      expect(codesButton).toHaveAttribute(ARIA_ATTRIBUTE.DISABLED, 'true');
       expect(styleGroup).toHaveAccessibleDescription(
         expect.stringContaining(
           LOOK_FORM.languageSwitcherOptionDescription.MENU_CODE,
@@ -113,7 +113,7 @@ describe(`<${LookForm.name}/>`, () => {
 
     expect(freeLine).toBeVisible();
     expect(singleLanguageNote).not.toBeInTheDocument();
-    expect(codesButton).toHaveAttribute(ARIA_DISABLED, 'true');
+    expect(codesButton).toHaveAttribute(ARIA_ATTRIBUTE.DISABLED, 'true');
     expect(badges).toHaveLength(0);
   });
 });

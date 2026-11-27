@@ -1,6 +1,6 @@
 import { faker } from '@faker-js/faker';
+import { ARIA_ATTRIBUTE } from '@platform/constants/aria-attribute';
 import { ICON_TEST_ID } from '@platform/constants/icon';
-import { ARIA_HIDDEN } from '@platform/testing/aria';
 import {
   customRender,
   renderWithIntl,
@@ -138,7 +138,7 @@ describe(`<${Alert.name}/>`, () => {
 
       const icon = screen.getByTestId(ICON_TEST_ID);
 
-      expect(icon).toHaveAttribute(ARIA_HIDDEN, 'true');
+      expect(icon).toHaveAttribute(ARIA_ATTRIBUTE.HIDDEN, 'true');
     },
   );
 });

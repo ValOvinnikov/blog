@@ -1,6 +1,6 @@
 import { faker } from '@faker-js/faker';
+import { ARIA_ATTRIBUTE } from '@platform/constants/aria-attribute';
 import { SHELL_MAIN_ID } from '@platform/constants/shell-frame';
-import { ARIA_DISABLED } from '@platform/testing/aria';
 import { customRender, screen, within } from '@platform/testing/custom-render';
 import { makeEnTranslator } from '@platform/testing/en-translator';
 import { USER_EVENT_KEY } from '@platform/testing/keyboard';
@@ -298,7 +298,7 @@ describe(`<${ConfirmDialog.name}/>`, () => {
         const pendingButton = await findConfirmButton(MOCK_CONFIRMING_LABEL);
         const status = screen.getByRole('status');
 
-        expect(pendingButton).toHaveAttribute(ARIA_DISABLED, 'true');
+        expect(pendingButton).toHaveAttribute(ARIA_ATTRIBUTE.DISABLED, 'true');
         expect(pendingButton).toHaveAttribute('aria-busy', 'true');
         expect(status).toHaveTextContent(MOCK_CONFIRMING_LABEL);
       });
@@ -363,7 +363,7 @@ describe(`<${ConfirmDialog.name}/>`, () => {
 
       await user.tab();
 
-      expect(trigger).toHaveAttribute(ARIA_DISABLED, 'true');
+      expect(trigger).toHaveAttribute(ARIA_ATTRIBUTE.DISABLED, 'true');
       expect(trigger).not.toBeDisabled();
       expect(trigger).toHaveAccessibleDescription(MOCK_DISABLED_REASON);
       expect(reason).toBeVisible();
@@ -396,8 +396,8 @@ describe(`<${ConfirmDialog.name}/>`, () => {
     const trigger = screen.getByRole('button', { name: MOCK_TRIGGER_LABEL });
 
     expect(trigger).toBeEnabled();
-    expect(trigger).not.toHaveAttribute(ARIA_DISABLED);
-    expect(trigger).not.toHaveAttribute('aria-describedby');
+    expect(trigger).not.toHaveAttribute(ARIA_ATTRIBUTE.DISABLED);
+    expect(trigger).not.toHaveAttribute(ARIA_ATTRIBUTE.DESCRIBEDBY);
   });
 
   describe('without an expected value', () => {
