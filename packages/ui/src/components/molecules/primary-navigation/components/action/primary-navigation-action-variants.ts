@@ -7,8 +7,8 @@ export const primaryNavigationActionVariants = tv({
   base: ['shrink-0 whitespace-nowrap'],
   variants: {
     style: {
-      [HEADER_ACTION_STYLE.FILLED]: [],
-      [HEADER_ACTION_STYLE.OUTLINED]: [],
+      [HEADER_ACTION_STYLE.FILLED]: ['rounded-header-control'],
+      [HEADER_ACTION_STYLE.OUTLINED]: ['rounded-header-control'],
       [HEADER_ACTION_STYLE.PLAIN]: [],
     },
     isInPanel: {
