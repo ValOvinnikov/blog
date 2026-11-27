@@ -2,10 +2,11 @@ import {
   ASIDE_KIND,
   PORTABLE_TEXT_BLOCK_TYPE,
 } from '@shinefold/config/constants';
+import { SITE_MESSAGES } from '@shinefold/config/voice';
 import { paragraphTextSchema } from '@shinefold/studio/schema-types/portable-text/paragraph-text/paragraph-text';
 import { toPlainText } from '@shinefold/studio/schema-types/portable-text/to-plain-text/to-plain-text';
 import type { TTextBlock } from '@shinefold/utils/portable-text';
-import { toTitleCase } from '@shinefold/utils/primitives';
+import { isOneOf } from '@shinefold/utils/primitives';
 import { MessageSquareText } from 'lucide-react';
 import { defineField, defineType } from 'sanity';
 
@@ -32,9 +33,9 @@ export const asideSchema = defineType({
       description:
         'Pick the kind that matches the note: a tip for a helpful shortcut, a note for something worth knowing, a warning for something that can go wrong, why not for an option you chose against, a digression for a related tangent, and context for background the reader may need.',
       options: {
-        layout: 'radio',
+        layout: 'dropdown',
         list: Object.values(ASIDE_KIND).map((value) => ({
-          title: toTitleCase(value),
+          title: SITE_MESSAGES.blogPostPage.asideKind[value],
           value,
         })),
       },
@@ -52,7 +53,9 @@ export const asideSchema = defineType({
     select: { kind: 'kind', body: 'body' },
     prepare({ kind, body }: { kind?: string; body?: TTextBlock[] }) {
       return {
-        title: kind ? toTitleCase(kind) : 'Unknown',
+        title: isOneOf(Object.values(ASIDE_KIND), kind)
+          ? SITE_MESSAGES.blogPostPage.asideKind[kind]
+          : 'Unknown',
         subtitle: body ? excerpt(toPlainText(body)) : '',
       };
     },
