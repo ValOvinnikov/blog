@@ -9,8 +9,6 @@ import { ContentsRailLayout } from './contents-rail-layout';
 
 faker.seed(6521);
 
-vi.mock('@web/i18n/navigation');
-
 const NAV_NAME = SITE_MESSAGES.contentsRail.label;
 const MOCK_CONTENT_TEXT = faker.lorem.sentence();
 const MOCK_FOOTER_TEXT = faker.lorem.sentence();

@@ -1,6 +1,8 @@
 import { faker } from '@faker-js/faker';
 import {
+  LOCALE_BCP47_TAGS,
   LOCALE_ISO_CODES,
+  routes,
   SITE_MESSAGES_BY_LOCALE,
   type TSiteMessages,
 } from '@shinefold/config';
@@ -115,6 +117,27 @@ describe(`<${StandaloneNotFoundPage.name}/>`, () => {
         MOCK_TENANT_ID,
       );
     });
+  });
+
+  it.each([
+    {
+      case: "leaves a Dutch-default tenant's home link unprefixed",
+      defaultLocale: NL,
+      expected: routes.home(),
+    },
+    {
+      case: "prefixes the home link outside the tenant's default language",
+      defaultLocale: EN,
+      expected: `/${LOCALE_BCP47_TAGS.NL}`,
+    },
+  ])('$case', async ({ defaultLocale, expected }) => {
+    await setup({ locale: NL, defaultLocale });
+
+    const link = screen.getByRole('link', {
+      name: NL_MESSAGES.notFound.returnHome,
+    });
+
+    expect(link).toHaveAttribute('href', expected);
   });
 
   describe('given no tenant', () => {

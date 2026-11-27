@@ -17,8 +17,6 @@ import { mockHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
 
 import { CtaModuleView } from './cta-module-view';
 
-vi.mock('@web/i18n/navigation');
-
 const MOCK_CTA_MODULE = mockCtaModuleData();
 const MOCK_CTA_HEADING = MOCK_CTA_MODULE.headingBlock.heading;
 const INSTANCE_COUNT = 2;

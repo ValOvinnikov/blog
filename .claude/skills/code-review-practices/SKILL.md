@@ -74,8 +74,8 @@ Map each changed file to its workspace and read its imports against `CLAUDE.md`
 - `@shinefold/ui` imports no `service`, Sanity SDK or `fetch` — props in, markup out.
 - `apps/web` fetches in Server Components through `@shinefold/service` and passes
   typed props to `@shinefold/ui`; no GROQ or raw Sanity client in `web`.
-- Links in `apps/web` go through `SmartLink`, never `next/link` or
-  `@web/i18n/navigation`'s `Link` at a call site. No lint rule enforces it
+- Links in `apps/web` go through `SmartLink`, never `next/link` at a call
+  site. No lint rule enforces it
   (→ `.claude/agents/web.md`).
 
 ## 2. Type safety (blocking)

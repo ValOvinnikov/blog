@@ -12,8 +12,6 @@ import {
 
 import { VoiceRichText } from './voice-rich-text';
 
-vi.mock('@web/i18n/navigation');
-
 faker.seed(6007);
 
 const MOCK_FORMATTED_VALUE = mockFormattedVoiceRich();

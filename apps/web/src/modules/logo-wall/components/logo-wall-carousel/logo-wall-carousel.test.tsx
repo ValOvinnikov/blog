@@ -6,8 +6,6 @@ import {
 
 import { LogoWallCarousel } from './logo-wall-carousel';
 
-vi.mock('@web/i18n/navigation');
-
 const setup = customRender(LogoWallCarousel, {
   logos: MOCK_LOGO_ITEMS,
   title: MOCK_LOGO_WALL_HEADING,

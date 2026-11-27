@@ -6,8 +6,6 @@ import {
 
 import { TestimonialCarousel } from './testimonial-carousel';
 
-vi.mock('@web/i18n/navigation');
-
 const CAROUSEL_LABEL = `${MOCK_TESTIMONIAL_HEADING} carousel`;
 
 const setup = customRender(TestimonialCarousel, {

@@ -14,8 +14,6 @@ vi.mock('@web/server/site-config/get-brand-name/get-brand-name');
 
 vi.mock('@web/server/site-config/get-bar-backgrounds/get-bar-backgrounds');
 
-vi.mock('@web/i18n/navigation');
-
 faker.seed(2894);
 
 const TERM_HREF = routes.tag(faker.lorem.slug());

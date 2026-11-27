@@ -6,8 +6,6 @@ import {
 
 import { ModuleActions } from './module-actions';
 
-vi.mock('@web/i18n/navigation');
-
 const setup = customRender(ModuleActions, {
   actions: MOCK_CTA_ACTIONS,
   align: undefined,

@@ -18,8 +18,6 @@ import {
 
 import { PostFeaturedModuleView } from './post-featured-module-view';
 
-vi.mock('@web/i18n/navigation');
-
 faker.seed(6011);
 
 const MOCK_TITLE_ID = faker.lorem.slug();

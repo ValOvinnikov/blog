@@ -1,5 +1,6 @@
 import { faker } from '@faker-js/faker';
 import { LOCALE_BCP47_TAGS, LOCALE_ISO_CODES, routes } from '@shinefold/config';
+import { DefaultLocaleProvider } from '@web/context/default-locale-provider';
 import {
   customRender,
   renderElement,
@@ -33,19 +34,37 @@ describe(`<${SmartLink.name}/>`, () => {
     expect(link).not.toHaveAttribute('rel');
   });
 
-  it('prefixes an internal href with a non-default language', () => {
+  it.each([
+    {
+      case: 'prefixes an internal href with a non-default language',
+      locale: LOCALE_ISO_CODES.NL,
+      defaultLocale: LOCALE_ISO_CODES.EN,
+      expected: `/${LOCALE_BCP47_TAGS.NL}${MOCK_INTERNAL_HREF}`,
+    },
+    {
+      case: 'leaves the tenant default language unprefixed',
+      locale: LOCALE_ISO_CODES.NL,
+      defaultLocale: LOCALE_ISO_CODES.NL,
+      expected: MOCK_INTERNAL_HREF,
+    },
+    {
+      case: 'prefixes English on a tenant whose default is another language',
+      locale: LOCALE_ISO_CODES.EN,
+      defaultLocale: LOCALE_ISO_CODES.NL,
+      expected: `/${LOCALE_BCP47_TAGS.EN}${MOCK_INTERNAL_HREF}`,
+    },
+  ])('$case', ({ locale, defaultLocale, expected }) => {
     renderElement(
-      <NextIntlClientProvider locale={LOCALE_ISO_CODES.NL} messages={{}}>
-        <SmartLink href={MOCK_INTERNAL_HREF}>{MOCK_LABEL}</SmartLink>
+      <NextIntlClientProvider locale={locale} messages={{}}>
+        <DefaultLocaleProvider value={defaultLocale}>
+          <SmartLink href={MOCK_INTERNAL_HREF}>{MOCK_LABEL}</SmartLink>
+        </DefaultLocaleProvider>
       </NextIntlClientProvider>,
     );
 
     const link = screen.getByRole('link', { name: MOCK_LABEL });
 
-    expect(link).toHaveAttribute(
-      'href',
-      `/${LOCALE_BCP47_TAGS.NL}${MOCK_INTERNAL_HREF}`,
-    );
+    expect(link).toHaveAttribute('href', expected);
   });
 
   it.each([

@@ -33,7 +33,6 @@ import { withSiteAnalytics } from '@web/testing/shared/site-analytics/with-site-
 import { createPostBodyOverride } from './config';
 import { PortableText } from './portable-text';
 
-vi.mock('@web/i18n/navigation');
 vi.mock(
   '@web/components/shared/portable-text/config/cookie-list',
   async (importOriginal) => {

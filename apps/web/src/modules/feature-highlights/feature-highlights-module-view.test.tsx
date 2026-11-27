@@ -13,8 +13,6 @@ import { mockHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
 
 import { FeatureHighlightsModuleView } from './feature-highlights-module-view';
 
-vi.mock('@web/i18n/navigation');
-
 faker.seed(6011);
 
 const MOCK_HIGHLIGHTS = Array.from({ length: 4 }, () =>

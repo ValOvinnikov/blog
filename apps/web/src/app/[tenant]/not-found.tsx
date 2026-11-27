@@ -15,7 +15,7 @@ export async function generateMetadata(): Promise<Metadata> {
 
 /** Owns the document for a `notFound()` thrown by `[tenant]/[locale]/layout.tsx` itself, which no same-segment boundary catches, and must never call `headers()`. */
 export default async function TenantNotFound() {
-  const { tenantId, locale } = await getNotFoundContext();
+  const { tenantId, locale, defaultLocale } = await getNotFoundContext();
   const lockedColorScheme = await getLockedColorScheme(
     tenantId ?? UNRESOLVED_TENANT_PLACEHOLDER,
   );
@@ -25,7 +25,11 @@ export default async function TenantNotFound() {
       lang={LOCALE_BCP47_TAGS[locale]}
       lockedColorScheme={lockedColorScheme}
     >
-      {await StandaloneNotFoundPage({ tenant: tenantId, locale })}
+      {await StandaloneNotFoundPage({
+        tenant: tenantId,
+        locale,
+        defaultLocale,
+      })}
     </DocumentShell>
   );
 }

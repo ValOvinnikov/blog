@@ -12,8 +12,6 @@ import { MOCK_GITHUB_PROFILE } from '@web/testing/shared/social-profile/fixtures
 
 import { TeamMemberCard } from './team-member-card';
 
-vi.mock('@web/i18n/navigation');
-
 const MOCK_MEMBER = mockTeamMember();
 
 const setup = customRender(TeamMemberCard, {

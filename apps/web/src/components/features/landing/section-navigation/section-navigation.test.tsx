@@ -19,8 +19,6 @@ import {
 
 import { SectionNavigation } from './section-navigation';
 
-vi.mock('@web/i18n/navigation');
-
 faker.seed(5776);
 
 const { label: NAV_NAME, backTo: BACK_TO_TEMPLATE } =

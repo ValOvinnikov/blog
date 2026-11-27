@@ -18,8 +18,6 @@ import type { IPricingCardData } from '@web/utils/to-pricing-panels';
 
 import { PricingModuleView } from './pricing-module-view';
 
-vi.mock('@web/i18n/navigation');
-
 faker.seed(11);
 
 const MOCK_TIER_ID = faker.string.uuid();

@@ -37,6 +37,7 @@ describe(generateMetadata, () => {
     vi.mocked(getNotFoundContext).mockResolvedValueOnce({
       tenantId: MOCK_TENANT_ID,
       locale: LOCALE_ISO_CODES.DE,
+      defaultLocale: LOCALE_ISO_CODES.DE,
     });
     vi.mocked(buildNotFoundMetadata).mockResolvedValueOnce(MOCK_METADATA);
   });
@@ -57,11 +58,12 @@ describe(TenantNotFound, () => {
     vi.mocked(getNotFoundContext).mockResolvedValueOnce({
       tenantId: MOCK_TENANT_ID,
       locale: LOCALE_ISO_CODES.NL,
+      defaultLocale: LOCALE_ISO_CODES.NL,
     });
     vi.mocked(StandaloneNotFoundPage).mockResolvedValueOnce(MOCK_PAGE);
   });
 
-  it('renders the page for the remembered tenant in the served language', async () => {
+  it('renders the page with the tenant, served language and default', async () => {
     const document = await TenantNotFound();
 
     const { lang, children } = document.props;
@@ -71,6 +73,7 @@ describe(TenantNotFound, () => {
     expect(StandaloneNotFoundPage).toHaveBeenCalledWith({
       tenant: MOCK_TENANT_ID,
       locale: LOCALE_ISO_CODES.NL,
+      defaultLocale: LOCALE_ISO_CODES.NL,
     });
   });
 

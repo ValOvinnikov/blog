@@ -34,8 +34,6 @@ const { getPricingModuleMock } = vi.hoisted(() => ({
   getPricingModuleMock: vi.fn(),
 }));
 
-vi.mock('@web/i18n/navigation');
-
 vi.mock('@shinefold/service', () => ({
   service: {
     modules: { pricing: { v1: { getPricingModule: getPricingModuleMock } } },

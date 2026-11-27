@@ -10,8 +10,6 @@ import {
 
 import { TestimonialCard } from './testimonial-card';
 
-vi.mock('@web/i18n/navigation');
-
 faker.seed(21);
 
 const MOCK_ITEM = mockTestimonialItem();

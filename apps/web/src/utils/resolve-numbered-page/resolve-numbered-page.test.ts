@@ -1,9 +1,12 @@
 import { faker } from '@faker-js/faker';
-import { LOCALE_ISO_CODES, NEXT_NAVIGATION_ERROR } from '@shinefold/config';
-import { permanentRedirect } from '@web/i18n/navigation';
+import {
+  LOCALE_BCP47_TAGS,
+  LOCALE_ISO_CODES,
+  NEXT_NAVIGATION_ERROR,
+} from '@shinefold/config';
 import { getRequestContext } from '@web/server/request-context/request-context';
 import { MOCK_REQUEST_CONTEXT } from '@web/testing/shared/tenant/fixtures';
-import { notFound } from 'next/navigation';
+import { notFound, permanentRedirect } from 'next/navigation';
 
 import {
   resolveNumberedPage,
@@ -11,8 +14,6 @@ import {
 } from './resolve-numbered-page';
 
 vi.mock('@web/server/request-context/request-context');
-
-vi.mock('@web/i18n/navigation');
 
 faker.seed(7645);
 
@@ -33,21 +34,41 @@ describe(resolveNumberedPage, () => {
     expect(notFound).not.toHaveBeenCalled();
   });
 
-  it('permanently redirects page 1 to the first-page href in the request language', async () => {
-    vi.mocked(getRequestContext).mockResolvedValueOnce({
-      ...MOCK_REQUEST_CONTEXT,
+  it.each([
+    {
+      case: 'with a prefix in a non-default language',
       locale: LOCALE_ISO_CODES.NL,
-    });
-
-    await expect(
-      resolveNumberedPage(MOCK_FIRST_PAGE, MOCK_FIRST_PAGE_HREF),
-    ).rejects.toThrow(NEXT_NAVIGATION_ERROR.NEXT_REDIRECT);
-
-    expect(permanentRedirect).toHaveBeenCalledWith({
-      href: MOCK_FIRST_PAGE_HREF,
+      defaultLocale: LOCALE_ISO_CODES.EN,
+      expected: `/${LOCALE_BCP47_TAGS.NL}${MOCK_FIRST_PAGE_HREF}`,
+    },
+    {
+      case: "without a prefix in a Dutch-default tenant's default language",
       locale: LOCALE_ISO_CODES.NL,
-    });
-  });
+      defaultLocale: LOCALE_ISO_CODES.NL,
+      expected: MOCK_FIRST_PAGE_HREF,
+    },
+    {
+      case: 'with a prefix in English on a Dutch-default tenant',
+      locale: LOCALE_ISO_CODES.EN,
+      defaultLocale: LOCALE_ISO_CODES.NL,
+      expected: `/${LOCALE_BCP47_TAGS.EN}${MOCK_FIRST_PAGE_HREF}`,
+    },
+  ])(
+    'permanently redirects page 1 to the first-page href $case',
+    async ({ locale, defaultLocale, expected }) => {
+      vi.mocked(getRequestContext).mockResolvedValueOnce({
+        ...MOCK_REQUEST_CONTEXT,
+        locale,
+        defaultLocale,
+      });
+
+      await expect(
+        resolveNumberedPage(MOCK_FIRST_PAGE, MOCK_FIRST_PAGE_HREF),
+      ).rejects.toThrow(NEXT_NAVIGATION_ERROR.NEXT_REDIRECT);
+
+      expect(permanentRedirect).toHaveBeenCalledWith(expected);
+    },
+  );
 
   it.each(MOCK_NON_CANONICAL_PAGES)(
     'hard-404s a non-canonical page param (%s)',

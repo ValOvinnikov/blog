@@ -2,7 +2,10 @@ import { faker } from '@faker-js/faker';
 import { LOCALE_ISO_CODES } from '@shinefold/config';
 import { buildNotFoundMetadata } from '@web/metadata/not-found-metadata';
 import { getNotFoundContext } from '@web/server/request-context/request-context';
-import { MOCK_TENANT_ID } from '@web/testing/shared/tenant/fixtures';
+import {
+  MOCK_NOT_FOUND_CONTEXT,
+  MOCK_TENANT_ID,
+} from '@web/testing/shared/tenant/fixtures';
 
 import { generateMetadata } from './not-found';
 
@@ -17,7 +20,7 @@ vi.mock('@web/server/request-context/request-context');
 describe(generateMetadata, () => {
   it('builds the metadata for the requested tenant in the served language', async () => {
     vi.mocked(getNotFoundContext).mockResolvedValueOnce({
-      tenantId: MOCK_TENANT_ID,
+      ...MOCK_NOT_FOUND_CONTEXT,
       locale: LOCALE_ISO_CODES.DE,
     });
     vi.mocked(buildNotFoundMetadata).mockResolvedValueOnce(MOCK_METADATA);

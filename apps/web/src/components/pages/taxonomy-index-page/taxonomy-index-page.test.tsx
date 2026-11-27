@@ -11,8 +11,6 @@ faker.seed(5503);
 
 vi.mock('@web/server/request-context/request-context');
 
-vi.mock('@web/i18n/navigation');
-
 const MOCK_PAGE_HEADING = faker.lorem.words(2);
 const MOCK_SUPPORTING_TEXT = faker.lorem.sentence();
 const MOCK_INDEX_PAGE = mockIndexPage({

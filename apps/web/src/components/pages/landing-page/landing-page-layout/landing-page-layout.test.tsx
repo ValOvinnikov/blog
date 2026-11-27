@@ -8,8 +8,6 @@ import {
 
 import { LandingPageLayout } from './landing-page-layout';
 
-vi.mock('@web/i18n/navigation');
-
 faker.seed(8107);
 
 const SECTION_NAV_NAME = SITE_MESSAGES.sectionNavigation.label;
