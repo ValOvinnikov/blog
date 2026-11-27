@@ -13,26 +13,29 @@ import { billingPageContentVariants } from './billing-page-content-variants';
 export type TBillingPageContentProps = {
   tenant: TPlatformTenant;
   viewer: TPlatformViewer;
+  isReadOnly?: boolean;
 };
 
 export const BillingPageContent = async ({
   tenant,
   viewer,
+  isReadOnly = false,
 }: TBillingPageContentProps) => {
   const { id, plan, status } = tenant;
   const [t, billing] = await Promise.all([
     getTranslations('billingPage'),
     queries.tenants.getTenantBilling(id),
   ]);
+  const canManage = viewer.isOwner && !isReadOnly;
   const { root } = billingPageContentVariants();
 
   return (
     <div className={root()}>
       <PageHeader
         title={t('title')}
-        description={t('description')}
+        description={t(isReadOnly ? 'operatorDescription' : 'description')}
         actions={
-          viewer.isOwner && billing?.stripeCustomerId ? (
+          canManage && billing?.stripeCustomerId ? (
             <ManageBillingButton tenantId={id} />
           ) : undefined
         }
@@ -43,6 +46,7 @@ export const BillingPageContent = async ({
           plan={plan}
           status={status}
           billing={billing}
+          canChangePlan={canManage}
         />
       </Suspense>
     </div>

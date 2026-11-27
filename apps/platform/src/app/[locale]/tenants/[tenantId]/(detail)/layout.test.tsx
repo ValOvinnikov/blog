@@ -135,4 +135,36 @@ describe(`<${TenantDetailLayout.name}/>`, () => {
       expect(subscribersLink).not.toBeInTheDocument();
     },
   );
+
+  describe('the Billing entry', () => {
+    beforeEach(() => {
+      getAdminByUserIdMock.mockResolvedValue(
+        mockAdmin({ role: ADMIN_ROLE.SUPERADMIN }),
+      );
+    });
+
+    it('shows a super admin the entry', async () => {
+      await setup();
+
+      const billingLink = screen.getByRole('link', {
+        name: navSections.billing,
+      });
+
+      expect(billingLink).toBeVisible();
+    });
+
+    it.each([ADMIN_ROLE.ADMIN, ADMIN_ROLE.MODERATOR])(
+      'hides it from a %s operator',
+      async (role) => {
+        getAdminByUserIdMock.mockResolvedValue(mockAdmin({ role }));
+        await setup();
+
+        const billingLink = screen.queryByRole('link', {
+          name: navSections.billing,
+        });
+
+        expect(billingLink).not.toBeInTheDocument();
+      },
+    );
+  });
 });

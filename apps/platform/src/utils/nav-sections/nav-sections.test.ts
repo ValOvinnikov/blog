@@ -168,13 +168,26 @@ describe(tenantNavSections, () => {
     expect(badged).toEqual([]);
   });
 
-  it('puts only Team in the Account section, linked to the tenant', () => {
-    const [team, ...rest] = account.items;
+  it('lists Team then Billing in the Account section, linked to the tenant', () => {
+    const [team, billing, ...rest] = account.items;
 
     expect(account.label).toBe(t('accountSectionLabel'));
     expect(team?.label).toBe(t('team'));
     expect(team?.href).toBe(adminRoutes.tenantTeam(MOCK_TENANT_ID));
+    expect(billing?.label).toBe(t('billing'));
+    expect(billing?.href).toBe(adminRoutes.tenantBilling(MOCK_TENANT_ID));
     expect(rest).toEqual([]);
+  });
+
+  it('leaves Billing out of the Account section without the billing option', () => {
+    const [, , , withoutBilling] = tenantNavSections(
+      t,
+      MOCK_TENANT_ID,
+      MOCK_TENANT_NAME,
+      { ...EVERY_PLAN_PAGE, billing: false },
+    );
+
+    expect(labelsOf(withoutBilling!)).toEqual([t('team')]);
   });
 
   it('links Provisioning and Danger zone, each badged as platform-only', () => {
