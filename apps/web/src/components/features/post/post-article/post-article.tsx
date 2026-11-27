@@ -1,4 +1,4 @@
-import { ASIDE_KIND, routes } from '@shinefold/config';
+import { routes } from '@shinefold/config';
 import {
   type TImageTransformOptions,
   urlForSanityImage,
@@ -7,9 +7,8 @@ import { Prose } from '@shinefold/ui/components/atoms/prose';
 import { Article } from '@shinefold/ui/components/organisms/article';
 import { ContentsRailLayout } from '@web/components/shared/contents-rail-layout';
 import {
-  createPostBodyOverride,
   PortableText,
-  type TAsideKindLabels,
+  postBodyOverride,
 } from '@web/components/shared/portable-text';
 import { SanityImage } from '@web/components/shared/sanity-image';
 import { SmartLink } from '@web/components/shared/smart-link';
@@ -74,16 +73,9 @@ export const PostArticle = async ({ slug }: TPostArticleProps) => {
     month: 'long',
     day: 'numeric',
   });
-  const asideKindLabels: TAsideKindLabels = Object.fromEntries(
-    Object.values(ASIDE_KIND).map((kind) => [
-      kind,
-      blogPostT(`asideKind.${kind}`),
-    ]),
-  );
   const footerTags = tags.flatMap(({ title: label, slug: tagSlug }) =>
     tagSlug ? [{ label, href: routes.tag(tagSlug) }] : [],
   );
-  const components = createPostBodyOverride(asideKindLabels);
 
   return (
     <PostSummaryProvider>
@@ -146,7 +138,7 @@ export const PostArticle = async ({ slug }: TPostArticleProps) => {
               footer={<Article.Footer tags={footerTags} linkAs={SmartLink} />}
             >
               <Prose className={s.prose()}>
-                <PortableText value={body} components={components} />
+                <PortableText value={body} components={postBodyOverride} />
               </Prose>
             </ContentsRailLayout>
           </ArticleBodyFocusTarget>

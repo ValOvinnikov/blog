@@ -1,6 +1,7 @@
 import { TEXT_ROLE } from '@shinefold/config';
 import {
   FOCUS_RING,
+  STANDALONE_LINK_HOVER_UNDERLINE,
   TRANSITION_COLORS,
   tv,
   TYPOGRAPHY,
@@ -9,19 +10,20 @@ import {
 export const adjacentPageLinkVariants = tv({
   slots: {
     root: [
-      'flex min-w-0 flex-col gap-1',
-      'rounded-md border border-border px-card-x py-card-y no-underline',
-      'hover:border-brand-primary',
+      'flex min-w-0 items-start gap-2 rounded-sm',
+      TYPOGRAPHY[TEXT_ROLE.ITEM_TITLE],
+      STANDALONE_LINK_HOVER_UNDERLINE,
       TRANSITION_COLORS,
       FOCUS_RING,
     ],
-    direction: [TYPOGRAPHY[TEXT_ROLE.LABEL], 'text-subtle'],
-    title: [TYPOGRAPHY[TEXT_ROLE.CARD_TITLE], 'break-words'],
+    direction: ['sr-only'],
+    title: ['min-w-0 break-words'],
+    arrow: ['mt-[0.25em]'],
   },
   variants: {
     isNext: {
-      true: { root: ['items-end text-right', 'md:col-start-2'] },
-      false: {},
+      true: { root: ['col-start-2 justify-self-end text-right'] },
+      false: { root: ['justify-self-start'], arrow: ['rotate-180'] },
     },
   },
 });
