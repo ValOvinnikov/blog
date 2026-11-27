@@ -24,8 +24,6 @@ import type { TRawFeatureHighlightsModule } from '@shinefold/service/features/mo
 import type { TRawHeroBlogModule } from '@shinefold/service/features/modules/hero-blog/adaptor/transformer';
 import type { TRawLogoWallModule } from '@shinefold/service/features/modules/logo-wall/adaptor/transformer';
 import type { TRawNewsletterModule } from '@shinefold/service/features/modules/newsletter/adaptor/transformer';
-import type { TRawSectionPagesModule } from '@shinefold/service/features/modules/section-pages/adaptor/module/transformer';
-import type { TRawSectionPages } from '@shinefold/service/features/modules/section-pages/adaptor/pages/transformer';
 import type { TRawStatsModule } from '@shinefold/service/features/modules/stats/adaptor/transformer';
 import type { TRawTaxonomyListModule } from '@shinefold/service/features/modules/taxonomy-list/adaptor/transformer';
 import type { TRawTimelineModule } from '@shinefold/service/features/modules/timeline/adaptor/transformer';
@@ -46,7 +44,6 @@ import {
   mockRawParagraphTextBlock,
   mockRawPortableTextMarkDef,
   mockRawSanityImage,
-  mockRawHeadingBlock,
 } from '@shinefold/service/testing/shared/fixtures';
 import {
   mockRawModuleHeadingBlock,
@@ -61,9 +58,6 @@ export const MOCK_COOKIE_SETTINGS_MODULE_ID = 'cookie-settings-1';
 export const MOCK_CTA_MODULE_ID = 'cta-1';
 export const MOCK_FAQ_MODULE_ID = 'faq-1';
 export const MOCK_NEWSLETTER_MODULE_ID = 'newsletter-1';
-export const MOCK_SECTION_PAGES_MODULE_ID = 'section-pages-1';
-export const MOCK_SECTION_PAGES_PARENT_ID = 'page-modules';
-export const MOCK_SECTION_PAGES_PARENT_PATH = 'section-home';
 export const MOCK_STATS_MODULE_ID = 'stats-1';
 export const MOCK_TAXONOMY_LIST_MODULE_ID = 'taxonomy-list-1';
 export const MOCK_TIMELINE_MODULE_ID = 'timeline-1';
@@ -73,7 +67,6 @@ const CTA_BUTTON_LABEL = 'Subscribe';
 export const MOCK_CTA_BUTTON_URL = '/newsletter';
 export const MOCK_FAQ_QUESTION_ID = 'block-faq-1';
 export const MOCK_SECOND_FAQ_QUESTION_ID = 'block-faq-2';
-export const MOCK_SECTION_PAGES_HEADING = 'In this section';
 export const MOCK_COOKIE_SETTINGS_HEADING = 'Your cookie choices';
 const MOCK_NEWSLETTER_HEADING = 'Stay in the loop';
 export const MOCK_RECENT_POSTS_HEADING = 'Recent writing';
@@ -132,32 +125,6 @@ export function mockRawHeroBlogModule(
     mediaOrderSplit: null,
     mediaOrderStacked: null,
     layout: null,
-    ...overrides,
-  };
-}
-
-export function mockRawSectionPagesModule(
-  overrides: Partial<TRawSectionPagesModule> = {},
-): TRawSectionPagesModule {
-  return {
-    brandVariant: BRAND_VARIANT.PRIMARY,
-    headingBlock: mockRawModuleHeadingBlock(MOCK_SECTION_PAGES_HEADING),
-    contentAlignment: null,
-    layout: null,
-    ...overrides,
-  };
-}
-
-export function mockRawSectionPage(
-  overrides: Partial<TRawSectionPages[number]> = {},
-): TRawSectionPages[number] {
-  return {
-    _id: 'page-faq',
-    slug: 'faq',
-    headingBlock: mockRawHeadingBlock('FAQ', {
-      supportingText: 'Answers to common questions.',
-    }),
-    image: mockRawSanityImage(),
     ...overrides,
   };
 }

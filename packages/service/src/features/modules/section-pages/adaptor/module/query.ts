@@ -4,6 +4,7 @@ import {
 } from '@shinefold/service/sanity/query/query';
 import { moduleHeadingBlockFragment } from '@shinefold/service/shared/fragments/heading-block/module-heading-block';
 import { moduleWideLayoutFragment } from '@shinefold/service/shared/fragments/layout/layout';
+import { moduleAppearanceFragment } from '@shinefold/service/shared/fragments/module/module-appearance';
 import { moduleContentAlignmentLeftCenterFragment } from '@shinefold/service/shared/fragments/module/module-content-alignment';
 
 export const sectionPagesModuleQuery = q
@@ -19,5 +20,6 @@ export const sectionPagesModuleQuery = q
       .nullable(true),
     ...moduleContentAlignmentLeftCenterFragment,
     ...moduleWideLayoutFragment,
+    ...moduleAppearanceFragment,
   }))
   .notNull();

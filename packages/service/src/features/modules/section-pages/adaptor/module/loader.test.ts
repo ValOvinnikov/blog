@@ -4,7 +4,7 @@ import {
   MOCK_SECTION_PAGES_HEADING,
   MOCK_SECTION_PAGES_MODULE_ID,
   mockRawSectionPagesModule,
-} from '@shinefold/service/testing/modules/fixtures';
+} from '@shinefold/service/testing/modules/section-pages/fixtures';
 import { mockCacheTag } from '@shinefold/service/testing/sanity/query/cache-tags';
 import {
   MOCK_MISSING_ID,

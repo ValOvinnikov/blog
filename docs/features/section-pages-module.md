@@ -24,6 +24,7 @@ Section Pages turns a landing page into a hub for the pages nested under it. Pla
 ## Data
 
 - **`module_sectionPages`** — Content group: `title`, optional `headingBlock` (the only module whose heading is optional). Appearance group: `brandVariant`, `contentAlignment` (Heading Alignment), the Cards fieldset — optional `cardStyle`, `radiusScale`, `density` and `columns`, each empty for Site default (Auto for columns) — and `layout` (`wideLayout`). Built with `cardModuleAppearance`. There is no list of pages to author: the children are derived.
+- **Module query** — returns `brandVariant`, `headingBlock`, `contentAlignment`, `layout` and the shared module appearance (`cardStyle`, `radiusScale`, `density`, `columns`), each `undefined` when unset.
 - **Children** — `page_landing` documents whose `parent` is the current page and whose `language` is the request language, ordered by `orderRank`. Each card reads the child's `slug`, its `headingBlock` heading (title) and supporting text (summary), and `seo.openGraph.ogImage` (image).
 - **Context** — the landing renderer passes `landingPage { id, path }`; the module uses `id` to find children and `path` to build their links.
 - **Caching** — the module query is tagged `modules:sectionPages` + `module:<id>`; the children query `page_landing`, so publishing any landing page refreshes every Section Pages grid. Fallback revalidate 86400s (`SANITY_CONTENT_REVALIDATE_SECONDS`).
@@ -32,7 +33,7 @@ Section Pages turns a landing page into a hub for the pages nested under it. Pla
 
 - Editors add the module to a landing template and choose its heading under Content, and its background, heading alignment, card overrides, columns and layout under Appearance. Which cards appear follows the landing page tree, not the module.
 - No plan or capability gate; no Voice strings.
-- Look: card style, radius and density restyle the cards ([look](./look.md)); the module's Appearance fields can override them per section. The web side does not yet read the per-module overrides or `columns`.
+- Look: card style, radius and density restyle the cards ([look](./look.md)); the module's Appearance fields can override them per section. The service returns the per-module overrides and `columns`; the web side does not yet apply them.
 
 ## Constraints and invariants
 
@@ -55,6 +56,7 @@ Section Pages turns a landing page into a hub for the pages nested under it. Pla
 - `apps/web/src/components/pages/landing-page/landing-module-renderer.tsx` — passes `landingPage` context
 - `packages/studio/src/schema-types/modules/section-pages/section-pages.ts`
 - `packages/service/src/features/modules/section-pages/application/get-section-pages-module.ts`
+- `packages/service/src/features/modules/section-pages/adaptor/module/query.ts`, `transformer.ts`
 - `packages/service/src/features/modules/section-pages/adaptor/pages/query.ts`, `transformer.ts`
 
 ## Tests and stories
