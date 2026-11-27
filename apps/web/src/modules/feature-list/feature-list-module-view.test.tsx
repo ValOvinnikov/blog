@@ -26,8 +26,6 @@ import {
 
 import { FeatureListModuleView } from './feature-list-module-view';
 
-vi.mock('@web/i18n/navigation');
-
 faker.seed(6011);
 
 const MOCK_MODULE_ID = faker.string.uuid();

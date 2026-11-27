@@ -38,8 +38,6 @@ vi.mock('@shinefold/service', () => ({
   },
 }));
 
-vi.mock('@web/i18n/navigation');
-
 const getTopicPageMock = vi.mocked(service.pages.topic.v1.getTopicPage);
 
 const MOCK_TOPIC_SLUG = faker.lorem.slug();

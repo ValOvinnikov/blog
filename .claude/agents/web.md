@@ -69,12 +69,13 @@ Before writing code:
 - `'use client'` goes at the leaf that needs it — `react-component-practices`
   → "Server first, client at the leaf".
 - **Links go through `SmartLink`** (`@web/components/shared/smart-link`) —
-  never `next/link` or `@web/i18n/navigation`'s `Link` at a call site, in
-  routes, layouts and components alike. It is locale-aware (next-intl's
-  `Link`, plain `next/link` only for protocol-relative hrefs), derives `rel`
-  from `target`, and is the `as`/`linkAs` target for `@shinefold/ui` components.
-  `@web/i18n/navigation` still supplies `permanentRedirect` and
-  `usePathname`. No lint rule enforces this.
+  never `next/link` at a call site, in routes, layouts and components alike.
+  It prefixes against the tenant's own default language
+  (`DefaultLocaleProvider`), derives `rel` from `target`, and is the
+  `as`/`linkAs` target for `@shinefold/ui` components. A server redirect to an
+  in-app path passes `localizeForRequest(href)` to `next/navigation`;
+  `@web/i18n/navigation` supplies only `usePathname`. No lint rule enforces
+  this.
 - **Discriminators** (`_type` names, stored enum values) come from
   `@shinefold/config` constants, never repeated string literals.
 - **A server action returns a `TActionResult`** with outcomes from

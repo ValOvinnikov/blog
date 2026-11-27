@@ -7,8 +7,6 @@ import {
 
 import { FeatureListCarousel } from './feature-list-carousel';
 
-vi.mock('@web/i18n/navigation');
-
 const setup = customRender(FeatureListCarousel, {
   items: MOCK_FEATURE_LIST_ITEMS,
   imageShape: CARD_IMAGE_SHAPE.WIDE,

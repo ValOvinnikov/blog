@@ -12,8 +12,6 @@ import { mockPortableTextBlock } from '@web/testing/shared/portable-text/fixture
 
 import { TeamSpotlight } from './team-spotlight';
 
-vi.mock('@web/i18n/navigation');
-
 faker.seed(6011);
 
 const MOCK_MEMBER = mockTeamMember();

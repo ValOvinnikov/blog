@@ -586,8 +586,8 @@ the logger, each app's `i18n/navigation`, Server Action modules (the
 `next-auth` and `next-auth/react`. Our components, `@shinefold/ui`, our helpers
 and our context providers render for real. This holds in both apps.
 
-- `SmartLink` is ours: fake `@web/i18n/navigation` under it, never
-  `SmartLink`. A component calling `useToast` renders inside the real
+- `SmartLink` is ours and renders for real under the test providers' English
+  locale; never fake it. A component calling `useToast` renders inside the real
   `ToastProvider` and the test asserts the toast on screen; never fake the
   hook.
 - **Check the app's `src/vitest-setup.ts` before writing a `vi.mock`.** Both

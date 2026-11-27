@@ -17,8 +17,6 @@ import { SectionDocumentPage } from './section-document-page';
 faker.seed(6522);
 
 vi.mock('@web/server/request-context/request-context');
-vi.mock('@web/i18n/navigation');
-
 vi.mock('@shinefold/service', () => ({
   service: {
     pages: { sectionDocument: { v1: { getSectionDocument: vi.fn() } } },

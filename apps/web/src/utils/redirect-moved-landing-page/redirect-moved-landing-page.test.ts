@@ -1,10 +1,13 @@
 import { faker } from '@faker-js/faker';
-import { LOCALE_ISO_CODES, REDIRECT_STATUS } from '@shinefold/config';
+import {
+  LOCALE_BCP47_TAGS,
+  LOCALE_ISO_CODES,
+  REDIRECT_STATUS,
+} from '@shinefold/config';
 import { NEXT_NAVIGATION_ERROR } from '@shinefold/config/constants';
 import { service } from '@shinefold/service';
 import { errorResult, okResult } from '@shinefold/utils';
 import { LANDING_PAGE_LOG } from '@web/constants/landing-page';
-import { permanentRedirect, redirect } from '@web/i18n/navigation';
 import { getRequestContext } from '@web/server/request-context/request-context';
 import { MOCK_ERROR } from '@web/testing/shared/error/fixtures';
 import {
@@ -12,6 +15,7 @@ import {
   MOCK_TENANT_SANITY_CONTEXT,
 } from '@web/testing/shared/tenant/fixtures';
 import { logger } from '@web/utils/logger/logger';
+import { permanentRedirect, redirect } from 'next/navigation';
 
 import { redirectMovedLandingPage } from './redirect-moved-landing-page';
 
@@ -20,8 +24,6 @@ vi.mock('@web/server/request-context/request-context');
 vi.mock('@shinefold/service', () => ({
   service: { pages: { landing: { v1: { getRedirect: vi.fn() } } } },
 }));
-
-vi.mock('@web/i18n/navigation');
 
 const getRedirectMock = vi.mocked(service.pages.landing.v1.getRedirect);
 
@@ -64,11 +66,44 @@ describe(redirectMovedLandingPage, () => {
         redirectMovedLandingPage(MISSING, MOCK_OLD_PATH),
       ).rejects.toThrow(NEXT_NAVIGATION_ERROR.NEXT_REDIRECT);
 
-      expect(redirectsWith).toHaveBeenCalledWith({
-        href: MOCK_DESTINATION,
-        locale: LOCALE_ISO_CODES.NL,
-      });
+      expect(redirectsWith).toHaveBeenCalledWith(
+        `/${LOCALE_BCP47_TAGS.NL}${MOCK_DESTINATION}`,
+      );
       expect(skips).not.toHaveBeenCalled();
+    },
+  );
+
+  it.each([
+    {
+      case: 'without a prefix in the default language',
+      locale: LOCALE_ISO_CODES.NL,
+      expected: MOCK_DESTINATION,
+    },
+    {
+      case: 'with a prefix in English',
+      locale: LOCALE_ISO_CODES.EN,
+      expected: `/${LOCALE_BCP47_TAGS.EN}${MOCK_DESTINATION}`,
+    },
+  ])(
+    'redirects $case on a Dutch-default tenant',
+    async ({ locale, expected }) => {
+      vi.mocked(getRequestContext).mockResolvedValue({
+        ...MOCK_REQUEST_CONTEXT,
+        locale,
+        defaultLocale: LOCALE_ISO_CODES.NL,
+      });
+      getRedirectMock.mockResolvedValueOnce(
+        okResult({
+          destination: MOCK_DESTINATION,
+          status: REDIRECT_STATUS.PERMANENT,
+        }),
+      );
+
+      await expect(
+        redirectMovedLandingPage(MISSING, MOCK_OLD_PATH),
+      ).rejects.toThrow(NEXT_NAVIGATION_ERROR.NEXT_REDIRECT);
+
+      expect(permanentRedirect).toHaveBeenCalledWith(expected);
     },
   );
 

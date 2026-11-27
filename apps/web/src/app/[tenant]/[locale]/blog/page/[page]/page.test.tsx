@@ -12,8 +12,6 @@ import PostIndexNumberedPage, { generateMetadata, revalidate } from './page';
 
 vi.mock('@web/server/request-context/request-context');
 
-vi.mock('@web/i18n/navigation');
-
 vi.mock('@web/metadata/post-index-metadata', () => ({
   buildPostIndexMetadata: vi.fn(),
 }));

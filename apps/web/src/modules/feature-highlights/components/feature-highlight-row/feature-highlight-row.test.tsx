@@ -5,8 +5,6 @@ import { mockFeatureHighlightItem } from '@web/testing/modules/feature-highlight
 
 import { FeatureHighlightRow } from './feature-highlight-row';
 
-vi.mock('@web/i18n/navigation');
-
 faker.seed(6011);
 
 const MOCK_ITEM = mockFeatureHighlightItem();

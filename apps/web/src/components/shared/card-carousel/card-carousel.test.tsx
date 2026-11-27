@@ -5,8 +5,6 @@ import { mockPostListItem } from '@web/testing/modules/post-list/fixtures';
 
 import { CardCarousel } from './card-carousel';
 
-vi.mock('@web/i18n/navigation');
-
 faker.seed(6007);
 
 const MOCK_TITLE = faker.lorem.words(2);

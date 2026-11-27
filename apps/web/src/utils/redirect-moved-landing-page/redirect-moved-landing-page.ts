@@ -1,10 +1,10 @@
 import { REDIRECT_STATUS, type TMaybeUndefined } from '@shinefold/config';
 import type { TResult } from '@shinefold/utils';
 import { LANDING_PAGE_LOG } from '@web/constants/landing-page';
-import { permanentRedirect, redirect } from '@web/i18n/navigation';
 import { getLandingRedirect } from '@web/server/landing/get-landing-redirect/get-landing-redirect';
-import { getRequestContext } from '@web/server/request-context/request-context';
+import { localizeForRequest } from '@web/utils/localize-for-request';
 import { logger } from '@web/utils/logger/logger';
+import { permanentRedirect, redirect } from 'next/navigation';
 
 export const redirectMovedLandingPage = async <T>(
   result: TResult<TMaybeUndefined<T>>,
@@ -25,9 +25,8 @@ export const redirectMovedLandingPage = async <T>(
   if (!landingRedirect.data) return;
 
   const { destination, status } = landingRedirect.data;
-  const { locale } = await getRequestContext();
   const sendRedirect =
     status === REDIRECT_STATUS.TEMPORARY ? redirect : permanentRedirect;
 
-  sendRedirect({ href: destination, locale });
+  sendRedirect(await localizeForRequest(destination));
 };

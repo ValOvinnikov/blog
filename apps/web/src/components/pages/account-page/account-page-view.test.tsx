@@ -10,8 +10,6 @@ import {
   type IAccountPageViewProps,
 } from './account-page-view';
 
-vi.mock('@web/i18n/navigation');
-
 vi.mock('@web/server/auth/auth');
 
 const MOCK_VIEW = mockAccountPageView();

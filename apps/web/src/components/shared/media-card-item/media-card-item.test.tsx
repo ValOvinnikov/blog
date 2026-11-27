@@ -5,8 +5,6 @@ import { MOCK_POST_IMAGE_TEST_ID } from '@web/testing/shared/post/fixtures';
 
 import { MediaCardItem } from './media-card-item';
 
-vi.mock('@web/i18n/navigation');
-
 const MOCK_ITEM = mockPostListItem();
 
 const setup = customRender(MediaCardItem, { item: MOCK_ITEM });

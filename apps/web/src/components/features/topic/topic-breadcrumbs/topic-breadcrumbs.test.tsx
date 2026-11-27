@@ -25,8 +25,6 @@ const { getTopicPageMock } = vi.hoisted(() => ({
   getTopicPageMock: vi.fn(),
 }));
 
-vi.mock('@web/i18n/navigation');
-
 vi.mock('@web/server/topic/get-topic-page/get-topic-page', () => ({
   getTopicPage: getTopicPageMock,
 }));

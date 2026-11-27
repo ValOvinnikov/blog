@@ -243,13 +243,16 @@ detected`, and a re-export with `it mustn't be reexported`, so a wrong form
   Localization. Never hardcode a
   locale; `setRequestLocale(locale)` at the top of every layout/page. All
   in-app links go through the single `SmartLink`
-  (`@web/components/shared/smart-link`), which is itself locale-aware — it
-  renders next-intl's `Link` internally, falling back to `next/link` only for
-  protocol-relative (`//host`) hrefs, and applies `rel="noopener noreferrer"`
-  on `target="_blank"`. Never use `next/link` or the i18n `Link` directly at a
-  call site. `@web/i18n/navigation` remains the source of the non-link
-  navigation helpers (`permanentRedirect`, `usePathname`) and of the `Link`
-  that `SmartLink` wraps internally.
+  (`@web/components/shared/smart-link`), a client component that prefixes the
+  href against the tenant's own default language (`DefaultLocaleProvider`,
+  set by `SiteProviders` from the request context; English outside it) via
+  `toLocalizedPathname`, leaves protocol-relative (`//host`) hrefs alone, and
+  applies `rel="noopener noreferrer"` on `target="_blank"`. Never use
+  `next/link` directly at a call site. Server redirects to an in-app path go
+  through `localizeForRequest` and `next/navigation`'s `redirect` /
+  `permanentRedirect`, never a navigation built from the static `routing`
+  (its default is always English). `@web/i18n/navigation` exports only
+  `usePathname`, which strips any locale prefix and so needs no tenant default.
 - **Root layout:** there is no `src/app/layout.tsx`. `[tenant]/[locale]/layout.tsx`
   is the root layout and renders the document shell through `DocumentShell`
   (`src/components/shared/document-shell/`: `<html>`/`<head>`/`<body>`,

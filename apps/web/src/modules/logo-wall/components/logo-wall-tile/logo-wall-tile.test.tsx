@@ -7,8 +7,6 @@ import {
 
 import { LogoWallTile } from './logo-wall-tile';
 
-vi.mock('@web/i18n/navigation');
-
 const MOCK_ASPECT_RATIO = 2400 / 1260;
 const LOGO_TEST_ID = 'logo-wall-tile-logo';
 const LOGO_ASPECT_PROPERTY = '--logo-aspect';

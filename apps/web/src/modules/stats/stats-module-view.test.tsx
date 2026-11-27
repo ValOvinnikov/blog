@@ -11,8 +11,6 @@ import {
 
 import { StatsModuleView } from './stats-module-view';
 
-vi.mock('@web/i18n/navigation');
-
 faker.seed(31);
 
 const MOCK_FOOTNOTE = faker.lorem.sentence();

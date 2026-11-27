@@ -14,8 +14,6 @@ import { notFound } from 'next/navigation';
 import { CookieStatementPage } from './cookie-statement-page';
 
 vi.mock('@web/server/request-context/request-context');
-vi.mock('@web/i18n/navigation');
-
 vi.mock('@shinefold/service', () => ({
   service: {
     pages: { cookieStatement: { v1: { getCookieStatementPage: vi.fn() } } },

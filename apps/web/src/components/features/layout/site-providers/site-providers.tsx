@@ -3,11 +3,13 @@ import { getSanityImageBaseUrl } from '@shinefold/service';
 import { ConsentPreferencesDialog } from '@web/components/shared/consent-preferences-dialog';
 import { BusyStyleProvider } from '@web/context/busy-style-provider';
 import { ConsentPreferencesProvider } from '@web/context/consent-preferences-provider';
+import { DefaultLocaleProvider } from '@web/context/default-locale-provider';
 import { HeaderOverlayProvider } from '@web/context/header-overlay-provider';
 import { SanityImageBaseUrlProvider } from '@web/context/sanity-image-base-url-provider';
 import { SiteAnalyticsProvider } from '@web/context/site-analytics-provider';
 import { ToastProvider } from '@web/context/toast-provider';
 import { VoiceRichProvider } from '@web/context/voice-rich-provider';
+import { routing } from '@web/i18n/routing';
 import { getRequestContext } from '@web/server/request-context/request-context';
 import { isCapabilityEnabled } from '@web/server/settings-features/is-capability-enabled/is-capability-enabled';
 import { getBusyStyle } from '@web/server/site-config/get-busy-style/get-busy-style';
@@ -27,7 +29,8 @@ export interface ISiteProvidersProps {
 }
 
 export const SiteProviders = async ({ children }: ISiteProvidersProps) => {
-  const { tenantId, locale, sanityContext } = await getRequestContext();
+  const { tenantId, locale, defaultLocale, sanityContext } =
+    await getRequestContext();
   const tenant = tenantId ?? UNRESOLVED_TENANT_PLACEHOLDER;
   const baseMessages = SITE_MESSAGES_BY_LOCALE[locale];
   const [now, timeZone, isConsentBannerEnabled, busyStyle, analytics] =
@@ -53,22 +56,24 @@ export const SiteProviders = async ({ children }: ISiteProvidersProps) => {
         now={now}
         timeZone={timeZone}
       >
-        <SessionProvider>
-          <BusyStyleProvider value={busyStyle}>
-            <ToastProvider>
-              <OutOfDatePageNotice />
-              <VoiceRichProvider values={rich}>
-                <SiteAnalyticsProvider value={analytics}>
-                  <ConsentPreferencesProvider>
-                    <HeaderOverlayProvider>{children}</HeaderOverlayProvider>
-                    <ConsentBannerSlot isEnabled={isConsentBannerEnabled} />
-                    <ConsentPreferencesDialog />
-                  </ConsentPreferencesProvider>
-                </SiteAnalyticsProvider>
-              </VoiceRichProvider>
-            </ToastProvider>
-          </BusyStyleProvider>
-        </SessionProvider>
+        <DefaultLocaleProvider value={defaultLocale ?? routing.defaultLocale}>
+          <SessionProvider>
+            <BusyStyleProvider value={busyStyle}>
+              <ToastProvider>
+                <OutOfDatePageNotice />
+                <VoiceRichProvider values={rich}>
+                  <SiteAnalyticsProvider value={analytics}>
+                    <ConsentPreferencesProvider>
+                      <HeaderOverlayProvider>{children}</HeaderOverlayProvider>
+                      <ConsentBannerSlot isEnabled={isConsentBannerEnabled} />
+                      <ConsentPreferencesDialog />
+                    </ConsentPreferencesProvider>
+                  </SiteAnalyticsProvider>
+                </VoiceRichProvider>
+              </ToastProvider>
+            </BusyStyleProvider>
+          </SessionProvider>
+        </DefaultLocaleProvider>
       </NextIntlClientProvider>
     </SanityImageBaseUrlProvider>
   );

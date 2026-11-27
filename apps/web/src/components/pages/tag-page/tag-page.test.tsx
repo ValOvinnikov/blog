@@ -28,8 +28,6 @@ vi.mock('@shinefold/service', () => ({
   },
 }));
 
-vi.mock('@web/i18n/navigation');
-
 const getTagPageMock = vi.mocked(service.pages.tag.v1.getTagPage);
 
 const MOCK_TAG_SLUG = faker.lorem.slug();

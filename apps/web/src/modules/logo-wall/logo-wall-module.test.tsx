@@ -20,8 +20,6 @@ const { getLogoWallModuleMock } = vi.hoisted(() => ({
   getLogoWallModuleMock: vi.fn(),
 }));
 
-vi.mock('@web/i18n/navigation');
-
 vi.mock('@shinefold/service', () => ({
   service: {
     modules: {

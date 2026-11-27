@@ -39,8 +39,6 @@ vi.mock('@shinefold/service', () => ({
   },
 }));
 
-vi.mock('@web/i18n/navigation');
-
 const getPostListMock = vi.mocked(service.modules.postList.v1.getPostList);
 
 const MOCK_TERM = mockTopic({

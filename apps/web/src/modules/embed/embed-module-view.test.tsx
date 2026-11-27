@@ -11,8 +11,6 @@ import {
 
 import { EmbedModuleView } from './embed-module-view';
 
-vi.mock('@web/i18n/navigation');
-
 const MOCK_EMBED = mockEmbed();
 const MOCK_EMBED_MODULE = mockEmbedModule({ embed: MOCK_EMBED });
 

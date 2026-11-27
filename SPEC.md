@@ -2253,7 +2253,7 @@ Static generation by default, revalidated on demand by the publish webhook
 with a time-based expiry as its backstop; the
 skim-generation pipeline (`/api/generate-skim`); the Sanity CDN is
 deliberately bypassed; i18n runs through `next-intl` with an `as-needed`
-language prefix (none for the default language) and a single `SmartLink` for
+language prefix (none for the tenant's own default language) and a single `SmartLink` for
 all in-app navigation. Content localization is described under Localization
 below.
 

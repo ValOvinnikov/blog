@@ -13,8 +13,6 @@ import {
 
 import { ContentsRail } from './contents-rail';
 
-vi.mock('@web/i18n/navigation');
-
 const NAV_NAME = SITE_MESSAGES.contentsRail.label;
 
 const ArticleWithContentsRail = () => (
