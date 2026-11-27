@@ -2,15 +2,8 @@ import {
   FINDING_KIND,
   FINDING_SEVERITY,
   FINDING_SOURCE,
-  FINDING_STATUS,
 } from '@shinefold/config/constants';
-import type { TMaybeUndefined } from '@shinefold/config/types';
-import {
-  getFindingDetails,
-  listFindingsForTenant,
-  openFinding,
-  resolveFinding,
-} from '@shinefold/db/queries/findings';
+import { getFindingDetails, openFinding } from '@shinefold/db/queries/findings';
 import type { TFindingSummary } from '@shinefold/db/schema/findings';
 import type { TTenant } from '@shinefold/db/schema/tenants';
 import {
@@ -18,24 +11,16 @@ import {
   OWNER_ACCESS_FINDING_IDENTIFIER,
   OWNER_ACCESS_LOG,
 } from '@worker/constants/owner-access';
+import {
+  findOpenFinding,
+  resolveOpenFinding,
+} from '@worker/utils/finding/find-open-finding';
 import { logger } from '@worker/utils/logger/logger';
 import { z } from 'zod';
 
 const failureCountSchema = z.object({
   failureCount: z.number().int().nonnegative().catch(0),
 });
-
-async function findOpenOwnerAccessFinding(
-  tenantId: string,
-): Promise<TMaybeUndefined<TFindingSummary>> {
-  const openFindings = await listFindingsForTenant(
-    tenantId,
-    FINDING_STATUS.OPEN,
-  );
-  return openFindings.find(
-    ({ kind }) => kind === FINDING_KIND.OWNER_ACCESS_CHECK_FAILED,
-  );
-}
 
 async function previousFailureCount(
   tenantId: string,
@@ -57,7 +42,10 @@ export async function recordOwnerAccessFailure(
   }
 
   const tenantId = tenant.id;
-  const finding = await findOpenOwnerAccessFinding(tenantId);
+  const finding = await findOpenFinding(
+    tenantId,
+    FINDING_KIND.OWNER_ACCESS_CHECK_FAILED,
+  );
   const failureCount = finding
     ? (await previousFailureCount(tenantId, finding)) + 1
     : 1;
@@ -85,13 +73,5 @@ export async function recordOwnerAccessFailure(
 export async function resolveOwnerAccessFinding(
   tenantId: string,
 ): Promise<void> {
-  const finding = await findOpenOwnerAccessFinding(tenantId);
-  if (!finding) return;
-
-  const resolved = await resolveFinding(finding.id);
-  if (!resolved.ok) {
-    throw new Error(
-      `Tenant "${tenantId}"'s owner-access finding could not be resolved (${resolved.error}).`,
-    );
-  }
+  await resolveOpenFinding(tenantId, FINDING_KIND.OWNER_ACCESS_CHECK_FAILED);
 }

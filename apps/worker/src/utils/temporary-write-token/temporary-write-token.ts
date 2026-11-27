@@ -1,5 +1,5 @@
 import { SANITY_ROBOT_ROLE } from '@shinefold/config';
-import {
+import type {
   createSanityRobotToken,
   deleteSanityRobotToken,
 } from '@shinefold/db/utils/sanity-management-client/sanity-robot-tokens';

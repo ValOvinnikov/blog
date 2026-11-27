@@ -1,8 +1,6 @@
 import {
   FINDING_KIND,
-  FINDING_SEVERITY,
-  FINDING_SOURCE,
-  FINDING_STATUS,
+  OAUTH_PROVIDER,
   SANITY_PROJECT_ROLE,
   SANITY_RESOURCE_TYPE,
   type TSanityResourceType,
@@ -18,11 +16,14 @@ import { MOCK_IDLE_PROVISIONING_STEPS } from '@shinefold/db/testing/tenants/fixt
 import type { TSanityInvite } from '@shinefold/db/utils/sanity-management-client/sanity-project-access';
 import type { TSanityUser } from '@shinefold/db/utils/sanity-management-client/sanity-project-users';
 import { SANITY_PENDING_INVITE_STATUS } from '@worker/constants/owner-access';
+import {
+  MOCK_FINDING_ID,
+  mockOpenFindingSummary,
+} from '@worker/testing/finding/fixtures';
 import { createMockFaker } from '@worker/testing/mock-faker';
 import { MOCK_PROVISION_ENV } from '@worker/testing/provision-env/fake-provision-env';
 import {
   MOCK_SANITY_PROJECT_ID,
-  MOCK_TENANT_ID,
   MOCK_TENANT_MANAGEMENT_TOKEN,
   mockProvisionedTenant,
 } from '@worker/testing/tenant/fixtures';
@@ -37,7 +38,6 @@ export const MOCK_SANITY_INVITE_ID = 'invite-1';
 export const MOCK_OWNER_PROJECT_USER_ID = 'p-owner';
 export const MOCK_SANITY_USER_ID = `g${mockFaker.string.alphanumeric(10)}`;
 const MOCK_OWNER_PROFILE_ID = `p${mockFaker.string.alphanumeric(10)}`;
-export const MOCK_OWNER_ACCESS_FINDING_ID = mockFaker.string.uuid();
 export const MOCK_OTHER_INVITE_ID = mockFaker.string.uuid();
 export const MOCK_OTHER_INVITEE_EMAIL = mockFaker.internet.email();
 
@@ -49,7 +49,7 @@ export function mockSanityOwner(
     profile: {
       id: MOCK_OWNER_PROJECT_USER_ID,
       email: MOCK_OWNER_EMAIL,
-      provider: 'google',
+      provider: OAUTH_PROVIDER.GOOGLE,
       ...overrides,
     },
   };
@@ -112,18 +112,8 @@ export function mockOwnerAccessFailingSince(
   });
 }
 
+export const MOCK_OWNER_ACCESS_FINDING_ID = MOCK_FINDING_ID;
+
 export function mockOwnerAccessFinding(): TFindingSummary {
-  return {
-    id: MOCK_OWNER_ACCESS_FINDING_ID,
-    tenantId: MOCK_TENANT_ID,
-    source: FINDING_SOURCE.TENANT_PROVISIONING,
-    kind: FINDING_KIND.OWNER_ACCESS_CHECK_FAILED,
-    severity: FINDING_SEVERITY.WARNING,
-    status: FINDING_STATUS.OPEN,
-    dedupeKey: mockFaker.string.alphanumeric(12),
-    hasDetails: true,
-    firstSeenAt: new Date(MOCK_INVITE_SENT_AT),
-    lastSeenAt: new Date(MOCK_INVITE_SENT_AT),
-    resolvedAt: null,
-  };
+  return mockOpenFindingSummary(FINDING_KIND.OWNER_ACCESS_CHECK_FAILED);
 }
