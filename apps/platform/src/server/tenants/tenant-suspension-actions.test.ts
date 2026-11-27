@@ -442,6 +442,7 @@ describe('tenant suspension actions', () => {
       expect(recordSignupBlockAddedMock).toHaveBeenCalledWith(
         mockBlockedAddressIdentity(),
         MOCK_BLOCK_REASON,
+        ACTIVE_TENANT.id,
       );
       expect(removeBlockedIdentityMock).not.toHaveBeenCalled();
       expect(result).toEqual({ outcome: ACTION_OUTCOME.SUCCESS });
@@ -558,6 +559,7 @@ describe('tenant suspension actions', () => {
         expect(recordSignupBlockAddedMock).toHaveBeenCalledWith(
           mockBlockedAddressIdentity(),
           MOCK_BLOCK_REASON,
+          ACTIVE_TENANT.id,
         );
       });
 

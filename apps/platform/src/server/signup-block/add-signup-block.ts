@@ -3,18 +3,17 @@ import 'server-only';
 import { SIGNUP_BLOCK_LOG } from '@platform/constants/signup-block';
 import { recordAuditEvent } from '@platform/server/audit/record-audit-event';
 import {
+  signupBlockAuditDetails,
+  type TSignupBlockAuditEntry,
+} from '@platform/server/signup-block/signup-block-audit';
+import {
   AUDIT_ACTION,
   AUDIT_TARGET_TYPE,
   type TErrorCode,
 } from '@shinefold/config';
-import {
-  BLOCKED_IDENTITY_KIND,
-  queries,
-  type TBlockedIdentityKind,
-} from '@shinefold/db';
+import { queries, type TBlockedIdentityKind } from '@shinefold/db';
 import type { TAddBlockedIdentityOutcome } from '@shinefold/db/queries/blocked-signup-identities/add-blocked-identity';
 import type { TAdmin } from '@shinefold/db/schema/admins';
-import type { TBlockedSignupIdentity } from '@shinefold/db/schema/blocked-signup-identities';
 import type { TResult } from '@shinefold/utils';
 
 export type TAddSignupBlockInput = {
@@ -40,19 +39,27 @@ export const saveSignupBlock = async ({
   });
 
 export const recordSignupBlockAdded = async (
-  { kind, value, id }: Pick<TBlockedSignupIdentity, 'kind' | 'value' | 'id'>,
+  entry: TSignupBlockAuditEntry,
   reason: string,
+  tenantId?: string,
 ): Promise<void> => {
+  const details = { ...signupBlockAuditDetails(entry), reason };
   await recordAuditEvent({
     logEvent: SIGNUP_BLOCK_LOG.ADD_AUDIT_FAILED,
     action: AUDIT_ACTION.SIGNUP_BLOCK_ADDED,
     targetType: AUDIT_TARGET_TYPE.BLOCKED_SIGNUP_IDENTITY,
-    targetId: id,
-    details: {
-      kind,
-      reason,
-      ...(kind === BLOCKED_IDENTITY_KIND.DOMAIN && { domain: value }),
-    },
+    targetId: entry.id,
+    details: tenantId ? { ...details, tenantId } : details,
+  });
+
+  if (!tenantId) return;
+
+  await recordAuditEvent({
+    logEvent: SIGNUP_BLOCK_LOG.ADD_AUDIT_FAILED,
+    action: AUDIT_ACTION.SIGNUP_BLOCK_ADDED,
+    targetType: AUDIT_TARGET_TYPE.TENANT,
+    targetId: tenantId,
+    details,
   });
 };
 

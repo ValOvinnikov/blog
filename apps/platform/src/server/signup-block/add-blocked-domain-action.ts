@@ -60,6 +60,17 @@ export const addBlockedDomainAction = async (
       admin,
     });
 
+    if (result.ok && !result.data.created) {
+      return {
+        outcome: ACTION_OUTCOME.INVALID,
+        fieldErrors: {
+          domain: {
+            reason: SIGNUP_BLOCK_FIELD_ERROR.BLOCK_DOMAIN_ALREADY_BLOCKED,
+          },
+        },
+      };
+    }
+
     if (result.ok) return toOutcome(ACTION_OUTCOME.SUCCESS);
 
     if (result.error === ERROR_CODE.DB_INVALID_DOMAIN) {

@@ -2255,6 +2255,7 @@
     "submitting": "Wird gesperrt…",
     "reasonRequired": "Geben Sie einen Grund ein.",
     "domainFormatInvalid": "Geben Sie eine gültige Domain ein, zum Beispiel example.com.",
+    "domainAlreadyBlocked": "Diese Domain ist bereits gesperrt.",
     "domainBlocked": "Domain gesperrt.",
     "domainBlockFailed": "Die Domain konnte nicht gesperrt werden – versuchen Sie es erneut.",
     "blockSubmit": "Domain sperren"

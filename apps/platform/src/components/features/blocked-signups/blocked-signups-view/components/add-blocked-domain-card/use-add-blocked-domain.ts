@@ -15,6 +15,8 @@ import { useState, useTransition } from 'react';
 
 const FIELD_ERROR_KEYS = {
   [SIGNUP_BLOCK_FIELD_ERROR.BLOCK_DOMAIN_INVALID]: 'domainFormatInvalid',
+  [SIGNUP_BLOCK_FIELD_ERROR.BLOCK_DOMAIN_ALREADY_BLOCKED]:
+    'domainAlreadyBlocked',
   [SIGNUP_BLOCK_FIELD_ERROR.BLOCK_REASON_REQUIRED]: 'reasonRequired',
 } as const;
 
@@ -42,6 +44,16 @@ export const useAddBlockedDomain = ({
   const [reason, setReason] = useState('');
   const [errors, setErrors] = useState(NO_ERRORS);
   const [isPending, startTransition] = useTransition();
+
+  const changeDomain = (value: string) => {
+    setDomain(value);
+    setErrors((current) => ({ ...current, domain: undefined }));
+  };
+
+  const changeReason = (value: string) => {
+    setReason(value);
+    setErrors((current) => ({ ...current, reason: undefined }));
+  };
 
   const submit = () => {
     startTransition(async () => {
@@ -75,8 +87,8 @@ export const useAddBlockedDomain = ({
   return {
     domain,
     reason,
-    setDomain,
-    setReason,
+    setDomain: changeDomain,
+    setReason: changeReason,
     domainErrorKey: errors.domain,
     reasonErrorKey: errors.reason,
     isPending,

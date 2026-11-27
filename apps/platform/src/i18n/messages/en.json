@@ -2255,6 +2255,7 @@
     "submitting": "Blocking…",
     "reasonRequired": "Enter a reason.",
     "domainFormatInvalid": "Enter a valid domain, such as example.com.",
+    "domainAlreadyBlocked": "This domain is already blocked.",
     "domainBlocked": "Domain blocked.",
     "domainBlockFailed": "Couldn't block the domain — try again.",
     "blockSubmit": "Block domain"

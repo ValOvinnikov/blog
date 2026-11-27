@@ -26,6 +26,7 @@ type TBlockTenantOwnerEmailFailure =
 
 export type TSavedOwnerEmailBlock = TAddBlockedIdentityOutcome & {
   reason: string;
+  tenantId: string;
 };
 
 export const blockTenantOwnerEmail = async (
@@ -47,7 +48,7 @@ export const blockTenantOwnerEmail = async (
     reason,
     admin,
   });
-  if (saved.ok) return okResult({ ...saved.data, reason });
+  if (saved.ok) return okResult({ ...saved.data, reason, tenantId });
 
   logger.error(TENANT_LOG.SUSPENSION_BLOCK_FAILED, {
     tenantId,
@@ -59,7 +60,9 @@ export const blockTenantOwnerEmail = async (
 export const confirmOwnerEmailBlock = async (
   block: TMaybeUndefined<TSavedOwnerEmailBlock>,
 ): Promise<void> => {
-  if (block?.created) await recordSignupBlockAdded(block.entry, block.reason);
+  if (block?.created) {
+    await recordSignupBlockAdded(block.entry, block.reason, block.tenantId);
+  }
 };
 
 export const undoOwnerEmailBlock = async (
