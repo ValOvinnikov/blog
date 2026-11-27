@@ -14,6 +14,7 @@
     "tenantOverview": "Aperçu du locataire",
     "tenantActivity": "Activité du locataire",
     "tenantProvisioning": "Provisionnement",
+    "tenantBilling": "Facturation",
     "tenantDanger": "Zone de danger",
     "tenantDomain": "Domaine",
     "signInApps": "Connexion",
@@ -2458,6 +2459,7 @@
   "billingPage": {
     "title": "Facturation",
     "description": "Votre formule, votre prochain paiement et vos factures.",
+    "operatorDescription": "Forfait, prochain paiement et factures d'un locataire, en lecture seule.",
     "manage": "Gérer la facturation",
     "managePending": "Ouverture…",
     "manageFailed": "La facturation n'a pas pu s'ouvrir. Réessayez dans un instant.",

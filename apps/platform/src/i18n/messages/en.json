@@ -14,6 +14,7 @@
     "tenantOverview": "Tenant overview",
     "tenantActivity": "Tenant activity",
     "tenantProvisioning": "Provisioning",
+    "tenantBilling": "Billing",
     "tenantDanger": "Danger zone",
     "tenantDomain": "Domain",
     "signInApps": "Sign-in",
@@ -2458,6 +2459,7 @@
   "billingPage": {
     "title": "Billing",
     "description": "Your plan, your next payment and your invoices.",
+    "operatorDescription": "A tenant's plan, next payment and invoices, read-only.",
     "manage": "Manage billing",
     "managePending": "Opening…",
     "manageFailed": "Billing couldn't be opened. Try again in a moment.",

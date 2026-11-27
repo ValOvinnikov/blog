@@ -23,6 +23,7 @@ const setup = customRender(PlanCard, {
   hasPayments: true,
   isSubscribed: true,
   renewal: { ...NO_RENEWAL, nextPayment: MOCK_NEXT_PAYMENT },
+  canChangePlan: true,
 });
 
 describe(`<${PlanCard.name}/>`, () => {
@@ -62,6 +63,16 @@ describe(`<${PlanCard.name}/>`, () => {
         MOCK_NEXT_PAYMENT.dueAt.toISOString(),
       );
     });
+  });
+
+  it('offers no plan change to a viewer who cannot change the plan', () => {
+    setup({ canChangePlan: false });
+
+    const changePlan = screen.queryByRole('link', {
+      name: billingPage.changePlan,
+    });
+
+    expect(changePlan).not.toBeInTheDocument();
   });
 
   it('says no payment is scheduled when there is none', () => {

@@ -14,6 +14,7 @@
     "tenantOverview": "Mandantenübersicht",
     "tenantActivity": "Mandantenaktivität",
     "tenantProvisioning": "Bereitstellung",
+    "tenantBilling": "Abrechnung",
     "tenantDanger": "Gefahrenzone",
     "tenantDomain": "Domain",
     "signInApps": "Anmeldung",
@@ -2458,6 +2459,7 @@
   "billingPage": {
     "title": "Abrechnung",
     "description": "Ihr Tarif, Ihre nächste Zahlung und Ihre Rechnungen.",
+    "operatorDescription": "Tarif, nächste Zahlung und Rechnungen eines Mandanten, nur lesend.",
     "manage": "Abrechnung verwalten",
     "managePending": "Wird geöffnet…",
     "manageFailed": "Die Abrechnung konnte nicht geöffnet werden. Versuchen Sie es gleich noch einmal.",

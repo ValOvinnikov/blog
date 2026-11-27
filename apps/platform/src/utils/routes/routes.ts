@@ -68,6 +68,7 @@ export const adminRoutes = {
   admins: () => '/admins',
   tenantOverview: (tenantId: string) => `/tenants/${tenantId}`,
   tenantProvisioning: (tenantId: string) => `/tenants/${tenantId}/provisioning`,
+  tenantBilling: (tenantId: string) => `/tenants/${tenantId}/billing`,
   tenantDanger: (tenantId: string) => `/tenants/${tenantId}/danger`,
   tenantDomain: (tenantId: string) => `/tenants/${tenantId}/domain`,
   tenantSignIn: (tenantId: string) => `/tenants/${tenantId}/sign-in`,
