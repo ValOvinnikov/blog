@@ -1,0 +1,1 @@
+ALTER TABLE "tenants" ADD COLUMN "created_from_platform" boolean DEFAULT false NOT NULL;

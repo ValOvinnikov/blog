@@ -42,6 +42,7 @@ export async function createTenantDraft(
       locale: normalizeLocaleCode(input.locale),
       plan: input.plan,
       status: TENANT_STATUS.ACTIVE,
+      createdFromPlatform: true,
     },
     async ({ id: tenantId }) => {
       const ownerInsert =

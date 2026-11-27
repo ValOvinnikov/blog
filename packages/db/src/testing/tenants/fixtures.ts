@@ -80,6 +80,7 @@ export function mockTenant(overrides: Partial<TTenant> = {}): TTenant {
     siteType: null,
     siteTemplateVersion: null,
     selfServeOwnerEmailIndex: null,
+    createdFromPlatform: false,
     ...MOCK_NO_OWNER_ACCESS,
     unsentReinviteFormerOwnerEmailEncrypted: null,
     lastActivityAt: createdAt,

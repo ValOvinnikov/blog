@@ -42,11 +42,12 @@ afterEach(async () => {
 });
 
 describe(reactivateTenant, () => {
-  it('makes an archived tenant ACTIVE, leaving its provisioning artifacts as they are', async () => {
+  it('makes an archived tenant ACTIVE, keeping its artifacts and platform origin', async () => {
     const tenant = await insertTestTenant(db(), {
       status: TENANT_STATUS.ARCHIVED,
       deprovisionedAt: MOCK_DEPROVISIONED_AT,
       provisioningStatus: TENANT_PROVISIONING_STATUS.READY,
+      createdFromPlatform: true,
     });
     const reactivated = {
       ...tenant,

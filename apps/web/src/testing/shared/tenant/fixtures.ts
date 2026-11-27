@@ -77,6 +77,7 @@ export const mockTenant = (overrides: Partial<TTenant> = {}): TTenant => ({
   siteType: null,
   siteTemplateVersion: null,
   selfServeOwnerEmailIndex: null,
+  createdFromPlatform: false,
   ...MOCK_NO_OWNER_ACCESS,
   unsentReinviteFormerOwnerEmailEncrypted: null,
   lastActivityAt: MOCK_TENANT_CREATED_AT,
