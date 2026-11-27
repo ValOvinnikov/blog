@@ -1,9 +1,5 @@
-import {
-  SITE_MESSAGES_BY_LOCALE,
-  type TPostSummary,
-  type TTenantEmailBrand,
-} from '@shinefold/config';
-import type { TFontChoice, TLocaleIsoCode } from '@shinefold/config/constants';
+import type { TPostSummary, TTenantEmailBrand } from '@shinefold/config';
+import type { TFontChoice } from '@shinefold/config/constants';
 import { renderEmailDocument } from '@shinefold/email/html/email-document/email-document';
 import { buildPlainTextBody } from '@shinefold/email/plain-text/plain-text-body';
 import {
@@ -33,7 +29,7 @@ export type TPostEmailInput = {
   unsubscribeUrl: string;
   brand: TTenantEmailBrand;
   brandName: string;
-  locale: TLocaleIsoCode;
+  summaryHeading: string;
   darkBrand?: TTenantEmailBrand;
   headingFont?: TFontChoice;
   bodyFont?: TFontChoice;
@@ -62,7 +58,7 @@ export function buildPostEmail({
   unsubscribeUrl,
   brand,
   brandName,
-  locale,
+  summaryHeading,
   darkBrand,
   headingFont,
   bodyFont,
@@ -79,8 +75,7 @@ export function buildPostEmail({
     title,
     excerpt,
     summary,
-    summaryHeading:
-      SITE_MESSAGES_BY_LOCALE[locale].blogPostPage.postSummary.button,
+    summaryHeading,
     postUrl,
     coverImageUrl,
   };

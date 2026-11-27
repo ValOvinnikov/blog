@@ -10,6 +10,7 @@ import {
   LOCALE_ISO_CODES,
   NEWSLETTER_TEST_SEND_REFUSAL,
   routes,
+  SITE_MESSAGES_BY_LOCALE,
   type TNewsletterTestSendResult,
 } from '@shinefold/config';
 import { EMAIL_ACCOUNT } from '@shinefold/config/constants';
@@ -99,7 +100,8 @@ export const sendNewsletterPostTest = async (
     postUrl: `${siteUrl}${routes.post(slug)}`,
     unsubscribeUrl: siteUrl,
     brandName: name,
-    locale,
+    summaryHeading:
+      SITE_MESSAGES_BY_LOCALE[locale].blogPostPage.postSummary.button,
     coverImageUrl,
     summary: takeaways,
     logoImageUrl: emailConfig?.logoAssetUrl ?? undefined,

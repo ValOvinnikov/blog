@@ -1,10 +1,6 @@
 import { faker } from '@faker-js/faker';
-import { SITE_MESSAGES_BY_LOCALE, type TPostSummary } from '@shinefold/config';
-import {
-  EMAIL_FONT_STACK,
-  FONT_CHOICE,
-  LOCALE_ISO_CODES,
-} from '@shinefold/config/constants';
+import type { TPostSummary } from '@shinefold/config';
+import { EMAIL_FONT_STACK, FONT_CHOICE } from '@shinefold/config/constants';
 import { POST_BOX_CLASS } from '@shinefold/email/templates/tenant/post-email-frame/post-email-frame';
 import { LIST_UNSUBSCRIBE_ONE_CLICK } from '@shinefold/email/templates/tenant/unsubscribe/unsubscribe';
 import {
@@ -49,6 +45,7 @@ const MOCK_SUMMARY: TPostSummary = [
   ),
 ];
 const MOCK_TEST_BANNER_TEXT = faker.lorem.sentence();
+const MOCK_SUMMARY_HEADING = faker.lorem.word();
 
 const MOCK_INPUT: TPostEmailInput = {
   subject: faker.lorem.sentence(),
@@ -58,7 +55,7 @@ const MOCK_INPUT: TPostEmailInput = {
   unsubscribeUrl: MOCK_UNSUBSCRIBE_URL,
   brand: MOCK_TENANT_EMAIL_BRAND,
   brandName: MOCK_TENANT_NAME,
-  locale: LOCALE_ISO_CODES.EN,
+  summaryHeading: MOCK_SUMMARY_HEADING,
 };
 
 describe(buildPostEmail, () => {
@@ -156,22 +153,17 @@ describe(buildPostEmail, () => {
     });
   });
 
-  it.each(Object.values(LOCALE_ISO_CODES))(
-    'heads the summary in the %s site language',
-    (locale) => {
-      const heading =
-        SITE_MESSAGES_BY_LOCALE[locale].blogPostPage.postSummary.button;
+  it('heads the summary with the given heading in both parts', () => {
+    const { html, text } = buildPostEmail({
+      ...MOCK_INPUT,
+      summary: MOCK_SUMMARY,
+    });
 
-      const { html, text } = buildPostEmail({
-        ...MOCK_INPUT,
-        locale,
-        summary: MOCK_SUMMARY,
-      });
-
-      expect(html).toContain(`>${heading}</h2>`);
-      expect(text).toContain(`${heading}\n\n${MOCK_SUMMARY_PARAGRAPH}`);
-    },
-  );
+    expect(html).toContain(`>${MOCK_SUMMARY_HEADING}</h2>`);
+    expect(text).toContain(
+      `${MOCK_SUMMARY_HEADING}\n\n${MOCK_SUMMARY_PARAGRAPH}`,
+    );
+  });
 
   it('renders no summary box for a summary with no text', () => {
     const { html } = buildPostEmail({
@@ -189,6 +181,10 @@ describe(buildPostEmail, () => {
   it.each<[string, Partial<TPostEmailInput>]>([
     ['title', { title: MOCK_UNSAFE_MARKUP }],
     ['excerpt', { excerpt: MOCK_UNSAFE_MARKUP }],
+    [
+      'summary heading',
+      { summary: MOCK_SUMMARY, summaryHeading: MOCK_UNSAFE_MARKUP },
+    ],
     [
       'summary',
       {

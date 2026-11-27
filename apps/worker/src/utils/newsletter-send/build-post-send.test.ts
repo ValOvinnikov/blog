@@ -1,6 +1,7 @@
 import {
   resolveTenantEmailBrand,
   resolveTenantEmailDarkBrand,
+  SITE_MESSAGES_BY_LOCALE,
 } from '@shinefold/config';
 import {
   EMAIL_ACCOUNT,
@@ -102,6 +103,14 @@ describe(buildPostSend, () => {
         MOCK_UNSUBSCRIBE_KEY,
       ),
     ).toBe(SUBSCRIBER_ID);
+  });
+
+  it('heads the post’s summary in the site’s default language', () => {
+    const { html, text } = buildFor(SUBSCRIBER_ID);
+    const heading = SITE_MESSAGES_BY_LOCALE.NL.blogPostPage.postSummary.button;
+
+    expect(html).toContain(`>${heading}</h2>`);
+    expect(text).toContain(heading);
   });
 
   it('keys each send by post and subscriber, so a retry is not delivered twice', () => {

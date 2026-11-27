@@ -1,4 +1,4 @@
-import { routes } from '@shinefold/config';
+import { routes, SITE_MESSAGES_BY_LOCALE } from '@shinefold/config';
 import { EMAIL_ACCOUNT } from '@shinefold/config/constants';
 import {
   buildPostEmail,
@@ -52,7 +52,8 @@ export function buildPostSend(
     unsubscribeUrl: `${siteUrl}${routes.newsletterUnsubscribe(unsubscribeToken, locale)}`,
     coverImageUrl,
     summary,
-    locale,
+    summaryHeading:
+      SITE_MESSAGES_BY_LOCALE[locale].blogPostPage.postSummary.button,
     ...brand,
   });
 
