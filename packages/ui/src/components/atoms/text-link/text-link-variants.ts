@@ -1,8 +1,9 @@
 import { TEXT_ROLE } from '@shinefold/config';
 import {
   FOCUS_RING,
-  LINK_UNDERLINE_AT_REST,
   LINK_UNDERLINE_EMPHASIS,
+  PROSE_LINK_UNDERLINE,
+  PROSE_LINK_UNDERLINE_HOVER,
   TRANSITION_COLORS,
   tv,
   TYPOGRAPHY,
@@ -17,11 +18,7 @@ export const textLinkVariants = tv({
   variants: {
     appearance: {
       prose: {
-        root: [
-          ...LINK_UNDERLINE_AT_REST,
-          'decoration-(length:--link-underline-width)',
-          'text-link-text decoration-link-underline',
-        ],
+        root: [...PROSE_LINK_UNDERLINE, 'text-link-text'],
       },
       nav: {
         root: [
@@ -78,10 +75,7 @@ export const textLinkVariants = tv({
       appearance: 'prose',
       hasHref: true,
       class: {
-        root: [
-          'hover:decoration-(length:--link-underline-width-hover)',
-          'hover:text-brand-primary-hover',
-        ],
+        root: [PROSE_LINK_UNDERLINE_HOVER, 'hover:text-brand-primary-hover'],
       },
     },
     {
