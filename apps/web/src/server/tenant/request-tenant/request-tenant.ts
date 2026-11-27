@@ -13,7 +13,7 @@ import { isValidTenantId } from '@web/utils/is-tenant-shaped-path-segment';
 import { headers } from 'next/headers';
 import { cache } from 'react';
 
-/** `proxy.ts` leaves `x-tenant-id` unsanitised on most `/api/*` and dotted paths, so it is never trusted here. */
+/** `proxy.ts` leaves `x-tenant-id` unsanitised on most `/api/*` and static-file paths, so it is never trusted here. */
 export const resolveRequestTenant = cache(
   async (tenant?: string): Promise<TMaybeUndefined<TTenant>> => {
     if (tenant === UNRESOLVED_TENANT_PLACEHOLDER) return undefined;

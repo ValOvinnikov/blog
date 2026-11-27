@@ -43,6 +43,7 @@ export const mockPricingModule = (
   headingBlock: mockHeadingBlock({ heading: 'Pricing' }),
   tiers: [mockPricingTier()],
   footnote: undefined,
+  showPlanComparison: true,
   ctaButtons: [],
   contentAlignment: undefined,
   layout: undefined,

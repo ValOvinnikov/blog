@@ -8,7 +8,7 @@ import {
   MOCK_SECTION_PAGES_PARENT_PATH,
   mockRawSectionPage,
   mockRawSectionPagesModule,
-} from '@shinefold/service/testing/modules/fixtures';
+} from '@shinefold/service/testing/modules/section-pages/fixtures';
 import {
   MOCK_MISSING_ID,
   mockValidationError,

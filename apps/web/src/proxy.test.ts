@@ -106,6 +106,9 @@ const BOTID_PREFIX =
 const ROBOTS_PATH = '/robots.txt';
 const SITEMAP_PATH = '/sitemap.xml';
 const DOTTED_SEGMENT_PATH = '/blog/v1.2/post';
+const DOTTED_POST_PATH = '/blog/v1.2-release-notes';
+const DOTTED_PAGE_PATH = '/guides/v2.0';
+const FAVICON_PATH = '/favicon.ico';
 const SITE_RSS_PATH = routes.rssFeed();
 const TAG_RSS_PATH = routes.tagRssFeed(MOCK_TAG_SLUG);
 const BLOG_PATH = '/blog';
@@ -263,7 +266,7 @@ describe('proxy matcher', () => {
     },
     { case: 'a BotID proxy path', path: `${BOTID_PREFIX}/fp` },
     { case: 'robots.txt', path: ROBOTS_PATH },
-    { case: 'the favicon', path: '/favicon.ico' },
+    { case: 'the favicon', path: FAVICON_PATH },
     { case: 'the sitemap', path: SITEMAP_PATH },
     { case: 'a root-level bot probe', path: '/wp-login.php' },
     { case: 'a nested bot probe', path: '/wp-admin/setup-config.php' },
@@ -278,6 +281,11 @@ describe('proxy matcher', () => {
     { case: 'the site feed', path: SITE_RSS_PATH },
     { case: 'a dotted multi-segment tag feed', path: TAG_RSS_PATH },
     { case: 'a dot in a non-final segment', path: DOTTED_SEGMENT_PATH },
+    { case: 'a post whose slug has a dot', path: DOTTED_POST_PATH },
+    {
+      case: 'a page whose slug ends in a dotted number',
+      path: DOTTED_PAGE_PATH,
+    },
     { case: 'an RSC request', path: `${BLOG_PATH}.rsc` },
     {
       case: 'an RSC segment prefetch',
@@ -458,7 +466,7 @@ describe(proxy, () => {
     });
 
     it('refuses to frame a passed-through path carrying a token', async () => {
-      const { headers } = await visit(withToken(DOTTED_SEGMENT_PATH));
+      const { headers } = await visit(withToken(FAVICON_PATH));
 
       expect(headers.get(FRAME_OPTIONS_HEADER)).toBe('DENY');
     });
@@ -495,15 +503,15 @@ describe(proxy, () => {
     });
   });
 
-  describe('dotted paths', () => {
+  describe('static files', () => {
     describe('with no client-supplied headers', () => {
       let response: NextResponse;
 
       beforeEach(async () => {
-        response = await visit(DOTTED_SEGMENT_PATH);
+        response = await visit(FAVICON_PATH);
       });
 
-      it('passes a path with a dotted non-final segment through without resolving a tenant', () => {
+      it('passes a static file through without resolving a tenant', () => {
         expect(resolveTenantRoutingMock).not.toHaveBeenCalled();
         expect(response.headers.get(REWRITE_HEADER)).toBeNull();
       });
@@ -516,7 +524,7 @@ describe(proxy, () => {
     });
 
     it('drops a client-supplied tenant header on a passed-through path', async () => {
-      const response = await visit(DOTTED_SEGMENT_PATH, {
+      const response = await visit(FAVICON_PATH, {
         headers: { [TENANT_ID_HEADER]: MOCK_SPOOFED_TENANT_ID },
       });
 
@@ -529,17 +537,19 @@ describe(proxy, () => {
   });
 
   describe('tenant resolution', () => {
-    it.each([BLOG_POST_PATH, SITE_RSS_PATH, TAG_RSS_PATH])(
-      'routes %s into the resolved tenant and language',
-      async (pathname) => {
-        const response = await visit(pathname);
+    it.each([
+      BLOG_POST_PATH,
+      SITE_RSS_PATH,
+      TAG_RSS_PATH,
+      DOTTED_POST_PATH,
+      DOTTED_PAGE_PATH,
+      DOTTED_SEGMENT_PATH,
+    ])('routes %s into the resolved tenant and language', async (pathname) => {
+      const response = await visit(pathname);
 
-        expect(resolveTenantRoutingMock).toHaveBeenCalledWith(MOCK_TENANT_HOST);
-        expect(response.headers.get(REWRITE_HEADER)).toBe(
-          rewrittenTo(pathname),
-        );
-      },
-    );
+      expect(resolveTenantRoutingMock).toHaveBeenCalledWith(MOCK_TENANT_HOST);
+      expect(response.headers.get(REWRITE_HEADER)).toBe(rewrittenTo(pathname));
+    });
 
     it('resolves the tenant from a missing Host header as null', async () => {
       await visit(BLOG_PATH, { host: null });
