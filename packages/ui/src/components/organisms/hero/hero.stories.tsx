@@ -14,6 +14,7 @@ import { Icon } from '@shinefold/ui/components/atoms/icon';
 import { TextLink } from '@shinefold/ui/components/atoms/text-link';
 import { ShareLink } from '@shinefold/ui/components/molecules/share-link';
 import { EveryBrandBand } from '@shinefold/ui/testing/brand-bands';
+import { MOCK_BRIGHT_PHOTO_URL } from '@shinefold/ui/testing/fixtures';
 import {
   MOCK_ONE_HIGHLIGHT_PIECES,
   MOCK_TWO_HIGHLIGHT_PIECES,
@@ -32,15 +33,19 @@ const PROFILE_EXCERPT =
 const BANNER_IMAGE_ALT = 'Bright mountain sunrise';
 const HERO_FOOTNOTE = 'Free for 14 days · no card required';
 
+const brightPhotoMedia = (
+  <Hero.Media>
+    <img
+      src={MOCK_BRIGHT_PHOTO_URL}
+      alt={BANNER_IMAGE_ALT}
+      className="size-full object-cover"
+    />
+  </Hero.Media>
+);
+
 const bannerContent = (
   <>
-    <Hero.Media>
-      <img
-        src="https://images.unsplash.com/photo-1500534623283-312aade485b7?w=1600&h=900&fit=crop"
-        alt={BANNER_IMAGE_ALT}
-        className="size-full object-cover"
-      />
-    </Hero.Media>
+    {brightPhotoMedia}
     <Hero.Cta>
       <TextLink appearance="nav" href="/posts/design-system">
         Read more
@@ -275,13 +280,7 @@ export const BannerWithBody: TStory = {
     },
     children: (
       <>
-        <Hero.Media>
-          <img
-            src="https://images.unsplash.com/photo-1500534623283-312aade485b7?w=1600&h=900&fit=crop"
-            alt={BANNER_IMAGE_ALT}
-            className="size-full object-cover"
-          />
-        </Hero.Media>
+        {brightPhotoMedia}
         <Hero.Body>
           <p>
             Six months building this system in public — every decision, every
@@ -320,6 +319,21 @@ export const BannerContentRight: TStory = {
     },
     children: bannerContent,
   },
+};
+
+export const BannerContentLeftDark: TStory = {
+  ...BannerContentLeft,
+  globals: { theme: 'dark' },
+};
+
+export const BannerContentCenterDark: TStory = {
+  ...BannerContentCenter,
+  globals: { theme: 'dark' },
+};
+
+export const BannerContentRightDark: TStory = {
+  ...BannerContentRight,
+  globals: { theme: 'dark' },
 };
 
 export const BannerToneBrandPrimary: TStory = {
@@ -414,7 +428,7 @@ const bannerProfileContent = (hasMedia: boolean) => (
     {hasMedia && (
       <Hero.Media>
         <img
-          src="https://images.unsplash.com/photo-1500534623283-312aade485b7?w=1600&h=900&fit=crop"
+          src={MOCK_BRIGHT_PHOTO_URL}
           alt=""
           className="size-full object-cover"
         />

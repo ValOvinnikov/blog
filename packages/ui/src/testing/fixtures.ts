@@ -28,3 +28,6 @@ export const MOCK_TAG = {
 export const MOCK_SITE_NAME = 'Northern Notes';
 
 export const MOCK_SITE_INITIAL = 'N';
+
+export const MOCK_BRIGHT_PHOTO_URL =
+  'https://images.unsplash.com/photo-1500534623283-312aade485b7?w=1600&h=900&fit=crop';

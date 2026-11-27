@@ -1,6 +1,7 @@
 import { faker } from '@faker-js/faker';
 import { Button } from '@shinefold/ui/components/atoms/button';
 import { CtaModule } from '@shinefold/ui/components/organisms/cta-module';
+import { MOCK_BRIGHT_PHOTO_URL } from '@shinefold/ui/testing/fixtures';
 import type { ReactNode } from 'react';
 
 export const mockCtaImage = (seed: string) => (
@@ -11,12 +12,7 @@ export const mockCtaImage = (seed: string) => (
   />
 );
 
-export const MOCK_CTA_BRIGHT_PHOTO = (
-  <img
-    src="https://images.unsplash.com/photo-1500534623283-312aade485b7?w=1600&h=900&fit=crop"
-    alt=""
-  />
-);
+export const MOCK_CTA_BRIGHT_PHOTO = <img src={MOCK_BRIGHT_PHOTO_URL} alt="" />;
 
 export const MOCK_CTA_PRIMARY_AND_SECONDARY = (
   <>
