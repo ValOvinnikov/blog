@@ -455,17 +455,15 @@ describe(getPageDocument, () => {
       ['a nested page', answers, faq, glossary, [faq]],
       ["a nested section's last page", glossary, answers, pricing, [faq]],
       ['a top-level page', pricing, glossary, undefined, []],
-      ['the section root', sectionRoot, undefined, faq, null],
+      ['the first page beneath the top page', faq, undefined, answers, []],
     ])(
       'returns the neighbours of %s in the side navigation order',
       async (_, current, previous, next, ancestors) => {
-        const sectionChain = isNull(ancestors)
-          ? [mockSection()]
-          : [
-              mockAncestor(current),
-              ...ancestors.map(mockAncestor),
-              mockSection(),
-            ];
+        const sectionChain = [
+          mockAncestor(current),
+          ...ancestors.map(mockAncestor),
+          mockSection(),
+        ];
 
         expect(await adjacentPagesFor({ sectionChain })).toEqual({
           previous: previous && toLink(previous),
@@ -488,7 +486,7 @@ describe(getPageDocument, () => {
         answers,
         pricing,
       ],
-      ['the root of a nested section', [nestedSection], sectionRoot, answers],
+      ['the root of a nested section', [nestedSection], undefined, answers],
     ])(
       "follows the top page's side navigation on %s while it shows sub-pages",
       async (_, chainBelowTop, previous, next) => {
@@ -499,7 +497,10 @@ describe(getPageDocument, () => {
               mockSection({ showSubPagesInNavigation: true }),
             ],
           }),
-        ).toEqual({ previous: toLink(previous), next: toLink(next) });
+        ).toEqual({
+          previous: previous && toLink(previous),
+          next: toLink(next),
+        });
       },
     );
 
@@ -532,7 +533,12 @@ describe(getPageDocument, () => {
         [mockAncestor(pricing), mockSection()],
         false,
       ],
-      ['the section has no other page', [mockSection({ children: [] })], null],
+      ['the page is the section top page', [mockSection()], null],
+      [
+        'the section has no other page',
+        [mockAncestor(pricing), mockSection({ children: [pricing] })],
+        null,
+      ],
     ])(
       'returns no neighbours when %s',
       async (_, sectionChain, showSectionNavigation) => {
