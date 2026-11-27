@@ -4,6 +4,7 @@ import {
   type TNewsletterPostSendOutcome,
 } from '@shinefold/db/constants';
 import { claimNewsletterPostSend } from '@shinefold/db/queries/newsletter-post-sends/claim-newsletter-post-send';
+import { markNewsletterPostFailed } from '@shinefold/db/queries/newsletter-post-sends/mark-newsletter-post-failed';
 import { markNewsletterPostSent } from '@shinefold/db/queries/newsletter-post-sends/mark-newsletter-post-sent';
 import { markNewsletterPostSkipped } from '@shinefold/db/queries/newsletter-post-sends/mark-newsletter-post-skipped';
 import * as schema from '@shinefold/db/schema';
@@ -30,6 +31,7 @@ const RECORD_OUTCOME: Record<
       postId,
       NEWSLETTER_SKIP_REASON.SITE_PAUSED,
     ),
+  [NEWSLETTER_POST_SEND_OUTCOME.FAILED]: markNewsletterPostFailed,
 };
 
 const db = useQueryTestDb();

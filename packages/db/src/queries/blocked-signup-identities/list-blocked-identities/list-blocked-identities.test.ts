@@ -1,15 +1,17 @@
 import { faker } from '@faker-js/faker';
-import { BLOCKED_IDENTITY_KIND } from '@shinefold/db/constants';
 import { userPersonalColumns } from '@shinefold/db/queries/users/user-personal-data/user-personal-data';
 import * as schema from '@shinefold/db/schema';
 import { insertTestAdmin } from '@shinefold/db/testing/admins/fixtures';
 import {
-  MOCK_BLOCK_REASON,
+  insertTestBlockedIdentity,
   MOCK_BLOCKED_ADDRESS_DOMAIN,
-  MOCK_BLOCKED_DOMAIN,
 } from '@shinefold/db/testing/blocked-signup-identities/fixtures';
-import { MOCK_OPERATOR_EMAIL } from '@shinefold/db/testing/fixtures';
+import {
+  insertTestTenant,
+  MOCK_OPERATOR_EMAIL,
+} from '@shinefold/db/testing/fixtures';
 import { useQueryTestDb } from '@shinefold/db/testing/query-test-db';
+import { insertTestTenantSuspension } from '@shinefold/db/testing/tenant-suspensions/fixtures';
 
 import {
   listBlockedIdentities,
@@ -29,23 +31,12 @@ const MOCK_ADMIN_NAME = faker.person.fullName();
 const db = useQueryTestDb();
 
 afterEach(async () => {
+  await db().delete(schema.tenantSuspensions);
+  await db().delete(schema.tenants);
   await db().delete(schema.blockedSignupIdentities);
   await db().delete(schema.admins);
   await db().delete(schema.users);
 });
-
-async function insertBlockedDomain(
-  overrides: Partial<typeof schema.blockedSignupIdentities.$inferInsert> = {},
-): Promise<void> {
-  await db()
-    .insert(schema.blockedSignupIdentities)
-    .values({
-      kind: BLOCKED_IDENTITY_KIND.DOMAIN,
-      value: MOCK_BLOCKED_DOMAIN,
-      reason: MOCK_BLOCK_REASON,
-      ...overrides,
-    });
-}
 
 async function listEntries(): Promise<TBlockedIdentityListing[]> {
   const result = await listBlockedIdentities();
@@ -60,13 +51,13 @@ describe(listBlockedIdentities, () => {
 
   it('lists entries newest first', async () => {
     const { id: createdByAdminId } = await insertTestAdmin(db());
-    await insertBlockedDomain({
+    await insertTestBlockedIdentity(db(), {
       value: MOCK_BLOCKED_ADDRESS_DOMAIN,
       reason: MOCK_OLDER_REASON,
       createdByAdminId,
       createdAt: MOCK_OLDER_AT,
     });
-    await insertBlockedDomain({
+    await insertTestBlockedIdentity(db(), {
       reason: MOCK_NEWER_REASON,
       createdByAdminId,
       createdAt: MOCK_NEWER_AT,
@@ -86,7 +77,7 @@ describe(listBlockedIdentities, () => {
         name: MOCK_ADMIN_NAME,
         ...userPersonalColumns({ email: MOCK_OPERATOR_EMAIL }),
       });
-      await insertBlockedDomain({ createdByAdminId });
+      await insertTestBlockedIdentity(db(), { createdByAdminId });
 
       const [entry] = await listEntries();
 
@@ -99,12 +90,38 @@ describe(listBlockedIdentities, () => {
         db(),
         userPersonalColumns({ email: MOCK_OPERATOR_EMAIL }),
       );
-      await insertBlockedDomain({ createdByAdminId });
+      await insertTestBlockedIdentity(db(), { createdByAdminId });
       await db().delete(schema.admins);
 
       const entries = await listEntries();
 
       expect(entries.map(({ addedByEmail }) => addedByEmail)).toEqual([null]);
+    });
+  });
+
+  describe('the suspension that added it', () => {
+    it('names its reference and tenant', async () => {
+      const { id: ownerBlockId } = await insertTestBlockedIdentity(db());
+      const tenant = await insertTestTenant(db());
+      const { reference } = await insertTestTenantSuspension(db(), tenant.id, {
+        ownerBlockId,
+      });
+
+      const [entry] = await listEntries();
+
+      expect(entry?.suspension).toEqual({
+        reference,
+        tenantId: tenant.id,
+        tenantName: tenant.name,
+      });
+    });
+
+    it('is null for an entry no suspension added', async () => {
+      await insertTestBlockedIdentity(db());
+
+      const entries = await listEntries();
+
+      expect(entries.map(({ suspension }) => suspension)).toEqual([null]);
     });
   });
 });

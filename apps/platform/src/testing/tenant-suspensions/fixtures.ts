@@ -25,6 +25,7 @@ export const mockTenantSuspension = (
   suspendedAt: MOCK_SUSPENDED_AT,
   liftedAt: null,
   liftedBy: null,
+  ownerBlockId: null,
   suspendedByEmail: MOCK_SUSPENDED_BY_EMAIL,
   ...overrides,
 });

@@ -1,6 +1,7 @@
 import { SUSPENSION_CATEGORY } from '@shinefold/db/constants';
 import * as schema from '@shinefold/db/schema';
 import { insertTestAdmin } from '@shinefold/db/testing/admins/fixtures';
+import { insertTestBlockedIdentity } from '@shinefold/db/testing/blocked-signup-identities/fixtures';
 import { insertTestTenant } from '@shinefold/db/testing/fixtures';
 import { useQueryTestDb } from '@shinefold/db/testing/query-test-db';
 import {
@@ -27,17 +28,19 @@ beforeEach(async () => {
 
 afterEach(async () => {
   await db().delete(schema.tenantSuspensions);
+  await db().delete(schema.blockedSignupIdentities);
   await db().delete(schema.tenants);
   await db().delete(schema.admins);
   await db().delete(schema.users);
 });
 
-async function openFor(caseTenantId: string) {
+async function openFor(caseTenantId: string, ownerBlockId?: string) {
   return openTenantSuspension({
     tenantId: caseTenantId,
     category: SUSPENSION_CATEGORY.TERMS_VIOLATION,
     description: MOCK_SUSPENSION_DESCRIPTION,
     suspendedBy,
+    ownerBlockId,
   });
 }
 
@@ -51,6 +54,7 @@ describe(openTenantSuspension, () => {
       description: MOCK_SUSPENSION_DESCRIPTION,
       suspendedBy,
       liftedAt: null,
+      ownerBlockId: null,
     });
     expect(suspension.reference).toMatch(MOCK_SUSPENSION_REFERENCE_PATTERN);
   });
@@ -86,5 +90,38 @@ describe(openTenantSuspension, () => {
       .from(schema.tenantSuspensions)
       .where(eq(schema.tenantSuspensions.tenantId, tenantId));
     expect(rows).toHaveLength(1);
+  });
+
+  describe('with an owner sign-up block', () => {
+    let ownerBlockId: string;
+
+    beforeEach(async () => {
+      ({ id: ownerBlockId } = await insertTestBlockedIdentity(db()));
+    });
+
+    it('records the block the suspension added', async () => {
+      const suspension = await openFor(tenantId, ownerBlockId);
+
+      expect(suspension.ownerBlockId).toBe(ownerBlockId);
+    });
+
+    it("refuses a block another tenant's suspension already holds", async () => {
+      const other = await insertTestTenant(db());
+      await openFor(other.id, ownerBlockId);
+
+      await expect(openFor(tenantId, ownerBlockId)).rejects.toThrow();
+    });
+
+    it('forgets the block once it is removed', async () => {
+      const { id } = await openFor(tenantId, ownerBlockId);
+
+      await db().delete(schema.blockedSignupIdentities);
+
+      const [row] = await db()
+        .select()
+        .from(schema.tenantSuspensions)
+        .where(eq(schema.tenantSuspensions.id, id));
+      expect(row?.ownerBlockId).toBeNull();
+    });
   });
 });

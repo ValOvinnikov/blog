@@ -5,11 +5,13 @@ import {
   type TTenantSuspension,
 } from '@shinefold/db/schema/tenant-suspensions';
 
+// `ownerBlockId` is only a block this suspension created, so lifting it removes nothing another case or operator added.
 export type TOpenTenantSuspensionInput = {
   tenantId: string;
   category: TSuspensionCategory;
   description: string;
   suspendedBy: string;
+  ownerBlockId?: string;
 };
 
 export async function openTenantSuspension(

@@ -3,6 +3,7 @@ import type { TValueOf } from '@shinefold/config/utils';
 export const NEWSLETTER_POST_SEND_OUTCOME = {
   SENT: 'SENT',
   SKIPPED: 'SKIPPED',
+  FAILED: 'FAILED',
 } as const;
 
 export type TNewsletterPostSendOutcome = TValueOf<

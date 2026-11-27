@@ -50,7 +50,7 @@ faker.seed(7712);
 
 const MOCK_NEWSLETTER_SECRET = faker.string.alphanumeric(32);
 const MOCK_REQUEST = { postId: MOCK_POST_ID, isPublished: true };
-const { emailsNeeded, allowanceLeft } = MOCK_SKIP_DETAILS;
+const { emailsNeeded, allowanceLeft, bandCeiling } = MOCK_SKIP_DETAILS;
 
 const startByHand = vi.mocked(
   queries.newsletterPostSends.startNewsletterPostSendByHand,
@@ -89,6 +89,7 @@ describe(startNewsletterPostSendNow, () => {
       clearedSkipReason: undefined,
       clearedEmailsNeeded: undefined,
       clearedAllowanceLeft: undefined,
+      clearedBandCeiling: undefined,
     });
   });
 
@@ -170,6 +171,7 @@ describe(startNewsletterPostSendNow, () => {
         clearedSkipReason: NEWSLETTER_SKIP_REASON.OVER_MONTHLY_ALLOWANCE,
         clearedEmailsNeeded: emailsNeeded,
         clearedAllowanceLeft: allowanceLeft,
+        clearedBandCeiling: bandCeiling,
       });
       readsAs({
         claim: mockNewsletterPostSend({
@@ -188,7 +190,7 @@ describe(startNewsletterPostSendNow, () => {
         MOCK_TENANT_ID,
         MOCK_POST_ID,
         NEWSLETTER_SKIP_REASON.OVER_MONTHLY_ALLOWANCE,
-        { emailsNeeded, allowanceLeft },
+        { emailsNeeded, allowanceLeft, bandCeiling },
       );
       expect(release).not.toHaveBeenCalled();
     });

@@ -62,6 +62,7 @@ const undoHandStart = async (
     clearedSkipReason,
     clearedEmailsNeeded,
     clearedAllowanceLeft,
+    clearedBandCeiling,
   }: TNewsletterPostHandStart,
 ): Promise<void> => {
   if (!clearedSkipReason) {
@@ -76,7 +77,11 @@ const undoHandStart = async (
     tenantId,
     postId,
     clearedSkipReason,
-    { emailsNeeded: clearedEmailsNeeded, allowanceLeft: clearedAllowanceLeft },
+    {
+      emailsNeeded: clearedEmailsNeeded,
+      allowanceLeft: clearedAllowanceLeft,
+      bandCeiling: clearedBandCeiling,
+    },
   );
 };
 
