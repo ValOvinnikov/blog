@@ -114,7 +114,7 @@ platform-wide Findings page. Tenant owners see neither.
     ([Tenant provisioning](tenant-provisioning.md)).
   - The worker's daily document-cap sweep writes one `DOCUMENT_COUNT_CHECK` /
     `DOCUMENT_CAP_APPROACHING` WARNING per FREE tenant whose Sanity documents
-    (drafts and versions included, image and file assets excluded) reach 80%
+    (drafts and versions included; assets, `sanity.tree`/`directory`/`symlink`, `sanity.assist.task.status` and `system.*` documents left out, as Sanity's quota does) reach 80%
     of the 10,000 cap, with `documentCount` and `documentCap` as `details`,
     and resolves it once the count drops back under 80% or the tenant leaves
     the FREE plan.
