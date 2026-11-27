@@ -29,6 +29,7 @@ export type TPostEmailInput = {
   unsubscribeUrl: string;
   brand: TTenantEmailBrand;
   brandName: string;
+  summaryHeading: string;
   darkBrand?: TTenantEmailBrand;
   headingFont?: TFontChoice;
   bodyFont?: TFontChoice;
@@ -57,6 +58,7 @@ export function buildPostEmail({
   unsubscribeUrl,
   brand,
   brandName,
+  summaryHeading,
   darkBrand,
   headingFont,
   bodyFont,
@@ -69,7 +71,14 @@ export function buildPostEmail({
 }: TPostEmailInput): TPostEmailContent {
   const bannerText = isTest ? testBannerText : undefined;
   const fonts = resolvePostEmailFonts(headingFont, bodyFont);
-  const card = { title, excerpt, summary, postUrl, coverImageUrl };
+  const card = {
+    title,
+    excerpt,
+    summary,
+    summaryHeading,
+    postUrl,
+    coverImageUrl,
+  };
   const unsubscribeAction = buildUnsubscribeAction(unsubscribeUrl);
   const footerLine = `You're getting this because you subscribed to ${brandName}.`;
 

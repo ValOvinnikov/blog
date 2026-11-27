@@ -14,6 +14,7 @@ import {
   ACTION_OUTCOME,
   LOCALE_ISO_CODES,
   NEWSLETTER_TEST_SEND_REFUSAL,
+  SITE_MESSAGES_BY_LOCALE,
 } from '@shinefold/config';
 import { EMAIL_ACCOUNT } from '@shinefold/config/constants';
 import { queries } from '@shinefold/db';
@@ -101,6 +102,15 @@ describe(sendNewsletterPostTest, () => {
     expect(email?.text).toContain(MOCK_POST.title);
     expect(email?.text).toContain(MOCK_TAKEAWAY);
     expect(email?.text).toContain(MOCK_POST.slug);
+  });
+
+  it("heads the summary in the post's locale", async () => {
+    await sendNewsletterPostTest(MOCK_STUDIO_CALLER, MOCK_POST);
+
+    const [[email] = []] = vi.mocked(sendEmail).mock.calls;
+    expect(email?.html).toContain(
+      `>${SITE_MESSAGES_BY_LOCALE.NL.blogPostPage.postSummary.button}</h2>`,
+    );
   });
 
   it('refuses at the test limit without sending, saying when to try again', async () => {

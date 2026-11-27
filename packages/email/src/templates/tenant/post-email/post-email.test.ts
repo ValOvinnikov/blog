@@ -45,6 +45,7 @@ const MOCK_SUMMARY: TPostSummary = [
   ),
 ];
 const MOCK_TEST_BANNER_TEXT = faker.lorem.sentence();
+const MOCK_SUMMARY_HEADING = faker.lorem.word();
 
 const MOCK_INPUT: TPostEmailInput = {
   subject: faker.lorem.sentence(),
@@ -54,6 +55,7 @@ const MOCK_INPUT: TPostEmailInput = {
   unsubscribeUrl: MOCK_UNSUBSCRIBE_URL,
   brand: MOCK_TENANT_EMAIL_BRAND,
   brandName: MOCK_TENANT_NAME,
+  summaryHeading: MOCK_SUMMARY_HEADING,
 };
 
 describe(buildPostEmail, () => {
@@ -151,6 +153,18 @@ describe(buildPostEmail, () => {
     });
   });
 
+  it('heads the summary with the given heading in both parts', () => {
+    const { html, text } = buildPostEmail({
+      ...MOCK_INPUT,
+      summary: MOCK_SUMMARY,
+    });
+
+    expect(html).toContain(`>${MOCK_SUMMARY_HEADING}</h2>`);
+    expect(text).toContain(
+      `${MOCK_SUMMARY_HEADING}\n\n${MOCK_SUMMARY_PARAGRAPH}`,
+    );
+  });
+
   it('renders no summary box for a summary with no text', () => {
     const { html } = buildPostEmail({
       ...MOCK_INPUT,
@@ -167,6 +181,10 @@ describe(buildPostEmail, () => {
   it.each<[string, Partial<TPostEmailInput>]>([
     ['title', { title: MOCK_UNSAFE_MARKUP }],
     ['excerpt', { excerpt: MOCK_UNSAFE_MARKUP }],
+    [
+      'summary heading',
+      { summary: MOCK_SUMMARY, summaryHeading: MOCK_UNSAFE_MARKUP },
+    ],
     [
       'summary',
       {
