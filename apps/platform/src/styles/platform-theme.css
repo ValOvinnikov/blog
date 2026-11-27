@@ -474,7 +474,6 @@
   --shadow-platform-glyph: var(--platform-shadow-glyph);
   --shadow-platform-thumb: var(--platform-shadow-thumb);
   --shadow-platform-choice-ring: 0 0 0 1px var(--platform-selected-edge);
-  --shadow-platform-focus-glow: 0 0 0 3px var(--platform-focus-ring);
   /* `--platform-focus-ground` is set per element by `focusRingClasses` and `insetFocusRingClasses`. */
   --shadow-platform-focus-ring:
     0 0 0 2px var(--platform-focus-ground),

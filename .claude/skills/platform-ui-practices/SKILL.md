@@ -379,8 +379,10 @@ text-platform-text` and a `selected-edge` border or inset ring
   `FOCUS_RING_TRIGGER`; the helper adds its forced-colours outline. A text
   field, textarea, link field or rich-text editor instead takes
   `FIELD_FOCUS_CLASSES` or `EDITABLE_SHELL_FOCUS_CLASSES`
-  (`@platform/utils/field-surface-classes/field-surface-classes`): a
-  `brand-ink` border in a 3px `focus-ring` glow, kept when invalid.
+  (`@platform/utils/field-surface-classes/field-surface-classes`): two
+  borders, as on the public site — the field keeps its own border (resting,
+  or `bad-line` when invalid) and the offset focus ring sits outside it;
+  focus never recolours the border.
   Never hand-write a focus style — no `focus-visible:`, `data-[highlighted]:`
   ring, shadow, outline or border outside these helpers; a missing ground or
   trigger is added to the helper. `outline-platform-brand-weak` (1.12:1) is

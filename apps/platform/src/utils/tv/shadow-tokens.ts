@@ -16,7 +16,6 @@ export const SHADOW_TOKENS = [
     'dock',
     'xs',
     'glyph',
-    'focus-glow',
     FOCUS_RING,
   ),
 ];
