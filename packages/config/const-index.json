@@ -10350,6 +10350,14 @@
         "file": "apps/platform/src/constants/stripe-event.ts"
       }
     ],
+    "invoice.payment_action_required": [
+      {
+        "ref": "STRIPE_EVENT_TYPE.INVOICE_PAYMENT_ACTION_REQUIRED",
+        "scope": "app:platform",
+        "from": "@platform/constants/stripe-event",
+        "file": "apps/platform/src/constants/stripe-event.ts"
+      }
+    ],
     "price.created": [
       {
         "ref": "STRIPE_EVENT_TYPE.PRICE_CREATED",
@@ -10481,6 +10489,22 @@
     "subscription_update": [
       {
         "ref": "STRIPE_BILLING_REASON.SUBSCRIPTION_UPDATE",
+        "scope": "app:platform",
+        "from": "@platform/constants/stripe-payment",
+        "file": "apps/platform/src/constants/stripe-payment.ts"
+      }
+    ],
+    "DECLINED": [
+      {
+        "ref": "PAYMENT_FAILURE.DECLINED",
+        "scope": "app:platform",
+        "from": "@platform/constants/stripe-payment",
+        "file": "apps/platform/src/constants/stripe-payment.ts"
+      }
+    ],
+    "AUTHENTICATION_REQUIRED": [
+      {
+        "ref": "PAYMENT_FAILURE.AUTHENTICATION_REQUIRED",
         "scope": "app:platform",
         "from": "@platform/constants/stripe-payment",
         "file": "apps/platform/src/constants/stripe-payment.ts"

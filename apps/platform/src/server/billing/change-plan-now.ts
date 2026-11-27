@@ -21,6 +21,7 @@ import { isOneOf, isString } from '@shinefold/utils/primitives';
 import type Stripe from 'stripe';
 
 import type { TSubscriptionPlan } from './load-subscription-plan';
+import { paymentIntentStatus } from './payment-intent-status';
 import { releaseSchedule } from './release-schedule';
 import type { TTargetPrices } from './schedule-change-at-renewal';
 import { stripeIdOf } from './stripe-id';
@@ -62,20 +63,6 @@ const releaseAfterChange = (
         ...toLoggableError(error),
       });
     });
-
-const paymentIntentStatus = async (
-  stripe: Stripe,
-  invoice: Stripe.Invoice,
-): Promise<TMaybeUndefined<Stripe.PaymentIntent.Status>> => {
-  const paymentIntent = invoice.payments?.data.find(
-    ({ payment }) => payment.payment_intent,
-  )?.payment.payment_intent;
-  if (!paymentIntent) return undefined;
-  const { status } = await stripe.paymentIntents.retrieve(
-    stripeIdOf(paymentIntent),
-  );
-  return status;
-};
 
 const pendingPaymentResult = async (
   stripe: Stripe,

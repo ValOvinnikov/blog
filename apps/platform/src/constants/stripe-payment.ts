@@ -31,3 +31,8 @@ export const STRIPE_BILLING_REASON = {
   SUBSCRIPTION_CYCLE: 'subscription_cycle',
   SUBSCRIPTION_UPDATE: 'subscription_update',
 } as const;
+
+export const PAYMENT_FAILURE = {
+  DECLINED: 'DECLINED',
+  AUTHENTICATION_REQUIRED: 'AUTHENTICATION_REQUIRED',
+} as const;

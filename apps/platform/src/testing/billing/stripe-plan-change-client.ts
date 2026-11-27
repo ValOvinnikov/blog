@@ -1,7 +1,7 @@
 import { getStripeClient } from '@platform/server/billing/stripe-client';
 import {
   MOCK_PAYMENT_CLIENT_SECRET,
-  MOCK_PAYMENT_INTENT_ID,
+  MOCK_INVOICE_PAYMENTS,
   MOCK_STRIPE_INVOICE_ID,
   mockStripeInvoice,
 } from '@platform/testing/billing/fixtures';
@@ -68,9 +68,7 @@ export const mockStripePlanChangeClient = (
         confirmation_secret: hasConfirmationSecret
           ? { client_secret: MOCK_PAYMENT_CLIENT_SECRET }
           : null,
-        payments: {
-          data: [{ payment: { payment_intent: MOCK_PAYMENT_INTENT_ID } }],
-        },
+        payments: MOCK_INVOICE_PAYMENTS,
       },
     });
     calls.retrievePaymentIntent.mockResolvedValue({ status });

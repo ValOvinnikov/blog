@@ -2408,7 +2408,12 @@
     "planLabel": "Abonnement",
     "nextRetryLabel": "Volgende poging",
     "planEnding": "We proberen het niet opnieuw, dus je abonnement stopt als je de factuur niet betaalt.",
-    "actionLabel": "Factuur betalen"
+    "actionLabel": "Factuur betalen",
+    "authenticationSubject": "Bevestig je betaling voor {siteName}",
+    "authenticationPreviewText": "Je bank wil dat je {amount} voor {siteName} bevestigt.",
+    "authenticationRequired": "Je bank wil dat je je betaling voor {siteName} bevestigt voordat we die kunnen afschrijven.",
+    "confirmPayment": "Open de betaalpagina van de factuur en bevestig de betaling bij je bank om je abonnement te behouden.",
+    "confirmActionLabel": "Betaling bevestigen"
   },
   "suspensionCategory": {
     "ABUSE": "Misbruik",

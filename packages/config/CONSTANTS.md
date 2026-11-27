@@ -885,7 +885,7 @@ Every key/value const an agent should reuse before writing a literal. The
 
 ### `@platform/constants/stripe-event` — `apps/platform/src/constants/stripe-event.ts`
 
-- **STRIPE_EVENT_TYPE**: `SUBSCRIPTION_CREATED`=`"customer.subscription.created"`, `SUBSCRIPTION_UPDATED`=`"customer.subscription.updated"`, `SUBSCRIPTION_DELETED`=`"customer.subscription.deleted"`, `INVOICE_PAID`=`"invoice.paid"`, `INVOICE_PAYMENT_FAILED`=`"invoice.payment_failed"`, `PRICE_CREATED`=`"price.created"`, `PRICE_UPDATED`=`"price.updated"`, `PRICE_DELETED`=`"price.deleted"`, `PROMOTION_CODE_CREATED`=`"promotion_code.created"`, `PROMOTION_CODE_UPDATED`=`"promotion_code.updated"`, `COUPON_DELETED`=`"coupon.deleted"`
+- **STRIPE_EVENT_TYPE**: `SUBSCRIPTION_CREATED`=`"customer.subscription.created"`, `SUBSCRIPTION_UPDATED`=`"customer.subscription.updated"`, `SUBSCRIPTION_DELETED`=`"customer.subscription.deleted"`, `INVOICE_PAID`=`"invoice.paid"`, `INVOICE_PAYMENT_FAILED`=`"invoice.payment_failed"`, `INVOICE_PAYMENT_ACTION_REQUIRED`=`"invoice.payment_action_required"`, `PRICE_CREATED`=`"price.created"`, `PRICE_UPDATED`=`"price.updated"`, `PRICE_DELETED`=`"price.deleted"`, `PROMOTION_CODE_CREATED`=`"promotion_code.created"`, `PROMOTION_CODE_UPDATED`=`"promotion_code.updated"`, `COUPON_DELETED`=`"coupon.deleted"`
 
 ### `@platform/constants/stripe-key-mode` — `apps/platform/src/constants/stripe-key-mode.ts`
 
@@ -898,6 +898,7 @@ Every key/value const an agent should reuse before writing a literal. The
 - **STRIPE_JS_ERROR_TYPE**: `CARD_ERROR`=`"card_error"`
 - **STRIPE_JS_ERROR_CODE**: `AUTHENTICATION_FAILURE`=`"payment_intent_authentication_failure"`
 - **STRIPE_BILLING_REASON**: `SUBSCRIPTION_CYCLE`=`"subscription_cycle"`, `SUBSCRIPTION_UPDATE`=`"subscription_update"`
+- **PAYMENT_FAILURE**: `DECLINED`, `AUTHENTICATION_REQUIRED`
 
 ### `@platform/constants/stripe-schedule` — `apps/platform/src/constants/stripe-schedule.ts`
 

@@ -2408,7 +2408,12 @@
     "planLabel": "Plan",
     "nextRetryLabel": "Próximo intento",
     "planEnding": "No volveremos a intentarlo, así que tu plan terminará si no pagas la factura.",
-    "actionLabel": "Pagar factura"
+    "actionLabel": "Pagar factura",
+    "authenticationSubject": "Confirma tu pago de {siteName}",
+    "authenticationPreviewText": "Tu banco necesita que confirmes {amount} por {siteName}.",
+    "authenticationRequired": "Tu banco necesita que confirmes tu pago por {siteName} antes de que podamos cobrarlo.",
+    "confirmPayment": "Abre la página de pago de la factura y confirma el pago con tu banco para conservar tu plan.",
+    "confirmActionLabel": "Confirmar pago"
   },
   "suspensionCategory": {
     "ABUSE": "Abuso",
