@@ -1,4 +1,5 @@
 import { ACCOUNT_IDENTITY_VOICE_FIXED_KEYS } from './voice-fixed-keys-account-identity';
+import { ACCOUNT_PRIVACY_VOICE_FIXED_KEYS } from './voice-fixed-keys-account-privacy';
 import { ASIDE_VOICE_FIXED_KEYS } from './voice-fixed-keys-aside';
 import { AUTH_MENU_VOICE_FIXED_KEYS } from './voice-fixed-keys-auth-menu';
 import { CONSENT_VOICE_FIXED_KEYS } from './voice-fixed-keys-consent';
@@ -15,6 +16,7 @@ import { TOAST_VOICE_FIXED_KEYS } from './voice-fixed-keys-toast';
  */
 export const VOICE_FIXED_KEYS = [
   ...ACCOUNT_IDENTITY_VOICE_FIXED_KEYS,
+  ...ACCOUNT_PRIVACY_VOICE_FIXED_KEYS,
   ...ASIDE_VOICE_FIXED_KEYS,
   ...AUTH_MENU_VOICE_FIXED_KEYS,
   ...CONSENT_VOICE_FIXED_KEYS,
@@ -47,7 +49,6 @@ export const VOICE_FIXED_KEYS = [
   'siteFooter.poweredByLabel',
   'bookmarkButton.saveAriaLabel',
   'bookmarkButton.removeAriaLabel',
-  'accountPage.privacy.deleteConfirmAriaLabel',
   'taxonomyListModule.topics.latestPostsLabel',
   'taxonomyListModule.tags.latestPostsLabel',
   'taxonomyListModule.topics.latestLabel',
@@ -64,10 +65,6 @@ export const VOICE_FIXED_KEYS = [
   'bookmarkButton.toastRevertedMessage',
   'bookmarkButton.toastUndoLabel',
   'bookmarkButton.toastRetryLabel',
-  'accountPage.privacy.deleteToastLoadingMessage',
-  'accountPage.privacy.deleteToastSuccessMessage',
-  'accountPage.privacy.deleteError',
-  'accountPage.privacy.deletePlatformRoleError',
   'accountPage.newsletter.unsubscribeToastLoadingMessage',
   'accountPage.newsletter.unsubscribeToastSuccessMessage',
   'accountPage.newsletter.unsubscribeError',
@@ -146,15 +143,6 @@ export const VOICE_FIXED_KEYS = [
   'bookmarksPage.title',
   'bookmarksPage.listHeading',
   'accountPage.title',
-  'accountPage.privacy.heading',
-  'accountPage.privacy.exportLabel',
-  'accountPage.privacy.exportDescription',
-  'accountPage.privacy.exportButton',
-  'accountPage.privacy.deleteLabel',
-  'accountPage.privacy.deleteDescription',
-  'accountPage.privacy.deleteConfirmPlaceholder',
-  'accountPage.privacy.deleteButton',
-  'accountPage.privacy.deletingLabel',
   'accountPage.newsletter.heading',
   'accountPage.newsletter.label',
   'accountPage.newsletter.activeBadge',

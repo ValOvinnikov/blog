@@ -29,7 +29,7 @@ A signed-in reader manages their own account at `/account`: edit the display nam
 - `/[locale]/account` — `force-dynamic`. A signed-in reader reaches it on every site, whatever its plan or Features. A signed-out visitor gets 404 when the site has no reader account, and is redirected home when it has one.
   - **Identity** — rows for GitHub, Google and email link with their linked status; Link / Unlink controls for the two OAuth providers; a display-name field, prefilled with the reader's handle when they have no name.
   - **Newsletter** — shown only when the reader's email has a subscriber row on this tenant: Unsubscribe when active, Resend confirmation when pending (see [newsletter](./newsletter.md)).
-  - **Privacy** — "Export my data" and a typed-confirm delete (the reader types their handle to arm the danger button).
+  - **Privacy** — "Export my data" and a typed-confirm delete (the reader types their handle to arm the danger button). Export fetches `GET /api/account/export` and saves the file: the button reads "Preparing…" and is busy until it finishes, then a success toast confirms the download or an error toast asks the reader to try again.
 - `GET /api/account/export` — downloads `account-data.json`, with the email and name decrypted from their encrypted forms. 401 without a session, 404 when the tenant or user is unknown.
 - The header avatar menu links to `/account` and `/bookmarks` (see [reader-auth](./reader-auth.md)).
 
