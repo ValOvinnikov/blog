@@ -7,6 +7,8 @@ export const canOperatorOpenSubscribers = (
   {
     pageAccess,
     createdFromPlatform,
-  }: Pick<TPlatformTenant, 'pageAccess' | 'createdFromPlatform'>,
+    isArchived,
+  }: Pick<TPlatformTenant, 'pageAccess' | 'createdFromPlatform' | 'isArchived'>,
   { isSuperAdmin }: Pick<TPlatformViewer, 'isSuperAdmin'>,
-): boolean => isSuperAdmin && createdFromPlatform && pageAccess.subscribers;
+): boolean =>
+  isSuperAdmin && createdFromPlatform && !isArchived && pageAccess.subscribers;

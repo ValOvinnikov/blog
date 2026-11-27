@@ -1,6 +1,7 @@
 import type { TSubscribersPageData } from '@platform/server/subscribers/load-subscribers-page';
 import { createMockFaker } from '@platform/testing/mock-faker';
 import { mockReadyTenant } from '@platform/testing/tenants/fixtures';
+import { adminRoutes } from '@platform/utils/routes/routes';
 import { toSubscriberLimits } from '@platform/utils/subscriber-limits/subscriber-limits';
 import { TENANT_PLAN } from '@shinefold/config';
 import type { TNewsletterLimits } from '@shinefold/db/queries/email-usage';
@@ -59,6 +60,7 @@ export const mockSubscribersPageData = (
     }),
     list: { rows, total: rows.length },
     page: 1,
+    pageHref: adminRoutes.dashboardSubscribers,
     totalPages: 1,
     emailNewPosts: true,
     pausedAt: undefined,

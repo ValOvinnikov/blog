@@ -12,19 +12,14 @@ import { subscribersListVariants } from './subscribers-list-variants';
 
 export type TSubscribersListProps = {
   tenantId: string;
-  data: Pick<TSubscribersPageData, 'list' | 'page' | 'totalPages'>;
-  pageHref: (page: number) => string;
+  data: Pick<TSubscribersPageData, 'list' | 'page' | 'pageHref' | 'totalPages'>;
 };
 
-export const SubscribersList = ({
-  tenantId,
-  data,
-  pageHref,
-}: TSubscribersListProps) => {
+export const SubscribersList = ({ tenantId, data }: TSubscribersListProps) => {
   const t = useTranslations('subscribersPage.list');
   const format = useFormatter();
   const titleId = useId();
-  const { list, page, totalPages } = data;
+  const { list, page, pageHref, totalPages } = data;
   const { rows } = list;
   const range = toSubscribersRange(data);
   const { wide, narrow, email, unavailable, date } = subscribersListVariants();
@@ -89,11 +84,7 @@ export const SubscribersList = ({
         </DataTableShell>
       </div>
       <div className={narrow()}>
-        <SubscribersPhoneList
-          tenantId={tenantId}
-          data={data}
-          pageHref={pageHref}
-        />
+        <SubscribersPhoneList tenantId={tenantId} data={data} />
       </div>
     </>
   );

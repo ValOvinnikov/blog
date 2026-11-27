@@ -67,11 +67,7 @@ export const SubscribersPageContent = async ({
             tenantId={tenant.id}
             isInitiallyOn={emailNewPosts}
           />
-          <SubscribersList
-            tenantId={tenant.id}
-            data={data}
-            pageHref={query.pageHref}
-          />
+          <SubscribersList tenantId={tenant.id} data={data} />
         </>
       )}
     </div>

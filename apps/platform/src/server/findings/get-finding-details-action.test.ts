@@ -1,4 +1,5 @@
 import { faker } from '@faker-js/faker';
+import { requireTenantById } from '@platform/server/auth/require-tenant-by-id';
 import { mockDbConstants } from '@platform/testing/mock-db-constants';
 import { MOCK_TENANT_ID } from '@platform/testing/tenants/fixtures';
 import { NEXT_NAVIGATION_ERROR } from '@shinefold/config';
@@ -8,14 +9,13 @@ import { getFindingDetailsAction } from './get-finding-details-action';
 
 faker.seed(5998);
 
-const { requireTenantByIdMock, getFindingDetailsMock } = vi.hoisted(() => ({
-  requireTenantByIdMock: vi.fn(),
+const { getFindingDetailsMock } = vi.hoisted(() => ({
   getFindingDetailsMock: vi.fn(),
 }));
 
-vi.mock('@platform/server/auth/require-tenant-by-id', () => ({
-  requireTenantById: requireTenantByIdMock,
-}));
+vi.mock('@platform/server/auth/require-tenant-by-id');
+
+const requireTenantByIdMock = vi.mocked(requireTenantById);
 
 vi.mock('@shinefold/db', async () => ({
   ...(await mockDbConstants()),

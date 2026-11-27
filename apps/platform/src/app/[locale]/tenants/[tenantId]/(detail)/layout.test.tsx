@@ -12,7 +12,9 @@ import {
   mockReadyTenant,
 } from '@platform/testing/tenants/fixtures';
 import { noEntitlementGrantQueries } from '@platform/testing/tenants/no-entitlement-grant-queries';
-import { ADMIN_ROLE } from '@shinefold/db/constants';
+import { TENANT_PLAN } from '@shinefold/config';
+import { ADMIN_ROLE, type TAdminRole } from '@shinefold/db/constants';
+import type { TTenant } from '@shinefold/db/schema/tenants';
 
 import TenantDetailLayout from './layout';
 
@@ -89,14 +91,6 @@ describe(`<${TenantDetailLayout.name}/>`, () => {
 
       expect(tenantDomain).not.toBeInTheDocument();
     });
-
-    it('shows no Subscribers entry for a site whose plan has no Newsletter', () => {
-      const subscribersLink = screen.queryByRole('link', {
-        name: navSections.subscribers,
-      });
-
-      expect(subscribersLink).not.toBeInTheDocument();
-    });
   });
 
   it('shows a super admin Subscribers on a platform-created site', async () => {
@@ -113,15 +107,24 @@ describe(`<${TenantDetailLayout.name}/>`, () => {
     expect(subscribersLink).toBeVisible();
   });
 
-  it.each([
-    ['an admin on a platform-created site', ADMIN_ROLE.ADMIN, true],
-    ['a super admin on a self-serve site', ADMIN_ROLE.SUPERADMIN, false],
+  it.each<[string, TAdminRole, Partial<TTenant>]>([
+    ['an admin on a platform-created site', ADMIN_ROLE.ADMIN, {}],
+    [
+      'a super admin on a self-serve site',
+      ADMIN_ROLE.SUPERADMIN,
+      { createdFromPlatform: false },
+    ],
+    [
+      'a super admin on a site without Newsletter',
+      ADMIN_ROLE.SUPERADMIN,
+      { plan: TENANT_PLAN.FREE },
+    ],
   ])(
     'shows %s no Subscribers entry',
-    async (_viewer, role, createdFromPlatform) => {
+    async (_viewer, role, tenantOverrides) => {
       getAdminByUserIdMock.mockResolvedValue(mockAdmin({ role }));
       getTenantByIdMock.mockResolvedValue(
-        mockPlatformNewsletterTenant({ createdFromPlatform }),
+        mockPlatformNewsletterTenant(tenantOverrides),
       );
       await setup();
 

@@ -10,7 +10,10 @@ import {
   moveUpOfferFor,
   type TMoveUpOffer,
 } from '@platform/utils/move-up-offer/move-up-offer';
-import { resolveTotalPages } from '@platform/utils/pagination/pagination';
+import {
+  resolveTotalPages,
+  type TPageHref,
+} from '@platform/utils/pagination/pagination';
 import type { TPlatformTenant } from '@platform/utils/platform-tenant/platform-tenant';
 import {
   toSubscriberLimits,
@@ -28,6 +31,7 @@ import { nextSubscriberBand } from '@shinefold/db/utils/next-subscriber-band/nex
 export type TSubscribersPageData = TSubscriberLimits & {
   list: TSubscribersPage;
   page: number;
+  pageHref: TPageHref;
   totalPages: number;
   emailNewPosts: boolean;
   pausedAt: TMaybeUndefined<Date>;
@@ -71,7 +75,7 @@ const readOffer = async (
 
 export type TSubscribersPageQuery = {
   page: number;
-  pageHref: (page: number) => string;
+  pageHref: TPageHref;
   movedUpCeiling: TMaybeUndefined<number>;
 };
 
@@ -110,6 +114,7 @@ export const loadSubscribersPage = async (
     ...subscriberLimits,
     list,
     page,
+    pageHref,
     totalPages,
     emailNewPosts,
     pausedAt: stop.pausedAt,

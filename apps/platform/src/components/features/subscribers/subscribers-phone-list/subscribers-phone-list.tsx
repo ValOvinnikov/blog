@@ -10,18 +10,16 @@ import { subscribersPhoneListVariants } from './subscribers-phone-list-variants'
 
 export type TSubscribersPhoneListProps = {
   tenantId: string;
-  data: Pick<TSubscribersPageData, 'list' | 'page' | 'totalPages'>;
-  pageHref: (page: number) => string;
+  data: Pick<TSubscribersPageData, 'list' | 'page' | 'pageHref' | 'totalPages'>;
 };
 
 export const SubscribersPhoneList = ({
   tenantId,
   data,
-  pageHref,
 }: TSubscribersPhoneListProps) => {
   const t = useTranslations('subscribersPage.list');
   const format = useFormatter();
-  const { list, page, totalPages } = data;
+  const { list, page, pageHref, totalPages } = data;
   const {
     list: listSlot,
     row,
