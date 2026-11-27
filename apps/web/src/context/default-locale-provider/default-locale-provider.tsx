@@ -1,16 +1,16 @@
 'use client';
 
 import type { TLocaleIsoCode } from '@shinefold/config';
+import type { IWithChildren } from '@shinefold/config/react';
 import { routing } from '@web/i18n/routing';
-import { createContext, type ReactNode, useContext } from 'react';
+import { createContext, useContext } from 'react';
 
 const DefaultLocaleContext = createContext<TLocaleIsoCode>(
   routing.defaultLocale,
 );
 
-export interface IDefaultLocaleProviderProps {
+export interface IDefaultLocaleProviderProps extends IWithChildren {
   value: TLocaleIsoCode;
-  children: ReactNode;
 }
 
 export const DefaultLocaleProvider = ({

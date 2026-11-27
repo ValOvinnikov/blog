@@ -3,10 +3,12 @@ import {
   CAPABILITY,
   LOCALE_ISO_CODES,
   portableTextToPlainText,
+  routes,
   SITE_MESSAGES_BY_LOCALE,
   type TLocaleIsoCode,
 } from '@shinefold/config';
 import { MOCK_PLAUSIBLE_ANALYTICS } from '@shinefold/db/testing/tenant-analytics/fixtures';
+import { SmartLink } from '@web/components/shared/smart-link';
 import { useSiteAnalytics } from '@web/context/site-analytics-provider';
 import { useVoiceRich } from '@web/context/voice-rich-provider';
 import { getRequestContext } from '@web/server/request-context/request-context';
@@ -56,6 +58,7 @@ const MOCK_CHILD_TEXT = faker.lorem.sentence();
 const MOCK_VOICE_TEXT = faker.lorem.sentence();
 const MOCK_NOW = faker.date.past();
 const MOCK_TIME_ZONE = faker.location.timeZone();
+const MOCK_LINK_LABEL = faker.lorem.words(2);
 
 const CONSENT_BANNER_HEADING = 'Cookies on this site';
 
@@ -151,6 +154,23 @@ describe(SiteProviders, () => {
       const message = screen.getByText(MOCK_VOICE_TEXT);
       expect(message).toBeVisible();
     });
+  });
+
+  it("links a Dutch-default tenant's Dutch pages without a prefix", async () => {
+    vi.mocked(getRequestContext).mockResolvedValueOnce({
+      ...MOCK_REQUEST_CONTEXT,
+      locale: LOCALE_ISO_CODES.NL,
+      defaultLocale: LOCALE_ISO_CODES.NL,
+    });
+
+    await setup({
+      children: (
+        <SmartLink href={routes.blogIndex()}>{MOCK_LINK_LABEL}</SmartLink>
+      ),
+    });
+
+    const link = screen.getByRole('link', { name: MOCK_LINK_LABEL });
+    expect(link).toHaveAttribute('href', routes.blogIndex());
   });
 
   it('provides the request time zone', async () => {

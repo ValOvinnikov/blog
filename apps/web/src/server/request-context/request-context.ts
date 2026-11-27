@@ -6,7 +6,10 @@ import { REQUEST_CONTEXT_LOG } from '@web/constants/request-context';
 import { routing } from '@web/i18n/routing';
 import { hasDraftPreviewToken } from '@web/server/draft-preview/has-draft-preview-token/has-draft-preview-token';
 import { parseTenantSegment } from '@web/server/draft-preview/parse-tenant-segment/parse-tenant-segment';
-import { resolveNotFoundLocale } from '@web/server/request-context/resolve-not-found-locale/resolve-not-found-locale';
+import {
+  type TNotFoundContext,
+  toNotFoundContext,
+} from '@web/server/request-context/to-not-found-context/to-not-found-context';
 import { toSanityContext } from '@web/server/request-context/to-sanity-context/to-sanity-context';
 import { isOperatorSuspended } from '@web/server/tenant/operator-suspension/operator-suspension';
 import { isTenantServable } from '@web/server/tenant/resolve-tenant/resolve-tenant';
@@ -29,11 +32,6 @@ export type TRequestContext = {
   liveLocales: TMaybeUndefined<TLocaleIsoCode[]>;
   isOperatorSuspended: boolean;
   isDraftPreview: boolean;
-};
-
-export type TNotFoundContext = {
-  tenantId: TMaybeUndefined<string>;
-  locale: TLocaleIsoCode;
 };
 
 type TRouteParams = { tenant: string; locale: string };
@@ -172,7 +170,7 @@ const buildNotFoundContext = async (
   const { tenantId, locale } = await store.requestedRoute;
   const row = await loadTenantRowForNotFound(store, tenantId);
 
-  return { tenantId, locale: await resolveNotFoundLocale(row, locale) };
+  return toNotFoundContext(row, tenantId, locale);
 };
 
 export const getNotFoundContext = (): Promise<TNotFoundContext> => {

@@ -7,6 +7,7 @@ import { MOCK_NO_HOLD } from '@shinefold/db/testing/tenants/inactivity';
 import { MOCK_NO_OWNER_ACCESS } from '@shinefold/db/testing/tenants/owner-access';
 import type { TTenantSanityContext } from '@shinefold/service';
 import type { TRequestContext } from '@web/server/request-context/request-context';
+import type { TNotFoundContext } from '@web/server/request-context/to-not-found-context/to-not-found-context';
 import { createMockFaker } from '@web/testing/mock-faker';
 
 const mockFaker = createMockFaker(61053);
@@ -43,6 +44,12 @@ export const MOCK_REQUEST_CONTEXT: TRequestContext = {
   liveLocales: [LOCALE_ISO_CODES.EN],
   isOperatorSuspended: false,
   isDraftPreview: false,
+};
+
+export const MOCK_NOT_FOUND_CONTEXT: TNotFoundContext = {
+  tenantId: MOCK_TENANT_ID,
+  locale: LOCALE_ISO_CODES.EN,
+  defaultLocale: LOCALE_ISO_CODES.EN,
 };
 
 export const mockTenant = (overrides: Partial<TTenant> = {}): TTenant => ({

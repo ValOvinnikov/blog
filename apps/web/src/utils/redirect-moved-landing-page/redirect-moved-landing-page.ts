@@ -2,7 +2,7 @@ import { REDIRECT_STATUS, type TMaybeUndefined } from '@shinefold/config';
 import type { TResult } from '@shinefold/utils';
 import { LANDING_PAGE_LOG } from '@web/constants/landing-page';
 import { getLandingRedirect } from '@web/server/landing/get-landing-redirect/get-landing-redirect';
-import { localizeForRequest } from '@web/utils/localize-for-request';
+import { localizeForRequest } from '@web/server/request-context/localize-for-request/localize-for-request';
 import { logger } from '@web/utils/logger/logger';
 import { permanentRedirect, redirect } from 'next/navigation';
 

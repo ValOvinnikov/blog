@@ -1,6 +1,6 @@
 import type { TMaybeNull } from '@shinefold/config';
 import { isNull } from '@shinefold/utils/primitives';
-import { localizeForRequest } from '@web/utils/localize-for-request';
+import { localizeForRequest } from '@web/server/request-context/localize-for-request/localize-for-request';
 import { parsePageParam } from '@web/utils/parse-page-param';
 import { notFound, permanentRedirect } from 'next/navigation';
 

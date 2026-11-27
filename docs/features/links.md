@@ -45,7 +45,7 @@ A link is authored once, as a `link` document — a label per language and exact
 - Prose offers no paste-a-URL annotation: the only annotation is `linkRef`. In prose the visible text is the annotated span; everywhere else it is the link's label.
 - An internal link never 404s for language reasons: it goes to the reader's translation when one exists, else to the default-language page.
 - Accessible names come from the link's content (its label, or the card or logo it wraps); a social link's comes from its platform via the catalog.
-- `SmartLink` is the only in-app link component: it renders next-intl's `Link`, which adds the current language's prefix to internal paths, falls back to `next/link` for protocol-relative `//host` hrefs, and adds `rel="noopener noreferrer"` to `target="_blank"`.
+- `SmartLink` is the only in-app link component: a client `next/link` whose href comes from `toLocalizedPathname` against the tenant's own default language (`DefaultLocaleProvider`, set by `SiteProviders` and by the standalone not-found page), so an internal path gets the current language's prefix unless that language is the default. It leaves protocol-relative `//host` hrefs alone and adds `rel="noopener noreferrer"` to `target="_blank"`.
 
 ## Dependencies
 
