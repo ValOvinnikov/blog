@@ -6,6 +6,7 @@ import { applyPreviewResponseHeaders } from '@web/server/draft-preview/apply-pre
 import { PREVIEW_TOKEN_HEADER } from '@web/server/draft-preview/constants/constants';
 import { readVerifiedPreviewToken } from '@web/server/draft-preview/read-verified-preview-token/read-verified-preview-token';
 import { getIntlMiddleware } from '@web/server/proxy/get-intl-middleware/get-intl-middleware';
+import { isStaticFilePath } from '@web/server/proxy/is-static-file-path/is-static-file-path';
 import { isUnroutablePath } from '@web/server/proxy/is-unroutable-path/is-unroutable-path';
 import { prependTenantSegment } from '@web/server/proxy/prepend-tenant-segment/prepend-tenant-segment';
 import { redirectSwitchedOffLocale } from '@web/server/proxy/redirect-switched-off-locale/redirect-switched-off-locale';
@@ -30,7 +31,6 @@ import { logger } from '@web/utils/logger/logger';
 import { siteUnavailableStatus } from '@web/utils/site-unavailable-response';
 import { NextResponse, type NextRequest } from 'next/server';
 
-const DOTTED_PATH_PATTERN = /\./;
 const FEED_PATH_PATTERN = /\/rss\.xml$/;
 const SUSPENSION_GATED_PATH_PATTERN = /^\/(?:api\/|sitemap\.xml$)/;
 
@@ -46,7 +46,7 @@ const routeRequest = async (request: NextRequest): Promise<NextResponse> => {
     return passThroughUnlessOperatorSuspended(request);
   }
 
-  if (DOTTED_PATH_PATTERN.test(pathname) && !FEED_PATH_PATTERN.test(pathname)) {
+  if (isStaticFilePath(pathname)) {
     request.headers.delete(TENANT_ID_HEADER);
     return NextResponse.next({ request: { headers: request.headers } });
   }
@@ -117,11 +117,11 @@ export default async function proxy(
 
 export const config = {
   // The UUID is BotID's fixed path prefix, which the tenant-shaped guard would otherwise 404.
-  // A dotted final segment skips the proxy unless it is a feed, or the `.rsc` suffix Next matches RSC requests with.
+  // A last segment with a static-file extension skips the proxy unless it is a feed; keep the list in step with `isStaticFilePath`.
   // The middle entries reach the proxy only so an operator-suspended site can answer them with 503; newsletter unsubscribe, sign-in and account export stay reachable.
   // The last two send every request carrying a preview token, a `~` or a `%` here, so none escapes the framing headers `next.config` leaves to the proxy and no encoding of the draft marker reaches a draft route; Next requires literals, not the constants.
   matcher: [
-    '/((?!api|_next|_vercel|icon|\\.well-known|149e9513-01fa-4fb0-aad4-566afd725d1b|(?:.*/)?(?!rss\\.xml$|[^/]*\\.rsc$)[^/]*\\.[^/]*$).*)',
+    '/((?!api|_next|_vercel|icon|\\.well-known|149e9513-01fa-4fb0-aad4-566afd725d1b|(?:.*/)?(?!rss\\.xml$)[^/]*\\.(?:ico|png|jpe?g|gif|svg|webp|avif|txt|xml|json|webmanifest|m?js|css|map|woff2?|ttf|otf|php|aspx?|env)$).*)',
     '/sitemap.xml',
     '/api/newsletter/confirm',
     '/api/switch-language',
