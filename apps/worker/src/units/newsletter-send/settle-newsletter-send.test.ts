@@ -61,8 +61,10 @@ describe(failNewsletterSend, () => {
     });
   });
 
-  it('logs a failure before the send counted its recipients without counts', async () => {
-    vi.mocked(getNewsletterPostSend).mockResolvedValue(undefined);
+  it('logs a failure before the gate with nobody reached and no recipient count', async () => {
+    vi.mocked(getNewsletterPostSend).mockResolvedValue(
+      mockNewsletterPostSend({ recipientCount: undefined }),
+    );
 
     await failSend();
 
@@ -71,7 +73,7 @@ describe(failNewsletterSend, () => {
       {
         tenantId: MOCK_TENANT_ID,
         postId: MOCK_POST_ID,
-        reachedCount: undefined,
+        reachedCount: 0,
         recipientCount: undefined,
         error: MOCK_WORKFLOW_CRASH,
       },

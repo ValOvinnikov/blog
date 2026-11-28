@@ -152,22 +152,17 @@ describe(checkOwnerAccess, () => {
       ]);
     });
 
-    it('grants the owner administrator', async () => {
-      const { outcome } = await checkOwnerAccess(MOCK_TENANT_ID);
-
-      expect(outcome).toBe(ELEVATE_TENANT_OWNER_OUTCOME.ELEVATED);
-      expect(grantSanityProjectRole).toHaveBeenCalledWith({
-        token: MOCK_PROVISION_ENV.sanityManagementToken,
-        projectId: MOCK_SANITY_PROJECT_ID,
-        projectUserId: MOCK_OWNER_PROJECT_USER_ID,
-        role: SANITY_PROJECT_ROLE.ADMINISTRATOR,
-      });
-    });
-
-    it('grants administrator to an owner the ACL keys on their project membership', async () => {
-      vi.mocked(listSanityProjectUsers).mockResolvedValue([
+    it.each([
+      [
+        'found by their email',
+        mockSanityOwner({ email: MOCK_MIXED_CASE_OWNER_EMAIL }),
+      ],
+      [
+        'the ACL keys on their project membership',
         mockSanityOwnerWithMembership(),
-      ]);
+      ],
+    ])('grants administrator to an owner %s', async (_, owner) => {
+      vi.mocked(listSanityProjectUsers).mockResolvedValue([owner]);
 
       const { outcome } = await checkOwnerAccess(MOCK_TENANT_ID);
 
