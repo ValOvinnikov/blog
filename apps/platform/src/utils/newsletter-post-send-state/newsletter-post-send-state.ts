@@ -9,8 +9,8 @@ import type { INewsletterPostSend } from '@shinefold/db/queries/newsletter-post-
 import { isUndefined } from '@shinefold/utils/primitives';
 
 const toSkippedState = (
-  { skipReason }: INewsletterPostSend,
-  bandCeiling: TMaybeUndefined<number>,
+  { skipReason, bandCeiling: skipBandCeiling }: INewsletterPostSend,
+  siteBandCeiling: TMaybeUndefined<number>,
 ): TNewsletterPostSendState => {
   if (!skipReason) {
     throw new Error('A skipped post send has no skip reason.');
@@ -18,8 +18,9 @@ const toSkippedState = (
   if (skipReason !== NEWSLETTER_SKIP_REASON.OVER_SUBSCRIBER_BAND) {
     return { status: NEWSLETTER_SEND_STATUS.SKIPPED, skipReason };
   }
+  const bandCeiling = skipBandCeiling ?? siteBandCeiling;
   if (isUndefined(bandCeiling)) {
-    throw new Error('A band skip needs the site band ceiling.');
+    throw new Error('A band skip needs the band it was measured against.');
   }
   return { status: NEWSLETTER_SEND_STATUS.SKIPPED, skipReason, bandCeiling };
 };
@@ -41,6 +42,13 @@ export const toNewsletterPostSendState = (
   }
   if (outcome === NEWSLETTER_POST_SEND_OUTCOME.SKIPPED) {
     return toSkippedState(claim, bandCeiling);
+  }
+  if (outcome === NEWSLETTER_POST_SEND_OUTCOME.FAILED) {
+    return {
+      status: NEWSLETTER_SEND_STATUS.FAILED,
+      sent: sentCount,
+      recipients: recipientCount,
+    };
   }
   if (!isUndefined(recipientCount)) {
     return {

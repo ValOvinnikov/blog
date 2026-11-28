@@ -21,3 +21,11 @@ export const SIGNUP_BLOCK_LOG = {
   REMOVE_FAILED: 'signup_block.remove_failed',
   REMOVE_LOOKUP_FAILED: 'signup_block.remove_lookup_failed',
 } as const;
+
+export const BLOCKED_SIGNUPS_COLUMN = {
+  KIND: 'KIND',
+  VALUE: 'VALUE',
+  REASON: 'REASON',
+  ADDED_BY: 'ADDED_BY',
+  ADDED_AT: 'ADDED_AT',
+} as const;

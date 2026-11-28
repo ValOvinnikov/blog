@@ -2219,7 +2219,8 @@
     "columnActions": "Actions",
     "addedByUnknown": "Inconnu",
     "empty": "Rien n’est bloqué.",
-    "regionLabel": "Inscriptions bloquées"
+    "regionLabel": "Inscriptions bloquées",
+    "fromSuspension": "De la suspension {reference} de <tenant>{tenantName}</tenant>"
   },
   "blockedSignupKindLabel": {
     "ADDRESS": "Adresse e-mail",
@@ -2237,7 +2238,7 @@
   },
   "newsletterPauseCard": {
     "title": "Newsletter en pause",
-    "pausedSince": "Les nouveaux articles ne sont pas envoyés aux abonnés. En pause depuis le <time>{date}</time>.",
+    "pausedSince": "Trop d'e-mails ont été rejetés ou signalés comme spam, donc les nouveaux articles ne sont pas envoyés aux abonnés. En pause depuis le <time>{date}</time>.",
     "openDialogButton": "Lever la pause",
     "dialogTitle": "Lever la pause de la newsletter ?",
     "dialogDescription": "Les nouveaux articles sont de nouveau envoyés aux abonnés. Si les taux de rebond ou de plainte restent trop élevés, le prochain envoi remet la newsletter en pause.",
@@ -2637,8 +2638,8 @@
       "largestBand": "Vous êtes sur le plus grand palier.",
       "operatorPause": {
         "title": "Les e-mails d'articles sont en pause pour ce site",
-        "description": "Shinefold a mis en pause l'envoi des articles par e-mail le {date}. Contactez le support pour le reprendre.",
-        "descriptionUndated": "Shinefold a mis en pause l'envoi des articles par e-mail pour ce site. Contactez le support pour le reprendre."
+        "description": "Shinefold a mis en pause l'envoi des articles par e-mail le {date}, car trop d'e-mails ont été rejetés ou signalés comme spam. Contactez le support pour le reprendre.",
+        "descriptionUndated": "Shinefold a mis en pause l'envoi des articles par e-mail pour ce site, car trop d'e-mails ont été rejetés ou signalés comme spam. Contactez le support pour le reprendre."
       },
       "bandPaused": {
         "title": "Les nouveaux articles ne sont pas envoyés par e-mail",

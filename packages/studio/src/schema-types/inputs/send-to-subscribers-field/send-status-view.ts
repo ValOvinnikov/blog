@@ -9,7 +9,10 @@ import {
   formatSubscribers,
 } from '@shinefold/studio/schema-types/inputs/send-to-subscribers-field/send-status-format';
 import type { TSendStatusView } from '@shinefold/studio/schema-types/inputs/send-to-subscribers-field/send-status-types';
-import { toSkippedView } from '@shinefold/studio/schema-types/inputs/send-to-subscribers-field/skipped-send-status-view';
+import {
+  NOT_EMAILED,
+  toSkippedView,
+} from '@shinefold/studio/schema-types/inputs/send-to-subscribers-field/skipped-send-status-view';
 import { isUndefined } from '@shinefold/utils/primitives';
 import { Check, Clock } from 'lucide-react';
 
@@ -44,6 +47,16 @@ export const toSendStatusView = (
         detail: isUndefined(recipients)
           ? SEND_PENDING
           : `Sending… ${formatSendCount(sent ?? 0)} of ${formatSendCount(recipients)} so far.`,
+      };
+    }
+    case NEWSLETTER_SEND_STATUS.FAILED: {
+      const { sent, recipients } = status;
+      return {
+        tone: 'critical',
+        lead: NOT_EMAILED,
+        detail: isUndefined(recipients)
+          ? ' — sending failed before any email went out.'
+          : ` — sending failed after ${formatSendCount(sent)} of ${formatSendCount(recipients)}.`,
       };
     }
     case NEWSLETTER_SEND_STATUS.SKIPPED:

@@ -2,7 +2,10 @@ import 'server-only';
 
 import { TENANT_REFUSAL, TENANT_LOG } from '@platform/constants/tenant';
 import { saveSignupBlock } from '@platform/server/signup-block/add-signup-block';
-import { recordSignupBlockAdded } from '@platform/server/signup-block/signup-block-audit';
+import {
+  recordOwnerBlockRemoved,
+  recordSignupBlockAdded,
+} from '@platform/server/signup-block/signup-block-audit';
 import { toLoggableError } from '@platform/utils/loggable-error/loggable-error';
 import { logger } from '@platform/utils/logger/logger';
 import {
@@ -11,9 +14,11 @@ import {
   type TOutcome,
   type TReasonedFailure,
 } from '@shinefold/config';
+import { ERROR_CODE } from '@shinefold/config/constants';
 import { BLOCKED_IDENTITY_KIND, queries } from '@shinefold/db';
 import type { TAddBlockedIdentityOutcome } from '@shinefold/db/queries/blocked-signup-identities/add-blocked-identity';
 import type { TAdmin } from '@shinefold/db/schema/admins';
+import type { TTenantSuspension } from '@shinefold/db/schema/tenant-suspensions';
 import { errorResult, okResult, type TResult } from '@shinefold/utils';
 import { toOutcome } from '@shinefold/utils/to-outcome';
 
@@ -81,6 +86,37 @@ export const undoOwnerEmailBlock = async (
   } catch (error) {
     logger.error(TENANT_LOG.SUSPENSION_BLOCK_UNDO_FAILED, {
       entryId,
+      ...toLoggableError(error),
+    });
+  }
+};
+
+export const ownerBlockIdOf = (
+  block: TMaybeUndefined<TSavedOwnerEmailBlock>,
+): TMaybeUndefined<string> => (block?.created ? block.entry.id : undefined);
+
+export const removeSuspensionOwnerBlock = async ({
+  tenantId,
+  ownerBlockId,
+}: TTenantSuspension): Promise<void> => {
+  if (!ownerBlockId) return;
+
+  try {
+    const removed =
+      await queries.blockedSignupIdentities.removeBlockedIdentity(ownerBlockId);
+    if (removed.ok) {
+      await recordOwnerBlockRemoved(ownerBlockId, tenantId);
+    } else if (removed.error !== ERROR_CODE.DB_NOT_FOUND) {
+      logger.error(TENANT_LOG.SUSPENSION_BLOCK_LIFT_FAILED, {
+        tenantId,
+        entryId: ownerBlockId,
+        error: removed.error,
+      });
+    }
+  } catch (error) {
+    logger.error(TENANT_LOG.SUSPENSION_BLOCK_LIFT_FAILED, {
+      tenantId,
+      entryId: ownerBlockId,
       ...toLoggableError(error),
     });
   }

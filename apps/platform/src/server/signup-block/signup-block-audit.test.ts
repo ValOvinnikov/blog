@@ -4,6 +4,7 @@ import {
 } from '@platform/testing/audit-events/recorded-audit-event';
 import {
   MOCK_BLOCK_REASON,
+  MOCK_BLOCKED_ADDRESS_ENTRY_ID,
   MOCK_BLOCKED_ADDRESS_HASH,
   mockBlockedIdentity,
 } from '@platform/testing/blocked-signups/fixtures';
@@ -12,7 +13,10 @@ import { MOCK_TENANT_ID } from '@platform/testing/tenants/fixtures';
 import { AUDIT_ACTION, AUDIT_TARGET_TYPE } from '@shinefold/config';
 import { BLOCKED_IDENTITY_KIND } from '@shinefold/db/constants';
 
-import { recordSignupBlockAdded } from './signup-block-audit';
+import {
+  recordOwnerBlockRemoved,
+  recordSignupBlockAdded,
+} from './signup-block-audit';
 
 const { recordAuditEventMock } = vi.hoisted(() => ({
   recordAuditEventMock: vi.fn(),
@@ -73,6 +77,37 @@ describe(recordSignupBlockAdded, () => {
           kind: BLOCKED_IDENTITY_KIND.ADDRESS,
           reason: MOCK_BLOCK_REASON,
         },
+      },
+    ]);
+  });
+});
+
+describe(recordOwnerBlockRemoved, () => {
+  beforeEach(() => {
+    recordAuditEventMock.mockReset();
+  });
+
+  it('audits the removal on the block and its tenant, without the address', async () => {
+    await recordOwnerBlockRemoved(
+      MOCK_BLOCKED_ADDRESS_ENTRY_ID,
+      MOCK_TENANT_ID,
+    );
+
+    expect(recordedAuditEvents(recordAuditEventMock)).toEqual([
+      {
+        action: AUDIT_ACTION.SIGNUP_BLOCK_REMOVED,
+        targetType: AUDIT_TARGET_TYPE.BLOCKED_SIGNUP_IDENTITY,
+        targetId: MOCK_BLOCKED_ADDRESS_ENTRY_ID,
+        details: {
+          kind: BLOCKED_IDENTITY_KIND.ADDRESS,
+          tenantId: MOCK_TENANT_ID,
+        },
+      },
+      {
+        action: AUDIT_ACTION.SIGNUP_BLOCK_REMOVED,
+        targetType: AUDIT_TARGET_TYPE.TENANT,
+        targetId: MOCK_TENANT_ID,
+        details: { kind: BLOCKED_IDENTITY_KIND.ADDRESS },
       },
     ]);
   });

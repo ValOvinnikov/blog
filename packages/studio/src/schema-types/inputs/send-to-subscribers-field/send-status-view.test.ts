@@ -16,6 +16,7 @@ import {
 
 import { formatSendCount, formatSendDay } from './send-status-format';
 import { SEND_PENDING, toSendStatusView } from './send-status-view';
+import { NOT_EMAILED } from './skipped-send-status-view';
 
 faker.seed(7711);
 
@@ -80,6 +81,27 @@ describe(toSendStatusView, () => {
     const view = viewOf({ status: NEWSLETTER_SEND_STATUS.SENDING });
 
     expect(view?.detail).toBe(SEND_PENDING);
+  });
+
+  it('names how far a failed run got, and offers nothing to retry', () => {
+    const view = viewOf({
+      status: NEWSLETTER_SEND_STATUS.FAILED,
+      sent: MOCK_SENT,
+      recipients: MOCK_RECIPIENTS,
+    });
+
+    expect(view?.lead).toBe(NOT_EMAILED);
+    expect(view?.detail).toContain(
+      `${formatSendCount(MOCK_SENT)} of ${formatSendCount(MOCK_RECIPIENTS)}`,
+    );
+    expect(view?.link).toBeUndefined();
+  });
+
+  it('says a run that failed before counting its recipients emailed nobody', () => {
+    const view = viewOf({ status: NEWSLETTER_SEND_STATUS.FAILED, sent: 0 });
+
+    expect(view?.lead).toBe(NOT_EMAILED);
+    expect(view?.detail).not.toContain(formatSendCount(0));
   });
 
   it('names the band and links to Subscribers for a band skip', () => {

@@ -5,6 +5,7 @@ import { revalidateSiteConfig } from '@platform/server/site-config/revalidate-si
 import {
   blockTenantOwnerEmail,
   confirmOwnerEmailBlock,
+  ownerBlockIdOf,
   type TSavedOwnerEmailBlock,
   undoOwnerEmailBlock,
 } from '@platform/server/tenants/block-tenant-owner-email';
@@ -85,6 +86,7 @@ export const applyTenantSuspension = async (
       tenantId,
       ...suspensionCase,
       suspendedBy: admin.id,
+      ownerBlockId: ownerBlockIdOf(ownerBlock),
     });
     const updated = await queries.tenants.setTenantSuspension(
       tenantId,

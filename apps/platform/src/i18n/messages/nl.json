@@ -2219,7 +2219,8 @@
     "columnActions": "Acties",
     "addedByUnknown": "Onbekend",
     "empty": "Er is niets geblokkeerd.",
-    "regionLabel": "Geblokkeerde aanmeldingen"
+    "regionLabel": "Geblokkeerde aanmeldingen",
+    "fromSuspension": "Van schorsing {reference} van <tenant>{tenantName}</tenant>"
   },
   "blockedSignupKindLabel": {
     "ADDRESS": "E-mailadres",
@@ -2237,7 +2238,7 @@
   },
   "newsletterPauseCard": {
     "title": "Nieuwsbrief gepauzeerd",
-    "pausedSince": "Nieuwe berichten worden niet naar abonnees gemaild. Gepauzeerd sinds <time>{date}</time>.",
+    "pausedSince": "Te veel e-mails zijn niet aangekomen of als spam gemarkeerd, dus nieuwe berichten worden niet naar abonnees gemaild. Gepauzeerd sinds <time>{date}</time>.",
     "openDialogButton": "Pauze opheffen",
     "dialogTitle": "Nieuwsbriefpauze opheffen?",
     "dialogDescription": "Nieuwe berichten worden weer naar abonnees gemaild. Zijn de bounce- of klachtpercentages nog te hoog, dan pauzeert de volgende verzending de nieuwsbrief opnieuw.",
@@ -2637,8 +2638,8 @@
       "largestBand": "U zit in de grootste schijf.",
       "operatorPause": {
         "title": "Berichtmails zijn gepauzeerd voor deze site",
-        "description": "Shinefold heeft het mailen van berichten op {date} gepauzeerd. Neem contact op met support om het te hervatten.",
-        "descriptionUndated": "Shinefold heeft het mailen van berichten voor deze site gepauzeerd. Neem contact op met support om het te hervatten."
+        "description": "Shinefold heeft het mailen van berichten op {date} gepauzeerd omdat te veel e-mails niet zijn aangekomen of als spam zijn gemarkeerd. Neem contact op met support om het te hervatten.",
+        "descriptionUndated": "Shinefold heeft het mailen van berichten voor deze site gepauzeerd omdat te veel e-mails niet zijn aangekomen of als spam zijn gemarkeerd. Neem contact op met support om het te hervatten."
       },
       "bandPaused": {
         "title": "Nieuwe berichten worden niet gemaild",

@@ -5,10 +5,12 @@ import {
   MOCK_BLOCKED_ADDRESS_ENTRY_ID,
   MOCK_BLOCKED_ADDRESS_HASH_PREVIEW,
   MOCK_BLOCKED_DOMAIN,
+  MOCK_BLOCKING_SUSPENSION,
   mockBlockedSignupEntry,
 } from '@platform/testing/blocked-signups/fixtures';
 import { customRender, screen, within } from '@platform/testing/custom-render';
 import { makeEnTranslator } from '@platform/testing/en-translator';
+import { adminRoutes } from '@platform/utils/routes/routes';
 import { BLOCKED_IDENTITY_KIND } from '@shinefold/db/constants';
 
 import { BlockedSignupsView } from './blocked-signups-view';
@@ -28,6 +30,7 @@ const MOCK_ADDRESS_ENTRY = mockBlockedSignupEntry({
   displayValue: MOCK_BLOCKED_ADDRESS_HASH_PREVIEW,
   reason: MOCK_ADDRESS_BLOCK_REASON,
   addedBy: null,
+  suspension: MOCK_BLOCKING_SUSPENSION,
 });
 
 const setup = customRender(BlockedSignupsView, {
@@ -61,6 +64,27 @@ describe(`<${BlockedSignupsView.name}/>`, () => {
       expect(domainAuthor).toBeVisible();
       expect(addressKind).toBeVisible();
       expect(addressAuthor).not.toBeInTheDocument();
+    });
+
+    it('names the suspension and links the site an owner block came from', () => {
+      const addressRow = screen.getByRole('row', {
+        name: new RegExp(MOCK_BLOCKED_ADDRESS_HASH_PREVIEW),
+      });
+
+      const reference = within(addressRow).getByText(
+        new RegExp(MOCK_BLOCKING_SUSPENSION.reference),
+      );
+      const site = within(addressRow).getByRole('link', {
+        name: MOCK_BLOCKING_SUSPENSION.tenantName,
+      });
+
+      expect(reference).toBeVisible();
+      expect(site).toHaveAttribute(
+        'href',
+        expect.stringContaining(
+          adminRoutes.tenantOverview(MOCK_BLOCKING_SUSPENSION.tenantId),
+        ),
+      );
     });
 
     it('offers a removal control for every entry', () => {

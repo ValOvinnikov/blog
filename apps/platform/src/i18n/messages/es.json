@@ -2219,7 +2219,8 @@
     "columnActions": "Acciones",
     "addedByUnknown": "Desconocido",
     "empty": "No hay nada bloqueado.",
-    "regionLabel": "Registros bloqueados"
+    "regionLabel": "Registros bloqueados",
+    "fromSuspension": "De la suspensión {reference} de <tenant>{tenantName}</tenant>"
   },
   "blockedSignupKindLabel": {
     "ADDRESS": "Dirección de correo",
@@ -2237,7 +2238,7 @@
   },
   "newsletterPauseCard": {
     "title": "Boletín en pausa",
-    "pausedSince": "Las nuevas entradas no se envían a los suscriptores. En pausa desde <time>{date}</time>.",
+    "pausedSince": "Demasiados correos rebotaron o se marcaron como spam, así que las nuevas entradas no se envían a los suscriptores. En pausa desde <time>{date}</time>.",
     "openDialogButton": "Quitar pausa",
     "dialogTitle": "¿Quitar la pausa del boletín?",
     "dialogDescription": "Las nuevas entradas vuelven a enviarse a los suscriptores. Si las tasas de rebote o de quejas siguen siendo demasiado altas, el próximo envío vuelve a pausar el boletín.",
@@ -2637,8 +2638,8 @@
       "largestBand": "Está en el tramo más grande.",
       "operatorPause": {
         "title": "Los correos de entradas están en pausa en este sitio",
-        "description": "Shinefold pausó el envío de entradas por correo el {date}. Contacte con soporte para reanudarlo.",
-        "descriptionUndated": "Shinefold pausó el envío de entradas por correo en este sitio. Contacte con soporte para reanudarlo."
+        "description": "Shinefold pausó el envío de entradas por correo el {date} porque demasiados correos rebotaron o se marcaron como spam. Contacte con soporte para reanudarlo.",
+        "descriptionUndated": "Shinefold pausó el envío de entradas por correo en este sitio porque demasiados correos rebotaron o se marcaron como spam. Contacte con soporte para reanudarlo."
       },
       "bandPaused": {
         "title": "Las nuevas entradas no se están enviando por correo",

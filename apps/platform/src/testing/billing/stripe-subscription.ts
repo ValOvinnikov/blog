@@ -3,6 +3,7 @@ import {
   STRIPE_TENANT_METADATA_KEY,
 } from '@platform/constants/billing';
 import { STRIPE_EVENT_TYPE } from '@platform/constants/stripe-event';
+import { STRIPE_PAUSE_BEHAVIOR } from '@platform/constants/subscription-lifecycle';
 import {
   MOCK_STRIPE_CURRENCY,
   MOCK_STRIPE_CUSTOMER_ID,
@@ -38,6 +39,7 @@ export type TMockStripeSubscription = {
   cancelAt?: number;
   schedule?: Stripe.SubscriptionSchedule | string | null;
   currency?: string;
+  isCollectionPaused?: boolean;
 };
 
 export const mockStripeSubscription = ({
@@ -49,6 +51,7 @@ export const mockStripeSubscription = ({
   cancelAt,
   schedule = null,
   currency = MOCK_STRIPE_CURRENCY,
+  isCollectionPaused = false,
 }: TMockStripeSubscription = {}): Stripe.Subscription =>
   ({
     id: MOCK_STRIPE_SUBSCRIPTION_ID,
@@ -58,6 +61,9 @@ export const mockStripeSubscription = ({
     cancel_at_period_end: cancelAtPeriodEnd,
     cancel_at: cancelAt ?? null,
     schedule,
+    pause_collection: isCollectionPaused
+      ? { behavior: STRIPE_PAUSE_BEHAVIOR.VOID }
+      : null,
     metadata: tenantId ? { [STRIPE_TENANT_METADATA_KEY]: tenantId } : {},
     discounts: promotionCode
       ? [{ promotion_code: { code: promotionCode } }]
