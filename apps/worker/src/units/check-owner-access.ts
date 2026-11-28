@@ -2,6 +2,7 @@ import {
   TENANT_OWNER_EMAIL,
   type TElevateTenantOwnerOutcome,
 } from '@shinefold/db/constants';
+import { isTenantWritable } from '@shinefold/db/utils/is-tenant-writable/is-tenant-writable';
 import { sanitizeLogMessage } from '@shinefold/insight';
 import { OWNER_ACCESS_LOG } from '@worker/constants/owner-access';
 import { PROVISIONING_UNIT_MAX_RETRIES } from '@worker/constants/provisioning';
@@ -45,7 +46,9 @@ async function resolveOwnerAccess(
   if (owner) {
     const outcome = await grantOwnerAdministrator(target, owner);
     await deleteOwnerInvitesAfterGrant(target);
-    await sendOwnerEmailOnce(target, TENANT_OWNER_EMAIL.SITE_READY);
+    if (isTenantWritable(tenant)) {
+      await sendOwnerEmailOnce(target, TENANT_OWNER_EMAIL.SITE_READY);
+    }
     return outcome;
   }
   const outcome = await awaitOwnerAcceptance(target);

@@ -1,7 +1,6 @@
 import {
   NEWSLETTER_POST_STATE,
   NEWSLETTER_SEND_GATE,
-  NEWSLETTER_SEND_LOG,
   NEWSLETTER_SEND_PACE,
   NEWSLETTER_SLOW_PAUSE_MS,
 } from '@worker/constants/newsletter-send';
@@ -21,10 +20,10 @@ import { gateNewsletterSend } from '@worker/units/newsletter-send/gate-newslette
 import { sendNewsletterPage } from '@worker/units/newsletter-send/send-newsletter-page';
 import {
   completeNewsletterSend,
+  failNewsletterSend,
   recordNewsletterSends,
   releaseNewsletterSendClaim,
 } from '@worker/units/newsletter-send/settle-newsletter-send';
-import { reportRunFailed } from '@worker/units/report-run-failed';
 import { sleep } from 'workflow';
 
 import { sendNewsletterPost } from './send-newsletter-post';
@@ -33,7 +32,6 @@ vi.mock('@worker/units/newsletter-send/check-newsletter-post');
 vi.mock('@worker/units/newsletter-send/gate-newsletter-send');
 vi.mock('@worker/units/newsletter-send/send-newsletter-page');
 vi.mock('@worker/units/newsletter-send/settle-newsletter-send');
-vi.mock('@worker/units/report-run-failed');
 vi.mock('workflow');
 
 const MOCK_READY = {
@@ -153,19 +151,36 @@ describe(sendNewsletterPost, () => {
     expect(completeNewsletterSend).toHaveBeenCalled();
   });
 
-  it('gives the claim back and sends nothing when the post can no longer be sent', async () => {
-    vi.mocked(checkNewsletterPost).mockResolvedValue({
-      state: NEWSLETTER_POST_STATE.CANCELLED,
+  describe('when the post can no longer be sent', () => {
+    beforeEach(() => {
+      vi.mocked(checkNewsletterPost).mockResolvedValue({
+        state: NEWSLETTER_POST_STATE.CANCELLED,
+      });
     });
 
-    await runSend();
+    it('gives the claim back and sends nothing', async () => {
+      await runSend();
 
-    expect(releaseNewsletterSendClaim).toHaveBeenCalledWith(
-      MOCK_TENANT_ID,
-      MOCK_POST_ID,
-      MOCK_CLAIMED_AT,
-    );
-    expect(sendNewsletterPage).not.toHaveBeenCalled();
+      expect(releaseNewsletterSendClaim).toHaveBeenCalledWith(
+        MOCK_TENANT_ID,
+        MOCK_POST_ID,
+        MOCK_CLAIMED_AT,
+      );
+      expect(sendNewsletterPage).not.toHaveBeenCalled();
+    });
+
+    it('settles as failed when giving the claim back runs out of retries', async () => {
+      vi.mocked(releaseNewsletterSendClaim).mockRejectedValue(
+        new Error(MOCK_WORKFLOW_CRASH),
+      );
+
+      await expect(runSend()).rejects.toThrow(MOCK_WORKFLOW_CRASH);
+      expect(failNewsletterSend).toHaveBeenCalledExactlyOnceWith(
+        MOCK_TENANT_ID,
+        MOCK_POST_ID,
+        MOCK_WORKFLOW_CRASH,
+      );
+    });
   });
 
   it('gives the claim back when tenant mail is not configured', async () => {
@@ -204,14 +219,13 @@ describe(sendNewsletterPost, () => {
     expect(sleep).toHaveBeenCalledExactlyOnceWith(NEWSLETTER_SLOW_PAUSE_MS);
   });
 
-  it('reports a run that fails for good, leaving its claim unsettled', async () => {
+  it('settles a run that fails for good as failed', async () => {
     vi.mocked(sendNewsletterPage).mockRejectedValue(
       new Error(MOCK_WORKFLOW_CRASH),
     );
 
     await expect(runSend()).rejects.toThrow(MOCK_WORKFLOW_CRASH);
-    expect(reportRunFailed).toHaveBeenCalledExactlyOnceWith(
-      NEWSLETTER_SEND_LOG.RUN_FAILED,
+    expect(failNewsletterSend).toHaveBeenCalledExactlyOnceWith(
       MOCK_TENANT_ID,
       MOCK_POST_ID,
       MOCK_WORKFLOW_CRASH,
@@ -220,6 +234,25 @@ describe(sendNewsletterPost, () => {
     expect(completeNewsletterSend).not.toHaveBeenCalled();
     expect(hook.dispose).toHaveBeenCalled();
   });
+
+  it.each([
+    ['the post check', () => vi.mocked(checkNewsletterPost)],
+    ['the gate', () => vi.mocked(gateNewsletterSend)],
+  ])(
+    'settles a run that fails for good at %s as failed, before any email',
+    async (_, step) => {
+      step().mockRejectedValue(new Error(MOCK_WORKFLOW_CRASH));
+
+      await expect(runSend()).rejects.toThrow(MOCK_WORKFLOW_CRASH);
+      expect(failNewsletterSend).toHaveBeenCalledExactlyOnceWith(
+        MOCK_TENANT_ID,
+        MOCK_POST_ID,
+        MOCK_WORKFLOW_CRASH,
+      );
+      expect(sendNewsletterPage).not.toHaveBeenCalled();
+      expect(releaseNewsletterSendClaim).not.toHaveBeenCalled();
+    },
+  );
 
   describe('a one-page send', () => {
     beforeEach(async () => {

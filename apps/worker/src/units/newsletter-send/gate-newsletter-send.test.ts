@@ -158,7 +158,7 @@ describe(gateNewsletterSend, () => {
       { emailsNeeded: 100, allowanceLeft: 50 },
     ],
   ])(
-    'skips the post %s with what it needed, and tells the owner which post it was',
+    'skips the post %s with its need and band, and names the post to the owner',
     async (reason, overrides, need) => {
       const limits = mockNewsletterLimits(overrides);
       vi.mocked(getNewsletterLimits).mockResolvedValue(limits);
@@ -168,7 +168,7 @@ describe(gateNewsletterSend, () => {
         MOCK_TENANT_ID,
         MOCK_POST_ID,
         reason,
-        { ...MOCK_POST_DETAILS, ...need },
+        { ...MOCK_POST_DETAILS, ...need, bandCeiling: limits.bandCeiling },
       );
       expect(sendOwnerNewsletterNotice).toHaveBeenCalledExactlyOnceWith(
         MOCK_TENANT,

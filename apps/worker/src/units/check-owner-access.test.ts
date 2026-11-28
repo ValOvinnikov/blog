@@ -15,6 +15,7 @@ import {
   TENANT_OWNER_EMAIL,
   TENANT_PROVISIONING_STEP,
   TENANT_PROVISIONING_STEP_STATUS,
+  TENANT_STATUS,
 } from '@shinefold/db/constants';
 import {
   getFindingDetails,
@@ -151,22 +152,17 @@ describe(checkOwnerAccess, () => {
       ]);
     });
 
-    it('grants the owner administrator', async () => {
-      const { outcome } = await checkOwnerAccess(MOCK_TENANT_ID);
-
-      expect(outcome).toBe(ELEVATE_TENANT_OWNER_OUTCOME.ELEVATED);
-      expect(grantSanityProjectRole).toHaveBeenCalledWith({
-        token: MOCK_PROVISION_ENV.sanityManagementToken,
-        projectId: MOCK_SANITY_PROJECT_ID,
-        projectUserId: MOCK_OWNER_PROJECT_USER_ID,
-        role: SANITY_PROJECT_ROLE.ADMINISTRATOR,
-      });
-    });
-
-    it('grants administrator to an owner the ACL keys on their project membership', async () => {
-      vi.mocked(listSanityProjectUsers).mockResolvedValue([
+    it.each([
+      [
+        'found by their email',
+        mockSanityOwner({ email: MOCK_MIXED_CASE_OWNER_EMAIL }),
+      ],
+      [
+        'the ACL keys on their project membership',
         mockSanityOwnerWithMembership(),
-      ]);
+      ],
+    ])('grants administrator to an owner %s', async (_, owner) => {
+      vi.mocked(listSanityProjectUsers).mockResolvedValue([owner]);
 
       const { outcome } = await checkOwnerAccess(MOCK_TENANT_ID);
 
@@ -177,80 +173,6 @@ describe(checkOwnerAccess, () => {
         projectUserId: MOCK_OWNER_PROJECT_USER_ID,
         role: SANITY_PROJECT_ROLE.ADMINISTRATOR,
       });
-    });
-
-    it('ignores a membership on another resource that shares the project id', async () => {
-      atStepAttempt(99);
-      vi.mocked(listSanityProjectUsers).mockResolvedValue([
-        mockSanityOwnerWithMembership(
-          undefined,
-          MOCK_OWNER_PROJECT_USER_ID,
-          SANITY_RESOURCE_TYPE.ORGANIZATION,
-        ),
-      ]);
-
-      const { outcome } = await checkOwnerAccess(MOCK_TENANT_ID);
-
-      expect(outcome).toBe(ELEVATE_TENANT_OWNER_OUTCOME.PENDING_ACCEPTANCE);
-      expect(grantSanityProjectRole).not.toHaveBeenCalled();
-    });
-
-    it('resolves the open owner-access finding', async () => {
-      vi.mocked(listFindingsForTenant).mockResolvedValue([
-        mockOwnerAccessFinding(),
-      ]);
-
-      await checkOwnerAccess(MOCK_TENANT_ID);
-
-      expect(listFindingsForTenant).toHaveBeenCalledWith(
-        MOCK_TENANT_ID,
-        FINDING_STATUS.OPEN,
-      );
-      expect(resolveFinding).toHaveBeenCalledExactlyOnceWith(
-        MOCK_OWNER_ACCESS_FINDING_ID,
-      );
-    });
-
-    it('retries without recording the access when the open finding cannot be resolved', async () => {
-      vi.mocked(listFindingsForTenant).mockResolvedValue([
-        mockOwnerAccessFinding(),
-      ]);
-      vi.mocked(resolveFinding).mockResolvedValue(
-        errorResult(ERROR_CODE.DB_NOT_FOUND),
-      );
-
-      await expect(checkOwnerAccess(MOCK_TENANT_ID)).rejects.toThrow(
-        /could not be resolved/,
-      );
-      expect(setTenantOwnerAccess).not.toHaveBeenCalled();
-    });
-
-    it('keeps the open finding and counts onto it when the grant fails', async () => {
-      atStepAttempt(99);
-      vi.mocked(getTenantById).mockResolvedValue(
-        mockOwnerAccessFailingSince(MOCK_FAILING_FOR_THRESHOLD, {
-          ownerInviteSentAt: MOCK_FAILING_FOR_THRESHOLD,
-        }),
-      );
-      vi.mocked(listSanityProjectAcl).mockResolvedValue([]);
-      vi.mocked(listFindingsForTenant).mockResolvedValue([
-        mockOwnerAccessFinding(),
-      ]);
-      vi.mocked(getFindingDetails).mockResolvedValue({
-        failureCount: MOCK_PRIOR_FAILURE_COUNT,
-      });
-
-      const { hasFailed } = await checkOwnerAccess(MOCK_TENANT_ID);
-
-      expect(hasFailed).toBe(true);
-      expect(resolveFinding).not.toHaveBeenCalled();
-      expect(openFinding).toHaveBeenCalledWith(
-        expect.objectContaining({
-          details: expect.objectContaining({
-            failureCount: MOCK_PRIOR_FAILURE_COUNT + 1,
-          }),
-        }),
-      );
     });
 
     it('reports the check as not failed', async () => {
@@ -259,79 +181,20 @@ describe(checkOwnerAccess, () => {
       expect(hasFailed).toBe(false);
     });
 
-    it('removes the viewer role the invite gave, leaving administrator alone', async () => {
-      await checkOwnerAccess(MOCK_TENANT_ID);
+    it.each([TENANT_STATUS.SUSPENDED, TENANT_STATUS.ARCHIVED])(
+      'holds the site-ready email back while the site is %s',
+      async (status) => {
+        vi.mocked(getTenantById).mockResolvedValue({
+          ...MOCK_WAITING_TENANT,
+          status,
+        });
 
-      expect(revokeSanityProjectRole).toHaveBeenCalledExactlyOnceWith({
-        token: MOCK_TENANT_MANAGEMENT_TOKEN,
-        projectId: MOCK_SANITY_PROJECT_ID,
-        projectUserId: MOCK_OWNER_PROJECT_USER_ID,
-        roleName: SANITY_PROJECT_ROLE.VIEWER,
-      });
-    });
+        const { outcome } = await checkOwnerAccess(MOCK_TENANT_ID);
 
-    it('removes a viewer role left beside an existing administrator role', async () => {
-      vi.mocked(listSanityProjectAcl).mockResolvedValue([
-        aclEntry(SANITY_PROJECT_ROLE.ADMINISTRATOR, SANITY_PROJECT_ROLE.VIEWER),
-      ]);
-
-      await checkOwnerAccess(MOCK_TENANT_ID);
-
-      expect(grantSanityProjectRole).not.toHaveBeenCalled();
-      expect(revokeSanityProjectRole).toHaveBeenCalledExactlyOnceWith({
-        token: MOCK_TENANT_MANAGEMENT_TOKEN,
-        projectId: MOCK_SANITY_PROJECT_ID,
-        projectUserId: MOCK_OWNER_PROJECT_USER_ID,
-        roleName: SANITY_PROJECT_ROLE.VIEWER,
-      });
-    });
-
-    it('records the acceptance, Sanity user, login provider and role', async () => {
-      await checkOwnerAccess(MOCK_TENANT_ID);
-
-      expect(setTenantOwnerAccess).toHaveBeenCalledWith(MOCK_TENANT_ID, {
-        inviteAcceptedAt: MOCK_NOW,
-        sanityUserId: MOCK_SANITY_USER_ID,
-        loginProvider: SANITY_LOGIN_PROVIDER.GOOGLE,
-        sanityRole: STORED_SANITY_PROJECT_ROLE.ADMINISTRATOR,
-      });
-    });
-
-    it('reports the outcome on the owner elevation step', async () => {
-      await checkOwnerAccess(MOCK_TENANT_ID);
-
-      expect(updateProvisioningStep).toHaveBeenCalledWith({
-        tenantId: MOCK_TENANT_ID,
-        step: TENANT_PROVISIONING_STEP.OWNER_ELEVATION,
-        status: TENANT_PROVISIONING_STEP_STATUS.DONE,
-        detail: ELEVATE_TENANT_OWNER_OUTCOME.ELEVATED,
-      });
-    });
-
-    it('sends the owner the site-ready email', async () => {
-      await checkOwnerAccess(MOCK_TENANT_ID);
-
-      expect(sendOwnerEmailOnce).toHaveBeenCalledWith(
-        mockOwnerAccessTarget(MOCK_WAITING_TENANT),
-        TENANT_OWNER_EMAIL.SITE_READY,
-      );
-    });
-
-    it('sends no invite reminders', async () => {
-      await checkOwnerAccess(MOCK_TENANT_ID);
-
-      expect(sendPendingOwnerEmails).not.toHaveBeenCalled();
-    });
-
-    it('still reports the owner elevated when a retry removes the viewer role the grant left', async () => {
-      vi.mocked(listSanityProjectAcl).mockResolvedValue([
-        aclEntry(SANITY_PROJECT_ROLE.ADMINISTRATOR, SANITY_PROJECT_ROLE.VIEWER),
-      ]);
-
-      const { outcome } = await checkOwnerAccess(MOCK_TENANT_ID);
-
-      expect(outcome).toBe(ELEVATE_TENANT_OWNER_OUTCOME.ELEVATED);
-    });
+        expect(outcome).toBe(ELEVATE_TENANT_OWNER_OUTCOME.ELEVATED);
+        expect(sendOwnerEmailOnce).not.toHaveBeenCalled();
+      },
+    );
 
     it('clears the failing time once a check succeeds', async () => {
       vi.mocked(getTenantById).mockResolvedValue(
@@ -355,15 +218,6 @@ describe(checkOwnerAccess, () => {
       expect(outcome).toBe(ELEVATE_TENANT_OWNER_OUTCOME.ALREADY_ADMINISTRATOR);
       expect(grantSanityProjectRole).not.toHaveBeenCalled();
       expect(revokeSanityProjectRole).not.toHaveBeenCalled();
-    });
-
-    it("resets the tenant's inactivity clock to the acceptance", async () => {
-      await checkOwnerAccess(MOCK_TENANT_ID);
-
-      expect(touchTenantActivity).toHaveBeenCalledWith(
-        MOCK_TENANT_ID,
-        MOCK_NOW,
-      );
     });
 
     it('leaves the inactivity clock alone once the acceptance was recorded', async () => {
@@ -391,6 +245,165 @@ describe(checkOwnerAccess, () => {
       );
     });
 
+    describe('once a check has granted access', () => {
+      beforeEach(async () => {
+        await checkOwnerAccess(MOCK_TENANT_ID);
+      });
+
+      it('removes the viewer role the invite gave, leaving administrator alone', async () => {
+        expect(revokeSanityProjectRole).toHaveBeenCalledExactlyOnceWith({
+          token: MOCK_TENANT_MANAGEMENT_TOKEN,
+          projectId: MOCK_SANITY_PROJECT_ID,
+          projectUserId: MOCK_OWNER_PROJECT_USER_ID,
+          roleName: SANITY_PROJECT_ROLE.VIEWER,
+        });
+      });
+
+      it('records the acceptance, Sanity user, login provider and role', async () => {
+        expect(setTenantOwnerAccess).toHaveBeenCalledWith(MOCK_TENANT_ID, {
+          inviteAcceptedAt: MOCK_NOW,
+          sanityUserId: MOCK_SANITY_USER_ID,
+          loginProvider: SANITY_LOGIN_PROVIDER.GOOGLE,
+          sanityRole: STORED_SANITY_PROJECT_ROLE.ADMINISTRATOR,
+        });
+      });
+
+      it('reports the outcome on the owner elevation step', async () => {
+        expect(updateProvisioningStep).toHaveBeenCalledWith({
+          tenantId: MOCK_TENANT_ID,
+          step: TENANT_PROVISIONING_STEP.OWNER_ELEVATION,
+          status: TENANT_PROVISIONING_STEP_STATUS.DONE,
+          detail: ELEVATE_TENANT_OWNER_OUTCOME.ELEVATED,
+        });
+      });
+
+      it('sends the owner the site-ready email', async () => {
+        expect(sendOwnerEmailOnce).toHaveBeenCalledWith(
+          mockOwnerAccessTarget(MOCK_WAITING_TENANT),
+          TENANT_OWNER_EMAIL.SITE_READY,
+        );
+      });
+
+      it('sends no invite reminders', async () => {
+        expect(sendPendingOwnerEmails).not.toHaveBeenCalled();
+      });
+
+      it("resets the tenant's inactivity clock to the acceptance", async () => {
+        expect(touchTenantActivity).toHaveBeenCalledWith(
+          MOCK_TENANT_ID,
+          MOCK_NOW,
+        );
+      });
+    });
+
+    describe('on the last attempt at the grant', () => {
+      beforeEach(() => {
+        atStepAttempt(99);
+      });
+
+      it('ignores a membership on another resource that shares the project id', async () => {
+        vi.mocked(listSanityProjectUsers).mockResolvedValue([
+          mockSanityOwnerWithMembership(
+            undefined,
+            MOCK_OWNER_PROJECT_USER_ID,
+            SANITY_RESOURCE_TYPE.ORGANIZATION,
+          ),
+        ]);
+
+        const { outcome } = await checkOwnerAccess(MOCK_TENANT_ID);
+
+        expect(outcome).toBe(ELEVATE_TENANT_OWNER_OUTCOME.PENDING_ACCEPTANCE);
+        expect(grantSanityProjectRole).not.toHaveBeenCalled();
+      });
+
+      it('keeps the open finding and counts onto it when the grant fails', async () => {
+        vi.mocked(getTenantById).mockResolvedValue(
+          mockOwnerAccessFailingSince(MOCK_FAILING_FOR_THRESHOLD, {
+            ownerInviteSentAt: MOCK_FAILING_FOR_THRESHOLD,
+          }),
+        );
+        vi.mocked(listSanityProjectAcl).mockResolvedValue([]);
+        vi.mocked(listFindingsForTenant).mockResolvedValue([
+          mockOwnerAccessFinding(),
+        ]);
+        vi.mocked(getFindingDetails).mockResolvedValue({
+          failureCount: MOCK_PRIOR_FAILURE_COUNT,
+        });
+
+        const { hasFailed } = await checkOwnerAccess(MOCK_TENANT_ID);
+
+        expect(hasFailed).toBe(true);
+        expect(resolveFinding).not.toHaveBeenCalled();
+        expect(openFinding).toHaveBeenCalledWith(
+          expect.objectContaining({
+            details: expect.objectContaining({
+              failureCount: MOCK_PRIOR_FAILURE_COUNT + 1,
+            }),
+          }),
+        );
+      });
+    });
+
+    describe('with an owner-access finding open', () => {
+      beforeEach(() => {
+        vi.mocked(listFindingsForTenant).mockResolvedValue([
+          mockOwnerAccessFinding(),
+        ]);
+      });
+
+      it('resolves the open owner-access finding', async () => {
+        await checkOwnerAccess(MOCK_TENANT_ID);
+
+        expect(listFindingsForTenant).toHaveBeenCalledWith(
+          MOCK_TENANT_ID,
+          FINDING_STATUS.OPEN,
+        );
+        expect(resolveFinding).toHaveBeenCalledExactlyOnceWith(
+          MOCK_OWNER_ACCESS_FINDING_ID,
+        );
+      });
+
+      it('retries without recording the access when the open finding cannot be resolved', async () => {
+        vi.mocked(resolveFinding).mockResolvedValue(
+          errorResult(ERROR_CODE.DB_NOT_FOUND),
+        );
+
+        await expect(checkOwnerAccess(MOCK_TENANT_ID)).rejects.toThrow(
+          /could not be resolved/,
+        );
+        expect(setTenantOwnerAccess).not.toHaveBeenCalled();
+      });
+    });
+
+    describe('with a viewer role left beside administrator', () => {
+      beforeEach(() => {
+        vi.mocked(listSanityProjectAcl).mockResolvedValue([
+          aclEntry(
+            SANITY_PROJECT_ROLE.ADMINISTRATOR,
+            SANITY_PROJECT_ROLE.VIEWER,
+          ),
+        ]);
+      });
+
+      it('removes a viewer role left beside an existing administrator role', async () => {
+        await checkOwnerAccess(MOCK_TENANT_ID);
+
+        expect(grantSanityProjectRole).not.toHaveBeenCalled();
+        expect(revokeSanityProjectRole).toHaveBeenCalledExactlyOnceWith({
+          token: MOCK_TENANT_MANAGEMENT_TOKEN,
+          projectId: MOCK_SANITY_PROJECT_ID,
+          projectUserId: MOCK_OWNER_PROJECT_USER_ID,
+          roleName: SANITY_PROJECT_ROLE.VIEWER,
+        });
+      });
+
+      it('still reports the owner elevated when a retry removes that viewer role', async () => {
+        const { outcome } = await checkOwnerAccess(MOCK_TENANT_ID);
+
+        expect(outcome).toBe(ELEVATE_TENANT_OWNER_OUTCOME.ELEVATED);
+      });
+    });
+
     describe('while an invite to the owner is still pending', () => {
       beforeEach(() => {
         vi.mocked(getTenantById).mockResolvedValue({
@@ -406,21 +419,23 @@ describe(checkOwnerAccess, () => {
         ]);
       });
 
-      it("deletes the owner's pending invite and leaves other emails' invites alone", async () => {
-        await checkOwnerAccess(MOCK_TENANT_ID);
-
-        expect(deleteSanityProjectInvite).toHaveBeenCalledExactlyOnceWith({
-          token: MOCK_TENANT_MANAGEMENT_TOKEN,
-          projectId: MOCK_SANITY_PROJECT_ID,
-          inviteId: MOCK_SANITY_INVITE_ID,
+      describe('once a check has run', () => {
+        beforeEach(async () => {
+          await checkOwnerAccess(MOCK_TENANT_ID);
         });
-      });
 
-      it('clears the recorded invite once it is deleted', async () => {
-        await checkOwnerAccess(MOCK_TENANT_ID);
+        it("deletes the owner's pending invite and leaves other emails' invites alone", async () => {
+          expect(deleteSanityProjectInvite).toHaveBeenCalledExactlyOnceWith({
+            token: MOCK_TENANT_MANAGEMENT_TOKEN,
+            projectId: MOCK_SANITY_PROJECT_ID,
+            inviteId: MOCK_SANITY_INVITE_ID,
+          });
+        });
 
-        expect(setTenantOwnerAccess).toHaveBeenCalledWith(MOCK_TENANT_ID, {
-          sanityInviteId: null,
+        it('clears the recorded invite once it is deleted', async () => {
+          expect(setTenantOwnerAccess).toHaveBeenCalledWith(MOCK_TENANT_ID, {
+            sanityInviteId: null,
+          });
         });
       });
 
@@ -546,19 +561,21 @@ describe(checkOwnerAccess, () => {
     expect(postOperatorAlert).not.toHaveBeenCalled();
   });
 
-  it('sends whichever invite emails are due while the invite waits', async () => {
-    await checkOwnerAccess(MOCK_TENANT_ID);
+  describe('after a check while the invite waits', () => {
+    beforeEach(async () => {
+      await checkOwnerAccess(MOCK_TENANT_ID);
+    });
 
-    expect(sendPendingOwnerEmails).toHaveBeenCalledWith(
-      mockOwnerAccessTarget(MOCK_WAITING_TENANT),
-    );
-    expect(sendOwnerEmailOnce).not.toHaveBeenCalled();
-  });
+    it('sends whichever invite emails are due while the invite waits', async () => {
+      expect(sendPendingOwnerEmails).toHaveBeenCalledWith(
+        mockOwnerAccessTarget(MOCK_WAITING_TENANT),
+      );
+      expect(sendOwnerEmailOnce).not.toHaveBeenCalled();
+    });
 
-  it('sends no invite once one was recorded', async () => {
-    await checkOwnerAccess(MOCK_TENANT_ID);
-
-    expect(listSanityProjectInvites).not.toHaveBeenCalled();
+    it('sends no invite once one was recorded', async () => {
+      expect(listSanityProjectInvites).not.toHaveBeenCalled();
+    });
   });
 
   describe('when no invite was ever recorded', () => {
@@ -621,25 +638,6 @@ describe(checkOwnerAccess, () => {
       );
     });
 
-    it('logs and reports the wait as pending once the last attempt fails', async () => {
-      atStepAttempt(99);
-
-      const { outcome } = await checkOwnerAccess(MOCK_TENANT_ID);
-
-      expect(outcome).toBe(ELEVATE_TENANT_OWNER_OUTCOME.PENDING_ACCEPTANCE);
-      expect(logger.error).toHaveBeenCalledWith(OWNER_ACCESS_LOG.CHECK_FAILED, {
-        tenantId: MOCK_TENANT_ID,
-        error: MOCK_SANITY_OUTAGE,
-      });
-      expect(updateProvisioningStep).toHaveBeenCalledWith({
-        tenantId: MOCK_TENANT_ID,
-        step: TENANT_PROVISIONING_STEP.OWNER_ELEVATION,
-        status: TENANT_PROVISIONING_STEP_STATUS.DONE,
-        detail: ELEVATE_TENANT_OWNER_OUTCOME.PENDING_ACCEPTANCE,
-        failingSince: MOCK_NOW.toISOString(),
-      });
-    });
-
     describe('on the last attempt', () => {
       beforeEach(() => {
         atStepAttempt(99);
@@ -651,14 +649,60 @@ describe(checkOwnerAccess, () => {
         expect(hasFailed).toBe(true);
       });
 
-      it('opens no finding on a first failed check, however old the invite', async () => {
-        vi.mocked(getTenantById).mockResolvedValue(
-          mockProvisionedTenant({ ownerInviteSentAt: MOCK_FOUR_DAYS_AGO }),
+      it('logs and reports the wait as pending once the last attempt fails', async () => {
+        const { outcome } = await checkOwnerAccess(MOCK_TENANT_ID);
+
+        expect(outcome).toBe(ELEVATE_TENANT_OWNER_OUTCOME.PENDING_ACCEPTANCE);
+        expect(logger.error).toHaveBeenCalledWith(
+          OWNER_ACCESS_LOG.CHECK_FAILED,
+          {
+            tenantId: MOCK_TENANT_ID,
+            error: MOCK_SANITY_OUTAGE,
+          },
         );
+        expect(updateProvisioningStep).toHaveBeenCalledWith({
+          tenantId: MOCK_TENANT_ID,
+          step: TENANT_PROVISIONING_STEP.OWNER_ELEVATION,
+          status: TENANT_PROVISIONING_STEP_STATUS.DONE,
+          detail: ELEVATE_TENANT_OWNER_OUTCOME.PENDING_ACCEPTANCE,
+          failingSince: MOCK_NOW.toISOString(),
+        });
+      });
 
-        await checkOwnerAccess(MOCK_TENANT_ID);
+      it('logs and reports the wait as pending when the owner has no ACL entry yet', async () => {
+        vi.mocked(listSanityProjectUsers).mockResolvedValue([
+          mockSanityOwner(),
+        ]);
+        vi.mocked(listSanityProjectAcl).mockResolvedValue([]);
 
-        expect(openFinding).not.toHaveBeenCalled();
+        const { outcome } = await checkOwnerAccess(MOCK_TENANT_ID);
+
+        expect(outcome).toBe(ELEVATE_TENANT_OWNER_OUTCOME.PENDING_ACCEPTANCE);
+      });
+
+      describe('with an invite sent four days ago', () => {
+        beforeEach(() => {
+          vi.mocked(getTenantById).mockResolvedValue(
+            mockProvisionedTenant({ ownerInviteSentAt: MOCK_FOUR_DAYS_AGO }),
+          );
+        });
+
+        it('opens no finding on a first failed check, however old the invite', async () => {
+          await checkOwnerAccess(MOCK_TENANT_ID);
+
+          expect(openFinding).not.toHaveBeenCalled();
+        });
+
+        it('still marks the owner stalled and alerts the operator after three days', async () => {
+          const { outcome } = await checkOwnerAccess(MOCK_TENANT_ID);
+
+          expect(outcome).toBe(ELEVATE_TENANT_OWNER_OUTCOME.STALLED);
+          expect(postOperatorAlert).toHaveBeenCalledWith({
+            kind: OPERATOR_ALERT_KIND.OWNER_ELEVATION,
+            tenantId: MOCK_TENANT_ID,
+            outcome: ELEVATE_TENANT_OWNER_OUTCOME.STALLED,
+          });
+        });
       });
 
       it('opens no finding while checks have failed for less than the threshold', async () => {
@@ -680,73 +724,77 @@ describe(checkOwnerAccess, () => {
           );
         });
 
-        it('keeps the time failures started on the owner elevation step', async () => {
-          await checkOwnerAccess(MOCK_TENANT_ID);
-
-          expect(updateProvisioningStep).toHaveBeenCalledWith(
-            expect.objectContaining({
-              failingSince: MOCK_FAILING_FOR_THRESHOLD.toISOString(),
-            }),
-          );
-        });
-
-        it('opens a finding naming the error and the first failure', async () => {
-          await checkOwnerAccess(MOCK_TENANT_ID);
-
-          expect(openFinding).toHaveBeenCalledExactlyOnceWith({
-            tenantId: MOCK_TENANT_ID,
-            source: FINDING_SOURCE.TENANT_PROVISIONING,
-            kind: FINDING_KIND.OWNER_ACCESS_CHECK_FAILED,
-            identifier: OWNER_ACCESS_FINDING_IDENTIFIER,
-            severity: FINDING_SEVERITY.WARNING,
-            details: {
-              error: MOCK_SANITY_OUTAGE,
-              failureCount: 1,
-              firstFailedAt: MOCK_FAILING_FOR_THRESHOLD.toISOString(),
-              lastFailedAt: MOCK_NOW.toISOString(),
-            },
-          });
-        });
-
-        it('counts the failure onto an open finding', async () => {
-          vi.mocked(listFindingsForTenant).mockResolvedValue([
-            mockOwnerAccessFinding(),
-          ]);
-          vi.mocked(getFindingDetails).mockResolvedValue({
-            failureCount: MOCK_PRIOR_FAILURE_COUNT,
+        describe('once that check has failed', () => {
+          beforeEach(async () => {
+            await checkOwnerAccess(MOCK_TENANT_ID);
           });
 
-          await checkOwnerAccess(MOCK_TENANT_ID);
+          it('keeps the time failures started on the owner elevation step', async () => {
+            expect(updateProvisioningStep).toHaveBeenCalledWith(
+              expect.objectContaining({
+                failingSince: MOCK_FAILING_FOR_THRESHOLD.toISOString(),
+              }),
+            );
+          });
 
-          expect(getFindingDetails).toHaveBeenCalledWith(
-            MOCK_TENANT_ID,
-            MOCK_OWNER_ACCESS_FINDING_ID,
-          );
-          expect(openFinding).toHaveBeenCalledWith(
-            expect.objectContaining({
+          it('opens a finding naming the error and the first failure', async () => {
+            expect(openFinding).toHaveBeenCalledExactlyOnceWith({
+              tenantId: MOCK_TENANT_ID,
+              source: FINDING_SOURCE.TENANT_PROVISIONING,
+              kind: FINDING_KIND.OWNER_ACCESS_CHECK_FAILED,
+              identifier: OWNER_ACCESS_FINDING_IDENTIFIER,
+              severity: FINDING_SEVERITY.WARNING,
               details: {
                 error: MOCK_SANITY_OUTAGE,
-                failureCount: MOCK_PRIOR_FAILURE_COUNT + 1,
+                failureCount: 1,
                 firstFailedAt: MOCK_FAILING_FOR_THRESHOLD.toISOString(),
                 lastFailedAt: MOCK_NOW.toISOString(),
               },
-            }),
-          );
+            });
+          });
         });
 
-        it('counts from one when an open finding records no count', async () => {
-          vi.mocked(listFindingsForTenant).mockResolvedValue([
-            mockOwnerAccessFinding(),
-          ]);
-          vi.mocked(getFindingDetails).mockResolvedValue(null);
+        describe('with a finding already open', () => {
+          beforeEach(() => {
+            vi.mocked(listFindingsForTenant).mockResolvedValue([
+              mockOwnerAccessFinding(),
+            ]);
+          });
 
-          await checkOwnerAccess(MOCK_TENANT_ID);
+          it('counts the failure onto an open finding', async () => {
+            vi.mocked(getFindingDetails).mockResolvedValue({
+              failureCount: MOCK_PRIOR_FAILURE_COUNT,
+            });
 
-          expect(openFinding).toHaveBeenCalledWith(
-            expect.objectContaining({
-              details: expect.objectContaining({ failureCount: 1 }),
-            }),
-          );
+            await checkOwnerAccess(MOCK_TENANT_ID);
+
+            expect(getFindingDetails).toHaveBeenCalledWith(
+              MOCK_TENANT_ID,
+              MOCK_OWNER_ACCESS_FINDING_ID,
+            );
+            expect(openFinding).toHaveBeenCalledWith(
+              expect.objectContaining({
+                details: {
+                  error: MOCK_SANITY_OUTAGE,
+                  failureCount: MOCK_PRIOR_FAILURE_COUNT + 1,
+                  firstFailedAt: MOCK_FAILING_FOR_THRESHOLD.toISOString(),
+                  lastFailedAt: MOCK_NOW.toISOString(),
+                },
+              }),
+            );
+          });
+
+          it('counts from one when an open finding records no count', async () => {
+            vi.mocked(getFindingDetails).mockResolvedValue(null);
+
+            await checkOwnerAccess(MOCK_TENANT_ID);
+
+            expect(openFinding).toHaveBeenCalledWith(
+              expect.objectContaining({
+                details: expect.objectContaining({ failureCount: 1 }),
+              }),
+            );
+          });
         });
 
         it('logs and still reports the wait when the finding cannot be opened', async () => {
@@ -763,34 +811,6 @@ describe(checkOwnerAccess, () => {
           );
         });
       });
-    });
-
-    it('still marks the owner stalled and alerts the operator after three days', async () => {
-      atStepAttempt(99);
-      vi.mocked(getTenantById).mockResolvedValue(
-        mockProvisionedTenant({
-          ownerInviteSentAt: MOCK_FOUR_DAYS_AGO,
-        }),
-      );
-
-      const { outcome } = await checkOwnerAccess(MOCK_TENANT_ID);
-
-      expect(outcome).toBe(ELEVATE_TENANT_OWNER_OUTCOME.STALLED);
-      expect(postOperatorAlert).toHaveBeenCalledWith({
-        kind: OPERATOR_ALERT_KIND.OWNER_ELEVATION,
-        tenantId: MOCK_TENANT_ID,
-        outcome: ELEVATE_TENANT_OWNER_OUTCOME.STALLED,
-      });
-    });
-
-    it('logs and reports the wait as pending when the owner has no ACL entry yet', async () => {
-      atStepAttempt(99);
-      vi.mocked(listSanityProjectUsers).mockResolvedValue([mockSanityOwner()]);
-      vi.mocked(listSanityProjectAcl).mockResolvedValue([]);
-
-      const { outcome } = await checkOwnerAccess(MOCK_TENANT_ID);
-
-      expect(outcome).toBe(ELEVATE_TENANT_OWNER_OUTCOME.PENDING_ACCEPTANCE);
     });
   });
 
