@@ -1,6 +1,7 @@
 import 'server-only';
 
 import { revalidateSiteConfig } from '@platform/server/site-config/revalidate-site-config';
+import { removeSuspensionOwnerBlock } from '@platform/server/tenants/block-tenant-owner-email';
 import { reopenTenantSuspensionCase } from '@platform/server/tenants/tenant-suspension-case';
 import {
   ARCHIVED_REFUSAL,
@@ -33,6 +34,7 @@ export const liftTenantSuspension = async (
       return errorResult(ARCHIVED_REFUSAL);
     }
     isLiftSaved = true;
+    if (closedCase) await removeSuspensionOwnerBlock(closedCase);
     await revalidateSiteConfig(tenantId);
     return okResult(closedCase);
   } catch (error) {

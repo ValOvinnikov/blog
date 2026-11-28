@@ -2219,7 +2219,8 @@
     "columnActions": "Aktionen",
     "addedByUnknown": "Unbekannt",
     "empty": "Es ist nichts gesperrt.",
-    "regionLabel": "Gesperrte Registrierungen"
+    "regionLabel": "Gesperrte Registrierungen",
+    "fromSuspension": "Aus Sperrung {reference} von <tenant>{tenantName}</tenant>"
   },
   "blockedSignupKindLabel": {
     "ADDRESS": "E-Mail-Adresse",
@@ -2237,7 +2238,7 @@
   },
   "newsletterPauseCard": {
     "title": "Newsletter pausiert",
-    "pausedSince": "Neue Beiträge werden nicht an Abonnenten gesendet. Pausiert seit <time>{date}</time>.",
+    "pausedSince": "Zu viele E-Mails waren unzustellbar oder wurden als Spam markiert, daher werden neue Beiträge nicht an Abonnenten gesendet. Pausiert seit <time>{date}</time>.",
     "openDialogButton": "Pause aufheben",
     "dialogTitle": "Newsletter-Pause aufheben?",
     "dialogDescription": "Neue Beiträge werden wieder an Abonnenten gesendet. Sind die Bounce- oder Beschwerderaten weiterhin zu hoch, pausiert der nächste Versand den Newsletter erneut.",
@@ -2637,8 +2638,8 @@
       "largestBand": "Sie sind in der größten Stufe.",
       "operatorPause": {
         "title": "Beitrags-E-Mails sind für diese Website pausiert",
-        "description": "Shinefold hat den E-Mail-Versand von Beiträgen am {date} pausiert. Wenden Sie sich an den Support, um ihn fortzusetzen.",
-        "descriptionUndated": "Shinefold hat den E-Mail-Versand von Beiträgen für diese Website pausiert. Wenden Sie sich an den Support, um ihn fortzusetzen."
+        "description": "Shinefold hat den E-Mail-Versand von Beiträgen am {date} pausiert, weil zu viele E-Mails unzustellbar waren oder als Spam markiert wurden. Wenden Sie sich an den Support, um ihn fortzusetzen.",
+        "descriptionUndated": "Shinefold hat den E-Mail-Versand von Beiträgen für diese Website pausiert, weil zu viele E-Mails unzustellbar waren oder als Spam markiert wurden. Wenden Sie sich an den Support, um ihn fortzusetzen."
       },
       "bandPaused": {
         "title": "Neue Beiträge werden nicht gemailt",

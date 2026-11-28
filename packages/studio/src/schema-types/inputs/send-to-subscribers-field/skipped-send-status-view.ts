@@ -12,7 +12,7 @@ import type {
 } from '@shinefold/studio/schema-types/inputs/send-to-subscribers-field/send-status-types';
 import { SITE_SUSPENDED } from '@shinefold/studio/schema-types/inputs/send-to-subscribers-field/send-switch-view';
 
-const NOT_EMAILED = 'Not emailed';
+export const NOT_EMAILED = 'Not emailed';
 const OPEN_SUBSCRIBERS: TSendStatusLink = {
   href: routes.dashboardSubscribers(),
   label: 'Open Subscribers',

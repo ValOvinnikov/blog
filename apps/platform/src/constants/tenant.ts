@@ -88,6 +88,7 @@ export const TENANT_LOG = {
   SIGN_IN_OWNER_LOOKUP_FAILED: 'tenant.sign_in_owner_lookup_failed',
   SUSPENSION_AUDIT_FAILED: 'tenant.suspension_audit_failed',
   SUSPENSION_BLOCK_FAILED: 'tenant.suspension_block_failed',
+  SUSPENSION_BLOCK_LIFT_FAILED: 'tenant.suspension_block_lift_failed',
   SUSPENSION_BLOCK_UNDO_FAILED: 'tenant.suspension_block_undo_failed',
   SUSPENSION_CASE_DISCARD_FAILED: 'tenant.suspension_case_discard_failed',
   SUSPENSION_CASE_REOPEN_FAILED: 'tenant.suspension_case_reopen_failed',

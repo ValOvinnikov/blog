@@ -14,6 +14,7 @@ export const NEWSLETTER_SEND_STATUS = {
   SENDING: 'SENDING',
   SENT: 'SENT',
   SKIPPED: 'SKIPPED',
+  FAILED: 'FAILED',
 } as const;
 
 export type TNewsletterSendStatus = TValueOf<typeof NEWSLETTER_SEND_STATUS>;
@@ -86,6 +87,11 @@ export type TNewsletterPostSendState =
       status: typeof NEWSLETTER_SEND_STATUS.SENT;
       recipients: number;
       settledAt: string;
+    }
+  | {
+      status: typeof NEWSLETTER_SEND_STATUS.FAILED;
+      sent: number;
+      recipients?: number;
     }
   | {
       status: typeof NEWSLETTER_SEND_STATUS.SKIPPED;

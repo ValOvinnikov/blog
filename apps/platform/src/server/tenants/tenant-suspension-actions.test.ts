@@ -50,6 +50,7 @@ const {
   getTenantOwnerEmailMock,
   saveSignupBlockMock,
   recordSignupBlockAddedMock,
+  recordOwnerBlockRemovedMock,
   removeBlockedIdentityMock,
   recordAuditEventMock,
   openTenantSuspensionMock,
@@ -62,6 +63,7 @@ const {
   getTenantOwnerEmailMock: vi.fn(),
   saveSignupBlockMock: vi.fn(),
   recordSignupBlockAddedMock: vi.fn(),
+  recordOwnerBlockRemovedMock: vi.fn(),
   removeBlockedIdentityMock: vi.fn(),
   recordAuditEventMock: vi.fn(),
   openTenantSuspensionMock: vi.fn(),
@@ -82,6 +84,7 @@ vi.mock('@platform/server/signup-block/add-signup-block', () => ({
 
 vi.mock('@platform/server/signup-block/signup-block-audit', () => ({
   recordSignupBlockAdded: recordSignupBlockAddedMock,
+  recordOwnerBlockRemoved: recordOwnerBlockRemovedMock,
 }));
 
 vi.mock('@platform/server/auth/require-super-admin');
@@ -134,6 +137,10 @@ const MOCK_ARCHIVED_AT = faker.date.past();
 const ACTIVE_TENANT = mockTenant();
 const SUSPENDED_TENANT = { ...ACTIVE_TENANT, status: TENANT_STATUS.SUSPENDED };
 const OPENED_CASE = mockTenantSuspension({ tenantId: ACTIVE_TENANT.id });
+const BLOCKING_CASE = mockTenantSuspension({
+  tenantId: ACTIVE_TENANT.id,
+  ownerBlockId: MOCK_BLOCKED_ADDRESS_ENTRY_ID,
+});
 const CASE_DETAILS = {
   name: ACTIVE_TENANT.name,
   reference: OPENED_CASE.reference,
@@ -172,6 +179,7 @@ describe('tenant suspension actions', () => {
         okResult({ entry: mockBlockedAddressIdentity(), created: true }),
       );
     recordSignupBlockAddedMock.mockReset();
+    recordOwnerBlockRemovedMock.mockReset();
     removeBlockedIdentityMock.mockReset().mockResolvedValue(okResult());
     vi.mocked(logger.error).mockReset();
     recordAuditEventMock.mockReset();
@@ -299,6 +307,68 @@ describe('tenant suspension actions', () => {
           expect(notifyOwnerOfSuspensionMock).not.toHaveBeenCalled();
         },
       );
+
+      it('removes no sign-up block when the case added none', async () => {
+        await liftTenantSuspensionAction(ACTIVE_TENANT.id);
+
+        expect(removeBlockedIdentityMock).not.toHaveBeenCalled();
+      });
+
+      describe('that blocked the owner email', () => {
+        beforeEach(() => {
+          closeTenantSuspensionMock.mockResolvedValue(BLOCKING_CASE);
+        });
+
+        it('removes the block the suspension added and audits the removal', async () => {
+          const result = await liftTenantSuspensionAction(ACTIVE_TENANT.id);
+
+          expect(result).toEqual({ outcome: ACTION_OUTCOME.SUCCESS });
+          expect(removeBlockedIdentityMock).toHaveBeenCalledExactlyOnceWith(
+            MOCK_BLOCKED_ADDRESS_ENTRY_ID,
+          );
+          expect(recordOwnerBlockRemovedMock).toHaveBeenCalledExactlyOnceWith(
+            MOCK_BLOCKED_ADDRESS_ENTRY_ID,
+            ACTIVE_TENANT.id,
+          );
+        });
+
+        it('audits nothing when an operator already removed the block', async () => {
+          removeBlockedIdentityMock.mockResolvedValue(
+            errorResult(ERROR_CODE.DB_NOT_FOUND),
+          );
+
+          await liftTenantSuspensionAction(ACTIVE_TENANT.id);
+
+          expect(recordOwnerBlockRemovedMock).not.toHaveBeenCalled();
+          expect(logger.error).not.toHaveBeenCalled();
+        });
+
+        it('still lifts the suspension and logs when the block cannot be removed', async () => {
+          removeBlockedIdentityMock.mockRejectedValue(MOCK_DB_ERROR);
+
+          const result = await liftTenantSuspensionAction(ACTIVE_TENANT.id);
+
+          expect(result).toEqual({ outcome: ACTION_OUTCOME.SUCCESS });
+          expect(logger.error).toHaveBeenCalledWith(
+            TENANT_LOG.SUSPENSION_BLOCK_LIFT_FAILED,
+            expect.objectContaining({
+              tenantId: ACTIVE_TENANT.id,
+              entryId: MOCK_BLOCKED_ADDRESS_ENTRY_ID,
+            }),
+          );
+        });
+
+        it.each(FAILED_STATUS_CHANGES)(
+          'keeps the block when the lift %s',
+          async (_, failLift) => {
+            failLift();
+
+            await liftTenantSuspensionAction(ACTIVE_TENANT.id);
+
+            expect(removeBlockedIdentityMock).not.toHaveBeenCalled();
+          },
+        );
+      });
 
       it('keeps the case closed when only the cache purge fails', async () => {
         revalidateSiteConfigMock.mockRejectedValue(MOCK_CACHE_ERROR);
@@ -451,6 +521,16 @@ describe('tenant suspension actions', () => {
       expect(result).toEqual({ outcome: ACTION_OUTCOME.SUCCESS });
     });
 
+    it('links the suspension to the block it created', async () => {
+      await suspendWithBlock();
+
+      expect(openTenantSuspensionMock).toHaveBeenCalledWith(
+        expect.objectContaining({
+          ownerBlockId: MOCK_BLOCKED_ADDRESS_ENTRY_ID,
+        }),
+      );
+    });
+
     it('trims the reason before storing it', async () => {
       await suspendTenantAction(ACTIVE_TENANT.id, MOCK_SUSPENSION_CASE, {
         reason: `  ${MOCK_BLOCK_REASON}  `,
@@ -459,13 +539,16 @@ describe('tenant suspension actions', () => {
       expect(saveSignupBlockMock).toHaveBeenCalledWith(SAVED_BLOCK);
     });
 
-    it('does not audit a block that was already on the list', async () => {
+    it('neither audits nor links a block that was already on the list', async () => {
       saveSignupBlockMock.mockResolvedValue(
         okResult({ entry: mockBlockedAddressIdentity(), created: false }),
       );
 
       const result = await suspendWithBlock();
 
+      expect(openTenantSuspensionMock).toHaveBeenCalledWith(
+        expect.objectContaining({ ownerBlockId: undefined }),
+      );
       expect(recordSignupBlockAddedMock).not.toHaveBeenCalled();
       expect(result).toEqual({ outcome: ACTION_OUTCOME.SUCCESS });
     });

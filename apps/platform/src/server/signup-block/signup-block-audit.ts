@@ -22,7 +22,7 @@ type TSignupBlockAuditEntry = Pick<
 type TBlockAuditEvent = {
   logEvent: string;
   action: TAuditAction;
-  entry: TSignupBlockAuditEntry;
+  entryId: string;
   details: Record<string, unknown>;
   tenantId: TMaybeUndefined<string>;
 };
@@ -38,7 +38,7 @@ const signupBlockAuditDetails = ({ kind, value }: TSignupBlockAuditEntry) => ({
 const recordOnBlockAndTenant = async ({
   logEvent,
   action,
-  entry,
+  entryId,
   details,
   tenantId,
 }: TBlockAuditEvent): Promise<void> => {
@@ -46,7 +46,7 @@ const recordOnBlockAndTenant = async ({
     logEvent,
     action,
     targetType: AUDIT_TARGET_TYPE.BLOCKED_SIGNUP_IDENTITY,
-    targetId: entry.id,
+    targetId: entryId,
     details: tenantId ? { ...details, tenantId } : details,
   });
 
@@ -91,7 +91,7 @@ export const recordSignupBlockAdded = async (
   await recordOnBlockAndTenant({
     logEvent: SIGNUP_BLOCK_LOG.ADD_AUDIT_FAILED,
     action: AUDIT_ACTION.SIGNUP_BLOCK_ADDED,
-    entry,
+    entryId: entry.id,
     details: { ...signupBlockAuditDetails(entry), reason },
     tenantId,
   });
@@ -103,8 +103,21 @@ export const recordSignupBlockRemoved = async (
   await recordOnBlockAndTenant({
     logEvent: SIGNUP_BLOCK_LOG.REMOVE_AUDIT_FAILED,
     action: AUDIT_ACTION.SIGNUP_BLOCK_REMOVED,
-    entry,
+    entryId: entry.id,
     details: signupBlockAuditDetails(entry),
     tenantId: await findBlockTenantId(entry.id),
+  });
+};
+
+export const recordOwnerBlockRemoved = async (
+  entryId: string,
+  tenantId: string,
+): Promise<void> => {
+  await recordOnBlockAndTenant({
+    logEvent: SIGNUP_BLOCK_LOG.REMOVE_AUDIT_FAILED,
+    action: AUDIT_ACTION.SIGNUP_BLOCK_REMOVED,
+    entryId,
+    details: { kind: BLOCKED_IDENTITY_KIND.ADDRESS },
+    tenantId,
   });
 };

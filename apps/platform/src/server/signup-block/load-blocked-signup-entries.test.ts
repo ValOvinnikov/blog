@@ -2,6 +2,7 @@ import {
   MOCK_BLOCK_AUTHOR_EMAIL,
   MOCK_BLOCKED_ADDRESS_HASH,
   MOCK_BLOCKED_ADDRESS_HASH_PREVIEW,
+  MOCK_BLOCKING_SUSPENSION,
   mockBlockedIdentityListing,
 } from '@platform/testing/blocked-signups/fixtures';
 import { mockDbConstants } from '@platform/testing/mock-db-constants';
@@ -43,8 +44,21 @@ describe(loadBlockedSignupEntries, () => {
         reason: listing.reason,
         createdAt: listing.createdAt,
         addedBy: MOCK_BLOCK_AUTHOR_EMAIL,
+        suspension: null,
       },
     ]);
+  });
+
+  it('names the suspension and site an owner block came from', async () => {
+    listBlockedIdentitiesMock.mockResolvedValue(
+      okResult([
+        mockBlockedIdentityListing({ suspension: MOCK_BLOCKING_SUSPENSION }),
+      ]),
+    );
+
+    const [entry] = await loadBlockedSignupEntries();
+
+    expect(entry?.suspension).toEqual(MOCK_BLOCKING_SUSPENSION);
   });
 
   it('shows only the start of an address hash', async () => {

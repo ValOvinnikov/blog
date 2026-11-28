@@ -20,8 +20,10 @@ import type { TTenantPlan } from '@shinefold/config/constants';
 import {
   queries,
   TENANT_PLAN_WRITE_OUTCOME,
+  TENANT_STATUS,
   WRITABLE_TENANT_STATUSES,
 } from '@shinefold/db';
+import type { TTenant } from '@shinefold/db/schema/tenants';
 import { isOneOf } from '@shinefold/utils/primitives';
 import type Stripe from 'stripe';
 
@@ -32,6 +34,15 @@ export type TSyncedSubscription = {
 };
 
 const SUBSCRIPTION_EXPAND = ['discounts.promotion_code'];
+
+// Suspending a paying site pauses its collection, and Stripe echoes that pause back here.
+const isSuspensionPauseEcho = (
+  { status }: Pick<TTenant, 'status'>,
+  subscription: Stripe.Subscription,
+): boolean =>
+  status === TENANT_STATUS.SUSPENDED &&
+  !!subscription.pause_collection &&
+  isOneOf(STRIPE_LIVE_SUBSCRIPTION_STATUSES, subscription.status);
 
 const isSupersededBy = (
   storedSubscriptionId: TMaybeUndefined<string>,
@@ -88,7 +99,9 @@ export const syncStripeSubscription = async (
 
   const notWritable = { tenantId, subscriptionId, status: tenant.status };
   if (!isOneOf(WRITABLE_TENANT_STATUSES, tenant.status)) {
-    logger.warn(BILLING_LOG.TENANT_NOT_WRITABLE, notWritable);
+    if (!isSuspensionPauseEcho(tenant, subscription)) {
+      logger.warn(BILLING_LOG.TENANT_NOT_WRITABLE, notWritable);
+    }
     return undefined;
   }
 

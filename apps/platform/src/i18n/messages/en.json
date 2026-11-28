@@ -2219,7 +2219,8 @@
     "columnActions": "Actions",
     "addedByUnknown": "Unknown",
     "empty": "Nothing is blocked.",
-    "regionLabel": "Blocked sign-ups"
+    "regionLabel": "Blocked sign-ups",
+    "fromSuspension": "From suspension {reference} of <tenant>{tenantName}</tenant>"
   },
   "blockedSignupKindLabel": {
     "ADDRESS": "Email address",
@@ -2237,7 +2238,7 @@
   },
   "newsletterPauseCard": {
     "title": "Newsletter paused",
-    "pausedSince": "New posts aren't emailed to subscribers. Paused since <time>{date}</time>.",
+    "pausedSince": "Too many emails bounced or were marked as spam, so new posts aren't emailed to subscribers. Paused since <time>{date}</time>.",
     "openDialogButton": "Clear pause",
     "dialogTitle": "Clear the newsletter pause?",
     "dialogDescription": "New posts are emailed to subscribers again. If bounce or complaint rates are still too high, the next send pauses the newsletter again.",
@@ -2637,8 +2638,8 @@
       "largestBand": "You're on the largest band.",
       "operatorPause": {
         "title": "Post emails are paused for this site",
-        "description": "Shinefold paused emailing posts on {date}. Contact support to resume.",
-        "descriptionUndated": "Shinefold paused emailing posts for this site. Contact support to resume."
+        "description": "Shinefold paused emailing posts on {date} because too many emails bounced or were marked as spam. Contact support to resume.",
+        "descriptionUndated": "Shinefold paused emailing posts for this site because too many emails bounced or were marked as spam. Contact support to resume."
       },
       "bandPaused": {
         "title": "New posts aren't being emailed",

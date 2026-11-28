@@ -9,6 +9,7 @@ import {
   MOCK_EARLIER_CLAIMED_AT,
   MOCK_LATER,
   MOCK_POST_SEND_START,
+  MOCK_SKIP_DETAILS,
   mockNewsletterPostSend,
 } from '@shinefold/db/testing/newsletter-post-sends/fixtures';
 
@@ -88,22 +89,59 @@ describe(toNewsletterPostSendState, () => {
     });
   });
 
-  it('gives a band skip the band it passed', () => {
-    const claim = mockNewsletterPostSend({
+  describe('for a band skip', () => {
+    const bandSkip = {
       outcome: NEWSLETTER_POST_SEND_OUTCOME.SKIPPED,
       skipReason: NEWSLETTER_SKIP_REASON.OVER_SUBSCRIBER_BAND,
+    } as const;
+
+    it('names the band the skip was measured against, not the site’s current band', () => {
+      const claim = mockNewsletterPostSend({
+        ...bandSkip,
+        bandCeiling: MOCK_SKIP_DETAILS.bandCeiling,
+      });
+
+      expect(
+        toNewsletterPostSendState(
+          claim,
+          MOCK_NEWSLETTER_LIMITS.bandCeiling,
+          MOCK_NOW,
+        ),
+      ).toEqual({
+        status: NEWSLETTER_SEND_STATUS.SKIPPED,
+        skipReason: bandSkip.skipReason,
+        bandCeiling: MOCK_SKIP_DETAILS.bandCeiling,
+      });
     });
 
-    expect(
-      toNewsletterPostSendState(
-        claim,
-        MOCK_NEWSLETTER_LIMITS.bandCeiling,
-        MOCK_NOW,
-      ),
-    ).toEqual({
-      status: NEWSLETTER_SEND_STATUS.SKIPPED,
-      skipReason: NEWSLETTER_SKIP_REASON.OVER_SUBSCRIBER_BAND,
-      bandCeiling: MOCK_NEWSLETTER_LIMITS.bandCeiling,
+    it('falls back to the site’s band for a skip that recorded none', () => {
+      const claim = mockNewsletterPostSend(bandSkip);
+
+      expect(
+        toNewsletterPostSendState(
+          claim,
+          MOCK_NEWSLETTER_LIMITS.bandCeiling,
+          MOCK_NOW,
+        ),
+      ).toEqual({
+        status: NEWSLETTER_SEND_STATUS.SKIPPED,
+        skipReason: bandSkip.skipReason,
+        bandCeiling: MOCK_NEWSLETTER_LIMITS.bandCeiling,
+      });
+    });
+  });
+
+  it('reports a failed run with how far it got', () => {
+    const claim = mockNewsletterPostSend({
+      outcome: NEWSLETTER_POST_SEND_OUTCOME.FAILED,
+      recipientCount,
+      sentCount: MOCK_SENT_COUNT,
+    });
+
+    expect(toNewsletterPostSendState(claim, undefined, MOCK_NOW)).toEqual({
+      status: NEWSLETTER_SEND_STATUS.FAILED,
+      sent: MOCK_SENT_COUNT,
+      recipients: recipientCount,
     });
   });
 });

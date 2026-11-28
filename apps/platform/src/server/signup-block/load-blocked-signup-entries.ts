@@ -6,7 +6,10 @@ import {
   queries,
   type TBlockedIdentityKind,
 } from '@shinefold/db';
-import type { TBlockedIdentityListing } from '@shinefold/db/queries/blocked-signup-identities/list-blocked-identities';
+import type {
+  TBlockedIdentityListing,
+  TBlockingSuspension,
+} from '@shinefold/db/queries/blocked-signup-identities/list-blocked-identities';
 
 const HASH_PREVIEW_LENGTH = 12;
 
@@ -17,6 +20,7 @@ export type TBlockedSignupEntry = {
   reason: string;
   createdAt: Date;
   addedBy: TMaybeNull<string>;
+  suspension: TMaybeNull<TBlockingSuspension>;
 };
 
 const toDisplayValue = ({ kind, value }: TBlockedIdentityListing): string =>
@@ -39,5 +43,6 @@ export const loadBlockedSignupEntries = async (): Promise<
     reason: entry.reason,
     createdAt: entry.createdAt,
     addedBy: entry.addedByEmail,
+    suspension: entry.suspension,
   }));
 };

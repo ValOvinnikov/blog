@@ -1,6 +1,14 @@
 import type { TBlockedSignupEntry } from '@platform/server/signup-block/load-blocked-signup-entries';
+import { MOCK_SUSPENSION_REFERENCE } from '@platform/testing/tenant-suspensions/fixtures';
+import {
+  MOCK_TENANT_ID,
+  MOCK_TENANT_NAME,
+} from '@platform/testing/tenants/tenant-identity';
 import { BLOCKED_IDENTITY_KIND } from '@shinefold/db/constants';
-import type { TBlockedIdentityListing } from '@shinefold/db/queries/blocked-signup-identities/list-blocked-identities';
+import type {
+  TBlockedIdentityListing,
+  TBlockingSuspension,
+} from '@shinefold/db/queries/blocked-signup-identities/list-blocked-identities';
 import type { TBlockedSignupIdentity } from '@shinefold/db/schema/blocked-signup-identities';
 
 export const MOCK_BLOCKED_DOMAIN = 'blocklist-spam.example';
@@ -13,6 +21,12 @@ export const MOCK_BLOCK_AUTHOR_EMAIL = 'blocklist-ops@example.com';
 export const MOCK_BLOCKED_OWNER_EMAIL = 'blocked-owner@example.com';
 
 const BLOCKED_AT = new Date(Date.UTC(2026, 4, 6));
+
+export const MOCK_BLOCKING_SUSPENSION = {
+  reference: MOCK_SUSPENSION_REFERENCE,
+  tenantId: MOCK_TENANT_ID,
+  tenantName: MOCK_TENANT_NAME,
+} as const satisfies TBlockingSuspension;
 
 export const mockBlockedIdentity = (
   overrides: Partial<TBlockedSignupIdentity> = {},
@@ -44,6 +58,7 @@ export const mockBlockedSignupEntry = (
   reason: MOCK_BLOCK_REASON,
   createdAt: BLOCKED_AT,
   addedBy: MOCK_BLOCK_AUTHOR_EMAIL,
+  suspension: null,
   ...overrides,
 });
 

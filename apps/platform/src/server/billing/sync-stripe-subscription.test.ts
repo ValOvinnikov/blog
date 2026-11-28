@@ -339,6 +339,40 @@ describe(syncStripeSubscription, () => {
     },
   );
 
+  describe('for a suspended tenant whose collection the suspension paused', () => {
+    beforeEach(() => {
+      getTenantByIdMock.mockResolvedValue(
+        mockTenant({ status: TENANT_STATUS.SUSPENDED }),
+      );
+    });
+
+    it('writes nothing and logs no warning for the echo of that pause', async () => {
+      retrieveSubscriptionMock.mockResolvedValue(
+        mockStripeSubscription({ isCollectionPaused: true }),
+      );
+
+      expect(await sync()).toBeUndefined();
+      expect(setTenantBillingMock).not.toHaveBeenCalled();
+      expect(logger.warn).not.toHaveBeenCalled();
+    });
+
+    it('still warns when the paused subscription has ended', async () => {
+      retrieveSubscriptionMock.mockResolvedValue(
+        mockStripeSubscription({
+          isCollectionPaused: true,
+          status: STRIPE_SUBSCRIPTION_STATUS.CANCELED,
+        }),
+      );
+
+      await sync();
+
+      expect(logger.warn).toHaveBeenCalledWith(
+        BILLING_LOG.TENANT_NOT_WRITABLE,
+        expect.objectContaining({ status: TENANT_STATUS.SUSPENDED }),
+      );
+    });
+  });
+
   it('reports nothing when the plan write finds the tenant no longer writable', async () => {
     setTenantPlanMock.mockResolvedValue({
       outcome: TENANT_PLAN_WRITE_OUTCOME.NOT_WRITABLE,
