@@ -221,6 +221,31 @@ describe(`<${PricingModule.name}/>`, () => {
       });
     });
 
+    describe('with the plan comparison switched off', () => {
+      beforeEach(async () => {
+        getPricingModuleMock.mockResolvedValue(
+          okResult({ ...MOCK_LINKED_MODULE, showPlanComparison: false }),
+        );
+        await setup();
+      });
+
+      it("still shows the tier's live price from the catalogue", () => {
+        const price = screen.getByText(
+          formatMockUnitAmount(MOCK_DOLLAR_AMOUNT, mockStripePrice().currency),
+        );
+
+        expect(price).toBeVisible();
+      });
+
+      it('shows no plan comparison', () => {
+        const table = screen.queryByRole('region', {
+          name: SITE_MESSAGES.pricingModule.compare.heading,
+        });
+
+        expect(table).not.toBeInTheDocument();
+      });
+    });
+
     it('logs and still renders the tier when the plan prices fail', async () => {
       vi.mocked(getPlanPrices).mockResolvedValue(errorResult(MOCK_ERROR));
 
