@@ -7,7 +7,10 @@ import {
   RADIUS_SCALE,
   type TMaybeUndefined,
 } from '@shinefold/config';
-import type { ISectionProps } from '@web/components/shared/section';
+import type {
+  ISectionProps,
+  TModuleSection,
+} from '@web/components/shared/section';
 import type { TSectionAppearance } from '@web/utils/build-section-scope-declarations';
 import type { TSectionStyleOverrides } from '@web/utils/gate-section-style-overrides';
 
@@ -20,6 +23,10 @@ export const MOCK_SECTION_STYLE_OVERRIDES: TSectionStyleOverrides = {
   cardStyle: CARD_STYLE.OUTLINED,
   radiusScale: RADIUS_SCALE.XL,
   density: DENSITY.COMPACT,
+};
+
+export const MOCK_PRIMARY_SECTION: TModuleSection = {
+  brandVariant: BRAND_VARIANT.PRIMARY,
 };
 
 export const MOCK_SCOPED_RADIUS_TOKEN = '--radius-md';

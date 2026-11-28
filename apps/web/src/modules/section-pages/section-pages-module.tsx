@@ -3,6 +3,7 @@ import { hasLength } from '@shinefold/utils/primitives';
 import { SECTION_PAGES_LOG } from '@web/constants/section-pages';
 import type { TModuleComponentProps } from '@web/modules/module-renderer';
 import { getRequestContext } from '@web/server/request-context/request-context';
+import { getModuleSection } from '@web/server/site-config/get-module-section/get-module-section';
 import { logger } from '@web/utils/logger/logger';
 
 import { SectionPagesModuleView } from './section-pages-module-view';
@@ -19,7 +20,7 @@ export const SectionPagesModule = async ({
     return null;
   }
 
-  const { sanityContext } = await getRequestContext();
+  const { sanityContext, tenantId } = await getRequestContext();
   const result = await service.modules.sectionPages.v1.getSectionPagesModule(
     id,
     landingPage.id,
@@ -38,9 +39,12 @@ export const SectionPagesModule = async ({
 
   if (!hasLength(result.data.pages)) return null;
 
+  const { section, content } = await getModuleSection(tenantId, result.data);
+
   return (
     <SectionPagesModuleView
-      {...result.data}
+      {...content}
+      section={section}
       titleId={`section-pages-${id}`}
       dataTestId={`section-pages-module-${id}`}
     />

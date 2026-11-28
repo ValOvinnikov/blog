@@ -1,5 +1,6 @@
 import { faker } from '@faker-js/faker';
 import { errorResult, okResult } from '@shinefold/utils';
+import { getSectionAppearance } from '@web/server/site-config/get-section-appearance/get-section-appearance';
 import { customRenderAsync, screen } from '@web/testing/custom-render';
 import {
   MOCK_SECTION_PAGE_PATH,
@@ -7,7 +8,11 @@ import {
   mockSectionPagesModule,
 } from '@web/testing/modules/section-pages/fixtures';
 import { MOCK_ERROR } from '@web/testing/shared/error/fixtures';
-import { MOCK_TENANT_SANITY_CONTEXT } from '@web/testing/shared/tenant/fixtures';
+import { MOCK_SECTION_STYLE_OVERRIDE_CASES } from '@web/testing/shared/section-appearance/fixtures';
+import {
+  MOCK_REQUEST_CONTEXT,
+  MOCK_TENANT_SANITY_CONTEXT,
+} from '@web/testing/shared/tenant/fixtures';
 import { logger } from '@web/utils/logger/logger';
 
 import { SectionPagesModule } from './section-pages-module';
@@ -27,6 +32,10 @@ vi.mock('@shinefold/service', () => ({
 }));
 
 vi.mock('@web/server/request-context/request-context');
+
+vi.mock(
+  '@web/server/site-config/get-section-appearance/get-section-appearance',
+);
 
 faker.seed(42);
 
@@ -69,6 +78,22 @@ describe(`<${SectionPagesModule.name}/>`, () => {
       expect(link).toHaveAttribute('href', `/${MOCK_SECTION_PAGE_PATH}`);
     });
   });
+
+  it.each(MOCK_SECTION_STYLE_OVERRIDE_CASES)(
+    'scopes the section to $title',
+    async ({ overrides }) => {
+      getSectionPagesModuleMock.mockResolvedValue(
+        okResult(mockSectionPagesModule(overrides)),
+      );
+
+      await setup();
+
+      expect(vi.mocked(getSectionAppearance)).toHaveBeenCalledWith(
+        MOCK_REQUEST_CONTEXT.tenantId,
+        overrides,
+      );
+    },
+  );
 
   it('renders nothing when the page has no children', async () => {
     getSectionPagesModuleMock.mockResolvedValue(

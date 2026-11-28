@@ -1,5 +1,6 @@
 import { BRAND_VARIANT } from '@shinefold/config';
 import type { TSectionPageCard, TSectionPagesModule } from '@shinefold/service';
+import type { TSectionPagesModuleContent } from '@web/modules/section-pages/section-pages-module-view';
 import { mockHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
 
 export const MOCK_SECTION_PAGE_TITLE = 'FAQ';
@@ -19,13 +20,21 @@ export const mockSectionPageCard = (
   ...overrides,
 });
 
-export const mockSectionPagesModule = (
-  overrides: Partial<TSectionPagesModule> = {},
-): TSectionPagesModule => ({
-  brandVariant: BRAND_VARIANT.PRIMARY,
+export const mockSectionPagesContent = (
+  overrides: Partial<TSectionPagesModuleContent> = {},
+): TSectionPagesModuleContent => ({
   headingBlock: mockHeadingBlock({ heading: MOCK_SECTION_PAGES_HEADING }),
   pages: [mockSectionPageCard()],
   contentAlignment: undefined,
+  columns: undefined,
+  ...overrides,
+});
+
+export const mockSectionPagesModule = (
+  overrides: Partial<TSectionPagesModule> = {},
+): TSectionPagesModule => ({
+  ...mockSectionPagesContent(),
+  brandVariant: BRAND_VARIANT.PRIMARY,
   layout: undefined,
   ...overrides,
 });
