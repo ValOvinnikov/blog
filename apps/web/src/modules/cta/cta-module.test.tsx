@@ -1,11 +1,18 @@
 import { errorResult, okResult } from '@shinefold/utils';
+import { CTA_LOG } from '@web/constants/cta';
+import { getSectionAppearance } from '@web/server/site-config/get-section-appearance/get-section-appearance';
 import { customRenderAsync, screen } from '@web/testing/custom-render';
 import {
   MOCK_CTA_MODULE_ID,
   mockCtaModuleData,
 } from '@web/testing/modules/cta/fixtures';
 import { MOCK_ERROR } from '@web/testing/shared/error/fixtures';
-import { MOCK_TENANT_SANITY_CONTEXT } from '@web/testing/shared/tenant/fixtures';
+import { MOCK_SECTION_STYLE_OVERRIDE_CASES } from '@web/testing/shared/section-appearance/fixtures';
+import {
+  MOCK_REQUEST_CONTEXT,
+  MOCK_TENANT_SANITY_CONTEXT,
+} from '@web/testing/shared/tenant/fixtures';
+import { logger } from '@web/utils/logger/logger';
 
 import { CtaModule } from './cta-module';
 
@@ -22,6 +29,10 @@ vi.mock('@shinefold/service', () => ({
 }));
 
 vi.mock('@web/server/request-context/request-context');
+
+vi.mock(
+  '@web/server/site-config/get-section-appearance/get-section-appearance',
+);
 
 const MOCK_CTA_MODULE = mockCtaModuleData();
 
@@ -52,11 +63,29 @@ describe(`<${CtaModule.name}/>`, () => {
     });
   });
 
-  it('renders nothing when the fetch fails', async () => {
+  it.each(MOCK_SECTION_STYLE_OVERRIDE_CASES)(
+    'scopes the section to $title',
+    async ({ overrides }) => {
+      getCtaMock.mockResolvedValue(okResult(mockCtaModuleData(overrides)));
+
+      await setup();
+
+      expect(vi.mocked(getSectionAppearance)).toHaveBeenCalledWith(
+        MOCK_REQUEST_CONTEXT.tenantId,
+        overrides,
+      );
+    },
+  );
+
+  it('logs and renders nothing when the fetch fails', async () => {
     getCtaMock.mockResolvedValue(errorResult(MOCK_ERROR));
 
     const { container } = await setup();
 
     expect(container).toBeEmptyDOMElement();
+    expect(vi.mocked(logger.error)).toHaveBeenCalledWith(
+      CTA_LOG.MODULE_FETCH_FAILED,
+      { id: MOCK_CTA_MODULE_ID, error: MOCK_ERROR },
+    );
   });
 });

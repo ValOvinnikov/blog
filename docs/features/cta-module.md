@@ -43,8 +43,8 @@ The same "Actions" building block — `ctaButtons`, rendered by `ActionGroup` �
 ## Configuration
 
 - **Editors** author every field in Studio. Text, image alt and footnote are per language.
-- **Look** reaches the module through tokens (card padding, fonts, accent, density's band spacing). Card style frames the Callout and Split box like every item card — outline, accent bar, shadow and corners (which follow the radius scale) — while its background stays the band variant's Plain, Shaded or Brand tint; Banner has no box. Voice does not reach CTA copy.
-- **Plans:** not gated; every plan can place it.
+- **Look** reaches the module through tokens (card padding, fonts, accent, density's band spacing). Card style frames the Callout and Split box like every item card — outline, accent bar, shadow and corners (which follow the radius scale) — while its background stays the band variant's Plain, Shaded or Brand tint; Banner has no box. On a plan with the Look entitlement, the module's card style, corners and density overrides win over the Look for its own band only, through the shared section appearance (`getSectionAppearance`), so other cards on the page keep the site's style; without it the stored overrides are ignored. Voice does not reach CTA copy.
+- **Plans:** not gated; every plan can place it. Its card overrides are gated by the Look entitlement ([plans-and-entitlements](./plans-and-entitlements.md)).
 
 ## Constraints and invariants
 

@@ -1,6 +1,7 @@
 import { service } from '@shinefold/service';
 import { CTA_LOG } from '@web/constants/cta';
 import { getRequestContext } from '@web/server/request-context/request-context';
+import { getSectionAppearance } from '@web/server/site-config/get-section-appearance/get-section-appearance';
 import { logger } from '@web/utils/logger/logger';
 
 import { CtaModuleView } from './cta-module-view';
@@ -10,7 +11,7 @@ export interface ICtaModuleProps {
 }
 
 export const CtaModule = async ({ id }: ICtaModuleProps) => {
-  const { sanityContext } = await getRequestContext();
+  const { sanityContext, tenantId } = await getRequestContext();
   const result = await service.modules.cta.v1.getCta(id, sanityContext);
 
   if (!result.ok) {
@@ -18,5 +19,12 @@ export const CtaModule = async ({ id }: ICtaModuleProps) => {
     return null;
   }
 
-  return <CtaModuleView id={id} module={result.data} />;
+  const { cardStyle, radiusScale, density } = result.data;
+  const appearance = await getSectionAppearance(tenantId, {
+    cardStyle,
+    radiusScale,
+    density,
+  });
+
+  return <CtaModuleView id={id} module={result.data} appearance={appearance} />;
 };

@@ -14,6 +14,10 @@ import {
   mockCtaModuleData,
 } from '@web/testing/modules/cta/fixtures';
 import { mockHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
+import {
+  MOCK_RADIUS_SCOPE_CASES,
+  MOCK_SCOPED_RADIUS_TOKEN,
+} from '@web/testing/shared/section-appearance/fixtures';
 
 import { CtaModuleView } from './cta-module-view';
 
@@ -27,6 +31,19 @@ const setup = customRender(CtaModuleView, {
 });
 
 describe(`<${CtaModuleView.name}/>`, () => {
+  it.each(MOCK_RADIUS_SCOPE_CASES)(
+    'scopes the radius token to its section $title an override',
+    ({ section: { appearance }, scoped }) => {
+      setup({ appearance });
+
+      const region = screen.getByRole('region', { name: MOCK_CTA_HEADING });
+
+      expect(region.style.getPropertyValue(MOCK_SCOPED_RADIUS_TOKEN)).toBe(
+        scoped,
+      );
+    },
+  );
+
   describe('with the default module data', () => {
     beforeEach(() => {
       setup();

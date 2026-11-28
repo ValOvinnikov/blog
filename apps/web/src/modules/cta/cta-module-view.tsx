@@ -7,14 +7,20 @@ import { PortableText } from '@web/components/shared/portable-text';
 import { SanityImage } from '@web/components/shared/sanity-image';
 import { Section } from '@web/components/shared/section';
 import { BANNER_SECTION_LAYOUT } from '@web/utils/banner-section-layout';
+import type { TSectionAppearance } from '@web/utils/build-section-scope-declarations';
 import { useId } from 'react';
 
 export interface ICtaModuleViewProps {
   id: string;
   module: TCtaModule;
+  appearance?: TSectionAppearance;
 }
 
-export const CtaModuleView = ({ id, module }: ICtaModuleViewProps) => {
+export const CtaModuleView = ({
+  id,
+  module,
+  appearance,
+}: ICtaModuleViewProps) => {
   const titleId = useId();
   const {
     variant,
@@ -71,6 +77,7 @@ export const CtaModuleView = ({ id, module }: ICtaModuleViewProps) => {
     <Section
       brandVariant={isBanner ? BRAND_VARIANT.PRIMARY : bandTone}
       layout={isBanner ? BANNER_SECTION_LAYOUT : layout}
+      appearance={appearance}
       titleId={titleId}
       dataTestId={`cta-module-${id}`}
     >
