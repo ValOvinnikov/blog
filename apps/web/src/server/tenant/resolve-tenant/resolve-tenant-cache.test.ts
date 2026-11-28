@@ -12,13 +12,10 @@ vi.mock(
   'next/cache',
   () => import('@web/testing/server/next-cache/memoizing-next-cache'),
 );
-vi.mock('@shinefold/db', async () => ({
-  ...(await import('@shinefold/db/constants')),
-  queries: {
-    tenantDomains: { getTenantByDomain: vi.fn() },
-    tenants: { listTenants: vi.fn() },
-  },
-}));
+vi.mock(
+  '@shinefold/db',
+  () => import('@web/testing/server/tenant/tenant-resolution-db'),
+);
 
 const MOCK_TENANT = mockServableTenant({ suspendedAt: new Date() });
 

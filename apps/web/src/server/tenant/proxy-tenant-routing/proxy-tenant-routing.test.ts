@@ -19,13 +19,10 @@ faker.seed(4418);
 vi.mock('@web/utils/is-production-environment');
 vi.mock('@web/server/tenant/tenant-live-locales/tenant-live-locales');
 vi.mock('@web/server/tenant/proxy-tenant-cache/proxy-tenant-cache');
-vi.mock('@shinefold/db', async () => ({
-  ...(await import('@shinefold/db/constants')),
-  queries: {
-    tenantDomains: { getTenantByDomain: vi.fn() },
-    tenants: { listTenants: vi.fn() },
-  },
-}));
+vi.mock(
+  '@shinefold/db',
+  () => import('@web/testing/server/tenant/tenant-resolution-db'),
+);
 
 const MOCK_UNKNOWN_HOST = faker.internet.domainName();
 const MOCK_SECONDARY_HOST = faker.internet.domainName();

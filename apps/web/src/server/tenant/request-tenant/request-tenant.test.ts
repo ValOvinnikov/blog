@@ -33,18 +33,10 @@ vi.mock(
   'next/cache',
   () => import('@web/testing/server/next-cache/passthrough-next-cache'),
 );
-vi.mock('@shinefold/db', async () => ({
-  ...(await import('@shinefold/db/constants')),
-  queries: {
-    tenantDomains: { getTenantByDomain: vi.fn() },
-    tenants: {
-      getTenantById: vi.fn(),
-      listTenants: vi.fn(),
-      toTenantSanityCredentials: vi.fn(),
-      toTenantSanityWriteCredentials: vi.fn(),
-    },
-  },
-}));
+vi.mock(
+  '@shinefold/db',
+  () => import('@web/testing/server/tenant/tenant-resolution-db'),
+);
 
 const MOCK_TENANT = mockServableTenant();
 const MOCK_NON_TENANT_SHAPED_SEGMENT = '.well-known';
