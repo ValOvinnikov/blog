@@ -90,10 +90,21 @@ export async function sendOwnerReputationPauseNotice(
   tenant: TTenant,
   pausedAt: Date,
 ): Promise<void> {
-  await deliverOwnerNewsletterNotice(tenant, {
-    kind: NEWSLETTER_LIMIT_NOTICE_KIND.REPUTATION_PAUSED,
-    since: pausedAt,
-    build: (subscribersUrl) =>
-      Promise.resolve(buildOwnerReputationPauseNotice(tenant, subscribersUrl)),
-  });
+  const kind = NEWSLETTER_LIMIT_NOTICE_KIND.REPUTATION_PAUSED;
+  try {
+    await deliverOwnerNewsletterNotice(tenant, {
+      kind,
+      since: pausedAt,
+      build: (subscribersUrl) =>
+        Promise.resolve(
+          buildOwnerReputationPauseNotice(tenant, subscribersUrl),
+        ),
+    });
+  } catch (error) {
+    logger.error(NEWSLETTER_SEND_LOG.OWNER_EMAIL_FAILED, {
+      tenantId: tenant.id,
+      kind,
+      error: sanitizeLogMessage(error),
+    });
+  }
 }

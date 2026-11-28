@@ -105,11 +105,14 @@ function sentEmail() {
   return vi.mocked(sendEmail).mock.calls[0]?.[0];
 }
 
+beforeEach(() => {
+  mockEnv.PLATFORM_APP_BASE_URL = MOCK_PLATFORM_APP_BASE_URL;
+  vi.mocked(markNewsletterLimitNoticeSent).mockResolvedValue(true);
+  vi.mocked(getTenantOwnerEmail).mockResolvedValue(MOCK_OWNER_EMAIL);
+});
+
 describe(sendOwnerNewsletterNotice, () => {
   beforeEach(() => {
-    mockEnv.PLATFORM_APP_BASE_URL = MOCK_PLATFORM_APP_BASE_URL;
-    vi.mocked(markNewsletterLimitNoticeSent).mockResolvedValue(true);
-    vi.mocked(getTenantOwnerEmail).mockResolvedValue(MOCK_OWNER_EMAIL);
     vi.mocked(listStripePrices).mockResolvedValue(MOCK_BAND_PRICES);
   });
 
@@ -123,7 +126,7 @@ describe(sendOwnerNewsletterNotice, () => {
     expect(markNewsletterLimitNoticeSent).toHaveBeenCalledWith(
       MOCK_TENANT_ID,
       SUBSCRIBER_BAND_NEAR,
-      {},
+      { since: undefined },
     );
     expect(sentEmail()).toMatchObject({
       account: EMAIL_ACCOUNT.PLATFORM,
@@ -306,12 +309,6 @@ describe(sendOwnerNewsletterNotice, () => {
 });
 
 describe(sendOwnerReputationPauseNotice, () => {
-  beforeEach(() => {
-    mockEnv.PLATFORM_APP_BASE_URL = MOCK_PLATFORM_APP_BASE_URL;
-    vi.mocked(markNewsletterLimitNoticeSent).mockResolvedValue(true);
-    vi.mocked(getTenantOwnerEmail).mockResolvedValue(MOCK_OWNER_EMAIL);
-  });
-
   it('claims this pause’s notice and emails the owner, linking to Subscribers', async () => {
     await sendOwnerReputationPauseNotice(mockGrowthTenant(), MOCK_PAUSED_AT);
 
@@ -363,6 +360,26 @@ describe(sendOwnerReputationPauseNotice, () => {
       MOCK_TENANT_ID,
       REPUTATION_PAUSED,
     );
+    expect(logger.error).toHaveBeenCalledWith(
+      NEWSLETTER_SEND_LOG.OWNER_EMAIL_FAILED,
+      {
+        tenantId: MOCK_TENANT_ID,
+        kind: REPUTATION_PAUSED,
+        error: MOCK_RESEND_DOWN,
+      },
+    );
+  });
+
+  it('logs and does not throw when the owner lookup fails', async () => {
+    vi.mocked(getTenantOwnerEmail).mockRejectedValue(
+      new Error(MOCK_RESEND_DOWN),
+    );
+
+    await expect(
+      sendOwnerReputationPauseNotice(mockGrowthTenant(), MOCK_PAUSED_AT),
+    ).resolves.toBeUndefined();
+
+    expect(sendEmail).not.toHaveBeenCalled();
     expect(logger.error).toHaveBeenCalledWith(
       NEWSLETTER_SEND_LOG.OWNER_EMAIL_FAILED,
       {

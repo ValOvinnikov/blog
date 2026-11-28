@@ -71,6 +71,14 @@ describe(markNewsletterLimitNoticeSent, () => {
     ).toBe(true);
   });
 
+  it('marks a first notice this month when given a since time', async () => {
+    expect(
+      await markNewsletterLimitNoticeSent(tenantId, REPUTATION_PAUSED, {
+        since: MOCK_EARLIER_CLAIMED_AT,
+      }),
+    ).toBe(true);
+  });
+
   describe('with a since time', () => {
     beforeEach(async () => {
       await markNewsletterLimitNoticeSent(tenantId, REPUTATION_PAUSED);
