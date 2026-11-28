@@ -7,6 +7,7 @@ import {
 import { recordAuditEvent } from '@platform/server/audit/record-audit-event';
 import { requireTenantMembership } from '@platform/server/auth/require-tenant-membership';
 import { enqueueWorkerRequest } from '@platform/server/provisioning/enqueue-provisioning';
+import { revalidateSiteConfig } from '@platform/server/site-config/revalidate-site-config';
 import {
   MOCK_CLAIM_ID,
   MOCK_CLAIM_TOKEN,
@@ -49,6 +50,8 @@ vi.mock('@platform/server/audit/record-audit-event');
 vi.mock('./lookup-txt-records');
 
 vi.mock('@platform/server/provisioning/enqueue-provisioning');
+
+vi.mock('@platform/server/site-config/revalidate-site-config');
 
 vi.mock('@shinefold/db', async () => {
   const { mockCustomDomainDb } =
@@ -249,6 +252,7 @@ describe(verifyCustomDomainAction, () => {
         domain: MOCK_CUSTOM_DOMAIN,
         token: MOCK_CLAIM_TOKEN,
       });
+      expect(revalidateSiteConfig).toHaveBeenCalledWith(MOCK_TENANT_ID);
       expect(recordAuditEvent).not.toHaveBeenCalled();
     },
   );
@@ -282,6 +286,7 @@ describe(verifyCustomDomainAction, () => {
       expect(
         customDomainClaims.restoreCustomDomainClaim,
       ).not.toHaveBeenCalled();
+      expect(revalidateSiteConfig).not.toHaveBeenCalled();
       expect(recordAuditEvent).not.toHaveBeenCalled();
     });
   });

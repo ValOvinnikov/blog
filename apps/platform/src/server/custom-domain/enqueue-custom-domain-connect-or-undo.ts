@@ -7,6 +7,7 @@ import {
   type TCustomDomainRefusal,
 } from '@platform/constants/custom-domain';
 import { enqueueWorkerRequest } from '@platform/server/provisioning/enqueue-provisioning';
+import { revalidateSiteConfig } from '@platform/server/site-config/revalidate-site-config';
 import { logger } from '@platform/utils/logger/logger';
 import { HTTP_STATUS, type TMaybeNull } from '@shinefold/config';
 import { queries } from '@shinefold/db';
@@ -39,7 +40,9 @@ export const enqueueCustomDomainConnectOrUndo = async (
     tenantId,
     domain,
   );
-  if (!isUndone) {
+  if (isUndone) {
+    await revalidateSiteConfig(tenantId);
+  } else {
     logger.error(CUSTOM_DOMAIN_LOG.CONNECT_ROLLBACK_FAILED, {
       tenantId,
       domain,
