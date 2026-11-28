@@ -5784,6 +5784,14 @@
         "file": "packages/db/src/constants/newsletter.ts"
       }
     ],
+    "REPUTATION_PAUSED": [
+      {
+        "ref": "NEWSLETTER_LIMIT_NOTICE_KIND.REPUTATION_PAUSED",
+        "scope": "db",
+        "from": "@shinefold/db/constants",
+        "file": "packages/db/src/constants/newsletter.ts"
+      }
+    ],
     "LOOK": [
       {
         "ref": "SITE_CONFIG_SAVED_AT.LOOK",

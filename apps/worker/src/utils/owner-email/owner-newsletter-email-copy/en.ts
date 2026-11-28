@@ -31,6 +31,14 @@ export const OWNER_NEWSLETTER_EMAIL_COPY_EN: TOwnerNewsletterEmailCopy = {
   actionLabel: 'Open Subscribers',
   footerLine: (siteName) =>
     `You get this because you own ${siteName} on ${PLATFORM_EMAIL_BRAND_NAME}.`,
+  reputationPaused: (siteName) => ({
+    subject: pausedSubject(siteName),
+    heading: PAUSED_HEADING,
+    paragraphs: [
+      `Too many emails from ${siteName} bounced or were marked as spam, so sending is paused to protect its delivery. Posts still publish and readers can still subscribe, but new posts are not emailed until support resumes sending.`,
+    ],
+    closingLine: 'Contact support to resume sending.',
+  }),
   emails: {
     [OWNER_NEWSLETTER_EMAIL.BAND_NEAR]: ({
       siteName,

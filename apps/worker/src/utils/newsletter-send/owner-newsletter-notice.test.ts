@@ -23,6 +23,7 @@ import { NEWSLETTER_SEND_LOG } from '@worker/constants/newsletter-send';
 import { OWNER_SUBSCRIBERS_PATH } from '@worker/constants/owner-email';
 import {
   MOCK_NEWSLETTER_POST,
+  MOCK_PAUSED_AT,
   mockNewsletterLimits,
 } from '@worker/testing/newsletter-send/fixtures';
 import { MOCK_RESEND_DOWN } from '@worker/testing/outage/fixtures';
@@ -32,7 +33,10 @@ import { MOCK_TENANT_ID, mockTenant } from '@worker/testing/tenant/fixtures';
 import { env as mockEnv } from '@worker/utils/env/__mocks__/env';
 import { logger } from '@worker/utils/logger/logger';
 
-import { sendOwnerNewsletterNotice } from './owner-newsletter-notice';
+import {
+  sendOwnerNewsletterNotice,
+  sendOwnerReputationPauseNotice,
+} from './owner-newsletter-notice';
 
 vi.mock('@shinefold/db/queries/memberships');
 vi.mock('@shinefold/db/queries/newsletter-post-sends');
@@ -40,8 +44,12 @@ vi.mock('@shinefold/db/queries/stripe-catalogue');
 vi.mock('@shinefold/email/transport/send-email');
 vi.mock('@worker/utils/env/env');
 
-const { SENDING_PAUSED, SUBSCRIBER_BAND_NEAR, MONTHLY_ALLOWANCE_NEAR } =
-  NEWSLETTER_LIMIT_NOTICE_KIND;
+const {
+  SENDING_PAUSED,
+  SUBSCRIBER_BAND_NEAR,
+  MONTHLY_ALLOWANCE_NEAR,
+  REPUTATION_PAUSED,
+} = NEWSLETTER_LIMIT_NOTICE_KIND;
 const MOCK_LIMITS = mockNewsletterLimits({
   activeCount: 2_001,
   bandCeiling: 2_500,
@@ -115,6 +123,7 @@ describe(sendOwnerNewsletterNotice, () => {
     expect(markNewsletterLimitNoticeSent).toHaveBeenCalledWith(
       MOCK_TENANT_ID,
       SUBSCRIBER_BAND_NEAR,
+      {},
     );
     expect(sentEmail()).toMatchObject({
       account: EMAIL_ACCOUNT.PLATFORM,
@@ -293,5 +302,74 @@ describe(sendOwnerNewsletterNotice, () => {
 
     expect(markNewsletterLimitNoticeSent).not.toHaveBeenCalled();
     expect(sendEmail).not.toHaveBeenCalled();
+  });
+});
+
+describe(sendOwnerReputationPauseNotice, () => {
+  beforeEach(() => {
+    mockEnv.PLATFORM_APP_BASE_URL = MOCK_PLATFORM_APP_BASE_URL;
+    vi.mocked(markNewsletterLimitNoticeSent).mockResolvedValue(true);
+    vi.mocked(getTenantOwnerEmail).mockResolvedValue(MOCK_OWNER_EMAIL);
+  });
+
+  it('claims this pause’s notice and emails the owner, linking to Subscribers', async () => {
+    await sendOwnerReputationPauseNotice(mockGrowthTenant(), MOCK_PAUSED_AT);
+
+    expect(markNewsletterLimitNoticeSent).toHaveBeenCalledWith(
+      MOCK_TENANT_ID,
+      REPUTATION_PAUSED,
+      { since: MOCK_PAUSED_AT },
+    );
+    expect(sentEmail()).toMatchObject({
+      account: EMAIL_ACCOUNT.PLATFORM,
+      to: MOCK_OWNER_EMAIL,
+    });
+    expect(sentEmail()?.html).toContain(
+      new URL(OWNER_SUBSCRIBERS_PATH, MOCK_PLATFORM_APP_BASE_URL).toString(),
+    );
+    expect(listStripePrices).not.toHaveBeenCalled();
+  });
+
+  it('writes a different email in every owner language', async () => {
+    for (const locale of Object.values(LOCALE_ISO_CODES)) {
+      await sendOwnerReputationPauseNotice(
+        mockGrowthTenant({ locale }),
+        MOCK_PAUSED_AT,
+      );
+    }
+
+    const subjects = vi
+      .mocked(sendEmail)
+      .mock.calls.map(([input]) => input.subject);
+    expect(new Set(subjects).size).toBe(Object.values(LOCALE_ISO_CODES).length);
+  });
+
+  it('sends nothing when this pause’s notice was already sent', async () => {
+    vi.mocked(markNewsletterLimitNoticeSent).mockResolvedValue(false);
+
+    await sendOwnerReputationPauseNotice(mockGrowthTenant(), MOCK_PAUSED_AT);
+
+    expect(sendEmail).not.toHaveBeenCalled();
+  });
+
+  it('gives the notice back and logs when the send fails, without throwing', async () => {
+    vi.mocked(sendEmail).mockRejectedValue(new Error(MOCK_RESEND_DOWN));
+
+    await expect(
+      sendOwnerReputationPauseNotice(mockGrowthTenant(), MOCK_PAUSED_AT),
+    ).resolves.toBeUndefined();
+
+    expect(releaseNewsletterLimitNotice).toHaveBeenCalledWith(
+      MOCK_TENANT_ID,
+      REPUTATION_PAUSED,
+    );
+    expect(logger.error).toHaveBeenCalledWith(
+      NEWSLETTER_SEND_LOG.OWNER_EMAIL_FAILED,
+      {
+        tenantId: MOCK_TENANT_ID,
+        kind: REPUTATION_PAUSED,
+        error: MOCK_RESEND_DOWN,
+      },
+    );
   });
 });

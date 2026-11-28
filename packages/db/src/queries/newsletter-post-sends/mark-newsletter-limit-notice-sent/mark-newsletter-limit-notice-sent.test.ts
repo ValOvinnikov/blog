@@ -2,7 +2,11 @@ import { NEWSLETTER_LIMIT_NOTICE_KIND } from '@shinefold/db/constants';
 import * as schema from '@shinefold/db/schema';
 import { insertTestTenant } from '@shinefold/db/testing/fixtures';
 import { useFrozenClock } from '@shinefold/db/testing/frozen-clock';
-import { MOCK_NEXT_MONTH } from '@shinefold/db/testing/newsletter-post-sends/fixtures';
+import {
+  MOCK_EARLIER_CLAIMED_AT,
+  MOCK_LATER,
+  MOCK_NEXT_MONTH,
+} from '@shinefold/db/testing/newsletter-post-sends/fixtures';
 import { useQueryTestDb } from '@shinefold/db/testing/query-test-db';
 import { useTestTenant } from '@shinefold/db/testing/test-tenant';
 
@@ -10,7 +14,8 @@ import { markNewsletterLimitNoticeSent } from './mark-newsletter-limit-notice-se
 
 vi.mock('@shinefold/db/client');
 
-const { SENDING_PAUSED, MONTHLY_ALLOWANCE_NEAR } = NEWSLETTER_LIMIT_NOTICE_KIND;
+const { SENDING_PAUSED, MONTHLY_ALLOWANCE_NEAR, REPUTATION_PAUSED } =
+  NEWSLETTER_LIMIT_NOTICE_KIND;
 
 const db = useQueryTestDb();
 const tenant = useTestTenant(db);
@@ -64,5 +69,34 @@ describe(markNewsletterLimitNoticeSent, () => {
     expect(
       await markNewsletterLimitNoticeSent(otherTenantId, SENDING_PAUSED),
     ).toBe(true);
+  });
+
+  describe('with a since time', () => {
+    beforeEach(async () => {
+      await markNewsletterLimitNoticeSent(tenantId, REPUTATION_PAUSED);
+    });
+
+    it('refuses a notice already sent since then', async () => {
+      expect(
+        await markNewsletterLimitNoticeSent(tenantId, REPUTATION_PAUSED, {
+          since: MOCK_EARLIER_CLAIMED_AT,
+        }),
+      ).toBe(false);
+    });
+
+    it('marks again a notice this month sent before then', async () => {
+      vi.setSystemTime(MOCK_LATER);
+
+      expect(
+        await markNewsletterLimitNoticeSent(tenantId, REPUTATION_PAUSED, {
+          since: MOCK_LATER,
+        }),
+      ).toBe(true);
+      expect(
+        await markNewsletterLimitNoticeSent(tenantId, REPUTATION_PAUSED, {
+          since: MOCK_LATER,
+        }),
+      ).toBe(false);
+    });
   });
 });

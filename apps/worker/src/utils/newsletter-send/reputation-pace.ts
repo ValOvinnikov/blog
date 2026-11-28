@@ -21,6 +21,7 @@ import {
 } from '@worker/constants/newsletter-send';
 import { env } from '@worker/utils/env/env';
 import { logger } from '@worker/utils/logger/logger';
+import { sendOwnerReputationPauseNotice } from '@worker/utils/newsletter-send/owner-newsletter-notice';
 import { sendOperatorEmail } from '@worker/utils/operator-email/send-operator-email';
 
 async function alertReputation(
@@ -58,14 +59,16 @@ export async function readReputationPace(
   const reputation = await getEmailReputation(tenant.id);
 
   switch (emailReputationLevel(reputation)) {
-    case EMAIL_REPUTATION_LEVEL.STOP:
-      await pauseNewsletter(tenant.id);
+    case EMAIL_REPUTATION_LEVEL.STOP: {
+      const pausedAt = await pauseNewsletter(tenant.id);
       await alertReputation(
         tenant,
         reputation,
         NEWSLETTER_REPUTATION_ALERT_LEVEL.STOP,
       );
+      await sendOwnerReputationPauseNotice(tenant, pausedAt);
       return NEWSLETTER_SEND_PACE.STOPPED;
+    }
     case EMAIL_REPUTATION_LEVEL.SLOW:
       if (isOperatorAlerted) {
         await alertReputation(

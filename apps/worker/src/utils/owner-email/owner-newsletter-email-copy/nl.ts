@@ -31,6 +31,14 @@ export const OWNER_NEWSLETTER_EMAIL_COPY_NL: TOwnerNewsletterEmailCopy = {
   actionLabel: 'Abonnees openen',
   footerLine: (siteName) =>
     `Je krijgt dit omdat je eigenaar bent van ${siteName} op ${PLATFORM_EMAIL_BRAND_NAME}.`,
+  reputationPaused: (siteName) => ({
+    subject: pausedSubject(siteName),
+    heading: PAUSED_HEADING,
+    paragraphs: [
+      `Te veel e-mails van ${siteName} kwamen niet aan of werden als spam gemarkeerd, dus het versturen is gepauzeerd om de bezorging te beschermen. Berichten worden nog steeds gepubliceerd en lezers kunnen zich nog steeds aanmelden, maar nieuwe berichten worden pas weer gemaild als support het versturen hervat.`,
+    ],
+    closingLine: 'Neem contact op met support om het versturen te hervatten.',
+  }),
   emails: {
     [OWNER_NEWSLETTER_EMAIL.BAND_NEAR]: ({
       siteName,

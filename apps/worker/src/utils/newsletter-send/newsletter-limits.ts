@@ -10,6 +10,11 @@ import {
 import type { TNewsletterLimits } from '@shinefold/db/queries/email-usage';
 import { NEWSLETTER_LIMIT_NEAR_RATIO } from '@worker/constants/newsletter-send';
 
+export type TOwnerLimitNoticeKind = Exclude<
+  TNewsletterLimitNoticeKind,
+  typeof NEWSLETTER_LIMIT_NOTICE_KIND.REPUTATION_PAUSED
+>;
+
 export function sentAfterThisPost({
   activeCount,
   sentThisMonth,
@@ -38,7 +43,7 @@ export function newsletterSkipReason(
 
 export function nearLimitNotices(
   limits: TNewsletterLimits,
-): TNewsletterLimitNoticeKind[] {
+): TOwnerLimitNoticeKind[] {
   const { activeCount, bandCeiling, allowance } = limits;
   return [
     activeCount >= bandCeiling * NEWSLETTER_LIMIT_NEAR_RATIO &&
