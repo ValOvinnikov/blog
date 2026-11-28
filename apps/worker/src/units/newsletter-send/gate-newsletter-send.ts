@@ -57,6 +57,7 @@ async function skip(
     ...(limits && {
       emailsNeeded: limits.activeCount,
       allowanceLeft: allowanceLeft(limits),
+      bandCeiling: limits.bandCeiling,
     }),
   };
   await markNewsletterPostSkipped(tenantId, postId, reason, details);

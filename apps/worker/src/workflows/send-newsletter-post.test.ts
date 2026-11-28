@@ -1,7 +1,6 @@
 import {
   NEWSLETTER_POST_STATE,
   NEWSLETTER_SEND_GATE,
-  NEWSLETTER_SEND_LOG,
   NEWSLETTER_SEND_PACE,
   NEWSLETTER_SLOW_PAUSE_MS,
 } from '@worker/constants/newsletter-send';
@@ -21,10 +20,10 @@ import { gateNewsletterSend } from '@worker/units/newsletter-send/gate-newslette
 import { sendNewsletterPage } from '@worker/units/newsletter-send/send-newsletter-page';
 import {
   completeNewsletterSend,
+  failNewsletterSend,
   recordNewsletterSends,
   releaseNewsletterSendClaim,
 } from '@worker/units/newsletter-send/settle-newsletter-send';
-import { reportRunFailed } from '@worker/units/report-run-failed';
 import { sleep } from 'workflow';
 
 import { sendNewsletterPost } from './send-newsletter-post';
@@ -33,7 +32,6 @@ vi.mock('@worker/units/newsletter-send/check-newsletter-post');
 vi.mock('@worker/units/newsletter-send/gate-newsletter-send');
 vi.mock('@worker/units/newsletter-send/send-newsletter-page');
 vi.mock('@worker/units/newsletter-send/settle-newsletter-send');
-vi.mock('@worker/units/report-run-failed');
 vi.mock('workflow');
 
 const MOCK_READY = {
@@ -204,14 +202,13 @@ describe(sendNewsletterPost, () => {
     expect(sleep).toHaveBeenCalledExactlyOnceWith(NEWSLETTER_SLOW_PAUSE_MS);
   });
 
-  it('reports a run that fails for good, leaving its claim unsettled', async () => {
+  it('settles a run that fails for good as failed', async () => {
     vi.mocked(sendNewsletterPage).mockRejectedValue(
       new Error(MOCK_WORKFLOW_CRASH),
     );
 
     await expect(runSend()).rejects.toThrow(MOCK_WORKFLOW_CRASH);
-    expect(reportRunFailed).toHaveBeenCalledExactlyOnceWith(
-      NEWSLETTER_SEND_LOG.RUN_FAILED,
+    expect(failNewsletterSend).toHaveBeenCalledExactlyOnceWith(
       MOCK_TENANT_ID,
       MOCK_POST_ID,
       MOCK_WORKFLOW_CRASH,
