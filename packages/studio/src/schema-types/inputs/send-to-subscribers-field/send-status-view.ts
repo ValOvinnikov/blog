@@ -18,6 +18,8 @@ import { Check, Clock } from 'lucide-react';
 
 // A claim the run has not yet counted may still be scheduled or skipped, so it never reads as sending.
 export const SEND_PENDING = 'Checking whether this post will be emailed…';
+export const SEND_FAILED_BEFORE_ANY =
+  ' — sending failed before any email went out.';
 
 /** What replaces the switch once the post has a claim; `undefined` keeps the switch. */
 export const toSendStatusView = (
@@ -51,13 +53,16 @@ export const toSendStatusView = (
     }
     case NEWSLETTER_SEND_STATUS.FAILED: {
       const { sent, recipients } = status;
-      return {
-        tone: 'critical',
-        lead: NOT_EMAILED,
-        detail: isUndefined(recipients)
-          ? ' — sending failed before any email went out.'
-          : ` — sending failed after ${formatSendCount(sent)} of ${formatSendCount(recipients)}.`,
-      };
+      return isUndefined(recipients)
+        ? {
+            tone: 'critical',
+            lead: NOT_EMAILED,
+            detail: SEND_FAILED_BEFORE_ANY,
+          }
+        : {
+            tone: 'critical',
+            detail: `Sending failed after ${formatSendCount(sent)} of ${formatSendCount(recipients)} — the rest were not emailed.`,
+          };
     }
     case NEWSLETTER_SEND_STATUS.SKIPPED:
       return toSkippedView(status);
