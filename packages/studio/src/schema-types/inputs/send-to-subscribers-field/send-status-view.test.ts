@@ -15,7 +15,11 @@ import {
 } from '@shinefold/studio/testing/newsletter-post-send-status';
 
 import { formatSendCount, formatSendDay } from './send-status-format';
-import { SEND_PENDING, toSendStatusView } from './send-status-view';
+import {
+  SEND_FAILED_BEFORE_ANY,
+  SEND_PENDING,
+  toSendStatusView,
+} from './send-status-view';
 import { NOT_EMAILED } from './skipped-send-status-view';
 
 faker.seed(7711);
@@ -83,25 +87,29 @@ describe(toSendStatusView, () => {
     expect(view?.detail).toBe(SEND_PENDING);
   });
 
-  it('names how far a failed run got, and offers nothing to retry', () => {
+  it('names how far a part-way failure got, with no Not emailed lead or retry', () => {
     const view = viewOf({
       status: NEWSLETTER_SEND_STATUS.FAILED,
       sent: MOCK_SENT,
       recipients: MOCK_RECIPIENTS,
     });
 
-    expect(view?.lead).toBe(NOT_EMAILED);
+    expect(view?.lead).toBeUndefined();
     expect(view?.detail).toContain(
       `${formatSendCount(MOCK_SENT)} of ${formatSendCount(MOCK_RECIPIENTS)}`,
     );
+    expect(view?.detail.startsWith(NOT_EMAILED)).toBe(false);
     expect(view?.link).toBeUndefined();
   });
 
-  it('says a run that failed before counting its recipients emailed nobody', () => {
+  it('says a run that failed before counting emailed nobody, with no retry', () => {
     const view = viewOf({ status: NEWSLETTER_SEND_STATUS.FAILED, sent: 0 });
 
-    expect(view?.lead).toBe(NOT_EMAILED);
-    expect(view?.detail).not.toContain(formatSendCount(0));
+    expect(view).toStrictEqual({
+      tone: 'critical',
+      lead: NOT_EMAILED,
+      detail: SEND_FAILED_BEFORE_ANY,
+    });
   });
 
   it('names the band and links to Subscribers for a band skip', () => {
