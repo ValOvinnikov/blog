@@ -1071,14 +1071,22 @@ filterable:
       and `event`, so a burst of one event sends one message, and the first
       arrives within 10 minutes of the line.
 - [ ] **Synthetic uptime checks** (Grafana Synthetic Monitoring, HTTP): the
-      apex home page `/` and the platform host's sign-in page
-      `/sign-in`. **2 probes, every 3 minutes**, alerting on **2
-      failures in 5 minutes** — both probes failing one run — and resolving on
-      recovery. The free tier allows 100k executions a month and every probe
-      run counts: two checks at this setting use about 60k, while the 1-minute
-      default with 2 probes uses about 89k per check. The check form's
-      **Execution** step shows the monthly estimate; the 5-minute **period** on
-      its **Alerting** step is the alert window, not the frequency.
+      apex's `/api/health` and the platform host's sign-in page `/sign-in`.
+      **2 probes, every 3 minutes**, alerting on **2 failures in 5 minutes** —
+      both probes failing one run — and resolving on recovery. `/api/health`
+      answers 200 without touching Postgres, Sanity or the proxy's tenant
+      lookup, so the checks never keep Neon's compute from its 5-minute idle
+      suspend; a check on a page would wake it every run.
+- [ ] **Hourly home-page check:** the apex home page `/`, **2 probes, every
+      hour**, alerting when both probes fail a run, so a full render — tenant
+      lookup, Sanity fetch and page build — stays covered between the Loki
+      error alerts at the cost of 24 database wakes a day.
+- [ ] **Execution budget.** The free tier allows 100k executions a month and
+      every probe run counts: the two 3-minute checks use about 58k and the
+      hourly check about 1.5k, while the 1-minute default with 2 probes uses
+      about 89k per check. The check form's **Execution** step shows the
+      monthly estimate; the 5-minute **period** on its **Alerting** step is the
+      alert window, not the frequency.
 
 #### 8e. Rehearsal — before the production env vars
 
