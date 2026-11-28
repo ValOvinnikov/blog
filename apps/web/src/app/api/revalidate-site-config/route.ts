@@ -1,7 +1,11 @@
 import { HTTP_STATUS, type TMaybeUndefined } from '@shinefold/config';
 import { queries } from '@shinefold/db';
 import { isSecretMatch } from '@shinefold/utils';
-import { hasLength, isNull, isString } from '@shinefold/utils/primitives';
+import {
+  hasLength,
+  isPlainObject,
+  isString,
+} from '@shinefold/utils/primitives';
 import { REVALIDATE_SITE_CONFIG_LOG } from '@web/constants/revalidate-site-config';
 import { purgeDerivedPaths } from '@web/server/revalidate/purge-derived-paths/purge-derived-paths';
 import { resolveTenantSitePaths } from '@web/server/revalidate/resolve-tenant-site-paths/resolve-tenant-site-paths';
@@ -34,10 +38,10 @@ const parseTenantId = async (
 ): Promise<TMaybeUndefined<string>> => {
   try {
     const body: unknown = await request.json();
-    if (typeof body !== 'object' || isNull(body)) {
+    if (!isPlainObject(body)) {
       return undefined;
     }
-    const tenantId = (body as Record<string, unknown>)['tenantId'];
+    const tenantId = body['tenantId'];
     return isString(tenantId) && hasLength(tenantId) ? tenantId : undefined;
   } catch {
     return undefined;

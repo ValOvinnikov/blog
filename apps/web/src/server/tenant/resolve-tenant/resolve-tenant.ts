@@ -10,12 +10,13 @@ import {
   TENANT_STATUS,
 } from '@shinefold/db';
 import type { TTenant } from '@shinefold/db/schema/tenants';
-import type { TResolvedHost } from '@web/server/tenant/proxy-tenant-cache/proxy-tenant-cache';
 import { reviveCachedTenant } from '@web/server/tenant/revive-cached-tenant/revive-cached-tenant';
 import { isPlatformFallbackHost } from '@web/utils/is-platform-fallback-host';
 import { isProductionEnvironment } from '@web/utils/is-production-environment';
 import { TENANT_BY_HOST_CACHE_TAG } from '@web/utils/tenant-cache-tags';
 import { unstable_cache } from 'next/cache';
+
+export type TResolvedHost = { tenant: TTenant; isOwnHost: boolean };
 
 /** Only production requires READY: local/dev rows predate `provisioningStatus`. */
 export const isTenantServable = (tenant: TTenant): boolean => {

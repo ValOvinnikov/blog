@@ -747,28 +747,26 @@ describe(proxy, () => {
       routes.newsletterResult(NEWSLETTER_RESULT.UNSUBSCRIBE_INVALID),
       routes.newsletterResult(NEWSLETTER_RESULT.UNSUBSCRIBE_FAILED),
       `${DUTCH_PREFIX}${routes.newsletterUnsubscribeConfirmation()}`,
-    ])('keeps the unsubscribe page %s reachable', async (path) => {
+      ACCOUNT_PATH,
+      DUTCH_ACCOUNT_PATH,
+    ])('keeps the reader self-service page %s reachable', async (path) => {
       const response = await visit(path);
 
       expect(response.status).not.toBe(HTTP_STATUS.SERVICE_UNAVAILABLE);
       expect(response.headers.get(REWRITE_HEADER)).not.toBeNull();
     });
 
-    it.each([ACCOUNT_PATH, DUTCH_ACCOUNT_PATH])(
-      'keeps the account page %s reachable',
+    it.each([
+      `${ACCOUNT_PATH}${BLOG_PATH}`,
+      routes.newsletterResult(NEWSLETTER_RESULT.CONFIRMED),
+    ])(
+      'still answers %s, outside reader self-service, with the unavailable page',
       async (path) => {
         const response = await visit(path);
 
-        expect(response.status).not.toBe(HTTP_STATUS.SERVICE_UNAVAILABLE);
-        expect(response.headers.get(REWRITE_HEADER)).not.toBeNull();
+        expect(response.status).toBe(HTTP_STATUS.SERVICE_UNAVAILABLE);
       },
     );
-
-    it('still answers a page under the account path with the unavailable page', async () => {
-      const response = await visit(`${ACCOUNT_PATH}${BLOG_PATH}`);
-
-      expect(response.status).toBe(HTTP_STATUS.SERVICE_UNAVAILABLE);
-    });
 
     describe('when the site has reader accounts', () => {
       beforeEach(() => {
@@ -800,14 +798,6 @@ describe(proxy, () => {
 
       expect(body).not.toContain(MANAGE_ACCOUNT_LABEL.EN);
       expect(body).not.toContain('<a ');
-    });
-
-    it('still answers another newsletter page with the unavailable page', async () => {
-      const response = await visit(
-        routes.newsletterResult(NEWSLETTER_RESULT.CONFIRMED),
-      );
-
-      expect(response.status).toBe(HTTP_STATUS.SERVICE_UNAVAILABLE);
     });
 
     it('serves the site of a tenant suspended for inactivity', async () => {

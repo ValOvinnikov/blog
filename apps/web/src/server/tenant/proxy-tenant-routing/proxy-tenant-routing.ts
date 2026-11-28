@@ -4,11 +4,11 @@ import type {
   TMaybeUndefined,
 } from '@shinefold/config';
 import type { TTenant } from '@shinefold/db/schema/tenants';
+import { readThroughProxyTenantCache } from '@web/server/tenant/proxy-tenant-cache/proxy-tenant-cache';
 import {
-  readThroughProxyTenantCache,
+  resolveServableHost,
   type TResolvedHost,
-} from '@web/server/tenant/proxy-tenant-cache/proxy-tenant-cache';
-import { resolveServableHost } from '@web/server/tenant/resolve-tenant/resolve-tenant';
+} from '@web/server/tenant/resolve-tenant/resolve-tenant';
 import { selectProxyTenantLiveLocales } from '@web/server/tenant/tenant-live-locales/tenant-live-locales';
 
 export type TTenantRouting = {

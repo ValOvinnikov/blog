@@ -1,6 +1,8 @@
 import { faker } from '@faker-js/faker';
 import { LOCALE_ISO_CODES } from '@shinefold/config';
 import { queries } from '@shinefold/db';
+import { readThroughProxyTenantCache } from '@web/server/tenant/proxy-tenant-cache/proxy-tenant-cache';
+import { resolveServableHost } from '@web/server/tenant/resolve-tenant/resolve-tenant';
 import { selectProxyTenantLiveLocales } from '@web/server/tenant/tenant-live-locales/tenant-live-locales';
 import { mockServableTenant } from '@web/testing/server/tenant/fixtures';
 import {
@@ -44,6 +46,10 @@ describe(resolveProxyTenant, () => {
     await expect(resolveProxyTenant(MOCK_TENANT_HOST)).resolves.toEqual(
       MOCK_TENANT,
     );
+    expect(readThroughProxyTenantCache).toHaveBeenCalledWith(
+      MOCK_TENANT_HOST,
+      resolveServableHost,
+    );
   });
 
   it('resolves undefined for a host no tenant owns', async () => {
@@ -78,6 +84,10 @@ describe(resolveTenantRouting, () => {
         isSecondaryHost: false,
       });
       expect(selectProxyTenantLiveLocales).toHaveBeenCalledWith(MOCK_TENANT);
+      expect(readThroughProxyTenantCache).toHaveBeenCalledWith(
+        MOCK_TENANT_HOST,
+        resolveServableHost,
+      );
     });
 
     it('marks a host that is not its main address as secondary', async () => {
