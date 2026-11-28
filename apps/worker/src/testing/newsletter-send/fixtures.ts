@@ -67,3 +67,5 @@ export function mockNewsletterPage(
     ...overrides,
   };
 }
+
+export const MOCK_PAUSED_AT = mockFaker.date.recent();

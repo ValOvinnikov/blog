@@ -6,10 +6,7 @@ import {
   type TNewsletterSkipReason,
 } from '@shinefold/config/constants';
 import type { TMaybeUndefined } from '@shinefold/config/types';
-import {
-  NEWSLETTER_LIMIT_NOTICE_KIND,
-  type TNewsletterLimitNoticeKind,
-} from '@shinefold/db/constants';
+import { NEWSLETTER_LIMIT_NOTICE_KIND } from '@shinefold/db/constants';
 import type { TNewsletterLimits } from '@shinefold/db/queries/email-usage';
 import type { TTenant } from '@shinefold/db/schema/tenants';
 import {
@@ -24,7 +21,10 @@ import {
   type TOwnerNewsletterEmail,
 } from '@worker/constants/owner-email';
 import { formatInactivityDate } from '@worker/utils/inactivity-sweep/inactivity-dates';
-import { sentAfterThisPost } from '@worker/utils/newsletter-send/newsletter-limits';
+import {
+  sentAfterThisPost,
+  type TOwnerLimitNoticeKind,
+} from '@worker/utils/newsletter-send/newsletter-limits';
 import type { TNewsletterMoveUpOffer } from '@worker/utils/newsletter-send/newsletter-move-up-offer';
 import { ownerNewsletterUsage } from '@worker/utils/newsletter-send/owner-newsletter-usage';
 import type { TOwnerNewsletterEmailCopy } from '@worker/utils/owner-email/owner-newsletter-copy-input';
@@ -36,7 +36,7 @@ export type TOwnerNewsletterPause = {
 };
 
 type TOwnerNewsletterNoticeInput = {
-  kind: TNewsletterLimitNoticeKind;
+  kind: TOwnerLimitNoticeKind;
   limits: TNewsletterLimits;
   pause: TMaybeUndefined<TOwnerNewsletterPause>;
   moveUp: TMaybeUndefined<TNewsletterMoveUpOffer>;
@@ -44,7 +44,7 @@ type TOwnerNewsletterNoticeInput = {
 };
 
 function ownerNewsletterEmailFor(
-  kind: TNewsletterLimitNoticeKind,
+  kind: TOwnerLimitNoticeKind,
   pause: TMaybeUndefined<TOwnerNewsletterPause>,
 ): TOwnerNewsletterEmail {
   switch (kind) {
@@ -102,4 +102,18 @@ export function buildOwnerNewsletterNotice(
   return kind === NEWSLETTER_LIMIT_NOTICE_KIND.SENDING_PAUSED
     ? buildOwnerNewsletterPausedEmail(input)
     : buildOwnerNewsletterLimitNearEmail(input);
+}
+
+export function buildOwnerReputationPauseNotice(
+  { name: siteName, locale }: TTenant,
+  subscribersUrl: string,
+): TOwnerEmail {
+  const copy = OWNER_NEWSLETTER_EMAIL_COPY[locale];
+
+  return buildOwnerNewsletterPausedEmail({
+    brandName: PLATFORM_EMAIL_BRAND_NAME,
+    ...copy.reputationPaused(siteName),
+    action: { label: copy.actionLabel, url: subscribersUrl },
+    footerLine: copy.footerLine(siteName),
+  });
 }

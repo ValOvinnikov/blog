@@ -32,6 +32,7 @@ export type TOwnerNewsletterEmailCopy = {
   extraPrice: Record<TBillingInterval, (price: string) => string>;
   actionLabel: string;
   footerLine: (siteName: string) => string;
+  reputationPaused: (siteName: string) => TOwnerNewsletterText;
   emails: Record<
     TOwnerNewsletterEmail,
     (input: TOwnerNewsletterCopyInput) => TOwnerNewsletterText

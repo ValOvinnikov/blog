@@ -31,6 +31,14 @@ export const OWNER_NEWSLETTER_EMAIL_COPY_FR: TOwnerNewsletterEmailCopy = {
   actionLabel: 'Ouvrir Abonnés',
   footerLine: (siteName) =>
     `Vous recevez ce message parce que vous êtes propriétaire de ${siteName} sur ${PLATFORM_EMAIL_BRAND_NAME}.`,
+  reputationPaused: (siteName) => ({
+    subject: pausedSubject(siteName),
+    heading: PAUSED_HEADING,
+    paragraphs: [
+      `Trop d’e-mails de ${siteName} n’ont pas été distribués ou ont été signalés comme spam : les envois sont donc en pause pour protéger sa délivrabilité. Les articles sont toujours publiés et les lecteurs peuvent toujours s’abonner, mais les nouveaux articles ne sont plus envoyés par e-mail tant que le support n’a pas repris les envois.`,
+    ],
+    closingLine: 'Contactez le support pour reprendre les envois.',
+  }),
   emails: {
     [OWNER_NEWSLETTER_EMAIL.BAND_NEAR]: ({
       siteName,

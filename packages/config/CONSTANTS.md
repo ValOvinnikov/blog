@@ -443,7 +443,7 @@ Every key/value const an agent should reuse before writing a literal. The
 ### `@shinefold/db/constants` — `packages/db/src/constants/newsletter.ts`
 
 - **NEWSLETTER_POST_SEND_OUTCOME**: `SENT`, `SKIPPED`, `FAILED`
-- **NEWSLETTER_LIMIT_NOTICE_KIND**: `SUBSCRIBER_BAND_NEAR`, `MONTHLY_ALLOWANCE_NEAR`, `SENDING_PAUSED`
+- **NEWSLETTER_LIMIT_NOTICE_KIND**: `SUBSCRIBER_BAND_NEAR`, `MONTHLY_ALLOWANCE_NEAR`, `SENDING_PAUSED`, `REPUTATION_PAUSED`
 
 ### `@shinefold/db/constants` — `packages/db/src/constants/row-lock.ts`
 
