@@ -3,27 +3,21 @@ import { queries } from '@shinefold/db';
 import { mockServableTenant } from '@web/testing/server/tenant/fixtures';
 import { MOCK_ERROR } from '@web/testing/shared/error/fixtures';
 
-import { resolveTenant, resolveTenantRouting } from './resolve-tenant';
+import { resolveTenant } from './resolve-tenant';
 
 faker.seed(6109);
 
 vi.mock('@web/utils/is-production-environment');
-vi.mock('@web/server/tenant/tenant-live-locales/tenant-live-locales');
 vi.mock(
   'next/cache',
   () => import('@web/testing/server/next-cache/memoizing-next-cache'),
 );
-vi.mock('@shinefold/db', async () => ({
-  ...(await import('@shinefold/db/constants')),
-  queries: {
-    tenantDomains: { getTenantByDomain: vi.fn() },
-    tenants: { listTenants: vi.fn() },
-  },
-}));
+vi.mock(
+  '@shinefold/db',
+  () => import('@web/testing/server/tenant/tenant-resolution-db'),
+);
 
 const MOCK_TENANT = mockServableTenant({ suspendedAt: new Date() });
-
-const MOCK_SAVED_TENANT = mockServableTenant({ suspendedAt: null });
 
 const getTenantByDomainMock = vi.mocked(
   queries.tenantDomains.getTenantByDomain,
@@ -66,24 +60,5 @@ describe('resolveTenant caching', () => {
     await expect(resolveTenant(host)).rejects.toBe(MOCK_ERROR);
 
     await expect(resolveTenant(host)).resolves.toEqual(MOCK_TENANT);
-  });
-});
-
-describe('resolveTenantRouting freshness', () => {
-  beforeEach(() => {
-    vi.resetAllMocks();
-  });
-
-  it('routes with a saved tenant change on the next request', async () => {
-    const host = faker.internet.domainName();
-    getTenantByDomainMock
-      .mockResolvedValueOnce(MOCK_TENANT)
-      .mockResolvedValueOnce(MOCK_SAVED_TENANT);
-
-    await resolveTenantRouting(host);
-
-    await expect(resolveTenantRouting(host)).resolves.toMatchObject({
-      tenant: MOCK_SAVED_TENANT,
-    });
   });
 });

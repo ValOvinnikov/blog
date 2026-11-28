@@ -1,6 +1,6 @@
 import { HTTP_METHOD, type TMaybeUndefined } from '@shinefold/config';
 import { localeForPrefix } from '@web/i18n/routing';
-import type { TTenantRouting } from '@web/server/tenant/resolve-tenant/resolve-tenant';
+import type { TTenantRouting } from '@web/server/tenant/proxy-tenant-routing/proxy-tenant-routing';
 import { getTenantTranslationMap } from '@web/server/translation-map/get-tenant-translation-map/get-tenant-translation-map';
 import { findTranslatedPath } from '@web/utils/find-translated-path';
 import { isCrawler } from '@web/utils/is-crawler';

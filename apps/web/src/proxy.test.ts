@@ -30,7 +30,7 @@ import {
   TENANT_ID_HEADER,
   UNRESOLVED_TENANT_PLACEHOLDER,
 } from '@web/server/tenant/constants/constants';
-import type { TTenantRouting } from '@web/server/tenant/resolve-tenant/resolve-tenant';
+import type { TTenantRouting } from '@web/server/tenant/proxy-tenant-routing/proxy-tenant-routing';
 import { MOCK_ERROR } from '@web/testing/shared/error/fixtures';
 import { MOCK_TAG_SLUG } from '@web/testing/shared/tag/fixtures';
 import {
@@ -50,7 +50,7 @@ faker.seed(6012);
 
 const {
   resolveTenantRoutingMock,
-  resolveUncachedTenantMock,
+  resolveProxyTenantMock,
   getTenantTranslationMapMock,
   intlMock,
   isReaderAccountEnabledForTenantMock,
@@ -58,7 +58,7 @@ const {
 } = vi.hoisted(() => ({
   isReaderAccountEnabledForTenantMock: vi.fn(),
   resolveTenantRoutingMock: vi.fn(),
-  resolveUncachedTenantMock: vi.fn(),
+  resolveProxyTenantMock: vi.fn(),
   getTenantTranslationMapMock: vi.fn(),
   intlMock: vi.fn(),
   env: {
@@ -73,9 +73,9 @@ vi.mock('next-intl/middleware', () => ({
     intlMock(request, routing),
 }));
 
-vi.mock('@web/server/tenant/resolve-tenant/resolve-tenant', () => ({
+vi.mock('@web/server/tenant/proxy-tenant-routing/proxy-tenant-routing', () => ({
   resolveTenantRouting: resolveTenantRoutingMock,
-  resolveUncachedTenant: resolveUncachedTenantMock,
+  resolveProxyTenant: resolveProxyTenantMock,
 }));
 
 vi.mock(
@@ -695,10 +695,8 @@ describe(proxy, () => {
       resolveTenantRoutingMock.mockResolvedValue(
         tenantRouting(EN, [EN, NL], MOCK_OPERATOR_SUSPENDED_TENANT),
       );
-      resolveUncachedTenantMock.mockReset();
-      resolveUncachedTenantMock.mockResolvedValue(
-        MOCK_OPERATOR_SUSPENDED_TENANT,
-      );
+      resolveProxyTenantMock.mockReset();
+      resolveProxyTenantMock.mockResolvedValue(MOCK_OPERATOR_SUSPENDED_TENANT);
       isReaderAccountEnabledForTenantMock.mockResolvedValue(false);
     });
 
@@ -739,9 +737,7 @@ describe(proxy, () => {
 
         expect(response.status).toBe(HTTP_STATUS.SERVICE_UNAVAILABLE);
         expect(response.headers.get(NEXT_HEADER)).toBeNull();
-        expect(resolveUncachedTenantMock).toHaveBeenCalledWith(
-          MOCK_TENANT_HOST,
-        );
+        expect(resolveProxyTenantMock).toHaveBeenCalledWith(MOCK_TENANT_HOST);
       },
     );
 
@@ -751,28 +747,26 @@ describe(proxy, () => {
       routes.newsletterResult(NEWSLETTER_RESULT.UNSUBSCRIBE_INVALID),
       routes.newsletterResult(NEWSLETTER_RESULT.UNSUBSCRIBE_FAILED),
       `${DUTCH_PREFIX}${routes.newsletterUnsubscribeConfirmation()}`,
-    ])('keeps the unsubscribe page %s reachable', async (path) => {
+      ACCOUNT_PATH,
+      DUTCH_ACCOUNT_PATH,
+    ])('keeps the reader self-service page %s reachable', async (path) => {
       const response = await visit(path);
 
       expect(response.status).not.toBe(HTTP_STATUS.SERVICE_UNAVAILABLE);
       expect(response.headers.get(REWRITE_HEADER)).not.toBeNull();
     });
 
-    it.each([ACCOUNT_PATH, DUTCH_ACCOUNT_PATH])(
-      'keeps the account page %s reachable',
+    it.each([
+      `${ACCOUNT_PATH}${BLOG_PATH}`,
+      routes.newsletterResult(NEWSLETTER_RESULT.CONFIRMED),
+    ])(
+      'still answers %s, outside reader self-service, with the unavailable page',
       async (path) => {
         const response = await visit(path);
 
-        expect(response.status).not.toBe(HTTP_STATUS.SERVICE_UNAVAILABLE);
-        expect(response.headers.get(REWRITE_HEADER)).not.toBeNull();
+        expect(response.status).toBe(HTTP_STATUS.SERVICE_UNAVAILABLE);
       },
     );
-
-    it('still answers a page under the account path with the unavailable page', async () => {
-      const response = await visit(`${ACCOUNT_PATH}${BLOG_PATH}`);
-
-      expect(response.status).toBe(HTTP_STATUS.SERVICE_UNAVAILABLE);
-    });
 
     describe('when the site has reader accounts', () => {
       beforeEach(() => {
@@ -806,14 +800,6 @@ describe(proxy, () => {
       expect(body).not.toContain('<a ');
     });
 
-    it('still answers another newsletter page with the unavailable page', async () => {
-      const response = await visit(
-        routes.newsletterResult(NEWSLETTER_RESULT.CONFIRMED),
-      );
-
-      expect(response.status).toBe(HTTP_STATUS.SERVICE_UNAVAILABLE);
-    });
-
     it('serves the site of a tenant suspended for inactivity', async () => {
       resolveTenantRoutingMock.mockResolvedValue(
         tenantRouting(EN, [EN], MOCK_INACTIVITY_SUSPENDED_TENANT),
@@ -827,7 +813,7 @@ describe(proxy, () => {
     it.each([SITEMAP_PATH, NEWSLETTER_CONFIRM_PATH])(
       'passes %s through for a tenant suspended for inactivity',
       async (path) => {
-        resolveUncachedTenantMock.mockResolvedValue(
+        resolveProxyTenantMock.mockResolvedValue(
           MOCK_INACTIVITY_SUSPENDED_TENANT,
         );
 
@@ -842,7 +828,7 @@ describe(proxy, () => {
     );
 
     it('answers service unavailable and logs once when the sitemap lookup fails', async () => {
-      resolveUncachedTenantMock.mockRejectedValue(MOCK_ERROR);
+      resolveProxyTenantMock.mockRejectedValue(MOCK_ERROR);
 
       const response = await visit(SITEMAP_PATH);
 

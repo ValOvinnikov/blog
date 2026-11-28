@@ -8,7 +8,10 @@ import {
   TENANT_UNRESOLVED_REASON,
   WHOLE_SITE_PURGE_ARGS,
 } from '@web/constants/revalidate';
+import { REVALIDATE_SITE_CONFIG_LOG } from '@web/constants/revalidate-site-config';
 import { resolveTenantSitePaths } from '@web/server/revalidate/resolve-tenant-site-paths/resolve-tenant-site-paths';
+import { expireProxyTenantCache } from '@web/server/tenant/proxy-tenant-cache/proxy-tenant-cache';
+import { MOCK_ERROR } from '@web/testing/shared/error/fixtures';
 import {
   MOCK_OTHER_TENANT_ID,
   MOCK_TENANT_ID,
@@ -47,6 +50,8 @@ vi.mock('@shinefold/db', () => ({
 }));
 
 vi.mock('@web/utils/env/env', () => ({ env: envMock }));
+
+vi.mock('@web/server/tenant/proxy-tenant-cache/proxy-tenant-cache');
 
 vi.mock(
   '@web/server/revalidate/resolve-tenant-site-paths/resolve-tenant-site-paths',
@@ -96,6 +101,7 @@ describe(POST, () => {
       mockTenant({ id: MOCK_OTHER_TENANT_ID }),
     ]);
     vi.mocked(logger.warn).mockReset();
+    vi.mocked(expireProxyTenantCache).mockClear();
     vi.mocked(resolveTenantSitePaths).mockResolvedValue(
       okResult(MOCK_TENANT_PATHS),
     );
@@ -123,11 +129,35 @@ describe(POST, () => {
     expect(listTenantsMock).not.toHaveBeenCalled();
   });
 
-  it('purges only the given tenant’s own paths', async () => {
+  it('expires every tenant’s proxy routing entries when no tenantId is given', async () => {
+    await POST(makeRequest(BEARER_SECRET));
+
+    expect(expireProxyTenantCache).toHaveBeenCalledWith([
+      MOCK_TENANT_ID,
+      MOCK_OTHER_TENANT_ID,
+    ]);
+  });
+
+  it('fails and logs when the proxy routing entries cannot be expired', async () => {
+    vi.mocked(expireProxyTenantCache).mockRejectedValueOnce(MOCK_ERROR);
+
+    const response = await POST(
+      makeRequest(BEARER_SECRET, JSON.stringify({ tenantId: MOCK_TENANT_ID })),
+    );
+
+    expect(response.status).toBe(HTTP_STATUS.INTERNAL_SERVER_ERROR);
+    expect(logger.error).toHaveBeenCalledWith(
+      REVALIDATE_SITE_CONFIG_LOG.PROXY_TENANT_CACHE_EXPIRE_FAILED,
+      { tenantId: MOCK_TENANT_ID, error: MOCK_ERROR },
+    );
+  });
+
+  it('purges only the given tenant’s own paths and proxy routing entries', async () => {
     await POST(
       makeRequest(BEARER_SECRET, JSON.stringify({ tenantId: MOCK_TENANT_ID })),
     );
 
+    expect(expireProxyTenantCache).toHaveBeenCalledWith([MOCK_TENANT_ID]);
     expect(resolveTenantSitePaths).toHaveBeenCalledWith(MOCK_TENANT_ID);
     expect(revalidatePathMock.mock.calls).toEqual(
       MOCK_TENANT_PATHS.map((path) => [path]),
@@ -232,5 +262,6 @@ describe(POST, () => {
     expect(response.status).toBe(HTTP_STATUS.INTERNAL_SERVER_ERROR);
     expect(revalidateTagMock).not.toHaveBeenCalled();
     expect(revalidatePathMock).not.toHaveBeenCalled();
+    expect(expireProxyTenantCache).not.toHaveBeenCalled();
   });
 });

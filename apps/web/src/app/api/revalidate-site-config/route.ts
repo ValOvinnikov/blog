@@ -1,10 +1,15 @@
 import { HTTP_STATUS, type TMaybeUndefined } from '@shinefold/config';
 import { queries } from '@shinefold/db';
 import { isSecretMatch } from '@shinefold/utils';
-import { hasLength, isNull, isString } from '@shinefold/utils/primitives';
+import {
+  hasLength,
+  isPlainObject,
+  isString,
+} from '@shinefold/utils/primitives';
 import { REVALIDATE_SITE_CONFIG_LOG } from '@web/constants/revalidate-site-config';
 import { purgeDerivedPaths } from '@web/server/revalidate/purge-derived-paths/purge-derived-paths';
 import { resolveTenantSitePaths } from '@web/server/revalidate/resolve-tenant-site-paths/resolve-tenant-site-paths';
+import { expireProxyTenantCache } from '@web/server/tenant/proxy-tenant-cache/proxy-tenant-cache';
 import { env } from '@web/utils/env/env';
 import { logger } from '@web/utils/logger/logger';
 import {
@@ -33,10 +38,10 @@ const parseTenantId = async (
 ): Promise<TMaybeUndefined<string>> => {
   try {
     const body: unknown = await request.json();
-    if (typeof body !== 'object' || isNull(body)) {
+    if (!isPlainObject(body)) {
       return undefined;
     }
-    const tenantId = (body as Record<string, unknown>)['tenantId'];
+    const tenantId = body['tenantId'];
     return isString(tenantId) && hasLength(tenantId) ? tenantId : undefined;
   } catch {
     return undefined;
@@ -89,6 +94,19 @@ export async function POST(request: Request): Promise<NextResponse> {
   purgeDerivedPaths(await resolveTenantSitePaths(requestedTenantId), {
     tenantId: requestedTenantId,
   });
+
+  try {
+    await expireProxyTenantCache(tenantIds);
+  } catch (error) {
+    logger.error(REVALIDATE_SITE_CONFIG_LOG.PROXY_TENANT_CACHE_EXPIRE_FAILED, {
+      tenantId: requestedTenantId,
+      error,
+    });
+    return NextResponse.json(
+      { message: 'Proxy tenant cache could not be expired.' },
+      { status: HTTP_STATUS.INTERNAL_SERVER_ERROR },
+    );
+  }
 
   return NextResponse.json(
     { revalidated: revalidatedTags, pathPurged: true },

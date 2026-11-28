@@ -1598,7 +1598,8 @@ renders in either role. Only the Console pair and the mono font preload. Fonts a
 woff2 files (SIL OFL, `OFL.txt` alongside) are committed beside each app's
 loaders, so no build fetches Google Fonts. `apps/web/src/proxy.ts` resolves the request's tenant from
 its `Host` header against `@shinefold/db`'s `tenant_domains`
-(`resolveTenantRouting()`, uncached, `apps/web/src/server/tenant/resolve-tenant/`), falling back to the
+(`resolveTenantRouting()`, `apps/web/src/server/tenant/proxy-tenant-routing/`, read through a
+per-project Vercel Runtime Cache entry that `/api/revalidate-site-config` expires), falling back to the
 sole `tenants` row outside production (`isProductionEnvironment()` — never
 `NODE_ENV`, which is `production` on every Vercel build including the live
 `web-dev` deployment) only for `localhost`, the `NEXT_PUBLIC_SITE_URL` host
