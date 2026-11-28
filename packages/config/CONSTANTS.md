@@ -1174,7 +1174,7 @@ Every key/value const an agent should reuse before writing a literal. The
 
 ### `@web/constants/proxy` — `apps/web/src/constants/proxy.ts`
 
-- **PROXY_LOG**: `TENANT_LOOKUP_FAILED`=`"proxy.tenant_lookup_failed"`
+- **PROXY_LOG**: `TENANT_LOOKUP_FAILED`=`"proxy.tenant_lookup_failed"`, `TENANT_CACHE_READ_FAILED`=`"proxy.tenant_cache_read_failed"`, `TENANT_CACHE_WRITE_FAILED`=`"proxy.tenant_cache_write_failed"`
 
 ### `@web/constants/request-context` — `apps/web/src/constants/request-context.ts`
 
@@ -1186,7 +1186,7 @@ Every key/value const an agent should reuse before writing a literal. The
 
 ### `@web/constants/revalidate-site-config` — `apps/web/src/constants/revalidate-site-config.ts`
 
-- **REVALIDATE_SITE_CONFIG_LOG**: `SECRET_MISSING`=`"revalidate_site_config.secret_missing"`
+- **REVALIDATE_SITE_CONFIG_LOG**: `SECRET_MISSING`=`"revalidate_site_config.secret_missing"`, `PROXY_TENANT_CACHE_EXPIRE_FAILED`=`"revalidate_site_config.proxy_tenant_cache_expire_failed"`
 
 ### `@web/constants/revalidate` — `apps/web/src/constants/revalidate.ts`
 

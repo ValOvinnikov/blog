@@ -1,5 +1,5 @@
 import { HTTP_STATUS, type TMaybeUndefined } from '@shinefold/config';
-import type { TTenantRouting } from '@web/server/tenant/resolve-tenant/resolve-tenant';
+import type { TTenantRouting } from '@web/server/tenant/proxy-tenant-routing/proxy-tenant-routing';
 import { NextResponse, type NextRequest } from 'next/server';
 
 export const redirectToMainAddress = (

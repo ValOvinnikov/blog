@@ -1,7 +1,7 @@
 import { LOCALE_BCP47_TAGS, routes } from '@shinefold/config';
 import { localeForPrefix } from '@web/i18n/routing';
 import { isReaderAccountEnabledForTenant } from '@web/server/settings-features/is-reader-account-enabled/is-reader-account-enabled';
-import type { TTenantRouting } from '@web/server/tenant/resolve-tenant/resolve-tenant';
+import type { TTenantRouting } from '@web/server/tenant/proxy-tenant-routing/proxy-tenant-routing';
 import { siteUnavailablePage } from '@web/utils/site-unavailable-response';
 import type { NextResponse } from 'next/server';
 

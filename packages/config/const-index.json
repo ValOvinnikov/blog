@@ -13526,6 +13526,22 @@
         "file": "apps/web/src/constants/proxy.ts"
       }
     ],
+    "proxy.tenant_cache_read_failed": [
+      {
+        "ref": "PROXY_LOG.TENANT_CACHE_READ_FAILED",
+        "scope": "app:web",
+        "from": "@web/constants/proxy",
+        "file": "apps/web/src/constants/proxy.ts"
+      }
+    ],
+    "proxy.tenant_cache_write_failed": [
+      {
+        "ref": "PROXY_LOG.TENANT_CACHE_WRITE_FAILED",
+        "scope": "app:web",
+        "from": "@web/constants/proxy",
+        "file": "apps/web/src/constants/proxy.ts"
+      }
+    ],
     "request_context.not_found_tenant_load_failed": [
       {
         "ref": "REQUEST_CONTEXT_LOG.NOT_FOUND_TENANT_LOAD_FAILED",
@@ -13545,6 +13561,14 @@
     "revalidate_site_config.secret_missing": [
       {
         "ref": "REVALIDATE_SITE_CONFIG_LOG.SECRET_MISSING",
+        "scope": "app:web",
+        "from": "@web/constants/revalidate-site-config",
+        "file": "apps/web/src/constants/revalidate-site-config.ts"
+      }
+    ],
+    "revalidate_site_config.proxy_tenant_cache_expire_failed": [
+      {
+        "ref": "REVALIDATE_SITE_CONFIG_LOG.PROXY_TENANT_CACHE_EXPIRE_FAILED",
         "scope": "app:web",
         "from": "@web/constants/revalidate-site-config",
         "file": "apps/web/src/constants/revalidate-site-config.ts"

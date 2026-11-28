@@ -48,6 +48,8 @@ export const env = createEnv({
     // @env-optional
     VERCEL_ENV: z.enum(['production', 'preview', 'development']).optional(),
     // @env-optional
+    VERCEL_PROJECT_ID: z.string().min(1).optional(),
+    // @env-optional
     PERSONAL_DATA_ENCRYPTION_KEY: z
       .string()
       .refine(isPersonalDataKeyring, PERSONAL_DATA_KEYRING_FORMAT)
@@ -94,6 +96,7 @@ export const env = createEnv({
     LOKI_USER: process.env.LOKI_USER,
     LOKI_TOKEN: process.env.LOKI_TOKEN,
     VERCEL_ENV: process.env.VERCEL_ENV,
+    VERCEL_PROJECT_ID: process.env.VERCEL_PROJECT_ID,
     PERSONAL_DATA_ENCRYPTION_KEY: process.env.PERSONAL_DATA_ENCRYPTION_KEY,
     PERSONAL_DATA_INDEX_KEY: process.env.PERSONAL_DATA_INDEX_KEY,
     NEWSLETTER_UNSUBSCRIBE_KEY: process.env.NEWSLETTER_UNSUBSCRIBE_KEY,

@@ -24,7 +24,7 @@ import { isSuspensionExemptPagePath } from '@web/server/tenant/operator-suspensi
 import {
   resolveTenantRouting,
   type TTenantRouting,
-} from '@web/server/tenant/resolve-tenant/resolve-tenant';
+} from '@web/server/tenant/proxy-tenant-routing/proxy-tenant-routing';
 import { getDecodedFirstPathSegment } from '@web/utils/get-decoded-first-path-segment';
 import { isPlatformFallbackHost } from '@web/utils/is-platform-fallback-host';
 import { logger } from '@web/utils/logger/logger';

@@ -5,6 +5,7 @@ import { hasLength, isNull, isString } from '@shinefold/utils/primitives';
 import { REVALIDATE_SITE_CONFIG_LOG } from '@web/constants/revalidate-site-config';
 import { purgeDerivedPaths } from '@web/server/revalidate/purge-derived-paths/purge-derived-paths';
 import { resolveTenantSitePaths } from '@web/server/revalidate/resolve-tenant-site-paths/resolve-tenant-site-paths';
+import { expireProxyTenantCache } from '@web/server/tenant/proxy-tenant-cache/proxy-tenant-cache';
 import { env } from '@web/utils/env/env';
 import { logger } from '@web/utils/logger/logger';
 import {
@@ -89,6 +90,19 @@ export async function POST(request: Request): Promise<NextResponse> {
   purgeDerivedPaths(await resolveTenantSitePaths(requestedTenantId), {
     tenantId: requestedTenantId,
   });
+
+  try {
+    await expireProxyTenantCache(tenantIds);
+  } catch (error) {
+    logger.error(REVALIDATE_SITE_CONFIG_LOG.PROXY_TENANT_CACHE_EXPIRE_FAILED, {
+      tenantId: requestedTenantId,
+      error,
+    });
+    return NextResponse.json(
+      { message: 'Proxy tenant cache could not be expired.' },
+      { status: HTTP_STATUS.INTERNAL_SERVER_ERROR },
+    );
+  }
 
   return NextResponse.json(
     { revalidated: revalidatedTags, pathPurged: true },

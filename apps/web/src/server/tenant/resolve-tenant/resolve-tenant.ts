@@ -1,6 +1,5 @@
 import {
   TENANT_CONFIG_REVALIDATE_SECONDS,
-  type TLocaleIsoCode,
   type TMaybeJsonDates,
   type TMaybeNull,
   type TMaybeUndefined,
@@ -11,22 +10,12 @@ import {
   TENANT_STATUS,
 } from '@shinefold/db';
 import type { TTenant } from '@shinefold/db/schema/tenants';
+import type { TResolvedHost } from '@web/server/tenant/proxy-tenant-cache/proxy-tenant-cache';
 import { reviveCachedTenant } from '@web/server/tenant/revive-cached-tenant/revive-cached-tenant';
-import { selectProxyTenantLiveLocales } from '@web/server/tenant/tenant-live-locales/tenant-live-locales';
 import { isPlatformFallbackHost } from '@web/utils/is-platform-fallback-host';
 import { isProductionEnvironment } from '@web/utils/is-production-environment';
 import { TENANT_BY_HOST_CACHE_TAG } from '@web/utils/tenant-cache-tags';
 import { unstable_cache } from 'next/cache';
-
-export type TTenantRouting = {
-  tenant: TTenant;
-  tenantId: string;
-  defaultLocale: TLocaleIsoCode;
-  liveLocales: TLocaleIsoCode[];
-  isSecondaryHost: boolean;
-};
-
-type TResolvedHost = { tenant: TTenant; isOwnHost: boolean };
 
 /** Only production requires READY: local/dev rows predate `provisioningStatus`. */
 export const isTenantServable = (tenant: TTenant): boolean => {
@@ -51,7 +40,7 @@ const resolveSoleTenant = async (): Promise<TMaybeUndefined<TTenant>> => {
   return tenant && isTenantServable(tenant) ? tenant : undefined;
 };
 
-const resolveServableHost = async (
+export const resolveServableHost = async (
   host: TMaybeNull<string>,
 ): Promise<TMaybeUndefined<TResolvedHost>> => {
   const tenant = host
@@ -67,18 +56,12 @@ const resolveServableHost = async (
   return soleTenant && { tenant: soleTenant, isOwnHost: false };
 };
 
-// The proxy reads this, never the cached lookup: Next gives the proxy its own cache, which `revalidateTag` in a route handler never purges.
-export const resolveUncachedTenant = async (
-  host: TMaybeNull<string>,
-): Promise<TMaybeUndefined<TTenant>> =>
-  (await resolveServableHost(host))?.tenant;
-
 class UnresolvedHostError extends Error {}
 
 const resolveServableTenantOrThrow = async (
   host: TMaybeNull<string>,
 ): Promise<TMaybeJsonDates<TTenant>> => {
-  const tenant = await resolveUncachedTenant(host);
+  const tenant = (await resolveServableHost(host))?.tenant;
   if (!tenant) throw new UnresolvedHostError();
   return tenant;
 };
@@ -116,24 +99,4 @@ export const resolveTenantId = async (
 ): Promise<TMaybeUndefined<string>> => {
   const tenant = await resolveTenant(host);
   return tenant?.id;
-};
-
-export const resolveTenantRouting = async (
-  host: TMaybeNull<string>,
-): Promise<TMaybeUndefined<TTenantRouting>> => {
-  const resolved = await resolveServableHost(host);
-
-  if (!resolved) {
-    return undefined;
-  }
-
-  const { tenant, isOwnHost } = resolved;
-
-  return {
-    tenant,
-    tenantId: tenant.id,
-    defaultLocale: tenant.locale,
-    liveLocales: await selectProxyTenantLiveLocales(tenant),
-    isSecondaryHost: isOwnHost && host !== tenant.primaryDomain,
-  };
 };

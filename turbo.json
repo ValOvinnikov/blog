@@ -46,6 +46,7 @@
         "LOKI_USER",
         "LOKI_TOKEN",
         "VERCEL_ENV",
+        "VERCEL_PROJECT_ID",
         "MAGIC_LINK_FROM_ADDRESS",
         "TENANT_TOKEN_ENCRYPTION_KEY",
         "TENANT_OAUTH_ENCRYPTION_KEY",

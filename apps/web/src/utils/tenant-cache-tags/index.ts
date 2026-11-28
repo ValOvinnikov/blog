@@ -1,4 +1,5 @@
 export {
+  buildProxyTenantCacheTag,
   buildSettingsFeaturesCacheTag,
   buildSiteConfigCacheTag,
   buildTenantPlanCacheTag,

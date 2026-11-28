@@ -2,7 +2,7 @@ import { HTTP_STATUS } from '@shinefold/config';
 import { PROXY_LOG } from '@web/constants/proxy';
 import { TENANT_ID_HEADER } from '@web/server/tenant/constants/constants';
 import { isOperatorSuspended } from '@web/server/tenant/operator-suspension/operator-suspension';
-import { resolveUncachedTenant } from '@web/server/tenant/resolve-tenant/resolve-tenant';
+import { resolveProxyTenant } from '@web/server/tenant/proxy-tenant-routing/proxy-tenant-routing';
 import { logger } from '@web/utils/logger/logger';
 import { siteUnavailableStatus } from '@web/utils/site-unavailable-response';
 import { NextResponse, type NextRequest } from 'next/server';
@@ -15,7 +15,7 @@ export const passThroughUnlessOperatorSuspended = async (
   const host = request.headers.get('host');
 
   try {
-    const tenant = await resolveUncachedTenant(host);
+    const tenant = await resolveProxyTenant(host);
     if (tenant && isOperatorSuspended(tenant)) return siteUnavailableStatus();
   } catch (error) {
     logger.error(PROXY_LOG.TENANT_LOOKUP_FAILED, { host, error });
